@@ -52,11 +52,8 @@ export const getUsersFake = async () => {
 
 export const getUser = async (idUsuario: number) => {
   try {
-    console.log(idUsuario)
     const url = `${apiUrl}/${idUsuario}`;
-    console.log(url)
     const response = await axios.get(url);
-    console.log(response.data)
 
     if (response.status === 200) {
       return response.data;

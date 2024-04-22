@@ -4,26 +4,30 @@
       <form @submit.prevent="login">
         <div class="form-group">
           <label for="email">Correo electrónico:</label>
-          <input type="email" id="email" v-model="email" required>
+          <input type="email" id="email" v-model="objLogin.correo" required>
         </div>
         <div class="form-group">
           <label for="password">Contraseña:</label>
-          <input type="password" id="password" v-model="password" required>
+          <input type="password" id="password" v-model="objLogin.pass" required>
         </div>
         <button type="submit">Iniciar sesión</button>
         <button type="button" @click="goToRegistration">Registro</button>
       </form>
     </div>
   </template>
+
+  
   
   <script setup lang="ts">
-    import { ref } from 'vue';
+    import { Ref, ref } from 'vue';
     import { useRouter } from 'vue-router';
     import { Login } from '@/interfaces/Login';
-    import {getUsers} from '@services/UsuariosService';
+
+    const objLogin = ref<Login>({
+      correo: "",
+      pass: ''
+    })
   
-    const email = ref('');
-    const password = ref('');
     const router = useRouter();
 
     const credenciales: Login = {
@@ -32,7 +36,7 @@
     }
   
     const login = () => {
-      if(email.value===credenciales.correo && password.value === credenciales.pass){
+      if(objLogin.value.correo===credenciales.correo && objLogin.value.pass === credenciales.pass){
         puedesPasar();
       }
       else{
@@ -41,7 +45,7 @@
     };
 
     const puedesPasar = () => {
-        router.push('/incio'); 
+        alert("Puedes pasar") 
     };
 
   
@@ -76,6 +80,7 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 3px;
+      color:#0056b3
     }
   
     button {
