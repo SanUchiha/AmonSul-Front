@@ -5,9 +5,8 @@
     <thead>
       <tr>
         <th class="text-center">id</th>
-        <th class="text-center">Nombre</th>
-        <th class="text-center">Nick</th>
         <th class="text-center">Correo</th>
+        <th class="text-center">Password</th>
       </tr>
     </thead>
     <tbody>
@@ -16,11 +15,10 @@
         <td>
           <router-link
             :to="{ name: 'detalle-jugador', params: { idJugador: item.id } }"
-            >{{ item.name }}</router-link
+            >{{ item.correo }}</router-link
           >
         </td>
-        <td>{{ item.username }}</td>
-        <td>{{ item.email }}</td>
+        <td>{{ item.password }}</td>
       </tr>
     </tbody>
   </v-table>

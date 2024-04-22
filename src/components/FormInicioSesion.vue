@@ -15,34 +15,22 @@
       </form>
     </div>
   </template>
-
-  
   
   <script setup lang="ts">
     import { Ref, ref } from 'vue';
     import { useRouter } from 'vue-router';
     import { Login } from '@/interfaces/Login';
+    import { doLogin } from '@/services/UsuariosService';
 
     const objLogin = ref<Login>({
       correo: "",
       pass: ''
     })
-  
     const router = useRouter();
-
-    const credenciales: Login = {
-        correo:"123@123.com",
-        pass:"123"
-    }
   
-    const login = () => {
-      if(objLogin.value.correo===credenciales.correo && objLogin.value.pass === credenciales.pass){
-        puedesPasar();
-      }
-      else{
-        alert("Has introducido mal las credenciales")
-      }
-    };
+    const login = async () => {
+      doLogin(objLogin.value.correo, objLogin.value.pass);
+    }
 
     const puedesPasar = () => {
         alert("Puedes pasar") 

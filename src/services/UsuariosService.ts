@@ -1,36 +1,7 @@
 import axios from "axios";
 
-const apiUrl = "https://jsonplaceholder.typicode.com/users";
+const apiUrl = "https://localhost:7125/api/Usuario";
 
-/*
-const usuarios: Usuario[] = [
-  {
-    nombre: "Jose Antonio Sanchez Molina",
-    correo: "123@123.com",
-    pass: "123",
-  },
-  {
-    nombre: "María García",
-    correo: "maria@example.com",
-    pass: "password456",
-  },
-  {
-    nombre: "Pedro Rodríguez",
-    correo: "pedro@example.com",
-    pass: "secreto789",
-  },
-  {
-    nombre: "Ana Martínez",
-    correo: "ana@example.com",
-    pass: "clave987",
-  },
-  {
-    nombre: "Luisa Sánchez",
-    correo: "luisa@example.com",
-    pass: "pass1234",
-  },
-];
-*/
 export const getUsers = async () => {
   try {
     const response = await axios.get(apiUrl);
@@ -46,8 +17,18 @@ export const getUsers = async () => {
   }
 };
 
-export const getUsersFake = async () => {
-  //return usuarios;
+export const doLogin = async (correo: string, password: string) => {
+  axios
+    .post(apiUrl, {
+      correo: correo,
+      password: password,
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 };
 
 export const getUser = async (idUsuario: number) => {

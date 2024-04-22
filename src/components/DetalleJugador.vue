@@ -4,9 +4,8 @@
 
     <div v-if="jugador">
       <p><strong>ID:</strong> {{ jugador.id }}</p>
-      <p><strong>Nombre:</strong> {{ jugador.name }}</p>
-      <p><strong>Nombre de usuario:</strong> {{ jugador.username }}</p>
-      <p><strong>Email:</strong> {{ jugador.email }}</p>
+      <p><strong>Nombre:</strong> {{ jugador.correo }}</p>
+      <p><strong>Nombre de usuario:</strong> {{ jugador.password }}</p>
     </div>
   </div>
 </template>
@@ -19,9 +18,8 @@ import { IUsuario } from '@/interfaces/Usuario';
 
 const jugador = ref<IUsuario>({
   id: 0,
-  name: '',
-  username: '',
-  email: ''
+  correo:"",
+  password:""  
 });
 
 onMounted(async () => {
