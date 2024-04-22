@@ -15,7 +15,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
   {
-    path: "/detalle-jugador/:id",
+    path: "/detalle-jugador/:idJugador",
     name: "detalle-jugador",
     component: DetalleJugadorView,
     props: true,
@@ -31,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
     component: DetalleTorneoView,
   },
   {
-    path: "/detalle-torneo-live/:idTorneo",
+    path: "/detalle-torneo-live/:idTorneoLive",
     name: "detalle-torneo-live",
     component: DetalleToneoLiveView,
   },
@@ -59,7 +59,9 @@ const routes: Array<RouteRecordRaw> = [
   },
 
   { path: "/torneos", name: "torneos", component: TorneosView },
-  { path: "/", redirect: "/inicio" },
+  { path: "/",
+    redirect: to => { return { name: 'inicio'} }
+  },
 ];
 
 const router = createRouter({

@@ -14,7 +14,10 @@
       <tr v-for="item in usuarios" :key="item.id">
         <td>{{ item.id }}</td>
         <td>
-          <router-link :to="{ name: 'detalle-jugador', params:{id:item.id}}">{{ item.name }}</router-link>
+          <router-link
+            :to="{ name: 'detalle-jugador', params: { idJugador: item.id } }"
+            >{{ item.name }}</router-link
+          >
         </td>
         <td>{{ item.username }}</td>
         <td>{{ item.email }}</td>
@@ -24,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { IUsuario } from '@/interfaces/Usuario';
-import { onMounted, ref } from 'vue';
-import { getUsers } from '../services/UsuariosService';
+import { IUsuario } from "@/interfaces/Usuario";
+import { onMounted, ref } from "vue";
+import { getUsers } from "../services/UsuariosService";
 
 const usuarios = ref<IUsuario[]>([]);
 

@@ -1,17 +1,20 @@
-<template>
-    hola
-</template>
+<template>componente con la info del jugador</template>
 
 <script setup lang="ts">
+import { IUsuario } from "@/interfaces/Usuario";
+import { onMounted, ref, defineProps } from "vue";
+import { getUser } from "../services/UsuariosService";
 
-import { IUsuario } from '@/interfaces/Usuario';
-import { DefineProps } from 'vue';
+const usuario = ref<IUsuario>();
+
 const props = defineProps<{
-  usuario: IUsuario;
+  id: number;
 }>();
 
+onMounted(async () => {
+  usuario.value = await getUser(props.id);
+  console.log(props.id);
+});
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -49,3 +49,22 @@ export const getUsers = async () => {
 export const getUsersFake = async () => {
   //return usuarios;
 };
+
+export const getUser = async (idUsuario: number) => {
+  try {
+    console.log(idUsuario)
+    const url = `${apiUrl}/${idUsuario}`;
+    console.log(url)
+    const response = await axios.get(url);
+    console.log(response.data)
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("No se pudo obtener la información del usuario");
+    }
+  } catch (error) {
+    console.error("Error al obtener la información de los usuarios:", error);
+    return null;
+  }
+};
