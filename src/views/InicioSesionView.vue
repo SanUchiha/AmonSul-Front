@@ -1,7 +1,9 @@
 <template>
-  <div>vista de inicio de sesion</div>
+  <FormInicioSesion/>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import FormInicioSesion from "../components/FormInicioSesion.vue";
+</script>
 
 <style scoped></style>

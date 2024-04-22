@@ -1,7 +1,10 @@
 <template>
-  <div>vista de registro de usuario</div>
+  <FormRegistroUsuario/>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import FormRegistroUsuario from "../components/FormRegistroUsuario.vue";
+
+</script>
 
 <style scoped></style>
