@@ -1,7 +1,5 @@
 Entidades:
 
-
-
 Usuario:
 ID_Usuario (PK)
 Nombre_Usuario
@@ -12,12 +10,14 @@ Contraseña
 Rol --> enum: Jugador, Admin
 Nick
 Ciudad
-Nombre_Grupo (FK) de Grupo_Usuario
+ID_Faccion (FK) Faccion
+Fecha_Registro
+Fecha_Nacimiento
 
 
-Grupo_Usuario:
-Nombre_Grupo
-
+Faccion:
+ID_Faccion
+Nombre_Faccion
 
 
 Torneo:
@@ -34,7 +34,7 @@ Estado_Torneo --> enum: Esperando, live, terminado, cancelado
 Lugar_Torneo
 Tipo_Torneo
 Es_Privado_Torneo
-Rango_Torneo (FK) de Rangos_Torneo
+ID_Rango_Torneo (FK) de Rango_Torneo
 Es_Matched_Play_Torneo
 Fecha_Entrega_Listas
 Fecha_Fin_Inscripcion
@@ -61,7 +61,7 @@ Puntos_10
 
 
 Partida_Torneo:
-ID_Partida (PK)
+ID_Partida_Torneo (PK)
 ID_Torneo (FK) de Torneo
 ID_Usuario1 (FK) de Usuario 
 ID_Usuario2 (FK) de Usuario
@@ -71,15 +71,37 @@ Fecha_Partida
 Es_Matched_Play_Partida
 Escenario_Partida
 Puntos_Partida
+Ganador_Partida_Torneo
 
 
-Inscripción:
+Clasifiacion_Torneo
+ID_Clasificacion_Torneo (PK): Identificador único de la clasificación del torneo.
+ID_Torneo (FK): Clave externa que referencia al torneo al que pertenece la clasificación.
+ID_Usuario (FK): Clave externa que referencia al usuario que participó en el torneo.
+Posicion_Final: La posición final del usuario en el torneo.
+Puntos_Torneo: Los puntos obtenidos por el usuario en el torneo, si es aplicable.
+Puntos_Favor
+Puntos_contra
+Puntos_General
+
+
+
+Inscripcion_Torneo:
 ID_Inscripcion (PK)
 ID_Torneo (FK) de Torneo
 ID_Usuario (FK) de Usuario
-Estado_Inscripcion --> enum de estados: Esperando confirmacion, Confirmada, Pagada 
+Estado_Inscripcion --> enum: Esperando confirmacion, Confirmada, Pagada 
 Fecha_Inscripcion
+Estado_Lista --> enum: No entregada, Entregada, Ilegal, Corregida/OK.
+Fecha_lista_entregada
+Es_Pago
 
+
+Listas:
+ID_Lista (PK)
+ID_Inscripcion (FK) de Inscripcion_Torneo
+Lista
+Fecha_Entrega
 
 
 Comentario:
@@ -91,9 +113,9 @@ Comentario
 Fecha_Comentario
 
 
-
 Elo:
-ID_Usuario (PK, FK) de Usuario
+ID_Elo (PK)
+ID_Usuario (FK) de Usuario
 Puntuacion_Elo
 
 
@@ -104,17 +126,16 @@ Puntuacion_Total
 Puntuacion_Elo (FK) de Elo
 
 
-
 Ronda:
 ID_Ronda (PK)
 ID_Torneo (FK)
 Numero_Ronda
-Estado_Ronda
+Estado_Ronda --> emum: Sin comenzar, Live, Terminada
 Fecha_Inicio_Ronda
 Fecha_Fin_Ronda
 Hora_Inicio_Ronda
 Duracion_Ronda
-
+Escenario_Ronda
 
 
 Partida_Amistosa:
@@ -126,3 +147,5 @@ Resultado_Usuario2
 Fecha_Partida
 Es_Matched_Play_Partida
 Escenario_Partida
+Puntos_Partida
+Ganador_Partida 

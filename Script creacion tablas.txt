@@ -1,0 +1,183 @@
+CREATE TABLE Faccion (
+    ID_Faccion INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre_Faccion VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Usuario (
+    ID_Usuario INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre_Usuario VARCHAR(50) NOT NULL,
+    Primer_Apellido VARCHAR(50) NOT NULL,
+    Segundo_Apellido VARCHAR(50),
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    Contraseña VARCHAR(100) NOT NULL,
+    Rol ENUM('Jugador', 'Admin') NOT NULL,
+    Nick VARCHAR(50) UNIQUE NOT NULL,
+    Ciudad VARCHAR(100),
+    Fecha_Registro DATE NOT NULL,
+    Fecha_Nacimiento DATE NOT NULL,
+    ID_Faccion INT,
+    FOREIGN KEY (ID_Faccion) REFERENCES Faccion(ID_Faccion)
+);
+
+CREATE TABLE Rango_Torneo (
+    ID_Rango INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre_Rango VARCHAR(100) NOT NULL,
+    Puntos_1 INT NOT NULL,
+    Puntos_2 INT NOT NULL,
+    Puntos_3 INT NOT NULL,
+    Puntos_4 INT NOT NULL,
+    Puntos_5 INT NOT NULL,
+    Puntos_6 INT NOT NULL,
+    Puntos_7 INT NOT NULL,
+    Puntos_8 INT NOT NULL,
+    Puntos_9 INT NOT NULL,
+    Puntos_10 INT NOT NULL
+);
+
+CREATE TABLE Torneo (
+    ID_Torneo INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Usuario INT NOT NULL,
+    Nombre_Torneo VARCHAR(200) NOT NULL,
+    Descripcion_Torneo TEXT NOT NULL,
+    Limite_Participantes INT,
+    Fecha_Inicio_Torneo DATE NOT NULL,
+    Fecha_Fin_Torneo DATE NOT NULL,
+    Precio_Torneo INT NOT NULL,
+    Numero_Partidas INT NOT NULL,
+    Puntos_Torneo INT NOT NUll,
+    Estado_Torneo ENUM('Esperando', 'Live', 'Terminado', 'Cancelado') NOT NULL,
+    Lugar_Torneo VARCHAR(200) NOT NULL,
+    Tipo_Torneo VARCHAR(50),
+    Es_Privado_Torneo BOOLEAN NOT NULL,
+    Es_Liga BOOLEAN NOT NULL,
+    ID_Rango_Torneo INT,
+    Es_Matched_Play_Torneo BOOLEAN,
+    Fecha_Entrega_Listas DATE,
+    Fecha_Fin_Inscripcion DATE,
+    Bases_Torneo BLOB,
+    Cartel_Torneo TEXT,
+    Metodos_Pago TEXT,
+    Hora_Inicio_Torneo TIME,
+    Hora_Fin_Torneo TIME,
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuario(ID_Usuario),
+    FOREIGN KEY (ID_Rango_Torneo) REFERENCES Rango_Torneo(ID_Rango)
+);
+
+CREATE TABLE Partida_Torneo (
+    ID_Partida_Torneo INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Torneo INT,
+    ID_Usuario1 INT,
+    ID_Usuario2 INT,
+    Resultado_Usuario1 INT,
+    Resultado_Usuario2 INT,
+    Fecha_Partida DATETIME,
+    Es_Matched_Play_Partida BOOLEAN,
+    Escenario_Partida VARCHAR(150),
+    Puntos_Partida INT,
+    Ganador_Partida_Torneo INT,
+    FOREIGN KEY (ID_Torneo) REFERENCES Torneo(ID_Torneo),
+    FOREIGN KEY (ID_Usuario1) REFERENCES Usuario(ID_Usuario),
+    FOREIGN KEY (ID_Usuario2) REFERENCES Usuario(ID_Usuario),
+    CHECK (Resultado_Usuario1 >= 0 AND Resultado_Usuario2 >= 0),
+    CHECK (Ganador_Partida_Torneo IN (ID_Usuario1, ID_Usuario2))
+);
+
+CREATE TABLE Clasificacion_Torneo (
+    ID_Clasificacion_Torneo INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Torneo INT,
+    ID_Usuario INT,
+    Posicion_Final INT,
+    Puntos_Torneo INT,
+    Puntos_Favor INT,
+    Puntos_contra INT,
+    Puntos_General INT,
+    FOREIGN KEY (ID_Torneo) REFERENCES Torneo(ID_Torneo),
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuario(ID_Usuario)
+);
+
+CREATE TABLE Inscripcion_Torneo (
+    ID_Inscripcion INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Torneo INT,
+    ID_Usuario INT,
+    Estado_Inscripcion ENUM('Esperando confirmacion', 'Confirmada', 'Pagada'),
+    Fecha_Inscripcion DATE,
+    Estado_Lista ENUM('No entregada', 'Entregada', 'Ilegal', 'Corregida/OK'),
+    Fecha_Entrega_Lista DATE,
+    Es_Pago BOOLEAN,
+    FOREIGN KEY (ID_Torneo) REFERENCES Torneo(ID_Torneo),
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuario(ID_Usuario)
+);
+
+CREATE TABLE Lista (
+    ID_Lista INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Inscripcion INT,
+    Lista TEXT,
+    Fecha_Entrega DATE,
+    FOREIGN KEY (ID_Inscripcion) REFERENCES Inscripcion_Torneo(ID_Inscripcion)
+);
+
+CREATE TABLE Comentario (
+    ID_Comentario INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Torneo INT,
+    ID_Usuario INT,
+    Puntuar_Torneo ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10'),
+    Comentario TEXT,
+    Fecha_Comentario DATE,
+    FOREIGN KEY (ID_Torneo) REFERENCES Torneo(ID_Torneo),
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuario(ID_Usuario)
+);
+
+CREATE TABLE Elo (
+    ID_Elo INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Usuario INT,
+    Puntuacion_Elo INT,
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuario(ID_Usuario)
+);
+
+CREATE TABLE Clasificacion_General (
+    ID_Clasificacion INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Usuario INT,
+    Puntuacion_Total INT,
+    ID_Puntuacion_Elo INT,
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuario(ID_Usuario),
+    FOREIGN KEY (ID_Puntuacion_Elo) REFERENCES Elo(ID_Elo)
+);
+
+CREATE TABLE Ronda (
+    ID_Ronda INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Torneo INT,
+    Numero_Ronda INT,
+    Estado_Ronda ENUM('Sin comenzar', 'Live', 'Terminada'),
+    Fecha_Inicio_Ronda DATE,
+    Fecha_Fin_Ronda DATE,
+    Hora_Inicio_Ronda TIME,
+    Duracion_Ronda INT,
+    Escenario_Ronda VARCHAR(100),
+    FOREIGN KEY (ID_Torneo) REFERENCES Torneo(ID_Torneo)
+);
+
+CREATE TABLE Partida_Amistosa (
+    ID_Partida_Amistosa INT PRIMARY KEY AUTO_INCREMENT,
+    ID_Usuario1 INT,
+    ID_Usuario2 INT,
+    Resultado_Usuario1 INT,
+    Resultado_Usuario2 INT,
+    Fecha_Partida DATE,
+    Es_Matched_Play_Partida BOOLEAN,
+    Escenario_Partida VARCHAR(100),
+    Puntos_Partida INT,
+    Ganador_Partida INT,
+    Es_Elo BOOLEAN,
+    FOREIGN KEY (ID_Usuario1) REFERENCES Usuario(ID_Usuario),
+    FOREIGN KEY (ID_Usuario2) REFERENCES Usuario(ID_Usuario),
+    FOREIGN KEY (Ganador_Partida) REFERENCES Usuario(ID_Usuario),
+    CHECK (Resultado_Usuario1 >= 0 AND Resultado_Usuario2 >= 0),
+    CHECK (Ganador_Partida IN (ID_Usuario1, ID_Usuario2))
+);
+
+
+
+
+
+
+
