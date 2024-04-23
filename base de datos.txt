@@ -1,0 +1,128 @@
+Entidades:
+
+
+
+Usuario:
+ID_Usuario (PK)
+Nombre_Usuario
+Primer_Apellido
+Segundo_Apellido
+Email
+Contraseña
+Rol --> enum: Jugador, Admin
+Nick
+Ciudad
+Nombre_Grupo (FK) de Grupo_Usuario
+
+
+Grupo_Usuario:
+Nombre_Grupo
+
+
+
+Torneo:
+ID_Torneo (PK)
+ID_Usuario (FK) Usuario admin del torneo
+Nombre_Torneo
+Descripción_Torneo
+Fecha_Inicio_Torneo
+Fecha_Fin_Torneo
+Precio_Torneo
+Numero_Partidas
+Puntos_Torneo
+Estado_Torneo --> enum: Esperando, live, terminado, cancelado
+Lugar_Torneo
+Tipo_Torneo
+Es_Privado_Torneo
+Rango_Torneo (FK) de Rangos_Torneo
+Es_Matched_Play_Torneo
+Fecha_Entrega_Listas
+Fecha_Fin_Inscripcion
+Bases_Torneo
+Cartel_Torneo
+Metodos_Pago
+Hora_Inicio_Torneo
+Hora_Fin_Torneo
+
+
+Rango_Torneo:
+ID_Rango (PK)
+Nombre_Rango
+Puntos_1
+Puntos_2
+Puntos_3
+Puntos_4
+Puntos_5
+Puntos_6
+Puntos_7
+Puntos_8
+Puntos_9
+Puntos_10
+
+
+Partida_Torneo:
+ID_Partida (PK)
+ID_Torneo (FK) de Torneo
+ID_Usuario1 (FK) de Usuario 
+ID_Usuario2 (FK) de Usuario
+Resultado_Usuario1
+Resultado_Usuario2
+Fecha_Partida
+Es_Matched_Play_Partida
+Escenario_Partida
+Puntos_Partida
+
+
+Inscripción:
+ID_Inscripcion (PK)
+ID_Torneo (FK) de Torneo
+ID_Usuario (FK) de Usuario
+Estado_Inscripcion --> enum de estados: Esperando confirmacion, Confirmada, Pagada 
+Fecha_Inscripcion
+
+
+
+Comentario:
+ID_Comentario (PK)
+ID_Torneo (FK) de Torneo
+ID_Usuario (FK) de Usuario
+Puntuar_Torneo --> enum:1-10
+Comentario
+Fecha_Comentario
+
+
+
+Elo:
+ID_Usuario (PK, FK) de Usuario
+Puntuacion_Elo
+
+
+Clasificacion_General
+ID_Clasificacion (PK)
+ID_Usuario (FK) de Usuario
+Puntuacion_Total
+Puntuacion_Elo (FK) de Elo
+
+
+
+Ronda:
+ID_Ronda (PK)
+ID_Torneo (FK)
+Numero_Ronda
+Estado_Ronda
+Fecha_Inicio_Ronda
+Fecha_Fin_Ronda
+Hora_Inicio_Ronda
+Duracion_Ronda
+
+
+
+Partida_Amistosa:
+ID_Partida_Amistosa (PK)
+ID_Usuario1 (FK) de Usuario 
+ID_Usuario2 (FK) de Usuario
+Resultado_Usuario1
+Resultado_Usuario2
+Fecha_Partida
+Es_Matched_Play_Partida
+Escenario_Partida
