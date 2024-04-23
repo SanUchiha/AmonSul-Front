@@ -4,11 +4,11 @@
       <form @submit.prevent="login">
         <div class="form-group">
           <label for="email">Correo electrónico:</label>
-          <input type="email" id="email" v-model="email" required>
+          <input type="email" id="email" v-model="objLogin.correo" required>
         </div>
         <div class="form-group">
           <label for="password">Contraseña:</label>
-          <input type="password" id="password" v-model="password" required>
+          <input type="password" id="password" v-model="objLogin.pass" required>
         </div>
         <button type="submit">Iniciar sesión</button>
         <button type="button" @click="goToRegistration">Registro</button>
@@ -17,31 +17,23 @@
   </template>
   
   <script setup lang="ts">
-    import { ref } from 'vue';
+    import { Ref, ref } from 'vue';
     import { useRouter } from 'vue-router';
     import { Login } from '@/interfaces/Login';
-    import {getUsers} from '@services/UsuariosService';
-  
-    const email = ref('');
-    const password = ref('');
-    const router = useRouter();
+    import { doLogin } from '@/services/UsuariosService';
 
-    const credenciales: Login = {
-        correo:"123@123.com",
-        pass:"123"
-    }
+    const objLogin = ref<Login>({
+      correo: "",
+      pass: ''
+    })
+    const router = useRouter();
   
-    const login = () => {
-      if(email.value===credenciales.correo && password.value === credenciales.pass){
-        puedesPasar();
-      }
-      else{
-        alert("Has introducido mal las credenciales")
-      }
-    };
+    const login = async () => {
+      doLogin(objLogin.value.correo, objLogin.value.pass);
+    }
 
     const puedesPasar = () => {
-        router.push('/incio'); 
+        alert("Puedes pasar") 
     };
 
   
@@ -76,6 +68,7 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 3px;
+      color:#0056b3
     }
   
     button {
