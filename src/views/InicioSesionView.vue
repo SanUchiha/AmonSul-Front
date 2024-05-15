@@ -1,5 +1,5 @@
 <template>
-  <FormInicioSesion/>
+  <FormInicioSesion />
 </template>
 
 <script setup lang="ts">
