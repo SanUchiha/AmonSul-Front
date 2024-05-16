@@ -1,9 +1,11 @@
 <template>
-  <TablaUsuarios/>
+  <NavBar />
+  <TablaUsuarios />
 </template>
 
 <script setup lang="ts">
-import TablaUsuarios from '@/components/TablaUsuarios.vue';
+import NavBar from "@/components/NavBar.vue";
+import TablaUsuarios from "@/components/TablaUsuarios.vue";
 </script>
 
 <style scoped></style>

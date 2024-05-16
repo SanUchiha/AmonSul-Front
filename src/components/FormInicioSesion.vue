@@ -42,7 +42,6 @@ const goToLogin = () => {
     tempLogin.correo === objLogin.value.correo &&
     tempLogin.pass === objLogin.value.pass
   ) {
-    alert("login correcto");
     router.push("/inicio");
   } else {
     alert("Login incorrecto");

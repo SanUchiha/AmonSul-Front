@@ -60,7 +60,7 @@ const routes: Array<RouteRecordRaw> = [
 
   { path: "/torneos", name: "torneos", component: TorneosView },
   { path: "/",
-    redirect: to => { return { name: 'inicio'} }
+    redirect: to => { return { name: 'inicio-sesion'} }
   },
 ];
 
