@@ -1,7 +1,7 @@
 <template>
-  <v-card outlined class="torneo-card">
+  <v-card outlined class="jugador-card">
     <v-card-title>
-      {{ torneo.Nombre_Torneo }}
+      {{ jugador.Nombre_Torneo }}
     </v-card-title>
     <v-card-text>
       <p>{{ torneo.Descripción_Torneo }}</p>
@@ -24,15 +24,15 @@
 </template>
 
 <script setup lang="ts">
-import { ITorneo } from "@/interfaces/Torneo";
+import { IJugador } from "@/interfaces/Usuario";
 import { defineProps } from "vue";
 import { useRouter } from "vue-router";
 
-const props = defineProps<{ torneo: ITorneo }>();
+const props = defineProps<{ jugador: IJugador }>();
 const router = useRouter();
 
 const goToDetalle = () => {
-  router.push(`/detalle-torneo/${props.torneo.ID_Torneo}`);
+  router.push(`/detalle-jugador/${props.jugador.nick}`);
 };
 const formatDate = (date: Date) => {
   return new Date(date).toLocaleDateString();
@@ -40,7 +40,7 @@ const formatDate = (date: Date) => {
 </script>
 
 <style scoped>
-.torneo-card {
+.jugador-card {
   max-width: 100%;
   min-width: 300px;
   margin: 16px;

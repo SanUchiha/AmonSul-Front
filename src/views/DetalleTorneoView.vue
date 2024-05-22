@@ -2,6 +2,9 @@
   <div>
     <NavBar />
 
+    <!-- Botón para volver atrás -->
+    <v-btn @click="goBack" variant="tonal"> Atrás </v-btn>
+
     <!-- Contenido de la vista de detalle del torneo -->
     <div v-if="torneo">
       <h2>{{ torneo.Nombre_Torneo }}</h2>
@@ -36,6 +39,10 @@
         <strong>Horario:</strong> de {{ torneo.Hora_Inicio_Torneo }} a
         {{ torneo.Hora_Fin_Torneo }}
       </p>
+      <p>
+        <strong>Límite de plazas:</strong>
+        {{ torneo.Limite_Plazas ? torneo.Limite_Plazas : "No hay límite" }}
+      </p>
     </div>
 
     <div v-else>
@@ -46,22 +53,24 @@
 
 <script setup lang="ts">
 import NavBar from "@/components/NavBar.vue";
-import { Torneo } from "@/interfaces/Torneo";
+import { ITorneo } from "@/interfaces/Torneo";
 import { getTorneoByIdMock } from "@/services/TorneosService";
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
-let torneo = ref<Torneo>();
+const router = useRouter();
+let torneo = ref<ITorneo>();
 
 onMounted(async () => {
-  const idTorneo = Number(route.params.idTorneo); // Obtener el ID del torneo de los parámetros de la URL
+  const idTorneo = Number(route.params.idTorneo);
   torneo.value = await getTorneoByIdMock(idTorneo);
 });
-const formatDate = (date: string | number | Date) => {
-  const options = { year: "numeric", month: "numeric", day: "numeric" };
-  return new Date(date).toLocaleDateString();
-};
+
+const formatDate = (date: string | number | Date) =>
+  new Date(date).toLocaleDateString();
+
+const goBack = () => router.go(-1);
 </script>
 
 <style scoped>

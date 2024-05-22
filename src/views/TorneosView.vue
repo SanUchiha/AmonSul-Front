@@ -13,12 +13,12 @@
 
 <script setup lang="ts">
 import NavBar from "@/components/NavBar.vue";
-import { Torneo } from "@/interfaces/Torneo";
+import { ITorneo } from "@/interfaces/Torneo";
 import { getTorneosMock } from "@/services/TorneosService";
 import { onMounted, ref } from "vue";
 import TorneoCard from "@/components/Torneos/TorneoCard.vue";
 
-const listaTorneos = ref<Torneo[]>([]);
+const listaTorneos = ref<ITorneo[]>([]);
 
 onMounted(async () => {
   listaTorneos.value = await getTorneosMock();

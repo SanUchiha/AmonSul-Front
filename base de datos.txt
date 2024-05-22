@@ -43,6 +43,7 @@ Cartel_Torneo
 Metodos_Pago
 Hora_Inicio_Torneo
 Hora_Fin_Torneo
+Limite_Plazas
 
 
 Rango_Torneo:

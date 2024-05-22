@@ -1,4 +1,4 @@
-export interface Torneo {
+export interface ITorneo {
     ID_Torneo: number; // Identificador único del torneo (PK)
     ID_Usuario: number; // ID del usuario administrador del torneo (FK)
     Nombre_Torneo: string; // Nombre del torneo
@@ -8,7 +8,7 @@ export interface Torneo {
     Precio_Torneo: number; // Precio del torneo
     Numero_Partidas: number; // Número de partidas del torneo
     Puntos_Torneo: number; // Puntos asignados al torneo
-    Estado_Torneo: 'Esperando' | 'live' | 'terminado' | 'cancelado'; // Estado del torneo (enum)
+    Estado_Torneo: 'ESPERANDO' | 'LIVE' | 'TERMINADO' | 'CANCELADO'; // Estado del torneo (enum)
     Lugar_Torneo: string; // Lugar donde se llevará a cabo el torneo
     Tipo_Torneo: string; // Tipo de torneo
     Es_Privado_Torneo: boolean; // Indica si el torneo es privado o no
@@ -21,4 +21,5 @@ export interface Torneo {
     Metodos_Pago: string[]; // Métodos de pago aceptados
     Hora_Inicio_Torneo: string; // Hora de inicio del torneo
     Hora_Fin_Torneo: string; // Hora de fin del torneo
+    Limite_Plazas?: number;// Limite de plazas del torneo
 }
