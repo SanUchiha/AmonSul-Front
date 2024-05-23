@@ -14,14 +14,14 @@
 <script setup lang="ts">
 import NavBar from "@/components/NavBar.vue";
 import { IJugador } from "@/interfaces/Usuario";
-import { getTorneosMock } from "@/services/TorneosService";
+import { getJugadoresMock } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
 import JugadorCard from "../components/Jugadores/JugadorCard.vue";
 
 const listaJugadores = ref<IJugador[]>([]);
 
 onMounted(async () => {
-  listaJugadores.value = await getTorneosMock();
+  listaJugadores.value = await getJugadoresMock();
 });
 </script>
 

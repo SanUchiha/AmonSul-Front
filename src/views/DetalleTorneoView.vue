@@ -73,7 +73,4 @@ const formatDate = (date: string | number | Date) =>
 const goBack = () => router.go(-1);
 </script>
 
-<style scoped>
-/* Estilos para la vista de detalle del torneo */
-/* Puedes agregar estilos personalizados según sea necesario */
-</style>
+<style scoped></style>
