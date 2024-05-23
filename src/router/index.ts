@@ -10,10 +10,12 @@ import PartidasAmistoasView from "@/views/PartidasAmistoasView.vue";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
 import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
 import TorneosView from "@/views/TorneosView.vue";
+import ContactoHomeView from "@/views/ContactoHomeView.vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
+  { path: "/contacto", name: "contactoHome", component: ContactoHomeView },
   {
     path: "/detalle-jugador/:Nick",
     name: "detalle-jugador",

@@ -12,6 +12,7 @@
       </div>
       <button type="button" @click="goToLogin">Iniciar sesión</button>
       <button type="button" @click="goToRegistration">Registro</button>
+      dejar en blanco los dos campos e Iniciar sesión
     </form>
   </div>
 </template>

@@ -10,7 +10,7 @@
     <router-link :to="{ name: 'perfil-usuario', params: { idUsuario: 1 } }"
       >Perfil usuario</router-link
     >
-    | <router-link :to="{ name: 'contacto' }">Contacto</router-link>
+    | <router-link :to="{ name: 'contactoHome' }">Contacto</router-link>
   </nav>
 </template>
 
