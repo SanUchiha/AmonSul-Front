@@ -1,11 +1,41 @@
-import { IJugador } from "@/interfaces/Usuario";
+import { RequestLoginDTO } from "@/interfaces/Login";
+import { IJugador, NewUserDTO } from "@/interfaces/Usuario";
+import { appsettings } from "@/settings/appsettings";
 import axios from "axios";
 
-const apiUrl = "https://localhost:7125/api/Usuario";
+//const apiUrl = "https://localhost:7125/api/Usuario";
+
+const baseUrl: string = appsettings.apiUrl;
+
+export const newUser = async (newUser: NewUserDTO) => {
+  axios
+    .post(baseUrl, {
+      newUser: newUser
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
+
+export const doLogin = async (login: RequestLoginDTO) => {
+  axios
+    .post(baseUrl, {
+      login
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
 
 export const getUsers = async () => {
   try {
-    const response = await axios.get(apiUrl);
+    const response = await axios.get(baseUrl);
 
     if (response.status === 200) {
       return response.data;
@@ -18,23 +48,9 @@ export const getUsers = async () => {
   }
 };
 
-export const doLogin = async (correo: string, password: string) => {
-  axios
-    .post(apiUrl, {
-      correo: correo,
-      password: password,
-    })
-    .then(function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-};
-
 export const getUser = async (idUsuario: number) => {
   try {
-    const url = `${apiUrl}/${idUsuario}`;
+    const url = `${baseUrl}/${idUsuario}`;
     const response = await axios.get(url);
 
     if (response.status === 200) {

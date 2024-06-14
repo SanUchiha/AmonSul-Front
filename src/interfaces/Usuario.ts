@@ -4,7 +4,18 @@ export interface IUsuario {
   password?: string;
 }
 
-
+export interface NewUserDTO{
+  Nombre_Usuario: string;
+  Primer_Apellido: string;
+  Segundo_Apellido?: string;
+  Email: string;
+  Contraseña: string;
+  Rol: 'JUGADOR';
+  Nick: string;
+  Ciudad: string;
+  Faccion: string;
+  Fecha_Nacimiento: Date;
+}
 
 export interface IFaccion {
   ID_Faccion: number;            
@@ -25,3 +36,5 @@ export interface IJugador{
   Fecha_Registro: Date;
   Fecha_Nacimiento: Date;
 }
+
+

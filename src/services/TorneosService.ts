@@ -85,3 +85,9 @@ export const getTorneoByIdMock = async (id:number) =>{
     const torneo = (await listaTorneos).find(x => x.ID_Torneo === id);
     return torneo;
 };
+
+export const getTorneos = async (id:number) =>{
+    const listaTorneos = getTorneosMock()
+    const torneo = (await listaTorneos).find(x => x.ID_Torneo === id);
+    return torneo;
+};
