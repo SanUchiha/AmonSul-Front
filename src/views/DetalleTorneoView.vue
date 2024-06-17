@@ -52,15 +52,15 @@
 </template>
 
 <script setup lang="ts">
-import NavBar from "@/components/NavBar.vue";
-import { ITorneo } from "@/interfaces/Torneo";
+import NavBar from "../components/Commons/NavBar";
+import { Torneo } from "@/interfaces/Torneo";
 import { getTorneoByIdMock } from "@/services/TorneosService";
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
-let torneo = ref<ITorneo>();
+let torneo = ref<Torneo>();
 
 onMounted(async () => {
   const idTorneo = Number(route.params.idTorneo);

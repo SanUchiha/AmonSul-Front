@@ -35,15 +35,15 @@
 </template>
 
 <script setup lang="ts">
-import NavBar from "@/components/NavBar.vue";
-import { IJugador } from "@/interfaces/Usuario";
+import NavBar from "../components/Commons/NavBar";
+import { Jugador } from "@/interfaces/Usuario";
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getTorneoByNickMock } from "../services/UsuariosService";
 
 const route = useRoute();
 const router = useRouter();
-let jugador = ref<IJugador>();
+let jugador = ref<Jugador>();
 
 onMounted(async () => {
   const Nick = String(route.params.Nick);

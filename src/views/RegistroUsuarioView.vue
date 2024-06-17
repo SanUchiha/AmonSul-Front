@@ -4,8 +4,8 @@
 </template>
 
 <script setup lang="ts">
-import NavBarInicio from "@/components/NavBarInicio.vue";
-import FormRegistroUsuario from "../components/FormRegistroUsuario.vue";
+import NavBarInicio from "../components/Commons/NavBarInicio";
+import FormRegistroUsuario from "../components/RegistroUsuarios/FormRegistroUsuario.vue";
 </script>
 
 <style scoped></style>

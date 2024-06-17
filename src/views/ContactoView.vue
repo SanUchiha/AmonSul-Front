@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import NavBarInicio from "@/components/NavBarInicio.vue";
+import NavBarInicio from "../components/Commons/NavBarInicio";
 </script>
 
 <style scoped></style>

@@ -10,7 +10,7 @@
         <label for="password">Contraseña:</label>
         <input type="password" id="password" v-model="objLogin.pass" required />
       </div>
-      <button type="button" @click="goToLogin">Iniciar sesión</button>
+      <button type="button" @click="login">Iniciar sesión</button>
       <button type="button" @click="goToRegistration">Registro</button>
       dejar en blanco los dos campos e Iniciar sesión
     </form>
@@ -18,23 +18,33 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { Login } from "@/interfaces/Login";
-import { doLogin } from "@/services/UsuariosService";
+import { RequestLoginDTO } from "@/interfaces/Login";
+import { doLogin } from "@/services/LoginService.ts";
 
-const objLogin = ref<Login>({
+const objLogin = ref<RequestLoginDTO>({
   correo: "",
   pass: "",
 });
 const router = useRouter();
 
 const login = async () => {
-  doLogin(objLogin.value.correo, objLogin.value.pass);
+  try {
+    var login = doLogin(objLogin);
+    if (login.isSuccess) {
+      localStorage.setItem("token", login.token);
+      router.push("/inicio");
+    } else {
+      alert("Login incorrecto");
+    }
+  } catch (error) {
+    console.log("Error al hacer login: " + error);
+  }
 };
 
 const goToLogin = () => {
-  let tempLogin: Login = {
+  let tempLogin: RequestLoginDTO = {
     correo: "",
     pass: "",
   };
@@ -50,9 +60,7 @@ const goToLogin = () => {
   //router.push("/registro-usuario ");
 };
 
-const goToRegistration = () => {
-  router.push("/registro-usuario");
-};
+const goToRegistration = () => router.push("/registro-usuario");
 </script>
 
 <style scoped>

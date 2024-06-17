@@ -1,4 +1,4 @@
-export interface IUsuario {
+export interface Usuario {
   id?: number;
   correo?: string;
   password?: string;
@@ -17,12 +17,12 @@ export interface NewUserDTO{
   Fecha_Nacimiento: Date;
 }
 
-export interface IFaccion {
+export interface Faccion {
   ID_Faccion: number;            
   Nombre_Faccion: string;
 }
 
-export interface IJugador{
+export interface Jugador{
   ID_Usuario: number;            
   Nombre_Usuario: string;
   Primer_Apellido: string;

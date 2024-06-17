@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import NavBar from "@/components/NavBar.vue";
+import NavBar from "../components/Commons/NavBar";
 import { ITorneo } from "@/interfaces/Torneo";
 import { getTorneosMock } from "@/services/TorneosService";
 import { onMounted, ref } from "vue";
