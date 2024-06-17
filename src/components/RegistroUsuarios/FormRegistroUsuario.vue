@@ -50,6 +50,7 @@
       </div>
       <button type="submit">Registrarse</button>
     </form>
+    <Modal :isVisible="isModalVisible" @close="isModalVisible = false" />
   </div>
 </template>
 
@@ -58,6 +59,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { NewUserDTO } from "@/interfaces/Usuario.ts";
 import { newUser } from "@/services/UsuariosService.ts";
+import ModalRegistroOK from "./ModalRegistroOk";
 
 const name = ref("");
 const primerApellido = ref("");
@@ -68,6 +70,7 @@ const nick = ref("");
 const ciudad = ref("");
 const faccion = ref("");
 const fechaNacimiento = ref("");
+const isModalVisible = ref(false);
 const router = useRouter();
 
 const register = async () => {
@@ -87,7 +90,8 @@ const register = async () => {
   try {
     const response = await newUser(newUserDTO);
     console.log("Usuario registrado:", response);
-    router.push("/inicio");
+    isModalVisible.value = true;
+    //router.push("/inicio");
   } catch (error) {
     console.log("Error al registrar el usuario:", error);
   }
