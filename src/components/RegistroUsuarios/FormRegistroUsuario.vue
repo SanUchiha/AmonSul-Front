@@ -65,6 +65,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { NewUserDTO } from "@/interfaces/Usuario";
 import { newUser } from "@/services/UsuariosService";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import axios, { AxiosError } from "axios";
 import ModalRegistroResponse from "../RegistroUsuarios/ModalRegistroResponse.vue";
 
