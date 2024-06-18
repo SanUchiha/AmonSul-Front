@@ -1,7 +1,7 @@
 <template>
   <div class="register-form">
     <h2>Registro de usuario</h2>
-    <form @submit.prevent="register">
+    <form @submit.prevent="crearUsuario">
       <div class="form-group">
         <label for="name">Nombre completo:</label>
         <input type="text" id="name" v-model="name" required />
@@ -50,16 +50,23 @@
       </div>
       <button type="submit">Registrarse</button>
     </form>
-    <Modal :isVisible="isModalVisible" @close="isModalVisible = false" />
+    <ModalRegistroResponse
+      :isVisible="isModalVisible"
+      :message="modalMessage"
+      :isSuccess="isModalSuccess"
+      @close="isModalVisible = false"
+      @modal-closed="handleModalClosed"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { NewUserDTO } from "@/interfaces/Usuario.ts";
-import { newUser } from "@/services/UsuariosService.ts";
-import ModalRegistroOK from "./ModalRegistroOk";
+import { NewUserDTO } from "@/interfaces/Usuario";
+import { newUser } from "@/services/UsuariosService";
+import axios, { AxiosError } from "axios";
+import ModalRegistroResponse from "../RegistroUsuarios/ModalRegistroResponse.vue";
 
 const name = ref("");
 const primerApellido = ref("");
@@ -71,29 +78,59 @@ const ciudad = ref("");
 const faccion = ref("");
 const fechaNacimiento = ref("");
 const isModalVisible = ref(false);
+const modalMessage = ref("");
+const isModalSuccess = ref(false);
+const errorMessage = ref("");
 const router = useRouter();
+const shouldRedirect = ref(false);
 
-const register = async () => {
+const formatFecha = (fechaString: string) => {
+  const fecha = new Date(fechaString);
+  const year = fecha.getFullYear();
+  const month = ("0" + (fecha.getMonth() + 1)).slice(-2);
+  const day = ("0" + fecha.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+};
+
+const crearUsuario = async () => {
   const newUserDTO: NewUserDTO = {
-    Nombre_Usuario: name.value,
-    Primer_Apellido: primerApellido.value,
-    Segundo_Apellido: segundoApellido.value,
+    NombreUsuario: name.value,
+    PrimerApellido: primerApellido.value,
+    SegundoApellido: segundoApellido.value,
     Email: email.value,
     Contraseña: password.value,
     Rol: "JUGADOR",
     Nick: nick.value,
     Ciudad: ciudad.value,
     Faccion: faccion.value,
-    Fecha_Nacimiento: new Date(fechaNacimiento.value),
+    FechaNacimiento: formatFecha(fechaNacimiento.value),
   };
 
   try {
     const response = await newUser(newUserDTO);
-    console.log("Usuario registrado:", response);
-    isModalVisible.value = true;
-    //router.push("/inicio");
+
+    if (response.status === 200) {
+      modalMessage.value = "Usuario registrado con éxito.";
+      isModalSuccess.value = true;
+      isModalVisible.value = true;
+      shouldRedirect.value = true;
+    }
   } catch (error) {
-    console.log("Error al registrar el usuario:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      errorMessage.value = error.response.data.message;
+      modalMessage.value = errorMessage.value;
+    } else {
+      errorMessage.value = "Ocurrió un error al registrar el usuario.";
+      modalMessage.value = errorMessage.value;
+    }
+    isModalSuccess.value = false;
+    isModalVisible.value = true;
+  }
+};
+
+const handleModalClosed = () => {
+  if (shouldRedirect.value) {
+    router.push("/inicio");
   }
 };
 </script>

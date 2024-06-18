@@ -1,3 +1,3 @@
 export const appsettings = {
-  apiUrl: "http://solodata.es/",
+  apiUrl: "https://localhost:7101/api/",
 };

@@ -4,37 +4,35 @@ export interface Usuario {
   password?: string;
 }
 
-export interface NewUserDTO{
-  Nombre_Usuario: string;
-  Primer_Apellido: string;
-  Segundo_Apellido?: string;
+export interface NewUserDTO {
+  NombreUsuario: string;
+  PrimerApellido: string;
+  SegundoApellido?: string;
   Email: string;
   Contraseña: string;
-  Rol: 'JUGADOR';
+  Rol: "JUGADOR";
   Nick: string;
   Ciudad: string;
   Faccion: string;
-  Fecha_Nacimiento: Date;
+  FechaNacimiento: string;
 }
 
 export interface Faccion {
-  ID_Faccion: number;            
+  ID_Faccion: number;
   Nombre_Faccion: string;
 }
 
-export interface Jugador{
-  ID_Usuario: number;            
-  Nombre_Usuario: string;
-  Primer_Apellido: string;
-  Segundo_Apellido?: string;
+export interface Jugador {
+  ID_Usuario: number;
+  NombreUsuario: string;
+  PrimerApellido: string;
+  SegundoApellido?: string;
   Email: string;
   Contraseña: string;
-  Rol: 'JUGADOR' | 'ADMIN';
+  Rol: "JUGADOR" | "ADMIN";
   Nick: string;
   Ciudad: string;
   Faccion: string;
-  Fecha_Registro: Date;
-  Fecha_Nacimiento: Date;
+  FechaRegistro: Date;
+  FechaNacimiento: Date;
 }
-
-
