@@ -112,6 +112,8 @@ const crearUsuario = async () => {
 
     if (response.status === 200) {
       modalMessage.value = "Usuario registrado con éxito.";
+      // Conseguir la cookie
+      alert(response.data);
       isModalSuccess.value = true;
       isModalVisible.value = true;
       shouldRedirect.value = true;

@@ -1,11 +1,9 @@
 export interface RequestLoginDTO {
-  correo: string;
-  pass: string;
+  email: string;
+  password: string;
 }
 
 export interface ResponseLoginDTO {
-  isSuccess: boolean,
-  token: string
+  isSuccess: boolean;
+  token: string;
 }
-
-

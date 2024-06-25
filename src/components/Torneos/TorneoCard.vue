@@ -1,20 +1,20 @@
 <template>
   <v-card outlined class="torneo-card">
     <v-card-title>
-      {{ torneo.Nombre_Torneo }}
+      {{ torneo.nombreTorneo }}
     </v-card-title>
     <v-card-text>
-      <p>{{ torneo.Descripción_Torneo }}</p>
+      <p>{{ torneo.descripcionTorneo }}</p>
     </v-card-text>
     <v-card-text>
-      <p>FECHA: {{ formatDate(torneo.Fecha_Inicio_Torneo) }}</p>
-      <p>LUGAR: {{ torneo.Lugar_Torneo }}</p>
-      <p>RONDAS: {{ torneo.Numero_Partidas }}</p>
-      <p>PUNTOS: {{ torneo.Puntos_Torneo }}</p>
-      <p>PRECIO: {{ torneo.Precio_Torneo }}</p>
+      <p>FECHA: {{ formatDate(torneo.fechaInicioTorneo) }}</p>
+      <p>LUGAR: {{ torneo.lugarTorneo }}</p>
+      <p>RONDAS: {{ torneo.numeroPartidas }}</p>
+      <p>PUNTOS: {{ torneo.puntosTorneo }}</p>
+      <p>PRECIO: {{ torneo.precioTorneo }}</p>
       <p>
         LÍMITE DE PLAZAS:
-        {{ torneo.Limite_Plazas ? torneo.Limite_Plazas : "No hay límite" }}
+        {{ torneo.limitePlazas ? torneo.limitePlazas : "No hay límite" }}
       </p>
     </v-card-text>
     <v-card-actions>

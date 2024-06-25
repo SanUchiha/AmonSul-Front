@@ -1,25 +1,25 @@
 export interface ITorneo {
-    ID_Torneo: number; // Identificador único del torneo (PK)
-    ID_Usuario: number; // ID del usuario administrador del torneo (FK)
-    Nombre_Torneo: string; // Nombre del torneo
-    Descripción_Torneo: string; // Descripción del torneo
-    Fecha_Inicio_Torneo: Date; // Fecha de inicio del torneo
-    Fecha_Fin_Torneo: Date; // Fecha de fin del torneo
-    Precio_Torneo: number; // Precio del torneo
-    Numero_Partidas: number; // Número de partidas del torneo
-    Puntos_Torneo: number; // Puntos asignados al torneo
-    Estado_Torneo: 'ESPERANDO' | 'LIVE' | 'TERMINADO' | 'CANCELADO'; // Estado del torneo (enum)
-    Lugar_Torneo: string; // Lugar donde se llevará a cabo el torneo
-    Tipo_Torneo: string; // Tipo de torneo
-    Es_Privado_Torneo: boolean; // Indica si el torneo es privado o no
-    ID_Rango_Torneo: number; // ID del rango del torneo (FK)
-    Es_Matched_Play_Torneo: boolean; // Indica si el torneo es de tipo Matched Play
-    Fecha_Entrega_Listas: Date; // Fecha límite de entrega de listas
-    Fecha_Fin_Inscripcion: Date; // Fecha límite de inscripción
-    Bases_Torneo: string; // Bases del torneo
-    Cartel_Torneo: string; // Imagen o cartel del torneo
-    Metodos_Pago: string[]; // Métodos de pago aceptados
-    Hora_Inicio_Torneo: string; // Hora de inicio del torneo
-    Hora_Fin_Torneo: string; // Hora de fin del torneo
-    Limite_Plazas?: number;// Limite de plazas del torneo
+  idTorneo: number; // Identificador único del torneo (PK)
+  idUsuario: number; // ID del usuario administrador del torneo (FK)
+  nombreTorneo: string; // Nombre del torneo
+  descripcionTorneo: string; // Descripción del torneo
+  fechaInicioTorneo: Date; // Fecha de inicio del torneo
+  fechaFinTorneo: Date; // Fecha de fin del torneo
+  precioTorneo: number; // Precio del torneo
+  numeroPartidas: number; // Número de partidas del torneo
+  puntosTorneo: number; // Puntos asignados al torneo
+  estadoTorneo: "ESPERANDO" | "LIVE" | "TERMINADO" | "CANCELADO"; // Estado del torneo (enum)
+  lugarTorneo: string; // Lugar donde se llevará a cabo el torneo
+  tipoTorneo: string; // Tipo de torneo
+  esPrivadoTorneo: boolean; // Indica si el torneo es privado o no
+  idRangoTorneo: number; // ID del rango del torneo (FK)
+  esMatchedPlayTorneo: boolean; // Indica si el torneo es de tipo Matched Play
+  fechaEntregaListas: Date; // Fecha límite de entrega de listas
+  fechaFinInscripcion: Date; // Fecha límite de inscripción
+  basesTorneo: string; // Bases del torneo (PDF en base 64 o URL)
+  cartelTorneo: string; // Imagen o cartel del torneo (URL o base 64)
+  metodosPago: string[]; // Métodos de pago aceptados
+  horaInicioTorneo: string; // Hora de inicio del torneo (HH:mm)
+  horaFinTorneo: string; // Hora de fin del torneo (HH:mm)
+  limitePlazas?: number; // Límite de plazas del torneo (opcional)
 }

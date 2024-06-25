@@ -12,16 +12,17 @@
 </template>
 
 <script setup lang="ts">
-import NavBar from "../components/Commons/NavBar";
+import NavBar from "../components/Commons/NavBar.vue";
 import { ITorneo } from "@/interfaces/Torneo";
-import { getTorneosMock } from "@/services/TorneosService";
+import { getTorneos } from "@/services/TorneosService";
 import { onMounted, ref } from "vue";
 import TorneoCard from "@/components/Torneos/TorneoCard.vue";
 
 const listaTorneos = ref<ITorneo[]>([]);
 
 onMounted(async () => {
-  listaTorneos.value = await getTorneosMock();
+  listaTorneos.value = await getTorneos();
+  console.log("torneos", listaTorneos.value);
 });
 </script>
 

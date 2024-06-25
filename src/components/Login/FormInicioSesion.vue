@@ -1,16 +1,16 @@
 <template>
   <div class="login-form">
     <h2>Iniciar sesión</h2>
-    <form @submit.prevent="login">
+    <form @submit.prevent="handleLogin">
       <div class="form-group">
         <label for="email">Correo electrónico:</label>
-        <input type="email" id="email" v-model="objLogin.correo" required />
+        <input type="email" id="email" v-model="email" required />
       </div>
       <div class="form-group">
         <label for="password">Contraseña:</label>
-        <input type="password" id="password" v-model="objLogin.pass" required />
+        <input type="password" id="password" v-model="password" required />
       </div>
-      <button type="button" @click="login">Iniciar sesión</button>
+      <button type="button" @click="handleLogin">Iniciar sesión</button>
       <button type="button" @click="goToRegistration">Registro</button>
     </form>
   </div>
@@ -20,44 +20,53 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { RequestLoginDTO } from "@/interfaces/Login";
-import { doLogin } from "@/services/LoginService.ts";
+import { doLogin } from "@/services/LoginService";
+import { useAuth } from "@/composables/useAuth";
 
-const objLogin = ref<RequestLoginDTO>({
-  correo: "",
-  pass: "",
-});
+const email = ref("");
+const password = ref("");
+const { login } = useAuth();
 const router = useRouter();
 
-const login = async () => {
-  try {
-    var login = doLogin(objLogin);
-    if (login.isSuccess) {
-      localStorage.setItem("token", login.token);
-      router.push("/inicio");
-    } else {
-      alert("Login incorrecto");
-    }
-  } catch (error) {
-    console.log("Error al hacer login: " + error);
-  }
-};
-
-const goToLogin = () => {
-  let tempLogin: RequestLoginDTO = {
-    correo: "",
-    pass: "",
+const handleLogin = async () => {
+  var credentials: RequestLoginDTO = {
+    email: email.value,
+    password: password.value,
   };
-
-  if (
-    tempLogin.correo === objLogin.value.correo &&
-    tempLogin.pass === objLogin.value.pass
-  ) {
-    router.push("/inicio");
-  } else {
-    alert("Login incorrecto");
-  }
-  //router.push("/registro-usuario ");
+  await login(credentials);
+  router.push("torneos");
 };
+
+// const login = async () => {
+//   try {
+//     var login = doLogin(objLogin);
+//     if (login.isSuccess) {
+//       localStorage.setItem("token", login.token);
+//       router.push("/inicio");
+//     } else {
+//       alert("Login incorrecto");
+//     }
+//   } catch (error) {
+//     console.log("Error al hacer login: " + error);
+//   }
+// };
+
+// const goToLogin = () => {
+//   let tempLogin: RequestLoginDTO = {
+//     correo: "",
+//     pass: "",
+//   };
+
+//   if (
+//     tempLogin.correo === objLogin.value.correo &&
+//     tempLogin.pass === objLogin.value.pass
+//   ) {
+//     router.push("/inicio");
+//   } else {
+//     alert("Login incorrecto");
+//   }
+//   //router.push("/registro-usuario ");
+// };
 
 const goToRegistration = () => router.push("/registro-usuario");
 </script>

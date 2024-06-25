@@ -15,26 +15,30 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
-  { path: "/contacto", name: "contactoHome", component: ContactoHomeView },
+  { path: "/contacto-home", name: "contactoHome", component: ContactoHomeView },
   {
     path: "/detalle-jugador/:Nick",
     name: "detalle-jugador",
     component: DetalleJugadorView,
+    meta: { requiresAuth: true },
   },
   {
     path: "/detalle-partida/:idPartida",
     name: "detalle-partida",
     component: DetallePartidasView,
+    meta: { requiresAuth: true },
   },
   {
     path: "/detalle-torneo/:idTorneo",
     name: "detalle-torneo",
     component: DetalleTorneoView,
+    meta: { requiresAuth: true },
   },
   {
     path: "/detalle-torneo-live/:idTorneoLive",
     name: "detalle-torneo-live",
     component: DetalleToneoLiveView,
+    meta: { requiresAuth: true },
   },
   {
     path: "/inicio-sesion",
@@ -46,28 +50,56 @@ const routes: Array<RouteRecordRaw> = [
     name: "registro-usuario",
     component: RegistroUsuarioView,
   },
-  { path: "/inicio", name: "inicio", component: InicioView },
-  { path: "/jugadores", name: "jugadores", component: JugadoresView },
+  {
+    path: "/inicio",
+    name: "inicio",
+    component: InicioView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/jugadores",
+    name: "jugadores",
+    component: JugadoresView,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/partidas-amistosas",
     name: "partidas-amistosas",
     component: PartidasAmistoasView,
+    meta: { requiresAuth: true },
   },
   {
     path: "/perfil-usuario/:idUsuario",
     name: "perfil-usuario",
     component: PerfilUsuarioView,
+    meta: { requiresAuth: true },
   },
 
-  { path: "/torneos", name: "torneos", component: TorneosView },
-  { path: "/",
-    redirect: to => { return { name: 'inicio-sesion'} }
+  {
+    path: "/torneos",
+    name: "torneos",
+    component: TorneosView,
+    meta: { requiresAuth: true },
+  },
+
+  {
+    path: "/",
+    redirect: { name: "inicio-sesion" },
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const loggedIn = localStorage.getItem("token");
+  if (to.matched.some((record) => record.meta.requiresAuth) && !loggedIn) {
+    next({ name: "inicio-sesion" });
+  } else {
+    next();
+  }
 });
 
 export default router;
