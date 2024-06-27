@@ -3,7 +3,7 @@
     <NavBar />
     <v-container>
       <v-row dense>
-        <v-col v-for="torneo in listaTorneos" :key="torneo.ID_Torneo">
+        <v-col v-for="torneo in listaTorneos" :key="torneo.idTorneo">
           <TorneoCard :torneo="torneo" />
         </v-col>
       </v-row>

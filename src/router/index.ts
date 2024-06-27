@@ -4,18 +4,24 @@ import DetallePartidasView from "@/views/DetallePartidasView.vue";
 import DetalleToneoLiveView from "@/views/DetalleToneoLiveView.vue";
 import DetalleTorneoView from "@/views/DetalleTorneoView.vue";
 import InicioSesionView from "@/views/InicioSesionView.vue";
-import InicioView from "@/views/InicioView.vue";
+import DashboardView from "@/views/DashboardView.vue";
 import JugadoresView from "@/views/JugadoresView.vue";
 import PartidasAmistoasView from "@/views/PartidasAmistoasView.vue";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
 import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
 import TorneosView from "@/views/TorneosView.vue";
 import ContactoHomeView from "@/views/ContactoHomeView.vue";
+import ErrorView from "@/views/ErrorView.vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
-  { path: "/contacto-home", name: "contactoHome", component: ContactoHomeView },
+  {
+    path: "/contacto-home",
+    name: "contactoHome",
+    component: ContactoHomeView,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/detalle-jugador/:Nick",
     name: "detalle-jugador",
@@ -51,9 +57,9 @@ const routes: Array<RouteRecordRaw> = [
     component: RegistroUsuarioView,
   },
   {
-    path: "/inicio",
-    name: "inicio",
-    component: InicioView,
+    path: "/dashboard",
+    name: "dashboard",
+    component: DashboardView,
     meta: { requiresAuth: true },
   },
   {
@@ -74,12 +80,16 @@ const routes: Array<RouteRecordRaw> = [
     component: PerfilUsuarioView,
     meta: { requiresAuth: true },
   },
-
   {
     path: "/torneos",
     name: "torneos",
     component: TorneosView,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/error",
+    name: "error",
+    component: ErrorView,
   },
 
   {

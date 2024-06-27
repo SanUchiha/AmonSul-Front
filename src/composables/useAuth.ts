@@ -2,17 +2,18 @@ import { reactive, computed } from "vue";
 import axios from "axios";
 import { RequestLoginDTO } from "@/interfaces/Login";
 import { appsettings } from "@/settings/appsettings";
+import { AuthState } from "@/interfaces/Error";
 
 const BASE_URL: string = appsettings.apiUrl;
 
-const stateAuth = reactive({
+const stateAuth = reactive<AuthState>({
   user: null,
   token: localStorage.getItem("token") || "",
+  error: null,
 });
 
 const login = async (credentials: RequestLoginDTO) => {
   try {
-    console.log("credenctiales:", credentials);
     const response = await axios.post(BASE_URL + "Acceso/Login", credentials);
     if (response.data.isAccess) {
       const token = response.data.token;
@@ -21,13 +22,15 @@ const login = async (credentials: RequestLoginDTO) => {
       localStorage.setItem("token", token);
       stateAuth.token = token;
       stateAuth.user = user;
-      console.log("response:", response);
-      console.log("localStorage:", localStorage);
-      console.log("stateauth", stateAuth);
-      console.log("localStorage.get:", localStorage.getItem("token"));
+      stateAuth.error = null;
     }
+    return response;
   } catch (error) {
-    console.error("Error in login:", error);
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.message || "Error de servidor";
+      return errorMessage;
+    }
+    throw error;
   }
 };
 
@@ -35,10 +38,12 @@ const logout = () => {
   localStorage.removeItem("token");
   stateAuth.user = null;
   stateAuth.token = "";
+  stateAuth.error = null;
 };
 
 const isAuthenticated = computed(() => !!stateAuth.token);
 const getUser = computed(() => stateAuth.user);
+const getError = computed<string | null>(() => stateAuth.error);
 
 export function useAuth() {
   return {
@@ -47,5 +52,6 @@ export function useAuth() {
     logout,
     isAuthenticated,
     getUser,
+    getError,
   };
 }
