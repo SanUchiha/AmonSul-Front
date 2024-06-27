@@ -10,18 +10,11 @@ import PartidasAmistoasView from "@/views/PartidasAmistoasView.vue";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
 import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
 import TorneosView from "@/views/TorneosView.vue";
-import ContactoHomeView from "@/views/ContactoHomeView.vue";
 import ErrorView from "@/views/ErrorView.vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
-  {
-    path: "/contacto-home",
-    name: "contactoHome",
-    component: ContactoHomeView,
-    meta: { requiresAuth: true },
-  },
   {
     path: "/detalle-jugador/:Nick",
     name: "detalle-jugador",
@@ -75,7 +68,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/perfil-usuario/:idUsuario",
+    path: "/perfil-usuario",
     name: "perfil-usuario",
     component: PerfilUsuarioView,
     meta: { requiresAuth: true },

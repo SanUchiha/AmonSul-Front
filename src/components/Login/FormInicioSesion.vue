@@ -1,6 +1,5 @@
 <template>
   <v-container class="login-form">
-    <!-- Capa de fondo semi-transparente para bloquear la pantalla -->
     <div class="overlay" v-if="loading"></div>
 
     <v-row justify="center">
@@ -23,11 +22,22 @@
                 type="password"
                 required
               ></v-text-field>
-              <v-row justify="center">
-                <v-btn color="primary" :disabled="loading" @click="handleLogin">
+              <v-row justify="center" class="my-4">
+                <v-btn
+                  variant="outlined"
+                  :disabled="loading"
+                  @click="handleLogin"
+                  class="mr-4"
+                >
                   Iniciar sesión
                 </v-btn>
-                <v-btn text @click="goToRegistration" :disabled="loading">
+                <v-btn
+                  variant="outlined"
+                  text
+                  to="registro-usuario"
+                  :disabled="loading"
+                  class="mr-4"
+                >
                   Nuevo usuario
                 </v-btn>
               </v-row>
@@ -47,6 +57,10 @@
     </v-row>
 
     <ErrorLogin :isVisible="dialog" @update:isVisible="dialog = $event" />
+    <ResponseLogin
+      :isVisible="dialogOk"
+      @update:isVisible="handleOkClick = $event"
+    />
   </v-container>
 </template>
 
@@ -56,16 +70,21 @@ import { useRouter } from "vue-router";
 import { RequestLoginDTO } from "@/interfaces/Login";
 import { useAuth } from "@/composables/useAuth";
 import ErrorLogin from "./ErrorLogin.vue";
+import { AxiosResponse } from "axios";
+import ResponseLogin from "./ResponseLogin.vue";
 
 const email = ref("");
 const password = ref("");
 const { login } = useAuth();
 const router = useRouter();
 const dialog = ref(false);
+const dialogOk = ref(false);
+
 const loading = ref(false);
 
 const handleLogin = async () => {
   dialog.value = false;
+  dialogOk.value = false;
   loading.value = true;
 
   var credentials: RequestLoginDTO = {
@@ -74,14 +93,14 @@ const handleLogin = async () => {
   };
 
   try {
-    const response = await login(credentials);
-    if (response === "Network Error") {
+    const response: string | AxiosResponse = await login(credentials);
+    if (typeof response === "string") {
       router.push("error");
     } else {
       if (!response.data.isAccess) {
         dialog.value = true;
       } else {
-        router.push("inicio");
+        dialogOk.value = true;
       }
     }
   } catch (error) {
@@ -90,8 +109,9 @@ const handleLogin = async () => {
     loading.value = false;
   }
 };
-
-const goToRegistration = () => router.push("registro-usuario");
+const handleOkClick = () => {
+  dialogOk.value = false;
+};
 </script>
 
 <style scoped>

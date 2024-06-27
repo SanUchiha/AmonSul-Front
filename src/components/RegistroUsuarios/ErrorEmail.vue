@@ -5,8 +5,8 @@
         <v-card
           max-width="400"
           prepend-icon="mdi-alert"
-          text="Usuario y/o contraseña incorrecta"
-          title="Error login"
+          text="El email ya está en uso"
+          title="Error registro"
         >
           <template v-slot:actions>
             <v-btn class="ms-auto" text="Ok" @click="closeDialog"></v-btn>

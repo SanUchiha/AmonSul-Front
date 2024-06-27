@@ -9,7 +9,7 @@ const baseUrl: string = appsettings.apiUrl;
 export const newUser = async (newUser: NewUserDTO) => {
   try {
     const response = await axios.post(baseUrl + "Usuario/Registrar", newUser);
-    return response;
+    if (response.data.status) return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw error as AxiosError;
