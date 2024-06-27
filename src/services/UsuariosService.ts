@@ -34,19 +34,16 @@ export const getUsers = async () => {
   }
 };
 
-export const getUser = async (idUsuario: number) => {
+export const getUsuario = async (email: string) => {
   try {
-    const url = `${baseUrl}/${idUsuario}`;
-    const response = await axios.get(url);
-
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      throw new Error("No se pudo obtener la información del usuario");
-    }
+    const response = await axios.get(baseUrl + "Usuario/" + email);
+    return response;
   } catch (error) {
-    console.error("Error al obtener la información de los usuarios:", error);
-    return null;
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
   }
 };
 

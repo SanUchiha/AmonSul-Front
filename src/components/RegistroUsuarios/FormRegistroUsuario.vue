@@ -65,11 +65,15 @@
                 :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
+                v-model="telefono"
+                label="Telefono"
+                type="text"
+                :rules="[rules.phone]"
+              ></v-text-field>
+              <v-text-field
                 v-model="faccion"
                 label="Facción"
                 type="text"
-                required
-                :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
                 v-model="fechaNacimiento"
@@ -146,6 +150,7 @@ const dialogNick = ref(false);
 const dialogEmail = ref(false);
 const dialogOk = ref(false);
 const loading = ref(false);
+const telefono = ref("");
 
 const formatFecha = (fechaString: string) => {
   const fecha = new Date(fechaString);
@@ -169,6 +174,9 @@ const rules = {
       "La fecha debe ser menor que la fecha actual."
     );
   },
+  phone: (value: string | null) =>
+    /^\d{9}$/.test(value as string) ||
+    "El número de teléfono debe tener 9 dígitos.",
 };
 
 const handlerNewUser = async () => {

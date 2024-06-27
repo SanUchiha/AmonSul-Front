@@ -15,6 +15,34 @@ export interface NewUserDTO {
   Ciudad: string;
   Faccion: string;
   FechaNacimiento: string;
+  Telefono: string;
+}
+
+export interface EditarUsuarioDTO {
+  NombreUsuario?: string;
+  PrimerApellido?: string;
+  SegundoApellido?: string;
+  Email: string;
+  NuevoEmail?: string;
+  Contraseña?: string;
+  Nick?: string;
+  Ciudad?: string;
+  Faccion?: string;
+  FechaNacimiento?: string;
+  Telefono?: string;
+}
+
+export interface UsuarioViewDTO {
+  nombreUsuario: string;
+  primerApellido: string;
+  segundoApellido?: string;
+  email: string;
+  nick: string;
+  ciudad?: string;
+  fechaRegistro: string;
+  fechaNacimiento: string;
+  idFaccion?: number;
+  telefono?: string;
 }
 
 export interface Faccion {
