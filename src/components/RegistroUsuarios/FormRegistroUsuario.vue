@@ -15,12 +15,14 @@
                 label="Nombre"
                 type="text"
                 required
+                :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
                 v-model="primerApellido"
                 label="Primer apellido"
                 type="text"
                 required
+                :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
                 v-model="segundoApellido"
@@ -31,18 +33,21 @@
                 v-model="email"
                 label="Correo electrónico"
                 type="email"
+                :rules="[rules.required, rules.email]"
                 required
               ></v-text-field>
               <v-text-field
                 v-model="password"
                 label="Contraseña"
                 type="password"
+                :rules="[rules.required]"
                 required
               ></v-text-field>
               <v-text-field
                 v-model="password2"
                 label="Repite contraseña"
                 type="password"
+                :rules="[rules.required, rules.matchPassword]"
                 required
               ></v-text-field>
               <v-text-field
@@ -50,23 +55,27 @@
                 label="Nick"
                 type="text"
                 required
+                :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
                 v-model="ciudad"
                 label="Ciudad"
                 type="text"
                 required
+                :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
                 v-model="faccion"
-                label="Faccion"
+                label="Facción"
                 type="text"
                 required
+                :rules="[rules.required]"
               ></v-text-field>
               <v-text-field
                 v-model="fechaNacimiento"
                 label="Fecha de Nacimiento"
                 type="date"
+                :rules="[rules.required, rules.validDate]"
                 required
               ></v-text-field>
               <v-row justify="center" class="my-4">
@@ -146,11 +155,28 @@ const formatFecha = (fechaString: string) => {
   return `${year}-${month}-${day}`;
 };
 
+const rules = {
+  required: (value: string | null) => !!value || "Este campo es obligatorio.",
+  email: (value: string | null) =>
+    /.+@.+\..+/.test(value as string) || "Formato de correo inválido.",
+  matchPassword: (value: string | null) =>
+    value === password.value || "Las contraseñas no coinciden.",
+  validDate: (value: string | null) => {
+    const selectedDate = new Date(value as string);
+    const currentDate = new Date();
+    return (
+      selectedDate < currentDate ||
+      "La fecha debe ser menor que la fecha actual."
+    );
+  },
+};
+
 const handlerNewUser = async () => {
   dialogNick.value = false;
   dialogEmail.value = false;
   dialogOk.value = false;
   loading.value = true;
+
   const newUserDTO: NewUserDTO = {
     NombreUsuario: nombre.value,
     PrimerApellido: primerApellido.value,
