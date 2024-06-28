@@ -1,10 +1,7 @@
 <template>
-  <NavBarInicio />
-  <div>vista de contacto</div>
+  <div>In progress</div>
 </template>
 
-<script setup lang="ts">
-import NavBarInicio from "../components/Commons/NavBarInicio";
-</script>
+<script setup lang="ts"></script>
 
 <style scoped></style>

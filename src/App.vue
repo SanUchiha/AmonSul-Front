@@ -40,7 +40,7 @@
         </v-list-item>
         <v-list-item link to="perfil-usuario">
           <v-list-item-icon>
-            <v-icon>mdi-account-circle</v-icon>
+            <v-icon>mdi-cog</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>Perfil</v-list-item-title>

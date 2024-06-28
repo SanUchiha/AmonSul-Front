@@ -8,12 +8,21 @@
             Login completado
           </v-card-title>
           <v-card-text class="text-center">
-            Login realizado con éxito
+            <img
+              class="success-image"
+              src="../../assets/images/PuertaMoria.jpg"
+              alt="Di amigo y entra"
+            />
           </v-card-text>
           <template v-slot:actions>
-            <v-btn variant="outlined" @click="handlerOk" class="mx-auto"
-              >Di amigo y entra</v-btn
+            <v-btn
+              color="blue darken-1"
+              variant="outlined"
+              @click="handlerOk"
+              class="mx-auto"
             >
+              Di amigo y entra
+            </v-btn>
           </template>
         </v-card>
       </v-dialog>
@@ -67,5 +76,10 @@ onUnmounted(() => {
 
 .dialog-card {
   margin-bottom: 20px; /* Ajusta el margen inferior según tu preferencia */
+}
+
+.success-image {
+  max-width: 100%; /* Ajusta el ancho máximo de la imagen al 100% del contenedor */
+  height: auto; /* Permite que la altura se ajuste automáticamente manteniendo la proporción */
 }
 </style>

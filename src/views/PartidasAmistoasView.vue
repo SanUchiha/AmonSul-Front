@@ -1,10 +1,7 @@
 <template>
-  <NavBar />
-  <div>vista de Partidas amistosas</div>
+  <div>In progress...</div>
 </template>
 
-<script setup lang="ts">
-import NavBar from "../components/Commons/NavBar";
-</script>
+<script setup lang="ts"></script>
 
 <style scoped></style>

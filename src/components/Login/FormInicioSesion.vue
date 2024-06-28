@@ -24,6 +24,7 @@
               ></v-text-field>
               <v-row justify="center" class="my-4">
                 <v-btn
+                  color="blue darken-1"
                   variant="outlined"
                   :disabled="loading"
                   @click="handleLogin"
@@ -32,8 +33,8 @@
                   Iniciar sesión
                 </v-btn>
                 <v-btn
+                  color="blue darken-1"
                   variant="outlined"
-                  text
                   to="registro-usuario"
                   :disabled="loading"
                   class="mr-4"

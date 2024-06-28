@@ -196,6 +196,7 @@ const handlerNewUser = async () => {
     Ciudad: ciudad.value,
     Faccion: faccion.value,
     FechaNacimiento: formatFecha(fechaNacimiento.value),
+    Telefono: telefono.value,
   };
 
   try {

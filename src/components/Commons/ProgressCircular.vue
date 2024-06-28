@@ -1,0 +1,11 @@
+<template>
+  <v-app>
+    <v-container>
+      <v-progress-circular
+        color="blue-lighten-3"
+        indeterminate
+        :size="57"
+      ></v-progress-circular>
+    </v-container>
+  </v-app>
+</template>

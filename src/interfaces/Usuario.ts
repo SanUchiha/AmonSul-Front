@@ -51,16 +51,6 @@ export interface Faccion {
 }
 
 export interface Jugador {
-  ID_Usuario: number;
-  NombreUsuario: string;
-  PrimerApellido: string;
-  SegundoApellido?: string;
-  Email: string;
-  Contraseña: string;
-  Rol: "JUGADOR" | "ADMIN";
-  Nick: string;
-  Ciudad: string;
-  Faccion: string;
-  FechaRegistro: Date;
-  FechaNacimiento: Date;
+  email: string;
+  nick: string;
 }
