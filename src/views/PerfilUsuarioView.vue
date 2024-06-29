@@ -20,29 +20,16 @@
                   <v-text-field
                     label="Nombre"
                     v-model="user!.nombreUsuario"
-                    append-icon="mdi-pencil"
-                    @click:append="
-                      iniciarEdicion(
-                        'nombreUsuario',
-                        'nombre',
-                        user!.nombreUsuario
-                      )
-                    "
-                  ></v-text-field>
+                    readonly
+                  >
+                  </v-text-field>
                 </v-col>
                 <v-divider></v-divider>
                 <v-col cols="12" class="d-flex justify-space-between">
                   <v-text-field
                     label="Primer Apellido"
                     v-model="user!.primerApellido"
-                    append-icon="mdi-pencil"
-                    @click:append="
-                      iniciarEdicion(
-                        'primerApellido',
-                        'primer apellido',
-                        user!.primerApellido
-                      )
-                    "
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
@@ -50,14 +37,7 @@
                   <v-text-field
                     label="Segundo Apellido"
                     v-model="user!.segundoApellido"
-                    append-icon="mdi-pencil"
-                    @click:append="
-                      iniciarEdicion(
-                        'segundoApellido',
-                        'segundo Apellido',
-                        user!.segundoApellido!
-                      )
-                    "
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
@@ -66,29 +46,17 @@
                     label="Email"
                     v-model="user!.email"
                     type="email"
-                    append-icon="mdi-pencil"
-                    @click:append="
-                      iniciarEdicion('email', 'email', user!.email)
-                    "
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
-                <v-col cols="12" class="d-flex justify-space-between">
-                  <v-text-field
-                    label="Contraseña"
-                    v-model="newPass"
-                    type="password"
-                    append-icon="mdi-pencil"
-                    @click:append="cambiarPass(newPass, 'contraseña')"
-                  ></v-text-field>
-                </v-col>
+
                 <v-divider></v-divider>
                 <v-col cols="12" class="d-flex justify-space-between">
                   <v-text-field
                     label="Nick"
                     v-model="user!.nick"
-                    append-icon="mdi-pencil"
-                    @click:append="iniciarEdicion('nick', 'nick', user!.nick)"
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
@@ -96,10 +64,7 @@
                   <v-text-field
                     label="ciudad"
                     v-model="user!.ciudad"
-                    append-icon="mdi-pencil"
-                    @click:append="
-                      iniciarEdicion('ciudad', 'Ciudad', user!.ciudad!)
-                    "
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
@@ -107,6 +72,7 @@
                   <v-text-field
                     label="Fecha de Registro"
                     v-model="user!.fechaRegistro"
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
@@ -114,14 +80,7 @@
                   <v-text-field
                     label="Fecha de nacimiento"
                     v-model="user!.fechaNacimiento"
-                    append-icon="mdi-pencil"
-                    @click:append="
-                      iniciarEdicion(
-                        'fechaNacimiento',
-                        'fecha de nacimiento',
-                        user!.fechaNacimiento
-                      )
-                    "
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
@@ -129,14 +88,7 @@
                   <v-text-field
                     label="Facción"
                     v-model="user!.idFaccion"
-                    append-icon="mdi-pencil"
-                    @click:append="
-                      iniciarEdicion(
-                        'idFaccion',
-                        'facción',
-                        user!.idFaccion?.toString()!
-                      )
-                    "
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
@@ -144,10 +96,7 @@
                   <v-text-field
                     label="Teléfono"
                     v-model="user!.telefono"
-                    append-icon="mdi-pencil"
-                    @click:append="
-                      iniciarEdicion('telefono', 'teléfono', user!.telefono!)
-                    "
+                    readonly
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -156,14 +105,6 @@
         </v-card>
       </v-col>
     </v-row>
-
-    <DialogConfirmarEdicion
-      v-model:dialogoEdicion="dialogoEdicion"
-      :campoEdicion="campoEdicion"
-      :valorEdicion="valorEdicion"
-      :label="label"
-      @guardar="guardarCambios"
-    />
   </v-container>
 </template>
 
@@ -172,23 +113,15 @@ import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import { getUsuario, editarUsuario } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
-import DialogConfirmarEdicion from "@/components/PerfilUsuario/DialogConfirmarEditar.vue";
 import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
 
 const user = ref<UsuarioViewDTO>();
 const loading = ref(true);
 const { getUser } = useAuth();
-
-const dialogoEdicion = ref(false);
-const campoEdicion = ref<keyof UsuarioViewDTO | null>(null);
-const valorEdicion = ref<string | null>(null);
-const newPass = ref<string>("");
-const label = ref<string>(``);
 const error = ref<string | null>(null); // Estado de error
 
 onMounted(async () => {
   const email: any = await getUser.value;
-  console.log(email);
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
     console.log(error.value);
@@ -204,41 +137,6 @@ onMounted(async () => {
     loading.value = false;
   }
 });
-
-const iniciarEdicion = (
-  campo: keyof UsuarioViewDTO,
-  labelForm: string,
-  valorActual: string
-) => {
-  campoEdicion.value = campo;
-  valorEdicion.value = valorActual;
-  dialogoEdicion.value = true;
-  label.value = labelForm;
-};
-
-const cambiarPass = (newPass: string, labelForm: string) => {
-  campoEdicion.value = "contraseña";
-  valorEdicion.value = newPass;
-  label.value = labelForm;
-  dialogoEdicion.value = true;
-};
-
-const guardarCambios = async (nuevoValor: string) => {
-  if (campoEdicion.value && user.value) {
-    user.value[campoEdicion.value] = nuevoValor;
-
-    try {
-      const json = {
-        email: getUser.value,
-        [campoEdicion.value]: nuevoValor,
-      };
-      const response = await editarUsuario(json);
-      console.log("response:", response);
-    } catch (error) {
-      console.error("Error al editar el usuario:", error);
-    }
-  }
-};
 </script>
 
 <style scoped>

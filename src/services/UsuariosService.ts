@@ -1,8 +1,6 @@
-import { Jugador, NewUserDTO } from "@/interfaces/Usuario";
+import { NewUserDTO } from "@/interfaces/Usuario";
 import { appsettings } from "@/settings/appsettings";
 import axios, { AxiosError } from "axios";
-
-//const apiUrl = "https://localhost:7125/api/Usuario";
 
 const baseUrl: string = appsettings.apiUrl;
 

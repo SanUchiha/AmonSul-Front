@@ -20,7 +20,6 @@ let jugador = ref<Jugador>();
 
 onMounted(async () => {
   const Nick = String(route.params.Nick);
-  console.log(Nick);
 });
 
 const formatDate = (date: string | number | Date) =>

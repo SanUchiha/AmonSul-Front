@@ -13,7 +13,7 @@ export interface NewUserDTO {
   Rol: "JUGADOR";
   Nick: string;
   Ciudad: string;
-  Faccion: string;
+  idFaccion: string;
   FechaNacimiento: string;
   Telefono: string;
 }
@@ -43,11 +43,6 @@ export interface UsuarioViewDTO {
   fechaNacimiento: string;
   idFaccion?: number;
   telefono?: string;
-}
-
-export interface Faccion {
-  ID_Faccion: number;
-  Nombre_Faccion: string;
 }
 
 export interface Jugador {

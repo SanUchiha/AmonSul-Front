@@ -9,7 +9,9 @@
           </v-card-title>
           <v-card-text> Usuario creado con éxito </v-card-text>
           <template v-slot:actions>
-            <v-btn text @click="handlerOk">Ok</v-btn>
+            <v-btn variant="outlined" color="blue darken-1" @click="handlerOk"
+              >Ok</v-btn
+            >
           </template>
         </v-card>
       </v-dialog>

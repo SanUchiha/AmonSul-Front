@@ -70,11 +70,14 @@
                 type="text"
                 :rules="[rules.phone]"
               ></v-text-field>
-              <v-text-field
-                v-model="faccion"
+              <v-select
+                v-model="faccionSelected"
+                :items="nombreFacciones"
+                density="comfortable"
                 label="Facción"
-                type="text"
-              ></v-text-field>
+                @click="loadFacciones"
+              ></v-select>
+              {{ faccionSelected }}
               <v-text-field
                 v-model="fechaNacimiento"
                 label="Fecha de Nacimiento"
@@ -83,16 +86,22 @@
                 required
               ></v-text-field>
               <v-row justify="center" class="my-4">
-                <v-btn variant="outlined" @click="handlerNewUser" class="mr-4">
+                <v-btn
+                  variant="outlined"
+                  color="blue darken-1"
+                  @click="handlerNewUser"
+                  class="mr-4"
+                >
                   Registrar
                 </v-btn>
                 <v-btn
                   variant="outlined"
+                  color="blue darken-1"
                   to="inicio-sesion"
                   :disabled="loading"
                   class="mr-4"
                 >
-                  Iniciar sesión
+                  Volver
                 </v-btn>
               </v-row>
               <v-row justify="center" v-if="loading" class="mt-3">
@@ -134,6 +143,8 @@ import { AxiosError } from "axios";
 import ErrorNick from "../RegistroUsuarios/ErrorNick.vue";
 import ErrorEmail from "../RegistroUsuarios/ErrorEmail.vue";
 import ResponseNuevoUsuario from "../RegistroUsuarios/ResponseNuevoUsuario.vue";
+import { getFacciones } from "@/services/FaccionesService";
+import { Faccion } from "@/interfaces/Faccion";
 
 const nombre = ref("");
 const primerApellido = ref("");
@@ -143,7 +154,6 @@ const password = ref("");
 const password2 = ref("");
 const nick = ref("");
 const ciudad = ref("");
-const faccion = ref("");
 const fechaNacimiento = ref("");
 const router = useRouter();
 const dialogNick = ref(false);
@@ -151,6 +161,9 @@ const dialogEmail = ref(false);
 const dialogOk = ref(false);
 const loading = ref(false);
 const telefono = ref("");
+const listaFacciones = ref<Faccion[]>([]);
+const nombreFacciones = ref<string[]>([]);
+const faccionSelected = ref<string>("");
 
 const formatFecha = (fechaString: string) => {
   const fecha = new Date(fechaString);
@@ -179,6 +192,19 @@ const rules = {
     "El número de teléfono debe tener 9 dígitos.",
 };
 
+const loadFacciones = async () => {
+  loading.value = true;
+  try {
+    const response = await getFacciones();
+    listaFacciones.value = response;
+    nombreFacciones.value = listaFacciones.value.map((f) => f.nombreFaccion);
+  } catch (error) {
+    console.log("Error al obtener las facciones:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
 const handlerNewUser = async () => {
   dialogNick.value = false;
   dialogEmail.value = false;
@@ -194,12 +220,20 @@ const handlerNewUser = async () => {
     Rol: "JUGADOR",
     Nick: nick.value,
     Ciudad: ciudad.value,
-    Faccion: faccion.value,
+    idFaccion: faccionSelected.value,
     FechaNacimiento: formatFecha(fechaNacimiento.value),
     Telefono: telefono.value,
   };
 
   try {
+    if (newUserDTO.idFaccion.length > 1) {
+      for (let index = 0; index < listaFacciones.value.length; index++) {
+        const element = listaFacciones.value[index];
+        if (newUserDTO.idFaccion === element.nombreFaccion) {
+          newUserDTO.idFaccion = element.idFaccion.toString();
+        }
+      }
+    }
     await newUser(newUserDTO);
     dialogOk.value = true;
   } catch (error: any) {

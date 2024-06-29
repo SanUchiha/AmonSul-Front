@@ -21,7 +21,6 @@ const listaJugadores = ref<Jugador[]>([]);
 onMounted(async () => {
   var response = await getUsuarios();
   listaJugadores.value = response.data;
-  console.log(listaJugadores.value);
 });
 </script>
 

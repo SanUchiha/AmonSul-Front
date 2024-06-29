@@ -1,7 +1,5 @@
 <template>
   <div>
-    <NavBar />
-
     <!-- Botón para volver atrás -->
     <v-btn @click="goBack" variant="tonal"> Atrás </v-btn>
 
@@ -52,9 +50,8 @@
 </template>
 
 <script setup lang="ts">
-import NavBar from "../components/Commons/NavBar";
 import { Torneo } from "@/interfaces/Torneo";
-import { getTorneoByIdMock } from "@/services/TorneosService";
+import { getTorneo } from "@/services/TorneosService";
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -64,7 +61,7 @@ let torneo = ref<Torneo>();
 
 onMounted(async () => {
   const idTorneo = Number(route.params.idTorneo);
-  torneo.value = await getTorneoByIdMock(idTorneo);
+  torneo.value = await getTorneo(idTorneo);
 });
 
 const formatDate = (date: string | number | Date) =>
