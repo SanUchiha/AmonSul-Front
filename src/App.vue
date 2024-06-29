@@ -5,7 +5,7 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <v-list>
-        <v-list-item link to="dashboard">
+        <v-list-item link to="dashboard" v-if="isAuthenticated">
           <v-list-item-icon>
             <v-icon>mdi-view-dashboard</v-icon>
           </v-list-item-icon>
@@ -14,7 +14,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item link to="torneos">
+        <v-list-item link to="torneos" v-if="isAuthenticated">
           <v-list-item-icon>
             <v-icon>mdi-trophy</v-icon>
           </v-list-item-icon>
@@ -22,7 +22,7 @@
             <v-list-item-title>Torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link to="jugadores">
+        <v-list-item link to="jugadores" v-if="isAuthenticated">
           <v-list-item-icon>
             <v-icon>mdi-account-group</v-icon>
           </v-list-item-icon>
@@ -30,7 +30,7 @@
             <v-list-item-title>Jugadores</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link to="partidas-amistosas">
+        <v-list-item link to="partidas-amistosas" v-if="isAuthenticated">
           <v-list-item-icon>
             <v-icon>mdi-gamepad-variant</v-icon>
           </v-list-item-icon>
@@ -38,7 +38,7 @@
             <v-list-item-title>Partidas</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link to="perfil-usuario">
+        <v-list-item link to="perfil-usuario" v-if="isAuthenticated">
           <v-list-item-icon>
             <v-icon>mdi-cog</v-icon>
           </v-list-item-icon>

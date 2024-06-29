@@ -1,5 +1,6 @@
 import { appsettings } from "@/settings/appsettings";
 import axios, { AxiosError } from "axios";
+import { RegistrarFaccionDTO } from "../interfaces/Faccion";
 
 const baseUrl: string = appsettings.apiUrl;
 
@@ -21,10 +22,13 @@ export const getFacciones = async () => {
   }
 };
 
-export const editarUsuario = async (json: any) => {
+export const registrarFaccion = async (nombreFaccionString: string) => {
   try {
-    const response = await axios.put(baseUrl + "Usuario/Editar", json);
-    return response;
+    const body: RegistrarFaccionDTO = {
+      nombreFaccion: nombreFaccionString,
+    };
+    const response = await axios.post(baseUrl + "Faccion/Registrar", body);
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw error as AxiosError;

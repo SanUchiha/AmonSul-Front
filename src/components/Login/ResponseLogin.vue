@@ -3,10 +3,6 @@
     <div class="text-center pa-4">
       <v-dialog v-model="internalVisible" width="auto" persistent>
         <v-card max-width="400" class="dialog-card">
-          <v-card-title class="text-center">
-            <v-icon color="success">mdi-check-circle</v-icon>
-            Login completado
-          </v-card-title>
           <v-card-text class="text-center">
             <img
               class="success-image"

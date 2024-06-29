@@ -70,14 +70,22 @@
                 type="text"
                 :rules="[rules.phone]"
               ></v-text-field>
-              <v-select
-                v-model="faccionSelected"
+              <v-combobox
+                v-model="faccion"
                 :items="nombreFacciones"
-                density="comfortable"
                 label="Facción"
                 @click="loadFacciones"
-              ></v-select>
-              {{ faccionSelected }}
+              >
+                <template #append-item>
+                  <v-btn
+                    variant="outlined"
+                    color="blue darken-1"
+                    @click="openDialogNuevaFaccion"
+                  >
+                    Añadir nueva facción
+                  </v-btn>
+                </template>
+              </v-combobox>
               <v-text-field
                 v-model="fechaNacimiento"
                 label="Fecha de Nacimiento"
@@ -131,6 +139,37 @@
       :isVisible="dialogOk"
       @update:isVisible="handleOkClick = $event"
     />
+
+    <v-dialog v-model="dialogAddFaccion" max-width="400px">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Añadir nueva facción</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="addFaccionForm">
+            <v-text-field
+              v-model="nuevaFaccion"
+              label="Nombre de la facción"
+              required
+              :rules="[rules.required]"
+            ></v-text-field>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            variant="outlined"
+            color="blue darken-1"
+            @click="dialogAddFaccion = false"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn variant="outlined" color="blue darken-1" @click="addFaccion">
+            Añadir
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -143,8 +182,8 @@ import { AxiosError } from "axios";
 import ErrorNick from "../RegistroUsuarios/ErrorNick.vue";
 import ErrorEmail from "../RegistroUsuarios/ErrorEmail.vue";
 import ResponseNuevoUsuario from "../RegistroUsuarios/ResponseNuevoUsuario.vue";
-import { getFacciones } from "@/services/FaccionesService";
-import { Faccion } from "@/interfaces/Faccion";
+import { getFacciones, registrarFaccion } from "@/services/FaccionesService";
+import { Faccion, RegistrarFaccionDTO } from "@/interfaces/Faccion";
 
 const nombre = ref("");
 const primerApellido = ref("");
@@ -159,11 +198,13 @@ const router = useRouter();
 const dialogNick = ref(false);
 const dialogEmail = ref(false);
 const dialogOk = ref(false);
+const dialogAddFaccion = ref(false);
 const loading = ref(false);
 const telefono = ref("");
 const listaFacciones = ref<Faccion[]>([]);
 const nombreFacciones = ref<string[]>([]);
 const faccionSelected = ref<string>("");
+const nuevaFaccion = ref<string>("");
 
 const formatFecha = (fechaString: string) => {
   const fecha = new Date(fechaString);
@@ -197,11 +238,33 @@ const loadFacciones = async () => {
   try {
     const response = await getFacciones();
     listaFacciones.value = response;
-    nombreFacciones.value = listaFacciones.value.map((f) => f.nombreFaccion);
+    nombreFacciones.value = listaFacciones.value
+      .map((f) => f.nombreFaccion)
+      .sort();
   } catch (error) {
     console.log("Error al obtener las facciones:", error);
   } finally {
     loading.value = false;
+  }
+};
+
+const openDialogNuevaFaccion = () => {
+  dialogAddFaccion.value = true;
+};
+
+const addFaccion = async () => {
+  loading.value = true;
+
+  try {
+    const response = await registrarFaccion(nuevaFaccion.value);
+    if (!response) alert("faccion no añadida");
+    dialogAddFaccion.value = false;
+    loadFacciones();
+  } catch (error) {
+    console.log("Error al registrar una nueva facción:", error);
+  } finally {
+    loading.value = false;
+    dialogAddFaccion.value = false;
   }
 };
 
