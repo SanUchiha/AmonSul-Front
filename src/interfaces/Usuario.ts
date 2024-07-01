@@ -13,7 +13,7 @@ export interface NewUserDTO {
   Rol: "JUGADOR";
   Nick: string;
   Ciudad: string;
-  idFaccion: string;
+  idFaccion: number;
   FechaNacimiento: string;
   Telefono: string;
 }

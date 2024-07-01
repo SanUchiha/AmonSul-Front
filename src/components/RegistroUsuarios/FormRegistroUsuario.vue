@@ -214,6 +214,7 @@ const listaFacciones = ref<Faccion[]>([]);
 const nombreFacciones = ref<string[]>([]);
 const faccionSelected = ref<string>("");
 const nuevaFaccion = ref<string>("");
+const idFaccionSelected = ref<number>();
 
 const formatFecha = (fechaString: string) => {
   const fecha = new Date(fechaString);
@@ -316,6 +317,15 @@ const handlerNewUser = async () => {
   dialogOk.value = false;
   loading.value = true;
 
+  if (faccionSelected.value.length > 1) {
+    for (let index = 0; index < listaFacciones.value.length; index++) {
+      const element = listaFacciones.value[index];
+      if (faccionSelected.value === element.nombreFaccion) {
+        idFaccionSelected.value = element.idFaccion;
+      }
+    }
+  }
+
   const newUserDTO: NewUserDTO = {
     NombreUsuario: nombre.value,
     PrimerApellido: primerApellido.value,
@@ -325,21 +335,11 @@ const handlerNewUser = async () => {
     Rol: "JUGADOR",
     Nick: nick.value,
     Ciudad: ciudad.value,
-    idFaccion: faccionSelected.value,
+    idFaccion: idFaccionSelected.value,
     FechaNacimiento: formatFecha(fechaNacimiento.value),
     Telefono: telefono.value,
   };
-  console.log("antes;", newUserDTO);
-
   try {
-    if (newUserDTO.idFaccion.length > 1) {
-      for (let index = 0; index < listaFacciones.value.length; index++) {
-        const element = listaFacciones.value[index];
-        if (newUserDTO.idFaccion === element.nombreFaccion) {
-          newUserDTO.idFaccion = element.idFaccion.toString();
-        }
-      }
-    }
     console.log("despues", newUserDTO);
     await newUser(newUserDTO);
     dialogOk.value = true;
