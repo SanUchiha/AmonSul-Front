@@ -9,13 +9,14 @@
             <h2>Nuevo usuario</h2>
           </v-card-title>
           <v-card-text>
-            <v-form @submit.prevent="handlerNewUser" ref="form">
+            <v-form @submit.prevent="validateForm" ref="form">
               <v-text-field
                 v-model="nombre"
                 label="Nombre"
                 type="text"
                 required
                 :rules="[rules.required]"
+                :error="errors.nombre"
               ></v-text-field>
               <v-text-field
                 v-model="primerApellido"
@@ -23,6 +24,7 @@
                 type="text"
                 required
                 :rules="[rules.required]"
+                :error="errors.primerApellido"
               ></v-text-field>
               <v-text-field
                 v-model="segundoApellido"
@@ -35,6 +37,7 @@
                 type="email"
                 :rules="[rules.required, rules.email]"
                 required
+                :error="errors.email"
               ></v-text-field>
               <v-text-field
                 v-model="password"
@@ -42,6 +45,7 @@
                 type="password"
                 :rules="[rules.required]"
                 required
+                :error="errors.password"
               ></v-text-field>
               <v-text-field
                 v-model="password2"
@@ -49,6 +53,7 @@
                 type="password"
                 :rules="[rules.required, rules.matchPassword]"
                 required
+                :error="errors.password2"
               ></v-text-field>
               <v-text-field
                 v-model="nick"
@@ -56,6 +61,7 @@
                 type="text"
                 required
                 :rules="[rules.required]"
+                :error="errors.nick"
               ></v-text-field>
               <v-text-field
                 v-model="ciudad"
@@ -63,15 +69,17 @@
                 type="text"
                 required
                 :rules="[rules.required]"
+                :error="errors.ciudad"
               ></v-text-field>
               <v-text-field
                 v-model="telefono"
                 label="Telefono"
                 type="text"
                 :rules="[rules.phone]"
+                :error="errors.telefono"
               ></v-text-field>
               <v-combobox
-                v-model="faccion"
+                v-model="faccionSelected"
                 :items="nombreFacciones"
                 label="Facción"
                 @click="loadFacciones"
@@ -92,12 +100,13 @@
                 type="date"
                 :rules="[rules.required, rules.validDate]"
                 required
+                :error="errors.fechaNacimiento"
               ></v-text-field>
               <v-row justify="center" class="my-4">
                 <v-btn
                   variant="outlined"
                   color="blue darken-1"
-                  @click="handlerNewUser"
+                  @click="validateForm"
                   class="mr-4"
                 >
                   Registrar
@@ -174,7 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { NewUserDTO } from "@/interfaces/Usuario";
 import { newUser } from "@/services/UsuariosService";
@@ -183,7 +192,7 @@ import ErrorNick from "../RegistroUsuarios/ErrorNick.vue";
 import ErrorEmail from "../RegistroUsuarios/ErrorEmail.vue";
 import ResponseNuevoUsuario from "../RegistroUsuarios/ResponseNuevoUsuario.vue";
 import { getFacciones, registrarFaccion } from "@/services/FaccionesService";
-import { Faccion, RegistrarFaccionDTO } from "@/interfaces/Faccion";
+import { Faccion } from "@/interfaces/Faccion";
 
 const nombre = ref("");
 const primerApellido = ref("");
@@ -233,6 +242,18 @@ const rules = {
     "El número de teléfono debe tener 9 dígitos.",
 };
 
+const errors = reactive({
+  nombre: false,
+  primerApellido: false,
+  email: false,
+  password: false,
+  password2: false,
+  nick: false,
+  ciudad: false,
+  fechaNacimiento: false,
+  telefono: false,
+});
+
 const loadFacciones = async () => {
   loading.value = true;
   try {
@@ -268,6 +289,27 @@ const addFaccion = async () => {
   }
 };
 
+const validateForm = () => {
+  errors.nombre = !nombre.value;
+  errors.primerApellido = !primerApellido.value;
+  errors.email = !email.value || !rules.email(email.value);
+  errors.password = !password.value;
+  errors.password2 = !password2.value || password.value !== password2.value;
+  errors.nick = !nick.value;
+  errors.ciudad = !ciudad.value;
+  errors.fechaNacimiento =
+    !fechaNacimiento.value || !rules.validDate(fechaNacimiento.value);
+  errors.telefono = telefono.value && !rules.phone(telefono.value);
+
+  const formIsValid = Object.values(errors).every((error) => !error);
+
+  if (formIsValid) {
+    handlerNewUser();
+  } else {
+    alert("Por favor, completa todos los campos requeridos correctamente.");
+  }
+};
+
 const handlerNewUser = async () => {
   dialogNick.value = false;
   dialogEmail.value = false;
@@ -287,6 +329,7 @@ const handlerNewUser = async () => {
     FechaNacimiento: formatFecha(fechaNacimiento.value),
     Telefono: telefono.value,
   };
+  console.log("antes;", newUserDTO);
 
   try {
     if (newUserDTO.idFaccion.length > 1) {
@@ -297,6 +340,7 @@ const handlerNewUser = async () => {
         }
       }
     }
+    console.log("despues", newUserDTO);
     await newUser(newUserDTO);
     dialogOk.value = true;
   } catch (error: any) {
