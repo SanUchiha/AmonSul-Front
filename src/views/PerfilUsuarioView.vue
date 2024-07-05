@@ -110,7 +110,7 @@
 
 <script setup lang="ts">
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
-import { getUsuario, editarUsuario } from "@/services/UsuariosService";
+import { getUsuario } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "@/components/Commons/ProgressCircular.vue";

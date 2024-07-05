@@ -17,6 +17,24 @@ export const newUser = async (newUser: NewUserDTO) => {
   }
 };
 
+export const getUsuarioPartidas = async (email: string) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(baseUrl + "Usuario/Email/" + email, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
+
 export const getUsuario = async (email: string) => {
   try {
     const token = localStorage.getItem("token");
@@ -43,7 +61,7 @@ export const getUsuarios = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response;
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw error as AxiosError;

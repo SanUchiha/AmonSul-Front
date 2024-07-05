@@ -49,3 +49,18 @@ export interface Jugador {
   email: string;
   nick: string;
 }
+
+export interface ViewUsuarioPartidaDTO {
+  idUsuario: number;
+  email: string;
+  nick: string;
+  ciudad?: string | null;
+  fechaRegistro: string;
+  idFaccion?: number | null;
+  numeroPartidasJugadas: number;
+  partidasGanadas: number;
+  partidasEmpatadas: number;
+  partidasPerdidas: number;
+  puntuacionElo: number;
+  clasificacionElo: number;
+}

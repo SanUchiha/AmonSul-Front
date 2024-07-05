@@ -14,6 +14,9 @@
             @partidaValidada="cargarPartidasPendientes"
           />
         </div>
+        <div v-else>
+          <h3>No tienes partidas validadas</h3>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -26,16 +29,19 @@ import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
 import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "../components/Commons/ProgressCircular.vue";
+import { useRouter } from "vue-router";
 
 const loading = ref(true);
 const { getUser } = useAuth();
 const error = ref<string | null>(null);
+const router = useRouter();
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 
 const cargarPartidasPendientes = async () => {
   const email: any = await getUser.value;
   if (!email) {
+    router.push("error");
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
     console.log(error.value);
     return;

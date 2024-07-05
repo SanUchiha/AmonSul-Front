@@ -340,7 +340,6 @@ const handlerNewUser = async () => {
     Telefono: telefono.value,
   };
   try {
-    console.log("despues", newUserDTO);
     await newUser(newUserDTO);
     dialogOk.value = true;
   } catch (error: any) {
