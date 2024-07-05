@@ -65,3 +65,21 @@ export const editarUsuario = async (json: any) => {
     }
   }
 };
+
+export const getNickById = async (idUduario: number) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(baseUrl + "Usuario/id/" + idUduario, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
