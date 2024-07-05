@@ -5,13 +5,13 @@
         <div v-if="loading">
           <ProgressCircular />
         </div>
-        <div v-if="!loading && pendingMatches.length > 0">
-          <PendingMatchCard
-            v-for="match in pendingMatches"
+        <div v-if="!loading && validMatches.length > 0">
+          <ValidadasMatchCard
+            v-for="match in validMatches"
             :key="match.idPartidaAmistosa"
             :match="match"
             class="mb-4"
-            @partidaValidada="cargarPartidasPendientes"
+            @partidaValidada="cargarPartidasValidadas"
           />
         </div>
         <div v-else>
@@ -24,9 +24,9 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { getPartidasPendientesValidar } from "@/services/PartidasAmistosasService";
+import { getPartidasValidadas } from "@/services/PartidasAmistosasService";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
-import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
+import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "../components/Commons/ProgressCircular.vue";
 import { useRouter } from "vue-router";
@@ -36,9 +36,9 @@ const { getUser } = useAuth();
 const error = ref<string | null>(null);
 const router = useRouter();
 
-const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
+const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 
-const cargarPartidasPendientes = async () => {
+const cargarPartidasValidadas = async () => {
   const email: any = await getUser.value;
   if (!email) {
     router.push("error");
@@ -47,8 +47,8 @@ const cargarPartidasPendientes = async () => {
     return;
   }
   try {
-    const response = await getPartidasPendientesValidar(email);
-    pendingMatches.value = response;
+    const response = await getPartidasValidadas(email);
+    validMatches.value = response;
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   } finally {
@@ -56,7 +56,7 @@ const cargarPartidasPendientes = async () => {
   }
 };
 
-onMounted(cargarPartidasPendientes);
+onMounted(cargarPartidasValidadas);
 </script>
 
 <style scoped></style>

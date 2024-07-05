@@ -46,3 +46,24 @@ export const ValidarPartida = async (validarpartidaDTO: ValidarPartidaDTO) => {
     }
   }
 };
+
+export const getPartidasValidadas = async (email: string) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(
+      baseUrl + "PartidaAmistosa/Validadas/" + email,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
