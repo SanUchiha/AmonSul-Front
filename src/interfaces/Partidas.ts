@@ -1,5 +1,3 @@
-import { Escenarios } from "@/settings/appsettings";
-
 export interface ViewPartidaAmistosaDTO {
   idPartidaAmistosa: number;
   idUsuario1: number;

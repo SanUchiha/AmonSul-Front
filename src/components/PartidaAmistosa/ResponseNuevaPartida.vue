@@ -5,9 +5,8 @@
         <v-card max-width="400">
           <v-card-title>
             <v-icon color="success">mdi-check-circle</v-icon>
-            Registro completado
+            Partida creada con éxito
           </v-card-title>
-          <v-card-text> Partida creada con éxito </v-card-text>
           <template v-slot:actions>
             <v-btn variant="outlined" color="blue darken-1" @click="handlerOk"
               >Ok</v-btn
@@ -44,7 +43,7 @@ watch(
 const handlerOk = () => {
   emits("update:isVisible", false);
   internalVisible.value = false;
-  router.push("inicio-sesion");
+  router.push("dashboard");
 };
 
 const handleEscapeKey = (event: KeyboardEvent) => {

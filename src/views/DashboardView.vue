@@ -43,6 +43,7 @@
     <v-row dense>
       <v-col cols="12" md="8" class="text-center">
         <v-card
+          color="#632687"
           class="mx-auto"
           @click="handleFormCreateMatch"
           max-width="344"
@@ -87,16 +88,22 @@ const router = useRouter();
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 
-const cargarPartidasPendientes = async () => {
-  const email: any = await getUser.value;
-  if (!email) {
-    error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
-    console.log(error.value);
-    return;
+const cargarPartidasPendientes = async (email: any) => {
+  if (email == null) {
+    email = await getUser.value;
+    console.log("email", email);
+    if (!email) {
+      error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
+      console.log(error.value);
+      router.push("error");
+      return;
+    }
   }
+
   try {
     const response = await getPartidasPendientesValidar(email);
     pendingMatches.value = response;
+    console.log(response);
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   } finally {
@@ -105,15 +112,18 @@ const cargarPartidasPendientes = async () => {
 };
 
 onMounted(async () => {
-  cargarPartidasPendientes;
+  console.log("entra");
   const email: any = await getUser.value;
   if (!email) {
     router.push("error");
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
     console.log(error.value);
+    router.push("error");
     loading.value = false;
     return;
   }
+  await cargarPartidasPendientes(email);
+
   try {
     const usuarioResponse = await getUsuarioPartidas(email);
     usuario.value = usuarioResponse;

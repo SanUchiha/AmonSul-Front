@@ -24,17 +24,20 @@ import JugadorCard from "../components/Usuarios/JugadorCard.vue";
 import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
+import { useRouter } from "vue-router";
 
 const listaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
 const { getUser } = useAuth();
-const error = ref<string | null>(null); // Estado de error
+const error = ref<string | null>(null);
 const loading = ref(true);
+const router = useRouter();
 
 onMounted(async () => {
   const email: any = await getUser.value;
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
     console.log(error.value);
+    router.push("error");
     loading.value = false;
     return;
   }

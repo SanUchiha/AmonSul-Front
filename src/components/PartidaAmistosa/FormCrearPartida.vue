@@ -11,49 +11,38 @@
           <v-card-text>
             <v-form @submit.prevent="validateForm" ref="form">
               <v-combobox
-                v-model="listadoNicks"
-                :items="nickUno"
-                label="Jugador 1"
-                @click="loadNicks"
-                :rules="[rules.required]"
-                required
-              ></v-combobox>
-              <v-combobox
-                v-model="listadoNicks"
-                :items="nickDos"
-                label="Jugador 2"
+                v-model="nickDosSelected"
+                :items="listadoNicks"
+                label="Rival"
                 @click="loadNicks"
                 :rules="[rules.required]"
                 required
               ></v-combobox>
               <v-text-field
                 v-model="puntosJugadorUno"
-                label="Puntos jugador 1"
+                label="Mis puntos"
                 type="number"
                 :rules="[rules.required]"
                 required
               ></v-text-field>
               <v-text-field
-                v-model="puntosJugadordos"
-                label="Puntos jugador 2"
+                v-model="puntosJugadorDos"
+                label="Puntos rival"
                 type="number"
                 :rules="[rules.required]"
                 required
               ></v-text-field>
-              <v-card-text>
-                <div class="d-flex pa-4">
-                  <v-checkbox-btn
-                    v-model="checkEsMatchedPlay"
-                    class="pe-2"
-                  ></v-checkbox-btn>
-                  <v-text-field
-                    :disabled="!checkEsMatchedPlay"
-                    label="Escenarios"
-                    @click="loadEscenarios"
-                    hide-details
-                  ></v-text-field>
-                </div>
-              </v-card-text>
+              <v-switch
+                v-model="checkEsMatchedPlay"
+                color="primary"
+                label="¿Es matched play?"
+              ></v-switch>
+              <v-combobox
+                v-if="checkEsMatchedPlay"
+                v-model="escenarioSelected"
+                :items="listaEscenarios"
+                label="Escenario"
+              ></v-combobox>
               <v-text-field
                 v-model="puntosPartida"
                 label="Puntos partida"
@@ -107,24 +96,25 @@ import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { getUsuarios } from "@/services/UsuariosService";
 import { registrarPartida } from "@/services/PartidasAmistosasService";
-import { AxiosError } from "axios";
 import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { CreatePartidaAmistosaDTO } from "@/interfaces/Partidas";
+import { useAuth } from "@/composables/useAuth";
+import { appsettings } from "@/settings/appsettings";
+import ResponseNuevaPartida from "./ResponseNuevaPartida.vue";
 
 const router = useRouter();
+const { getUser } = useAuth();
+const error = ref<string | null>(null);
 const dialogOk = ref(false);
 const loading = ref(false);
 const listaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
 const listadoNicks = ref<string[]>([]);
-const idJugadorUnoSelected = ref<number>();
-const idJugadorDosSelected = ref<number>();
-
-const jugadorUno = ref<string>("");
-const jugadorDos = ref<string>("");
+const listaEscenarios: string[] = appsettings.escenarios;
+const nickDosSelected = ref<string>("");
+const escenarioSelected = ref<string>("");
 const puntosJugadorUno = ref<number | null>(null);
 const puntosJugadorDos = ref<number | null>(null);
 const checkEsMatchedPlay = ref<boolean>(false);
-const escenario = ref<string>("");
 const puntosPartida = ref<number | null>(null);
 
 const rules = {
@@ -133,9 +123,19 @@ const rules = {
 
 const loadNicks = async () => {
   loading.value = true;
+  const email: any = await getUser.value;
+  if (!email) {
+    error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
+    console.log(error.value);
+    router.push("error");
+    loading.value = false;
+    return;
+  }
   try {
-    var rawListaUsuarios: ViewUsuarioPartidaDTO[] = getUsuarios();
+    var rawListaUsuarios: ViewUsuarioPartidaDTO[] = await getUsuarios();
+    rawListaUsuarios = rawListaUsuarios.filter((u) => u.email != email);
     listaUsuarios.value = rawListaUsuarios;
+    listadoNicks.value;
     listadoNicks.value = listaUsuarios.value.map((f) => f.nick).sort();
   } catch (error) {
     console.log("Error al obtener los nicks:", error);
@@ -145,16 +145,14 @@ const loadNicks = async () => {
 };
 
 const errors = reactive({
-  jugadorUno: false,
-  jugadorDos: false,
+  nickDosSelected: false,
   puntosJugadorUno: false,
   puntosJugadorDos: false,
   puntosPartida: false,
 });
 
 const validateForm = () => {
-  errors.jugadorUno = !jugadorUno.value;
-  errors.jugadorDos = !jugadorDos.value;
+  errors.nickDosSelected = !nickDosSelected.value;
   errors.puntosJugadorUno = puntosJugadorUno.value === null;
   errors.puntosJugadorDos = puntosJugadorDos.value === null;
   errors.puntosPartida = puntosPartida.value === null;
@@ -171,22 +169,32 @@ const validateForm = () => {
 const handlerNuevaPartida = async () => {
   dialogOk.value = false;
   loading.value = true;
+  const email: any = await getUser.value;
+  if (!email) {
+    error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
+    console.log(error.value);
+    router.push("error");
+    loading.value = false;
+    return;
+  }
 
-  //Seleccionamos los id de los nicks
-  //Jugador 1
-  idJugadorUnoSelected.value = listaUsuarios.value;
-  // Jugador 2
+  const usuarioCreador: ViewUsuarioPartidaDTO | undefined =
+    listaUsuarios.value.find((u) => u.email == email);
 
-  //   if (faccionSelected.value.length > 1) {
-  //     for (let index = 0; index < listaFacciones.value.length; index++) {
-  //       const element = listaFacciones.value[index];
-  //       if (faccionSelected.value === element.nombreFaccion) {
-  //         idFaccionSelected.value = element.idFaccion;
-  //       }
-  //     }
-  //   }
+  const rival: ViewUsuarioPartidaDTO | undefined = listaUsuarios.value.find(
+    (u) => u.nick == nickDosSelected.value
+  );
 
-  const nuevaPartida: CreatePartidaAmistosaDTO = {};
+  const nuevaPartida: CreatePartidaAmistosaDTO = {
+    IdUsuario1: usuarioCreador!.idUsuario,
+    IdUsuario2: rival!.idUsuario,
+    resultadoUsuario1: puntosJugadorUno.value ?? 0,
+    resultadoUsuario2: puntosJugadorDos.value ?? 0,
+    puntosPartida: puntosPartida.value ?? 0,
+    esMatchedPlayPartida: checkEsMatchedPlay.value ?? false,
+    escenarioPartida: escenarioSelected.value,
+  };
+
   try {
     await registrarPartida(nuevaPartida);
     dialogOk.value = true;
@@ -199,6 +207,7 @@ const handlerNuevaPartida = async () => {
 
 const handleOkClick = () => {
   dialogOk.value = false;
+  router.push("dashboard");
 };
 </script>
 
