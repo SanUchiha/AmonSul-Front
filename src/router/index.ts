@@ -12,6 +12,7 @@ import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
 import TorneosView from "@/views/TorneosView.vue";
 import ErrorView from "@/views/ErrorView.vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -19,6 +20,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/detalle-jugador/:Nick",
     name: "detalle-jugador",
     component: DetalleJugadorView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/registrar-partida",
+    name: "registrar-partida",
+    component: FormCrearPartida,
     meta: { requiresAuth: true },
   },
   {

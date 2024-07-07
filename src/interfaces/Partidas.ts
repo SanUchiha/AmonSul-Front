@@ -1,3 +1,5 @@
+import { Escenarios } from "@/settings/appsettings";
+
 export interface ViewPartidaAmistosaDTO {
   idPartidaAmistosa: number;
   idUsuario1: number;
@@ -17,4 +19,14 @@ export interface ViewPartidaAmistosaDTO {
 export interface ValidarPartidaDTO {
   idPartida: number;
   emailJugador: string;
+}
+
+export interface CreatePartidaAmistosaDTO {
+  IdUsuario1: number;
+  IdUsuario2: number;
+  resultadoUsuario1: number;
+  resultadoUsuario2: number;
+  puntosPartida: number;
+  esMatchedPlayPartida: boolean;
+  escenarioPartida: string;
 }

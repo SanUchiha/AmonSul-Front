@@ -40,6 +40,19 @@
         <JugadorCard :usuario="usuario" />
       </v-col>
     </v-row>
+    <v-row dense>
+      <v-col cols="12" md="8" class="text-center">
+        <v-card
+          class="mx-auto"
+          @click="handleFormCreateMatch"
+          max-width="344"
+          title="Registrar partida"
+          appendIcon="mdi-open-in-app"
+          prependIcon="mdi-open-in-app"
+        >
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -110,6 +123,10 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+const handleFormCreateMatch = () => {
+  router.push("registrar-partida");
+};
 </script>
 
 <style scoped>

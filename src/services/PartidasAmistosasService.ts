@@ -1,4 +1,7 @@
-import { ValidarPartidaDTO } from "@/interfaces/Partidas";
+import {
+  CreatePartidaAmistosaDTO,
+  ValidarPartidaDTO,
+} from "@/interfaces/Partidas";
 import { appsettings } from "@/settings/appsettings";
 import axios, { AxiosError } from "axios";
 
@@ -59,6 +62,30 @@ export const getPartidasValidadas = async (email: string) => {
       }
     );
     return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
+
+export const registrarPartida = async (
+  nuevaPartida: CreatePartidaAmistosaDTO
+) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.post(
+      baseUrl + "PartidaAmistosa",
+      nuevaPartida,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (response.data.status) return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw error as AxiosError;
