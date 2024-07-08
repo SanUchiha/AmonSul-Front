@@ -10,6 +10,20 @@
           Resultado: {{ match.resultadoUsuario1 }} -
           {{ match.resultadoUsuario2 }}
         </p>
+        <p>Fecha: {{ fechaPartidaFormateada }}</p>
+      </v-card-text>
+      <v-card-text>
+        <p>
+          Resultado: {{ match.resultadoUsuario1 }} -
+          {{ match.resultadoUsuario2 }}
+        </p>
+        <p>Fecha: {{ match.fechaPartida }}</p>
+      </v-card-text>
+      <v-card-text>
+        <p>
+          Resultado: {{ match.resultadoUsuario1 }} -
+          {{ match.resultadoUsuario2 }}
+        </p>
         <p>Fecha: {{ match.fechaPartida }}</p>
       </v-card-text>
     </v-card>
@@ -34,6 +48,7 @@ import { getNickById } from "@/services/UsuariosService";
 import { useRouter } from "vue-router";
 import { ValidarPartida } from "@/services/PartidasAmistosasService";
 import ModalResponsePartidaValidada from "./ModalResponsePartidaValidada.vue";
+import { formatFechaSpa } from "@/utils/Fecha";
 
 const loading = ref(true);
 const { getUser } = useAuth();
@@ -43,6 +58,7 @@ const nickJugadorDos = ref<string>("");
 const validarPartidaDTO = ref<ValidarPartidaDTO>();
 const router = useRouter();
 const modalVisible = ref(false);
+const fechaPartidaFormateada = ref<string>("");
 
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
@@ -54,6 +70,9 @@ onMounted(async () => {
   try {
     nickJugadorUno.value = await getNickById(props.match.idUsuario1);
     nickJugadorDos.value = await getNickById(props.match.idUsuario2);
+    fechaPartidaFormateada.value = await formatFechaSpa(
+      props.match.fechaPartida
+    );
   } catch (err) {
     router.push("error");
     error.value = "Error al cargar los datos";

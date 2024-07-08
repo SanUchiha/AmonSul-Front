@@ -33,7 +33,7 @@ const loading = ref(true);
 const router = useRouter();
 
 onMounted(async () => {
-  const email: any = await getUser.value;
+  const email: string | unknown = await getUser.value;
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
     console.log(error.value);

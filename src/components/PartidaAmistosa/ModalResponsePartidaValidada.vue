@@ -5,7 +5,9 @@
       <v-card-text> La partida ha sido validada exitosamente. </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="green darken-1" @click="closeModal">Aceptar</v-btn>
+        <v-btn variant="outlined" color="blue darken-1" @click="closeModal"
+          >Aceptar</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>

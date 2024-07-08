@@ -101,7 +101,6 @@ import { CreatePartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
 import { appsettings } from "@/settings/appsettings";
 import ResponseNuevaPartida from "./ResponseNuevaPartida.vue";
-import ContactoView from "@/views/ContactoView.vue";
 
 const router = useRouter();
 const { getUser } = useAuth();
@@ -126,7 +125,7 @@ const rules = {
 
 const loadNicks = async () => {
   loading.value = true;
-  const email: any = await getUser.value;
+  const email: string = await getUser.value;
   emailOwner.value = email;
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
@@ -155,7 +154,9 @@ const errors = reactive({
 });
 
 const validateForm = () => {
-  errors.nickDosSelected = !nickDosSelected.value;
+  errors.nickDosSelected =
+    !nickDosSelected.value ||
+    !listadoNicks.value.includes(nickDosSelected.value);
   errors.puntosJugadorUno = puntosJugadorUno.value === null;
   errors.puntosJugadorDos = puntosJugadorDos.value === null;
   errors.puntosPartida = puntosPartida.value === null;
@@ -172,7 +173,7 @@ const validateForm = () => {
 const handlerNuevaPartida = async () => {
   dialogOk.value = false;
   loading.value = true;
-  const email: any = await getUser.value;
+  const email: string = await getUser.value;
   emailOwner.value = email;
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
@@ -189,8 +190,8 @@ const handlerNuevaPartida = async () => {
     await listaUsuarios.value.find((u) => u.nick == nickDosSelected.value);
 
   const nuevaPartida: CreatePartidaAmistosaDTO = {
-    IdUsuario1: usuarioCreador!.idUsuario,
-    IdUsuario2: rival!.idUsuario,
+    IdUsuario1: usuarioCreador?.idUsuario,
+    IdUsuario2: rival?.idUsuario,
     resultadoUsuario1: puntosJugadorUno.value ?? 0,
     resultadoUsuario2: puntosJugadorDos.value ?? 0,
     puntosPartida: puntosPartida.value ?? 0,
@@ -201,7 +202,7 @@ const handlerNuevaPartida = async () => {
   try {
     await registrarPartida(nuevaPartida);
     dialogOk.value = true;
-  } catch (error: any) {
+  } catch (error: string) {
     router.push("error");
   } finally {
     loading.value = false;
