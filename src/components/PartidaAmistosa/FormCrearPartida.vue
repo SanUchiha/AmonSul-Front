@@ -101,6 +101,7 @@ import { CreatePartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
 import { appsettings } from "@/settings/appsettings";
 import ResponseNuevaPartida from "./ResponseNuevaPartida.vue";
+import ContactoView from "@/views/ContactoView.vue";
 
 const router = useRouter();
 const { getUser } = useAuth();
@@ -116,6 +117,8 @@ const puntosJugadorUno = ref<number | null>(null);
 const puntosJugadorDos = ref<number | null>(null);
 const checkEsMatchedPlay = ref<boolean>(false);
 const puntosPartida = ref<number | null>(null);
+const emailOwner = ref<string>("");
+const rawListaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
 
 const rules = {
   required: (value: string | null) => !!value || "Este campo es obligatorio.",
@@ -124,6 +127,7 @@ const rules = {
 const loadNicks = async () => {
   loading.value = true;
   const email: any = await getUser.value;
+  emailOwner.value = email;
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
     console.log(error.value);
@@ -132,10 +136,9 @@ const loadNicks = async () => {
     return;
   }
   try {
-    var rawListaUsuarios: ViewUsuarioPartidaDTO[] = await getUsuarios();
-    rawListaUsuarios = rawListaUsuarios.filter((u) => u.email != email);
-    listaUsuarios.value = rawListaUsuarios;
-    listadoNicks.value;
+    rawListaUsuarios.value = await getUsuarios();
+    listaUsuarios.value = rawListaUsuarios.value;
+    listaUsuarios.value = listaUsuarios.value.filter((u) => u.email != email);
     listadoNicks.value = listaUsuarios.value.map((f) => f.nick).sort();
   } catch (error) {
     console.log("Error al obtener los nicks:", error);
@@ -170,6 +173,7 @@ const handlerNuevaPartida = async () => {
   dialogOk.value = false;
   loading.value = true;
   const email: any = await getUser.value;
+  emailOwner.value = email;
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
     console.log(error.value);
@@ -179,11 +183,10 @@ const handlerNuevaPartida = async () => {
   }
 
   const usuarioCreador: ViewUsuarioPartidaDTO | undefined =
-    listaUsuarios.value.find((u) => u.email == email);
+    await rawListaUsuarios.value.find((u) => u.email == email);
 
-  const rival: ViewUsuarioPartidaDTO | undefined = listaUsuarios.value.find(
-    (u) => u.nick == nickDosSelected.value
-  );
+  const rival: ViewUsuarioPartidaDTO | undefined =
+    await listaUsuarios.value.find((u) => u.nick == nickDosSelected.value);
 
   const nuevaPartida: CreatePartidaAmistosaDTO = {
     IdUsuario1: usuarioCreador!.idUsuario,

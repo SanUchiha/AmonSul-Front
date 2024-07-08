@@ -91,7 +91,6 @@ const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const cargarPartidasPendientes = async (email: any) => {
   if (email == null) {
     email = await getUser.value;
-    console.log("email", email);
     if (!email) {
       error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
       console.log(error.value);
@@ -103,7 +102,6 @@ const cargarPartidasPendientes = async (email: any) => {
   try {
     const response = await getPartidasPendientesValidar(email);
     pendingMatches.value = response;
-    console.log(response);
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   } finally {
@@ -112,7 +110,6 @@ const cargarPartidasPendientes = async (email: any) => {
 };
 
 onMounted(async () => {
-  console.log("entra");
   const email: any = await getUser.value;
   if (!email) {
     router.push("error");
