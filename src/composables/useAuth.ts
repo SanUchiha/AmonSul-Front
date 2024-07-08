@@ -7,7 +7,7 @@ import { AuthState } from "@/interfaces/Error";
 const BASE_URL: string = appsettings.apiUrl;
 
 const stateAuth = reactive<AuthState>({
-  user: null,
+  user: JSON.parse(localStorage.getItem("user") || "null"),
   token: localStorage.getItem("token") || "",
   error: null,
 });
@@ -20,6 +20,8 @@ const login = async (credentials: RequestLoginDTO) => {
       const user = response.data.user;
 
       localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
       stateAuth.token = token;
       stateAuth.user = user;
       stateAuth.error = null;
@@ -28,6 +30,7 @@ const login = async (credentials: RequestLoginDTO) => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.message || "Error de servidor";
+      stateAuth.error = errorMessage;
       return errorMessage;
     }
     throw error;
@@ -36,6 +39,8 @@ const login = async (credentials: RequestLoginDTO) => {
 
 const logout = () => {
   localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
   stateAuth.user = null;
   stateAuth.token = "";
   stateAuth.error = null;
