@@ -125,7 +125,7 @@ const rules = {
 
 const loadNicks = async () => {
   loading.value = true;
-  const email: string = await getUser.value;
+  const email: any = await getUser.value;
   emailOwner.value = email;
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
@@ -173,7 +173,7 @@ const validateForm = () => {
 const handlerNuevaPartida = async () => {
   dialogOk.value = false;
   loading.value = true;
-  const email: string = await getUser.value;
+  const email: any = await getUser.value;
   emailOwner.value = email;
   if (!email) {
     error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
@@ -190,8 +190,8 @@ const handlerNuevaPartida = async () => {
     await listaUsuarios.value.find((u) => u.nick == nickDosSelected.value);
 
   const nuevaPartida: CreatePartidaAmistosaDTO = {
-    IdUsuario1: usuarioCreador?.idUsuario,
-    IdUsuario2: rival?.idUsuario,
+    IdUsuario1: usuarioCreador!.idUsuario,
+    IdUsuario2: rival!.idUsuario,
     resultadoUsuario1: puntosJugadorUno.value ?? 0,
     resultadoUsuario2: puntosJugadorDos.value ?? 0,
     puntosPartida: puntosPartida.value ?? 0,
@@ -202,7 +202,7 @@ const handlerNuevaPartida = async () => {
   try {
     await registrarPartida(nuevaPartida);
     dialogOk.value = true;
-  } catch (error: string) {
+  } catch (error: any) {
     router.push("error");
   } finally {
     loading.value = false;

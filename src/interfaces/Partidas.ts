@@ -1,7 +1,9 @@
 export interface ViewPartidaAmistosaDTO {
   idPartidaAmistosa: number;
   idUsuario1: number;
+  nickUsuario1: string;
   idUsuario2: number;
+  nickUsuario2: string;
   resultadoUsuario1: number;
   resultadoUsuario2: number;
   fechaPartida: string;
@@ -9,6 +11,7 @@ export interface ViewPartidaAmistosaDTO {
   escenarioPartida: string;
   puntosPartida: number | null;
   ganadorPartida: number;
+  ganadorPartidaNick: string;
   esElo: boolean;
   partidaValidadaUsuario1: boolean;
   partidaValidadaUsuario2: boolean;
