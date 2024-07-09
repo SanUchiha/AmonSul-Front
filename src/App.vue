@@ -38,6 +38,14 @@
             <v-list-item-title>Partidas</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item link to="elo" v-if="isAuthenticated">
+          <v-list-item-icon>
+            <v-icon>mdi-cog</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Elo</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item link to="perfil-usuario" v-if="isAuthenticated">
           <v-list-item-icon>
             <v-icon>mdi-cog</v-icon>

@@ -19,7 +19,6 @@
         </div>
       </v-col>
     </v-row>
-
     <v-row dense>
       <v-col cols="12" md="8" class="text-center">
         <JugadorCard :usuario="usuario" />
@@ -91,7 +90,6 @@ const usuario = ref<ViewUsuarioPartidaDTO>({
 
 const loading = ref(true);
 const { getUser } = useAuth();
-const error = ref<string | null>(null);
 const router = useRouter();
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
@@ -132,6 +130,16 @@ const cargarPartidasValidadas = async (email: string) => {
 
 const cargarPartidasPendientes = async (email: string) => {
   try {
+    if (!email) {
+      email = await getUser.value;
+      if (!email) {
+        throw new Error(
+          "No se pudo obtener el usuario. Por favor, inicie sesión."
+        );
+      }
+    }
+
+    console.log("entra");
     const response = await getPartidasPendientesValidar(email);
     pendingMatches.value = response;
   } catch (error) {
