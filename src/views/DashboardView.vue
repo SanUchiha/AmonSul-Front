@@ -139,7 +139,6 @@ const cargarPartidasPendientes = async (email: string) => {
       }
     }
 
-    console.log("entra");
     const response = await getPartidasPendientesValidar(email);
     pendingMatches.value = response;
   } catch (error) {

@@ -69,7 +69,6 @@ onMounted(async () => {
     if (!email) {
       error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
       router.push("error");
-      console.log(error.value);
       loading.value = false;
       return;
     }
@@ -77,8 +76,6 @@ onMounted(async () => {
     const elos = response.elos.map(
       (elo: { puntuacionElo: any }) => elo.puntuacionElo
     );
-
-    console.log(elos);
 
     value.value = elos;
 

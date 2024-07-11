@@ -49,6 +49,11 @@ const cargarPartidasValidadas = async () => {
   try {
     const response = await getPartidasValidadas(email);
     validMatches.value = response;
+    validMatches.value = validMatches.value.sort((a, b) => {
+      let dateA = new Date(a.fechaPartida).getTime();
+      let dateB = new Date(b.fechaPartida).getTime();
+      return dateB - dateA;
+    });
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   } finally {

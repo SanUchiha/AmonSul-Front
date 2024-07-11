@@ -60,7 +60,7 @@
     <v-app-bar app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Amon sûl</v-toolbar-title>
-      <v-btn icon to="contacto">
+      <v-btn icon to="contacto" disabled>
         <v-icon>mdi-email</v-icon>
       </v-btn>
       <v-btn

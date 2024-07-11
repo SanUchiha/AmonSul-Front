@@ -3,41 +3,54 @@
     <ProgressCircular />
   </div>
   <div v-else class="center">
-    <v-card class="center-card">
-      <v-card-title>
-        <p>{{ usuario.nick }}</p>
+    <v-card class="jugador-card">
+      <v-card-title class="title">
+        <div class="ml-4">
+          <h2>{{ usuario.nick }}</h2>
+          <p class="subtitle">{{ nombreFaccionSelected }}</p>
+        </div>
       </v-card-title>
       <v-card-text>
-        <p>Facción: {{ nombreFaccionSelected }}</p>
-        <p>Número de partidas: {{ usuario.numeroPartidasJugadas }}</p>
-        <div class="resultado-container">
-          <div>
-            <p>
-              Victorias:
-              <span class="victoria">{{ usuario.partidasGanadas }}</span>
-            </p>
-          </div>
-          <div>
-            <p>
-              Empates:
-              <span class="empate">{{ usuario.partidasEmpatadas }}</span>
-            </p>
-          </div>
-          <div>
-            <p>
-              Derrotas:
-              <span class="derrota">{{ usuario.partidasPerdidas }}</span>
-            </p>
-          </div>
+        <v-divider></v-divider>
+        <div class="stats-container">
+          <v-row>
+            <v-col class="stat-item">
+              <v-icon color="primary">mdi-gamepad-variant</v-icon>
+              <p>{{ usuario.numeroPartidasJugadas }}</p>
+            </v-col>
+            <v-col class="stat-item">
+              <v-icon color="green">mdi-trophy</v-icon>
+              <p class="victoria">{{ usuario.partidasGanadas }}</p>
+            </v-col>
+            <v-col class="stat-item">
+              <v-icon color="yellow">mdi-handshake</v-icon>
+              <p class="empate">{{ usuario.partidasEmpatadas }}</p>
+            </v-col>
+            <v-col class="stat-item">
+              <v-icon color="red">mdi-alert-circle</v-icon>
+              <p class="derrota">{{ usuario.partidasPerdidas }}</p>
+            </v-col>
+          </v-row>
         </div>
-        <p>ELO: {{ usuario.puntuacionElo }}</p>
-        <p>Posición ELO: {{ usuario.clasificacionElo }}</p>
+        <v-divider></v-divider>
+        <div class="stats-container">
+          <v-row>
+            <v-col class="stat-item">
+              <v-icon color="blue">mdi-star</v-icon> ELO:
+              {{ usuario.puntuacionElo }}
+            </v-col>
+            <v-col class="stat-item">
+              <v-icon color="purple">mdi-medal</v-icon> Posición ELO:
+              {{ usuario.clasificacionElo }}
+            </v-col>
+          </v-row>
+        </div>
       </v-card-text>
-      <!-- <v-card-actions>
-      <v-btn color="blue darken-1" variant="outlined" @click="goToDetalle"
-        >Ver Detalle</v-btn
-      >
-    </v-card-actions> -->
+      <!-- <v-card-actions class="center">
+        <v-btn color="primary" variant="outlined" @click="goToDetalle">
+          Ver Detalle
+        </v-btn>
+      </v-card-actions> -->
     </v-card>
   </div>
 </template>
@@ -63,7 +76,7 @@ const goToDetalle = () => {
 onMounted(async () => {
   try {
     var rawListaFacciones: Faccion[] = await getFacciones();
-    nombreFaccionSelected.value = rawListaFacciones.find(
+    nombreFaccionSelected.value = await rawListaFacciones.find(
       (u) => u.idFaccion == props.usuario.idFaccion
     )?.nombreFaccion;
   } catch (error) {
@@ -79,6 +92,20 @@ onMounted(async () => {
   max-width: 100%;
   min-width: 300px;
   margin: 16px;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: rgb(207, 199, 199);
+}
+
+.stats-container {
+  margin: 16px 0;
+}
+
+.stat-item p {
+  margin: 5px 0;
+  font-size: 18px;
 }
 
 .resultado-container {
