@@ -5,8 +5,9 @@
   <div v-else class="center">
     <v-card class="jugador-card">
       <v-card-title class="title">
-        <div class="ml-4">
-          <h2>{{ usuario.nick }}</h2>
+        <div class="title">
+          <h3 v-if="usuario.nick.length <= 26">{{ usuario.nick }}</h3>
+          <h3 v-else>{{ usuario.nick.substring(0, 23) + "..." }}</h3>
           <p class="subtitle">{{ nombreFaccionSelected }}</p>
         </div>
       </v-card-title>
@@ -36,12 +37,12 @@
         <div class="stats-container">
           <v-row>
             <v-col class="stat-item">
-              <v-icon color="blue">mdi-star</v-icon> ELO:
-              {{ usuario.puntuacionElo }}
+              <v-icon color="blue">mdi-star</v-icon>
+              <p>{{ usuario.puntuacionElo }}</p>
             </v-col>
             <v-col class="stat-item">
-              <v-icon color="purple">mdi-medal</v-icon> Posición ELO:
-              {{ usuario.clasificacionElo }}
+              <v-icon color="purple">mdi-medal</v-icon>
+              <p>Puesto: {{ usuario.clasificacionElo }}</p>
             </v-col>
           </v-row>
         </div>
@@ -95,12 +96,22 @@ onMounted(async () => {
 }
 
 .subtitle {
-  font-size: 20px;
+  font-size: 18px;
   color: rgb(207, 199, 199);
 }
 
 .stats-container {
   margin: 16px 0;
+  display: flex;
+  justify-content: center; /* Centra los elementos horizontalmente */
+  align-items: center; /* Centra los elementos verticalmente */
+}
+
+.stat-item {
+  display: flex; /* Hace que el contenedor use flexbox */
+  flex-direction: column; /* Apila los elementos verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente */
+  text-align: center; /* Centra el texto */
 }
 
 .stat-item p {

@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <SparklineElo />
-    <TablaClasificacionElo />
+    <SparklineElo class="separated" />
+    <TablaClasificacionElo class="separated" />
   </v-container>
 </template>
 
@@ -10,4 +10,8 @@ import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import TablaClasificacionElo from "@/components/Elo/TablaClasificacionElo.vue";
 </script>
 
-<style scoped></style>
+<style scoped>
+.separated {
+  margin-bottom: 20px; /* Ajusta el valor según tus necesidades */
+}
+</style>

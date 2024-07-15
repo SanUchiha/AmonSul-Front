@@ -20,3 +20,21 @@ export const getEloUsuario = async (email: string) => {
     }
   }
 };
+
+export const getClasifiacionElo = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(baseUrl + "Elo/Clasificacion/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
