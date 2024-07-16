@@ -84,10 +84,46 @@ export const editarUsuario = async (json: any) => {
   }
 };
 
-export const getNickById = async (idUduario: number) => {
+export const getNickById = async (idUsuario: number) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.get(baseUrl + "Usuario/id/" + idUduario, {
+    const response = await axios.get(baseUrl + "Usuario/id/" + idUsuario, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
+
+export const getUsuarioByNick = async (nick: string) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(baseUrl + "Usuario/nick/" + nick, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
+
+export const getDetalleUsuarioByEmail = async (email: string) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(baseUrl + "Usuario/detalle/" + email, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

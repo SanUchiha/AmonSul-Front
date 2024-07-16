@@ -24,19 +24,27 @@
       v-model:search="search"
       :items="items"
       :loading="loading"
+      :headers="headers"
       class="custom-table"
+      item-key="nick"
     >
-      <template v-slot:item.elo="{ item }">
-        <v-chip color="blue" dark>{{ item.elo }}</v-chip>
-      </template>
-      <template v-slot:item.win="{ item }">
-        <v-chip color="green" dark>{{ item.win }}</v-chip>
-      </template>
-      <template v-slot:item.draw="{ item }">
-        <v-chip color="yellow" dark>{{ item.draw }}</v-chip>
-      </template>
-      <template v-slot:item.lost="{ item }">
-        <v-chip color="red" dark>{{ item.lost }}</v-chip>
+      <template v-slot:item="{ item }">
+        <tr @click="goToUserDetail(item.nick)" class="clickable-row">
+          <td>{{ item.nick }}</td>
+          <td>
+            <v-chip color="blue" dark>{{ item.elo }}</v-chip>
+          </td>
+          <td>{{ item.partidas }}</td>
+          <td>
+            <v-chip color="green" dark>{{ item.ganadas }}</v-chip>
+          </td>
+          <td>
+            <v-chip color="yellow" dark>{{ item.empatadas }}</v-chip>
+          </td>
+          <td>
+            <v-chip color="red" dark>{{ item.perdidas }}</v-chip>
+          </td>
+        </tr>
       </template>
     </v-data-table>
   </v-card>
@@ -46,6 +54,7 @@
 import { UsuarioElo } from "@/interfaces/Elo";
 import { getClasifiacionElo } from "@/services/EloService";
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import {
   VDataTable,
   VCard,
@@ -57,15 +66,20 @@ import {
 const search = ref<string>("");
 const items = ref<UsuarioElo[]>([]);
 const loading = ref<boolean>(true);
+const router = useRouter();
 
-// const headers = [
-//   { title: "NICK", key: "nick" },
-//   { title: "EMP", key: "draw" },
-//   { title: "ELO", key: "elo" },
-//   { title: "NUM", key: "games" },
-//   { title: "DER", key: "Lost" },
-//   { title: "VIC", key: "win" },
-// ];
+const headers = [
+  { title: "Nick", key: "nick" },
+  { title: "ELO", key: "elo" },
+  { title: "#", key: "partidas" },
+  { title: "V", key: "ganadas" },
+  { title: "E", key: "empatadas" },
+  { title: "D", key: "perdidas" },
+];
+
+const goToUserDetail = (nick: string) => {
+  router.push({ name: "detalle-jugador", params: { Nick: nick } });
+};
 
 onMounted(async () => {
   try {
@@ -74,7 +88,6 @@ onMounted(async () => {
     const data = await getClasifiacionElo();
     items.value = data;
     items.value = items.value.sort((a, b) => b.elo - a.elo);
-    console.log(items.value);
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
   } finally {
@@ -85,7 +98,7 @@ onMounted(async () => {
 
 <style scoped>
 .custom-table {
-  text-align: center;
+  text-align: left;
 }
 
 .v-data-table-header {
