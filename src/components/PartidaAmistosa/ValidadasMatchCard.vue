@@ -3,7 +3,7 @@
     <ProgressCircular />
   </div>
   <div v-else>
-    <v-card :class="cardColorClass">
+    <v-card :class="cardColorClass" @click="goToDetallePartida">
       <v-card-title>Rival: {{ nickRival }}</v-card-title>
       <v-card-text>
         Resultado: {{ match.resultadoUsuario1 }} - {{ match.resultadoUsuario2 }}
@@ -23,10 +23,7 @@
 
 <script setup lang="ts">
 import { defineProps, ref, onMounted, defineEmits, computed } from "vue";
-import {
-  ValidarPartidaDTO,
-  ViewPartidaAmistosaDTO,
-} from "@/interfaces/Partidas";
+import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "../Commons/ProgressCircular.vue";
 import { getUsuario } from "@/services/UsuariosService";
@@ -102,6 +99,13 @@ const cardColorClass = computed(() => {
   }
 });
 
+const goToDetallePartida = () => {
+  router.push({
+    name: "detalle-partida",
+    params: { idPartida: props.match.idPartidaAmistosa },
+  });
+};
+
 onMounted(initializeComponent);
 </script>
 
@@ -109,16 +113,19 @@ onMounted(initializeComponent);
 .victoria-card {
   background-color: rgb(14, 84, 14);
   color: white;
+  cursor: pointer;
 }
 
 .derrota-card {
   background-color: rgb(106, 12, 12);
   color: white;
+  cursor: pointer;
 }
 
 .empate-card {
   background-color: rgb(151, 151, 15);
   color: black;
+  cursor: pointer;
 }
 
 .error {

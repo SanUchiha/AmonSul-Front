@@ -1,38 +1,46 @@
 <template>
-  <v-card class="mx-auto text-center">
-    <v-card-text>
-      <v-sheet>
-        <v-sparkline
-          :auto-line-width="autoLineWidth"
-          :fill="fill"
-          :gradient="gradient"
-          :gradient-direction="gradientDirection"
-          :line-width="width"
-          :model-value="value"
-          :padding="padding"
-          :smooth="radius || false"
-          :stroke-linecap="lineCap"
-          :type="type"
-          auto-draw
-        ></v-sparkline>
-      </v-sheet>
-    </v-card-text>
+  <div v-if="loading" class="center">
+    <ProgressCircular />
+  </div>
+  <div v-else class="center">
+    <v-card class="mx-auto text-center">
+      <v-card-text>
+        <v-sheet>
+          <v-sparkline
+            :auto-line-width="autoLineWidth"
+            :fill="fill"
+            :gradient="gradient"
+            :gradient-direction="gradientDirection"
+            :line-width="width"
+            :model-value="value"
+            :padding="padding"
+            :smooth="radius || false"
+            :stroke-linecap="lineCap"
+            :type="type"
+            auto-draw
+          ></v-sparkline>
+        </v-sheet>
+      </v-card-text>
 
-    <v-divider></v-divider>
+      <v-divider></v-divider>
 
-    <v-card-text class="d-flex justify-center">
-      <span class="mx-2">Mejor: {{ mejorResultado }}</span>
-      <span class="mx-2">Peor: {{ peorResultado }}</span>
-      <span class="mx-2">Actual: {{ resultadoActual }}</span>
-    </v-card-text>
-  </v-card>
+      <v-card-text class="d-flex justify-center">
+        <span class="mx-2">Mejor: {{ mejorResultado }}</span>
+        <span class="mx-2">Peor: {{ peorResultado }}</span>
+        <span class="mx-2">Actual: {{ resultadoActual }}</span>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { defineProps, onMounted, ref } from "vue";
 import { getEloUsuario } from "@/services/EloService";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
+import ProgressCircular from "../Commons/ProgressCircular.vue";
+
+const props = defineProps<{ email: any }>();
 
 const { getUser } = useAuth();
 const router = useRouter();
@@ -69,19 +77,18 @@ onMounted(async () => {
     if (!email) {
       error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
       router.push("error");
-      loading.value = false;
       return;
     }
-    const response = await getEloUsuario(email);
+    const response = await getEloUsuario(props.email);
     const elos = response.elos.map(
-      (elo: { puntuacionElo: any }) => elo.puntuacionElo
+      (elo: { puntuacionElo: unknown }) => elo.puntuacionElo
     );
 
     value.value = elos;
 
     mejorResultado.value = Math.max(...elos);
     peorResultado.value = Math.min(...elos);
-    resultadoActual.value = elos[elos.length - 1];
+    resultadoActual.value = await elos[elos.length - 1];
   } catch (error) {
     console.error("Error al obtener datos del usuario:", error);
   } finally {

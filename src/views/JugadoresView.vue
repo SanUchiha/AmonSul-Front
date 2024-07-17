@@ -1,30 +1,16 @@
 <template>
-  <div>
-    <div v-if="loading">
-      <v-row justify="center" align="center" style="height: 100px">
-        <v-col cols="12" class="text-center">
-          <ProgressCircular />
-        </v-col>
-      </v-row>
-    </div>
-    <v-container>
-      <v-row dense>
-        <v-col v-for="usuario in listaUsuarios" :key="usuario.idUsuario">
-          <JugadorCard :usuario="usuario" />
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
+  <v-container>
+    <TablaUsuarios />
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { getUsuarios } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
-import JugadorCard from "../components/Usuarios/JugadorCard.vue";
 import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { useAuth } from "@/composables/useAuth";
-import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
 import { useRouter } from "vue-router";
+import TablaUsuarios from "@/components/Usuarios/TablaUsuarios.vue";
 
 const listaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
 const { getUser } = useAuth();

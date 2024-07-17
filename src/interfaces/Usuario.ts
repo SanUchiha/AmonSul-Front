@@ -1,9 +1,3 @@
-export interface Usuario {
-  id?: number;
-  correo?: string;
-  password?: string;
-}
-
 export interface NewUserDTO {
   NombreUsuario: string;
   PrimerApellido: string;
@@ -33,6 +27,7 @@ export interface EditarUsuarioDTO {
 }
 
 export interface UsuarioViewDTO {
+  idUsuario: number;
   nombreUsuario: string;
   primerApellido: string;
   segundoApellido?: string;
@@ -57,6 +52,7 @@ export interface ViewUsuarioPartidaDTO {
   ciudad?: string | null;
   fechaRegistro: string;
   idFaccion?: number | null;
+  nombreFaccion?: string;
   numeroPartidasJugadas: number;
   partidasGanadas: number;
   partidasEmpatadas: number;

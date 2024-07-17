@@ -13,21 +13,57 @@
               <v-combobox
                 v-model="nickDosSelected"
                 :items="listadoNicks"
-                label="Rival"
+                label="¿Contra quien has jugado?"
                 @click="loadNicks"
                 :rules="[rules.required]"
                 required
               ></v-combobox>
+              <v-progress-linear
+                v-if="loadingNicks"
+                indeterminate
+                color="primary"
+                class="progress-linear-margin"
+              ></v-progress-linear>
+
+              <v-combobox
+                v-model="ejercitoRival"
+                :items="listadoEjercitos"
+                label="¿Que llevaba tu rival?"
+                @click="loadEjercitos"
+                :rules="[rules.required]"
+                required
+              ></v-combobox>
+              <v-progress-linear
+                v-if="loadingEjercitos"
+                indeterminate
+                color="primary"
+                class="progress-linear-margin"
+              ></v-progress-linear>
+
+              <v-combobox
+                v-model="ejercitoPropio"
+                :items="listadoEjercitos"
+                label="¿Que llevaba tú?"
+                @click="loadEjercitos"
+                :rules="[rules.required]"
+                required
+              ></v-combobox>
+              <v-progress-linear
+                v-if="loadingEjercitos"
+                indeterminate
+                color="primary"
+                class="progress-linear-margin"
+              ></v-progress-linear>
               <v-text-field
                 v-model="puntosJugadorUno"
-                label="Mis puntos"
+                label="¿Cuantos puntos has conseguido?"
                 type="number"
                 :rules="[rules.required]"
                 required
               ></v-text-field>
               <v-text-field
                 v-model="puntosJugadorDos"
-                label="Puntos rival"
+                label="¿Cuantos puntos ha conseguido el rival?"
                 type="number"
                 :rules="[rules.required]"
                 required
@@ -37,15 +73,28 @@
                 color="primary"
                 label="¿Es matched play?"
               ></v-switch>
+
               <v-combobox
                 v-if="checkEsMatchedPlay"
                 v-model="escenarioSelected"
                 :items="listaEscenarios"
+                @click="loadEscenarios"
                 label="Escenario"
               ></v-combobox>
+              <v-progress-linear
+                v-if="loadingEscenarios"
+                indeterminate
+                color="primary"
+                class="progress-linear-margin"
+              ></v-progress-linear>
+              <v-switch
+                v-model="esTorneo"
+                color="primary"
+                label="¿Es torneo?"
+              ></v-switch>
               <v-text-field
                 v-model="puntosPartida"
-                label="Puntos partida"
+                label="¿Ha cuantos puntos has jugado"
                 type="number"
                 :rules="[rules.required]"
                 required
@@ -107,14 +156,21 @@ const { getUser } = useAuth();
 const error = ref<string | null>(null);
 const dialogOk = ref(false);
 const loading = ref(false);
+const loadingNicks = ref(false);
+const loadingEjercitos = ref(false);
+const loadingEscenarios = ref(false);
 const listaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
 const listadoNicks = ref<string[]>([]);
-const listaEscenarios: string[] = appsettings.escenarios;
+const listadoEjercitos = ref<string[]>([]);
+const listaEscenarios = ref<string[]>([]);
 const nickDosSelected = ref<string>("");
 const escenarioSelected = ref<string>("");
+const ejercitoPropio = ref<string>("");
+const ejercitoRival = ref<string>("");
 const puntosJugadorUno = ref<number | null>(null);
 const puntosJugadorDos = ref<number | null>(null);
 const checkEsMatchedPlay = ref<boolean>(false);
+const esTorneo = ref<boolean>(false);
 const puntosPartida = ref<number | null>(null);
 const emailOwner = ref<string>("");
 const rawListaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
@@ -125,6 +181,7 @@ const rules = {
 
 const loadNicks = async () => {
   loading.value = true;
+  loadingNicks.value = true;
   const email: any = await getUser.value;
   emailOwner.value = email;
   if (!email) {
@@ -137,13 +194,36 @@ const loadNicks = async () => {
   try {
     rawListaUsuarios.value = await getUsuarios();
     listaUsuarios.value = rawListaUsuarios.value;
-    listaUsuarios.value = listaUsuarios.value.filter((u) => u.email != email);
+    listaUsuarios.value = listaUsuarios.value.filter(
+      (u) => u.email != emailOwner.value
+    );
     listadoNicks.value = listaUsuarios.value.map((f) => f.nick).sort();
   } catch (error) {
     console.log("Error al obtener los nicks:", error);
   } finally {
     loading.value = false;
+    loadingNicks.value = false;
   }
+};
+
+const loadEjercitos = async () => {
+  loading.value = true;
+  loadingEjercitos.value = true;
+
+  listadoEjercitos.value = await appsettings.ejercitos;
+
+  loading.value = false;
+  loadingEjercitos.value = false;
+};
+
+const loadEscenarios = async () => {
+  loading.value = true;
+  loadingEscenarios.value = true;
+
+  listaEscenarios.value = await appsettings.escenarios;
+
+  loading.value = false;
+  loadingEscenarios.value = false;
 };
 
 const errors = reactive({
@@ -197,6 +277,9 @@ const handlerNuevaPartida = async () => {
     puntosPartida: puntosPartida.value ?? 0,
     esMatchedPlayPartida: checkEsMatchedPlay.value ?? false,
     escenarioPartida: escenarioSelected.value,
+    esTorneo: esTorneo.value ?? false,
+    ejercitoUsuario1: ejercitoPropio.value,
+    ejercitoUsuario2: ejercitoRival.value,
   };
 
   try {

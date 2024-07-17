@@ -13,8 +13,11 @@ export interface ViewPartidaAmistosaDTO {
   ganadorPartida: number;
   ganadorPartidaNick: string;
   esElo: boolean;
+  esTorneo: boolean;
   partidaValidadaUsuario1: boolean;
   partidaValidadaUsuario2: boolean;
+  ejercitoUsuario1: string;
+  ejercitoUsuario2: string;
 }
 
 export interface ValidarPartidaDTO {
@@ -30,4 +33,7 @@ export interface CreatePartidaAmistosaDTO {
   puntosPartida: number;
   esMatchedPlayPartida: boolean;
   escenarioPartida: string;
+  esTorneo: boolean;
+  ejercitoUsuario1: string;
+  ejercitoUsuario2: string;
 }

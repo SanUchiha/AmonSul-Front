@@ -44,6 +44,10 @@
               <v-icon color="purple">mdi-medal</v-icon>
               <p>Puesto: {{ usuario.clasificacionElo }}</p>
             </v-col>
+            <v-col class="stat-item">
+              <v-icon color="orange">mdi-percent</v-icon>
+              <p>Victorias: {{ porcentajeVictorias }}%</p>
+            </v-col>
           </v-row>
         </div>
       </v-card-text>
@@ -58,7 +62,7 @@
 
 <script setup lang="ts">
 import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
-import { defineProps, onMounted, ref } from "vue";
+import { computed, defineProps, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Faccion } from "@/interfaces/Faccion";
 import { getFacciones } from "@/services/FaccionesService";
@@ -73,6 +77,15 @@ const nombreFaccionSelected = ref<string | undefined>("");
 const goToDetalle = () => {
   router.push(`/detalle-jugador/${props.usuario.nick}`);
 };
+
+const porcentajeVictorias = computed(() => {
+  return props.usuario.numeroPartidasJugadas > 0
+    ? (
+        (props.usuario.partidasGanadas / props.usuario.numeroPartidasJugadas) *
+        100
+      ).toFixed(2)
+    : "0";
+});
 
 onMounted(async () => {
   try {

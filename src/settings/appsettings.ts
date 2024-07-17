@@ -1,6 +1,6 @@
 export const appsettings = {
-  apiUrl: "https://localhost:7101/api/",
-  //apiUrl: "https://sanuchiha-001-site1.ctempurl.com/api/",
+  //apiUrl: "https://localhost:7101/api/",
+  apiUrl: "https://sanuchiha-001-site1.ctempurl.com/api/",
   escenarios: [
     "1. Domination",
     "2. To the Death!",
@@ -21,4 +21,6 @@ export const appsettings = {
     "17. Divide And Conquer",
     "18. Assassination",
   ],
+
+  ejercitos: ["Rivendel", "Lorien", "Salones de Thranduil"],
 };
