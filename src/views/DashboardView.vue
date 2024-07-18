@@ -91,9 +91,11 @@ const usuario = ref<ViewUsuarioPartidaDTO>({
 const loading = ref(true);
 const { getUser } = useAuth();
 const router = useRouter();
+const emailUsuario = ref<string>(getUser.value ?? "null");
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const ultimaPartida = ref<ViewPartidaAmistosaDTO | null>(null);
+
 const messageUltimaPartida = computed(() => {
   if (!ultimaPartida.value) return null;
 
@@ -121,48 +123,40 @@ const cardClass = computed(() => {
 
 const cargarPartidasValidadas = async (email: string) => {
   try {
-    const responseValidadas = await getPartidasValidadas(email);
+    loading.value = true;
+    const responseValidadas = await getPartidasValidadas(emailUsuario.value);
     ultimaPartida.value = responseValidadas[responseValidadas.length - 1];
   } catch (error) {
     console.error("Error al obtener las partidas validadas:", error);
+  } finally {
+    loading.value = false;
   }
 };
 
 const cargarPartidasPendientes = async (email: string) => {
   try {
-    if (!email) {
-      email = await getUser.value;
-      if (!email) {
-        throw new Error(
-          "No se pudo obtener el usuario. Por favor, inicie sesión."
-        );
-      }
-    }
-
-    const response = await getPartidasPendientesValidar(email);
-    pendingMatches.value = response;
+    loading.value = true;
+    pendingMatches.value = await getPartidasPendientesValidar(
+      emailUsuario.value
+    );
+    pendingMatches.value = pendingMatches.value.reverse();
   } catch (error) {
     console.error(
       "Error al obtener las partidas pendientes de validar:",
       error
     );
+  } finally {
+    loading.value = false;
   }
 };
 
 const initializeComponent = async () => {
   loading.value = true;
   try {
-    const email: any = await getUser.value;
-    if (!email) {
-      throw new Error(
-        "No se pudo obtener el usuario. Por favor, inicie sesión."
-      );
-    }
-
-    const usuarioResponse = await getUsuarioPartidas(email);
+    const usuarioResponse = await getUsuarioPartidas(emailUsuario.value);
     usuario.value = usuarioResponse;
-    await cargarPartidasPendientes(email);
-    await cargarPartidasValidadas(email);
+    await cargarPartidasPendientes(emailUsuario.value);
+    await cargarPartidasValidadas(emailUsuario.value);
   } catch (error) {
     console.error(error);
     router.push("error");

@@ -51,11 +51,6 @@
           </v-row>
         </div>
       </v-card-text>
-      <!-- <v-card-actions class="center">
-        <v-btn color="primary" variant="outlined" @click="goToDetalle">
-          Ver Detalle
-        </v-btn>
-      </v-card-actions> -->
     </v-card>
   </div>
 </template>
@@ -93,6 +88,7 @@ onMounted(async () => {
     nombreFaccionSelected.value = await rawListaFacciones.find(
       (u) => u.idFaccion == props.usuario.idFaccion
     )?.nombreFaccion;
+    console.log(props.usuario);
   } catch (error) {
     console.error("Error al obtener la facción:", error);
   } finally {

@@ -2,7 +2,7 @@ import { reactive, computed } from "vue";
 import axios from "axios";
 import { RequestLoginDTO } from "@/interfaces/Login";
 import { appsettings } from "@/settings/appsettings";
-import { AuthState } from "@/interfaces/Error";
+import { AuthState } from "@/interfaces/Login";
 
 const BASE_URL: string = appsettings.apiUrl;
 

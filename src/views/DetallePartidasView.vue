@@ -17,9 +17,10 @@
             <v-list>
               <v-list-item>
                 <v-list-item-content>
-                  <v-list-item-title
-                    >{{ partida?.nickUsuario1 }} vs
-                    {{ partida?.nickUsuario2 }}</v-list-item-title
+                  <v-list-item-title class="jugadores">
+                    <h4>
+                      {{ partida?.nickUsuario1 }} vs {{ partida?.nickUsuario2 }}
+                    </h4></v-list-item-title
                   >
                 </v-list-item-content>
               </v-list-item>
@@ -39,13 +40,12 @@
                   }}</v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
-
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title>Ganador</v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ partida?.ganadorPartidaNick }}
-                  </v-list-item-subtitle>
+                  <v-list-item-subtitle>{{
+                    partida?.ganadorPartidaNick
+                  }}</v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item>
@@ -81,7 +81,6 @@
                   }}</v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
-
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title>Es Torneo</v-list-item-title>
@@ -93,9 +92,9 @@
             </v-list>
           </v-card-text>
           <v-card-actions>
-            <v-btn @click="goBack" variant="outlined" color="blue darken-1">
-              Volver
-            </v-btn>
+            <v-btn @click="goBack" variant="outlined" color="blue darken-1"
+              >Volver</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-col>
@@ -104,25 +103,16 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { getById } from "@/services/PartidasAmistosasService";
 import { formatFechaSpa } from "@/utils/Fecha";
-import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
 const partida = ref<ViewPartidaAmistosaDTO | null>(null);
 const loading = ref(true);
-
-const getResultadoClass = (ganadorPartida: number | null) => {
-  if (ganadorPartida === null) return ""; // Si no hay ganador, no aplica clase
-  return ganadorPartida === partida.value?.idUsuario1
-    ? "victoria"
-    : ganadorPartida === partida.value?.idUsuario2
-    ? "derrota"
-    : "empate";
-};
 
 const goBack = () => {
   router.back();
@@ -136,6 +126,7 @@ onMounted(async () => {
       partidaData.fechaPartida = await formatFechaSpa(partidaData.fechaPartida);
     }
     partida.value = partidaData;
+    console.log(partida.value);
   } catch (error) {
     console.error("Error al obtener los detalles de la partida:", error);
   } finally {
@@ -145,15 +136,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.victoria {
-  color: blue;
+.v-list-item-title {
+}
+.jugadores {
+  font-weight: bold;
+  font-size: large;
+
+  color: rgb(183, 125, 236);
 }
 
-.derrota {
-  color: red;
-}
-
-.empate {
-  color: yellow;
+.v-list-item-subtitle {
+  color: #ffffff;
 }
 </style>

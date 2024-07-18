@@ -104,7 +104,7 @@ onMounted(async () => {
     userOwner.value = await getUsuario(props.email);
     const data = await getPartidasValidadas(props.email);
     items.value = data;
-
+    items.value = items.value.reverse();
     // Mapear la nueva lista de items con fechas formateadas
     listadoItems.value = await Promise.all(
       items.value.map(async (partida) => {

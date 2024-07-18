@@ -30,11 +30,12 @@
     >
       <template v-slot:item="{ item }">
         <tr @click="goToUserDetail(item.nick)" class="clickable-row">
+          <td>{{ item.clasificacion }}</td>
+
           <td>{{ item.nick }}</td>
           <td>
             <v-chip color="blue" dark>{{ item.elo }}</v-chip>
           </td>
-          <td>{{ item.partidas }}</td>
           <td>
             <v-chip color="green" dark>{{ item.ganadas }}</v-chip>
           </td>
@@ -44,6 +45,7 @@
           <td>
             <v-chip color="red" dark>{{ item.perdidas }}</v-chip>
           </td>
+          <td>{{ item.partidas }}</td>
         </tr>
       </template>
     </v-data-table>
@@ -69,12 +71,13 @@ const loading = ref<boolean>(true);
 const router = useRouter();
 
 const headers = [
+  { title: "#", key: "clasificacion" },
   { title: "Nick", key: "nick" },
   { title: "ELO", key: "elo" },
-  { title: "#", key: "partidas" },
   { title: "V", key: "ganadas" },
   { title: "E", key: "empatadas" },
   { title: "D", key: "perdidas" },
+  { title: "Jugadas", key: "partidas" },
 ];
 
 const goToUserDetail = (nick: string) => {
@@ -88,6 +91,12 @@ onMounted(async () => {
     const data = await getClasifiacionElo();
     items.value = data;
     items.value = items.value.sort((a, b) => b.elo - a.elo);
+
+    items.value = items.value.map((item, index) => ({
+      ...item,
+      clasificacion: index + 1,
+    }));
+    console.log(items.value);
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
   } finally {

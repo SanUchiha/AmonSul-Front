@@ -281,6 +281,7 @@ const handlerNuevaPartida = async () => {
     ejercitoUsuario1: ejercitoPropio.value,
     ejercitoUsuario2: ejercitoRival.value,
   };
+  console.log(nuevaPartida);
 
   try {
     await registrarPartida(nuevaPartida);
