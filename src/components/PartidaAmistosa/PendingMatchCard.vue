@@ -10,16 +10,31 @@
       <v-divider></v-divider>
       <v-card-text class="my-4">
         <v-row>
-          <v-col>
-            <p>
-              <v-icon class="mr-2">mdi-trophy</v-icon>
-              Resultado: {{ match.resultadoUsuario1 }} -
-              {{ match.resultadoUsuario2 }}
-            </p>
-            <p>
-              <v-icon class="mr-2">mdi-calendar</v-icon>
-              Fecha: {{ fechaFormateada }}
-            </p>
+          <v-col class="text-center">
+            <div>
+              <p>
+                <v-icon class="mr-2">mdi-trophy</v-icon>
+                Resultado: {{ match.resultadoUsuario1 }} -
+                {{ match.resultadoUsuario2 }}
+              </p>
+              <p>
+                <v-icon class="mr-2">mdi-calendar</v-icon>
+                Fecha: {{ fechaFormateada }}
+              </p>
+            </div>
+
+            <v-divider vertical class="mx-2"></v-divider>
+
+            <div>
+              <v-btn
+                variant="outlined"
+                color="blue darken-1"
+                @click="goToDetallePartida"
+                class="mx-auto"
+              >
+                <v-icon left>mdi-magnify</v-icon>
+              </v-btn>
+            </div>
           </v-col>
         </v-row>
       </v-card-text>
@@ -30,11 +45,25 @@
             <div v-if="!IsValidadaOwner">
               <v-btn
                 variant="outlined"
-                color="blue darken-1"
+                color="green darken-1"
                 @click="validarPartida"
                 class="mx-auto"
               >
+                <v-icon left>mdi-check</v-icon>
+
                 Validar
+              </v-btn>
+              <v-divider vertical class="mx-2"></v-divider>
+
+              <v-btn
+                variant="outlined"
+                color="red darken-1"
+                @click="cancelarPartida"
+                class="mx-auto"
+              >
+                <v-icon left>mdi-close</v-icon>
+
+                Cancelar
               </v-btn>
             </div>
             <div v-else class="validada">Validada</div>
@@ -115,6 +144,12 @@ const validarPartida = async () => {
   modalVisible.value = true;
 };
 
+const goToDetallePartida = () => {
+  router.push({
+    name: "detalle-partida",
+    params: { idPartida: props.match.idPartidaAmistosa },
+  });
+};
 const handleModalAccepted = () => {
   modalVisible.value = false;
   emit("partidaValidada");
@@ -180,7 +215,7 @@ const controlValidacionesPartidas = () => {
   color: rgb(233, 69, 69);
 }
 .validada {
-  color: rgb(69, 181, 233);
+  color: rgb(25, 145, 61);
 }
 
 .mx-auto {
