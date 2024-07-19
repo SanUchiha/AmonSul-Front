@@ -1,10 +1,10 @@
-export interface ITorneo {
+export interface Torneo {
   idTorneo: number; // Identificador único del torneo (PK)
   idUsuario: number; // ID del usuario administrador del torneo (FK)
   nombreTorneo: string; // Nombre del torneo
   descripcionTorneo: string; // Descripción del torneo
-  fechaInicioTorneo: Date; // Fecha de inicio del torneo
-  fechaFinTorneo: Date; // Fecha de fin del torneo
+  fechaInicioTorneo: string; // Fecha de inicio del torneo
+  fechaFinTorneo: string; // Fecha de fin del torneo
   precioTorneo: number; // Precio del torneo
   numeroPartidas: number; // Número de partidas del torneo
   puntosTorneo: number; // Puntos asignados al torneo
@@ -14,8 +14,8 @@ export interface ITorneo {
   esPrivadoTorneo: boolean; // Indica si el torneo es privado o no
   idRangoTorneo: number; // ID del rango del torneo (FK)
   esMatchedPlayTorneo: boolean; // Indica si el torneo es de tipo Matched Play
-  fechaEntregaListas: Date; // Fecha límite de entrega de listas
-  fechaFinInscripcion: Date; // Fecha límite de inscripción
+  fechaEntregaListas: string; // Fecha límite de entrega de listas
+  fechaFinInscripcion: string; // Fecha límite de inscripción
   basesTorneo: string; // Bases del torneo (PDF en base 64 o URL)
   cartelTorneo: string; // Imagen o cartel del torneo (URL o base 64)
   metodosPago: string[]; // Métodos de pago aceptados

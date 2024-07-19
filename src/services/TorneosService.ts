@@ -1,4 +1,3 @@
-import { ITorneo } from "@/interfaces/Torneo";
 import { appsettings } from "@/settings/appsettings";
 import axios from "axios";
 

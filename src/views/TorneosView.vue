@@ -19,12 +19,12 @@
 </template>
 
 <script setup lang="ts">
-import { ITorneo } from "@/interfaces/Torneo";
+import { Torneo } from "@/interfaces/Torneo";
 import { getTorneos } from "@/services/TorneosService";
 import { onMounted, ref } from "vue";
 import TorneoCard from "@/components/Torneos/TorneoCard.vue";
 
-const listaTorneos = ref<ITorneo[]>([]);
+const listaTorneos = ref<Torneo[]>([]);
 const loading = ref(true);
 
 onMounted(async () => {

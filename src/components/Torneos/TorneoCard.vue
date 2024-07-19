@@ -1,48 +1,79 @@
 <template>
-  <v-card outlined class="torneo-card">
-    <v-card-title>
-      {{ torneo.nombreTorneo }}
-    </v-card-title>
-    <v-card-text>
-      <p>{{ torneo.descripcionTorneo }}</p>
-    </v-card-text>
-    <v-card-text>
-      <p>FECHA: {{ formatDate(torneo.fechaInicioTorneo) }}</p>
-      <p>LUGAR: {{ torneo.lugarTorneo }}</p>
-      <p>RONDAS: {{ torneo.numeroPartidas }}</p>
-      <p>PUNTOS: {{ torneo.puntosTorneo }}</p>
-      <p>PRECIO: {{ torneo.precioTorneo }}</p>
-      <p>
-        LÍMITE DE PLAZAS:
-        {{ torneo.limitePlazas ? torneo.limitePlazas : "No hay límite" }}
-      </p>
-    </v-card-text>
+  <v-card class="mx-auto my-3" max-width="100%">
+    <!-- Imagen del torneo -->
+    <v-img :src="torneo.cartelTorneo" height="200px" contain></v-img>
+
+    <v-divider class="my-3"></v-divider>
+
+    <!-- Título del torneo -->
+    <v-card-title>{{ torneo.nombreTorneo }}</v-card-title>
+
+    <!-- Subtítulos con iconos -->
+    <v-card-subtitle>
+      <v-icon left>mdi-map-marker</v-icon>
+      Lugar: {{ torneo.lugarTorneo }}
+    </v-card-subtitle>
+
+    <v-card-subtitle>
+      <v-icon left>mdi-calendar-month</v-icon>
+      Fecha: {{ fechaTorneo }}
+    </v-card-subtitle>
+
+    <v-card-subtitle>
+      <v-icon left>mdi-star</v-icon>
+      Puntos: {{ torneo.puntosTorneo }}
+    </v-card-subtitle>
+
+    <v-card-subtitle>
+      <v-icon left>mdi-format-list-bulleted</v-icon>
+      Rondas: {{ torneo.numeroPartidas }}
+    </v-card-subtitle>
+
+    <!-- Botón de acciones -->
     <v-card-actions>
-      <v-btn variant="tonal" @click="goToDetalle">Ver Detalle</v-btn>
+      <v-btn color="orange lighten-2" @click="goToDetalle" block>
+        Ver Detalle
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script setup lang="ts">
-import { ITorneo } from "@/interfaces/Torneo";
-import { defineProps } from "vue";
+import { Torneo } from "@/interfaces/Torneo";
+import { formatFechaSpa } from "@/utils/Fecha";
+import { defineProps, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
-const props = defineProps<{ torneo: ITorneo }>();
+const props = defineProps<{ torneo: Torneo }>();
 const router = useRouter();
+const fechaTorneo = ref<string>("");
+const img = ref<string>("");
+
+onMounted(async () => {
+  console.log(props.torneo);
+  fechaTorneo.value = await formatFechaSpa(props.torneo.fechaInicioTorneo);
+});
 
 const goToDetalle = () => {
-  router.push(`/detalle-torneo/${props.torneo.ID_Torneo}`);
-};
-const formatDate = (date: Date) => {
-  return new Date(date).toLocaleDateString();
+  router.push(`/detalle-torneo/${props.torneo.idTorneo}`);
 };
 </script>
 
 <style scoped>
-.torneo-card {
+/* Ajustes generales para la tarjeta */
+.v-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Asegura que la imagen se adapte bien en pantallas pequeñas */
+.v-img {
+  width: 100%;
   max-width: 100%;
-  min-width: 300px;
-  margin: 16px;
+}
+
+/* Ajustes del botón para que ocupe todo el ancho disponible */
+.v-btn {
+  width: 100%;
 }
 </style>
