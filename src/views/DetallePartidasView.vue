@@ -126,7 +126,6 @@ onMounted(async () => {
       partidaData.fechaPartida = await formatFechaSpa(partidaData.fechaPartida);
     }
     partida.value = partidaData;
-    console.log(partida.value);
   } catch (error) {
     console.error("Error al obtener los detalles de la partida:", error);
   } finally {

@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { UsuarioElo } from "@/interfaces/Elo";
+import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
 import { getClasifiacionElo } from "@/services/EloService";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -66,7 +66,7 @@ import {
 } from "vuetify/components";
 
 const search = ref<string>("");
-const items = ref<UsuarioElo[]>([]);
+const items = ref<UsuarioEloTablaClasificacion[]>([]);
 const loading = ref<boolean>(true);
 const router = useRouter();
 
@@ -96,7 +96,6 @@ onMounted(async () => {
       ...item,
       clasificacion: index + 1,
     }));
-    console.log(items.value);
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
   } finally {

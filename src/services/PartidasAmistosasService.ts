@@ -71,6 +71,25 @@ export const ValidarPartida = async (validarpartidaDTO: ValidarPartidaDTO) => {
   }
 };
 
+export const cancelarPartida = async (idPartida: number) => {
+  try {
+    const token = localStorage.getItem("token");
+    const url = `${baseUrl}PartidaAmistosa/Cancelar/${idPartida}`;
+    const response = await axios.delete(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
+
 export const getPartidasValidadas = async (email: string) => {
   try {
     const token = localStorage.getItem("token");

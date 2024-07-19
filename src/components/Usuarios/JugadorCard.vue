@@ -88,7 +88,6 @@ onMounted(async () => {
     nombreFaccionSelected.value = await rawListaFacciones.find(
       (u) => u.idFaccion == props.usuario.idFaccion
     )?.nombreFaccion;
-    console.log(props.usuario);
   } catch (error) {
     console.error("Error al obtener la facción:", error);
   } finally {

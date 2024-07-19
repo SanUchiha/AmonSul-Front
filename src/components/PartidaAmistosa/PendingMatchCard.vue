@@ -53,13 +53,12 @@
 
                 Validar
               </v-btn>
-              <v-divider vertical class="mx-2"></v-divider>
 
               <v-btn
                 variant="outlined"
                 color="red darken-1"
-                @click="cancelarPartida"
-                class="mx-auto"
+                @click="cancelPartida"
+                class="mx-auto mt-2"
               >
                 <v-icon left>mdi-close</v-icon>
 
@@ -95,7 +94,10 @@ import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "../Commons/ProgressCircular.vue";
 import { getNickById, getUsuario } from "@/services/UsuariosService";
 import { useRouter } from "vue-router";
-import { ValidarPartida } from "@/services/PartidasAmistosasService";
+import {
+  cancelarPartida,
+  ValidarPartida,
+} from "@/services/PartidasAmistosasService";
 import ModalResponsePartidaValidada from "./ModalResponsePartidaValidada.vue";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
@@ -149,6 +151,18 @@ const goToDetallePartida = () => {
     name: "detalle-partida",
     params: { idPartida: props.match.idPartidaAmistosa },
   });
+};
+
+const cancelPartida = async () => {
+  try {
+    console.log(props.match.idPartidaAmistosa);
+    await cancelarPartida(props.match.idPartidaAmistosa);
+  } catch (err) {
+    router.push("error");
+    error.value = "Error al cancelar la partida";
+  } finally {
+    loading.value = false;
+  }
 };
 const handleModalAccepted = () => {
   modalVisible.value = false;
@@ -239,3 +253,4 @@ const controlValidacionesPartidas = () => {
   vertical-align: middle;
 }
 </style>
+async
