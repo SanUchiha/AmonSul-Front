@@ -155,8 +155,8 @@ const goToDetallePartida = () => {
 
 const cancelPartida = async () => {
   try {
-    console.log(props.match.idPartidaAmistosa);
     await cancelarPartida(props.match.idPartidaAmistosa);
+    emit("partidaValidada");
   } catch (err) {
     router.push("error");
     error.value = "Error al cancelar la partida";
