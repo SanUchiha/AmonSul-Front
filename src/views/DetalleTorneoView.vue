@@ -30,7 +30,7 @@
             <p><strong>Precio:</strong> {{ torneo.precioTorneo }}€</p>
             <p>
               <strong>Límite de Participantes:</strong>
-              {{ torneo.limitePlazas || "Sin límite" }}
+              {{ torneo.limiteParticipantes || "Sin límite" }}
             </p>
             <p><strong>Tipo de Torneo:</strong> {{ torneo.tipoTorneo }}</p>
             <p>
@@ -57,12 +57,15 @@
             <v-btn variant="outlined" color="orange lighten-2" @click="goBack">
               Volver
             </v-btn>
-            <v-btn
-              variant="tonal"
-              color="success lighten-1"
-              @click="showModalResponse"
-              >Apúntate</v-btn
-            >
+            <div v-if="!estaApuntado">
+              <v-btn
+                variant="tonal"
+                color="success lighten-1"
+                @click="showModalResponse"
+                >Apúntate</v-btn
+              >
+            </div>
+            <div v-else class="color-text">Ya estás apúntado a este torneo</div>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -76,18 +79,37 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Torneo } from "@/interfaces/Torneo";
-import { getTorneo } from "@/services/TorneosService";
+import { descargarBasesTorneo, getTorneo } from "@/services/TorneosService";
 import ResponseInscripcion from "@/components/Torneos/ResponseInscripcion.vue";
+import {
+  getInscripcionesUser,
+  registrarInscripcion,
+} from "@/services/InscripcionesService";
+import { useAuth } from "@/composables/useAuth";
+import {
+  CrearInscripcionDTO,
+  InscripcionUsuarioDTO,
+} from "@/interfaces/Inscripcion";
 
+const { getidUsuario } = useAuth();
 const route = useRoute();
 const router = useRouter();
-let torneo = ref<Torneo>();
+const torneo = ref<Torneo>();
 const showModal = ref(false);
+const idUsuario = ref<string>(getidUsuario.value!);
+const idTorneo = ref<number>();
+const estaApuntado = ref<boolean>(false);
+const torneosApuntado = ref<InscripcionUsuarioDTO[]>();
 
 onMounted(async () => {
-  const idTorneo = Number(route.params.idTorneo);
-  torneo.value = await getTorneo(idTorneo);
-  console.log(torneo.value);
+  idTorneo.value = Number(route.params.idTorneo);
+  torneo.value = await getTorneo(idTorneo.value);
+  // comprobar si ya esta apuntado
+  torneosApuntado.value = await getInscripcionesUser(idUsuario.value);
+
+  torneosApuntado.value!.forEach((element) => {
+    if (element.idTorneo == idTorneo.value) estaApuntado.value = true;
+  });
 });
 
 watch(
@@ -103,9 +125,35 @@ const formatDate = (date: string | number | Date | undefined) =>
   date ? new Date(date).toLocaleDateString() : "Fecha no disponible";
 
 const goBack = () => router.go(-1);
-const descargarBases = () => router.go(-1);
 
-const showModalResponse = () => {
+const descargarBases = async () => {
+  try {
+    const blob = await descargarBasesTorneo(idTorneo.value!);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Bases_Torneo_${torneo.value?.nombreTorneo}.pdf`;
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Error descargando el archivo:", error);
+    alert("Error al descargar el archivo. Por favor, inténtelo de nuevo.");
+  }
+};
+
+const showModalResponse = async () => {
+  try {
+    const body: CrearInscripcionDTO = {
+      idUsuario: parseInt(idUsuario.value),
+      idTorneo: idTorneo.value!,
+    };
+    console.log("innx", body);
+    await registrarInscripcion(body);
+    showModal.value = true;
+  } catch {
+    alert("Error en la inscripción. Habla con el administrador.");
+  }
   showModal.value = true;
 };
 
@@ -118,5 +166,9 @@ const handleCloseModal = () => {
 .v-card-actions {
   display: flex;
   justify-content: space-between;
+}
+
+.color-text {
+  color: #4caf50; /* Success Lighten-1 color */
 }
 </style>

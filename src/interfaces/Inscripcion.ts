@@ -12,4 +12,5 @@ export interface InscripcionUsuarioDTO {
   estadoLista: string;
   fechaEntregaLista: string;
   esPago: boolean;
+  nombreTorneo: string;
 }

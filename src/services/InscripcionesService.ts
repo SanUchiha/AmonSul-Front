@@ -72,7 +72,7 @@ export const cancelarInscripcion = async (idInscripcion: number) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+    return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw error as AxiosError;
@@ -82,7 +82,7 @@ export const cancelarInscripcion = async (idInscripcion: number) => {
   }
 };
 
-export const getInscripcionesUser = async (idUsuario: number) => {
+export const getInscripcionesUser = async (idUsuario: string) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.get(baseUrl + "byUser/" + idUsuario, {

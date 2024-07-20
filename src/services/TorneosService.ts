@@ -20,17 +20,31 @@ export const getTorneos = async () => {
 
 export const getTorneo = async (idTorneo: number) => {
   try {
-    console.log(idTorneo);
     const token = localStorage.getItem("token");
     const response = await axios.get(BASE_URL + "Torneo/id/" + idTorneo, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("service", response.data);
     return response.data;
   } catch (error) {
     console.error("Error recuperando torneos:", error);
+    throw error;
+  }
+};
+
+export const descargarBasesTorneo = async (idTorneo: number) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(BASE_URL + "Torneo/bases/" + idTorneo, {
+      responseType: "blob", // Importante para manejar la respuesta como blob
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data; // El blob del archivo PDF
+  } catch (error) {
+    console.error("Error recuperando el archivo del torneo:", error);
     throw error;
   }
 };

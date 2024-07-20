@@ -21,5 +21,5 @@ export interface Torneo {
   metodosPago: string[]; // Métodos de pago aceptados
   horaInicioTorneo: string; // Hora de inicio del torneo (HH:mm)
   horaFinTorneo: string; // Hora de fin del torneo (HH:mm)
-  limitePlazas?: number; // Límite de plazas del torneo (opcional)
+  limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
 }

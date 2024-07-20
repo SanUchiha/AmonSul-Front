@@ -10,6 +10,7 @@ const stateAuth = reactive<AuthState>({
   user: JSON.parse(localStorage.getItem("user") || "null"),
   token: localStorage.getItem("token") || "",
   error: null,
+  idUsuario: JSON.parse(localStorage.getItem("idUsuario") || "null"),
 });
 
 const login = async (credentials: RequestLoginDTO) => {
@@ -18,12 +19,15 @@ const login = async (credentials: RequestLoginDTO) => {
     if (response.data.isAccess) {
       const token = response.data.token;
       const user = response.data.user;
+      const idUsuario = response.data.idUsuario;
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("idUsuario", JSON.stringify(idUsuario));
 
       stateAuth.token = token;
       stateAuth.user = user;
+      stateAuth.idUsuario = idUsuario;
       stateAuth.error = null;
     }
     return response;
@@ -40,14 +44,17 @@ const login = async (credentials: RequestLoginDTO) => {
 const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("idUsuario");
 
   stateAuth.user = null;
   stateAuth.token = "";
   stateAuth.error = null;
+  stateAuth.idUsuario = null;
 };
 
 const isAuthenticated = computed(() => !!stateAuth.token);
 const getUser = computed(() => stateAuth.user);
+const getidUsuario = computed(() => stateAuth.idUsuario);
 const getError = computed<string | null>(() => stateAuth.error);
 
 export function useAuth() {
@@ -57,6 +64,7 @@ export function useAuth() {
     logout,
     isAuthenticated,
     getUser,
+    getidUsuario,
     getError,
   };
 }
