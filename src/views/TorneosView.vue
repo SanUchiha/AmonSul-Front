@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row dense>
+    <v-row dense justify="center">
       <div v-if="loading">
         <v-row justify="center" align="center" style="height: 100px">
           <v-col cols="12" class="text-center">
@@ -10,9 +10,15 @@
       </div>
       <div v-else>
         <div v-if="listaTorneos.length < 1">In progress...</div>
-        <v-col v-for="torneo in listaTorneos" :key="torneo.idTorneo">
-          <TorneoCard :torneo="torneo" />
-        </v-col>
+        <v-row dense justify="center">
+          <v-col
+            v-for="torneo in listaTorneos"
+            :key="torneo.idTorneo"
+            cols="12"
+          >
+            <TorneoCard :torneo="torneo" />
+          </v-col>
+        </v-row>
       </div>
     </v-row>
   </v-container>
