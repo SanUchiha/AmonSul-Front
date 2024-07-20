@@ -29,9 +29,15 @@
       Rondas: {{ torneo.numeroPartidas }}
     </v-card-subtitle>
 
-    <!-- Botón de acciones -->
+    <v-spacer class="my-3"></v-spacer>
+
     <v-card-actions>
-      <v-btn color="orange lighten-2" @click="goToDetalle" block>
+      <v-btn
+        variant="tonal"
+        color="orange lighten-2"
+        @click="goToDetalle"
+        block
+      >
         Ver Detalle
       </v-btn>
     </v-card-actions>
@@ -50,7 +56,6 @@ const fechaTorneo = ref<string>("");
 const img = ref<string>("");
 
 onMounted(async () => {
-  console.log(props.torneo);
   fechaTorneo.value = await formatFechaSpa(props.torneo.fechaInicioTorneo);
 });
 

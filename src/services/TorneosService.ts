@@ -18,14 +18,16 @@ export const getTorneos = async () => {
   }
 };
 
-export const getTorneo = async (id: number) => {
+export const getTorneo = async (idTorneo: number) => {
   try {
+    console.log(idTorneo);
     const token = localStorage.getItem("token");
-    const response = await axios.get(BASE_URL + "Torneo", {
+    const response = await axios.get(BASE_URL + "Torneo/id/" + idTorneo, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log("service", response.data);
     return response.data;
   } catch (error) {
     console.error("Error recuperando torneos:", error);
