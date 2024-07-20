@@ -35,6 +35,13 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>Mis Partidas</v-list-item-title>
+          </v-list-item-content> </v-list-item
+        ><v-list-item link to="/mis-torneos" v-if="isAuthenticated">
+          <v-list-item-icon>
+            <v-icon>mdi-gamepad-variant</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Mis Torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/elo" v-if="isAuthenticated">

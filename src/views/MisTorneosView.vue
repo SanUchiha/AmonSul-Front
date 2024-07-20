@@ -1,5 +1,5 @@
 <template>
-  <div>Vista contacto. En desarrollo</div>
+  <div>Vista Mis torneos. En desarrollo</div>
 </template>
 
 <script setup lang="ts"></script>

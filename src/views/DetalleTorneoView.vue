@@ -40,7 +40,7 @@
             <p><strong>Métodos de Pago:</strong> {{ torneo.metodosPago }}</p>
           </v-card-text>
 
-          <v-card-actions class="justify-space-between">
+          <v-card-actions>
             <v-btn
               variant="outlined"
               color="blue lighten-2"
@@ -53,32 +53,36 @@
 
           <v-divider class="my-3"></v-divider>
 
-          <v-card-actions class="justify-space-between">
+          <v-card-actions>
             <v-btn variant="outlined" color="orange lighten-2" @click="goBack">
               Volver
             </v-btn>
             <v-btn
               variant="tonal"
               color="success lighten-1"
-              @click="inscripcion"
+              @click="showModalResponse"
               >Apúntate</v-btn
             >
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
+
+    <ResponseInscripcion :isVisible="showModal" @close="handleCloseModal" />
   </v-container>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { Torneo } from "@/interfaces/Torneo";
 import { getTorneo } from "@/services/TorneosService";
-import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import ResponseInscripcion from "@/components/Torneos/ResponseInscripcion.vue";
 
 const route = useRoute();
 const router = useRouter();
 let torneo = ref<Torneo>();
+const showModal = ref(false);
 
 onMounted(async () => {
   const idTorneo = Number(route.params.idTorneo);
@@ -86,12 +90,28 @@ onMounted(async () => {
   console.log(torneo.value);
 });
 
+watch(
+  () => showModal.value,
+  (newValue) => {
+    if (!newValue) {
+      router.push("/mis-torneos");
+    }
+  }
+);
+
 const formatDate = (date: string | number | Date | undefined) =>
   date ? new Date(date).toLocaleDateString() : "Fecha no disponible";
 
 const goBack = () => router.go(-1);
-const inscripcion = () => router.go(-1);
 const descargarBases = () => router.go(-1);
+
+const showModalResponse = () => {
+  showModal.value = true;
+};
+
+const handleCloseModal = () => {
+  showModal.value = false;
+};
 </script>
 
 <style scoped>

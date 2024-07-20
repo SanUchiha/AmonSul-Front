@@ -14,6 +14,7 @@ import ErrorView from "@/views/ErrorView.vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
 import EloView from "@/views/EloView.vue";
+import MisTorneosView from "@/views/MisTorneosView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -85,6 +86,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/perfil-usuario",
     name: "perfil-usuario",
     component: PerfilUsuarioView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/mis-torneos",
+    name: "mis-torneos",
+    component: MisTorneosView,
     meta: { requiresAuth: true },
   },
   {
