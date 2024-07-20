@@ -39,13 +39,27 @@
             <p><strong>Puntos del Torneo:</strong> {{ torneo.puntosTorneo }}</p>
             <p><strong>Métodos de Pago:</strong> {{ torneo.metodosPago }}</p>
           </v-card-text>
+
+          <v-card-actions class="justify-space-between">
+            <v-btn
+              variant="outlined"
+              color="blue lighten-2"
+              @click="descargarBases"
+              block
+            >
+              Descargar Bases
+            </v-btn>
+          </v-card-actions>
+
+          <v-divider class="my-3"></v-divider>
+
           <v-card-actions class="justify-space-between">
             <v-btn variant="outlined" color="orange lighten-2" @click="goBack">
               Volver
             </v-btn>
             <v-btn
               variant="tonal"
-              color="success lighten-2"
+              color="success lighten-1"
               @click="inscripcion"
               >Apúntate</v-btn
             >
@@ -77,6 +91,7 @@ const formatDate = (date: string | number | Date | undefined) =>
 
 const goBack = () => router.go(-1);
 const inscripcion = () => router.go(-1);
+const descargarBases = () => router.go(-1);
 </script>
 
 <style scoped>
