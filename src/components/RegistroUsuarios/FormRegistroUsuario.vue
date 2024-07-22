@@ -81,7 +81,7 @@
               <v-combobox
                 v-model="faccionSelected"
                 :items="nombreFacciones"
-                label="Facción"
+                label="Comunidad de juego"
                 @click="loadFacciones"
               >
                 <template #append-item>
@@ -90,7 +90,7 @@
                     color="blue darken-1"
                     @click="openDialogNuevaFaccion"
                   >
-                    Añadir nueva facción
+                    Añadir nueva comunidad
                   </v-btn>
                 </template>
               </v-combobox>
@@ -149,16 +149,21 @@
       @update:isVisible="handleOkClick = $event"
     />
 
+    <ModalMessageError
+      :isVisible="dialogDuplicado"
+      @update:isVisible="dialogDuplicado = $event"
+    />
+
     <v-dialog v-model="dialogAddFaccion" max-width="400px">
       <v-card>
         <v-card-title>
-          <span class="text-h5">Añadir nueva facción</span>
+          <span class="text-h5">Añadir nueva comunidad de juego</span>
         </v-card-title>
         <v-card-text>
           <v-form ref="addFaccionForm">
             <v-text-field
               v-model="nuevaFaccion"
-              label="Nombre de la facción"
+              label="Nombre de la comunidad"
               required
               :rules="[rules.required]"
             ></v-text-field>
@@ -193,6 +198,7 @@ import ErrorEmail from "../RegistroUsuarios/ErrorEmail.vue";
 import ResponseNuevoUsuario from "../RegistroUsuarios/ResponseNuevoUsuario.vue";
 import { getFacciones, registrarFaccion } from "@/services/FaccionesService";
 import { Faccion } from "@/interfaces/Faccion";
+import ModalMessageError from "../Commons/ModalMessageError.vue";
 
 const nombre = ref("");
 const primerApellido = ref("");
@@ -207,6 +213,7 @@ const router = useRouter();
 const dialogNick = ref(false);
 const dialogEmail = ref(false);
 const dialogOk = ref(false);
+const dialogDuplicado = ref(false);
 const dialogAddFaccion = ref(false);
 const loading = ref(false);
 const telefono = ref("");
@@ -278,8 +285,19 @@ const addFaccion = async () => {
   loading.value = true;
 
   try {
-    const response = await registrarFaccion(nuevaFaccion.value);
-    if (!response) alert("faccion no añadida");
+    //Controlar que no duplique
+    if (
+      listaFacciones.value.find(
+        (f) =>
+          f.nombreFaccion.toUpperCase() === nuevaFaccion.value.toUpperCase()
+      )
+    )
+      dialogDuplicado.value = true;
+    else {
+      const response = await registrarFaccion(nuevaFaccion.value);
+      if (!response) alert("Error del servidor");
+    }
+
     dialogAddFaccion.value = false;
     loadFacciones();
   } catch (error) {
@@ -287,6 +305,7 @@ const addFaccion = async () => {
   } finally {
     loading.value = false;
     dialogAddFaccion.value = false;
+    dialogDuplicado.value = true;
   }
 };
 
