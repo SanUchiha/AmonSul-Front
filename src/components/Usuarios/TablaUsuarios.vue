@@ -99,4 +99,8 @@ onMounted(async () => {
   text-align: left;
   background-color: rgb(55, 59, 59);
 }
+
+.clickable-row {
+  cursor: pointer;
+}
 </style>

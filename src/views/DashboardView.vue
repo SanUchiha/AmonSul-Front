@@ -1,7 +1,7 @@
 <template>
-  <v-container>
+  <v-container class="text-center">
     <v-row dense>
-      <v-col cols="12" md="8" class="text-center">
+      <v-col cols="12" md="12" class="text-center">
         <div v-if="loading">
           <ProgressCircular />
         </div>
@@ -20,13 +20,13 @@
       </v-col>
     </v-row>
     <v-row dense>
-      <v-col cols="12" md="8" class="text-center">
+      <v-col cols="12" md="12" class="text-center">
         <JugadorCard :usuario="usuario" />
       </v-col>
     </v-row>
 
     <v-row dense>
-      <v-col cols="12" md="8" class="text-center">
+      <v-col cols="12" md="12" class="text-center">
         <v-card :class="cardClass">
           <v-card-title>Última partida jugada</v-card-title>
           <v-card-text v-if="ultimaPartida">{{
@@ -38,7 +38,7 @@
     </v-row>
 
     <v-row dense>
-      <v-col cols="12" md="8" class="text-center">
+      <v-col cols="12" md="12" class="text-center">
         <v-card>
           <v-card-title>Último torneo jugado</v-card-title>
           <v-card-text>In progress...</v-card-text>
@@ -46,17 +46,15 @@
       </v-col>
     </v-row>
 
-    <v-col cols="12" md="8" class="text-center">
-      <v-card
-        color="#632687"
-        class="mx-auto register-card"
-        @click="handleFormCreateMatch"
-        max-width="344"
-        title="Registrar partida"
-        appendIcon="mdi-open-in-app"
-        prependIcon="mdi-open-in-app"
-      />
-    </v-col>
+    <v-btn
+      class="dashboard__button mt-2"
+      variant="tonal"
+      size="large"
+      appendIcon="mdi-open-in-app"
+      prependIcon="mdi-open-in-app"
+      @click="handleFormCreateMatch"
+      >Registrar partida</v-btn
+    >
   </v-container>
 </template>
 
@@ -172,11 +170,7 @@ const handleFormCreateMatch = () => {
 };
 </script>
 
-<style scoped>
-.register-card {
-  cursor: pointer;
-}
-
+<style scoped lang="scss">
 .victoria-card {
   background-color: rgb(14, 84, 14);
   color: white;
@@ -195,5 +189,15 @@ const handleFormCreateMatch = () => {
 .error {
   color: red;
   text-align: center;
+}
+
+.dashboard {
+  &__button {
+    background-color: #632687;
+
+    @media screen and (max-width: 720px){
+      width: 100%;
+    }
+  }
 }
 </style>

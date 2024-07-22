@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col cols="12" md="8">
+      <v-col cols="12" md="12">
         <v-card v-if="torneo">
           <v-img :src="torneo.cartelTorneo" height="200px" />
           <v-card-title align="center">{{ torneo.nombreTorneo }}</v-card-title>
@@ -45,7 +45,6 @@
               variant="outlined"
               color="blue lighten-2"
               @click="descargarBases"
-              block
             >
               Descargar Bases
             </v-btn>

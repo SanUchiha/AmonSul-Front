@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" md="8" class="text-center">
+      <v-col cols="12" md="12" class="text-center">
         <div v-if="loading">
           <ProgressCircular />
         </div>
