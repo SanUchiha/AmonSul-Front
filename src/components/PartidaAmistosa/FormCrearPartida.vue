@@ -71,7 +71,7 @@
               <v-switch
                 v-model="checkEsMatchedPlay"
                 color="primary"
-                label="¿Es matched play?"
+                label="¿El escenario es del Matched play??"
               ></v-switch>
 
               <v-combobox
@@ -88,13 +88,13 @@
                 class="progress-linear-margin"
               ></v-progress-linear>
               <v-switch
-                v-model="esTorneo"
+                v-model="esElo"
                 color="primary"
-                label="¿Es torneo?"
+                label="¿Quieres que cuente para el ELO?"
               ></v-switch>
               <v-text-field
                 v-model="puntosPartida"
-                label="¿Ha cuantos puntos has jugado"
+                label="¿Ha cuantos puntos has jugado?"
                 type="number"
                 :rules="[rules.required]"
                 required
@@ -153,7 +153,6 @@ import ResponseNuevaPartida from "./ResponseNuevaPartida.vue";
 
 const router = useRouter();
 const { getUser } = useAuth();
-const error = ref<string | null>(null);
 const dialogOk = ref(false);
 const loading = ref(false);
 const loadingNicks = ref(false);
@@ -171,8 +170,9 @@ const puntosJugadorUno = ref<number | null>(null);
 const puntosJugadorDos = ref<number | null>(null);
 const checkEsMatchedPlay = ref<boolean>(false);
 const esTorneo = ref<boolean>(false);
+const esElo = ref<boolean>(false);
 const puntosPartida = ref<number | null>(null);
-const emailOwner = ref<string>("");
+const emailOwner = ref<string>(await getUser.value!);
 const rawListaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
 
 const rules = {
@@ -182,15 +182,7 @@ const rules = {
 const loadNicks = async () => {
   loading.value = true;
   loadingNicks.value = true;
-  const email: any = await getUser.value;
-  emailOwner.value = email;
-  if (!email) {
-    error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
-    console.log(error.value);
-    router.push("error");
-    loading.value = false;
-    return;
-  }
+
   try {
     rawListaUsuarios.value = await getUsuarios();
     listaUsuarios.value = rawListaUsuarios.value;
@@ -253,18 +245,9 @@ const validateForm = () => {
 const handlerNuevaPartida = async () => {
   dialogOk.value = false;
   loading.value = true;
-  const email: any = await getUser.value;
-  emailOwner.value = email;
-  if (!email) {
-    error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
-    console.log(error.value);
-    router.push("error");
-    loading.value = false;
-    return;
-  }
 
   const usuarioCreador: ViewUsuarioPartidaDTO | undefined =
-    await rawListaUsuarios.value.find((u) => u.email == email);
+    await rawListaUsuarios.value.find((u) => u.email == emailOwner.value);
 
   const rival: ViewUsuarioPartidaDTO | undefined =
     await listaUsuarios.value.find((u) => u.nick == nickDosSelected.value);
@@ -280,6 +263,7 @@ const handlerNuevaPartida = async () => {
     esTorneo: esTorneo.value ?? false,
     ejercitoUsuario1: ejercitoPropio.value,
     ejercitoUsuario2: ejercitoRival.value,
+    esElo: esElo.value ?? false,
   };
 
   try {

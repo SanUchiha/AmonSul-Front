@@ -36,4 +36,5 @@ export interface CreatePartidaAmistosaDTO {
   esTorneo: boolean;
   ejercitoUsuario1: string;
   ejercitoUsuario2: string;
+  esElo: boolean;
 }
