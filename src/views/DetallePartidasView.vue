@@ -83,9 +83,9 @@
               </v-list-item>
               <v-list-item>
                 <v-list-item-content>
-                  <v-list-item-title>Es Torneo</v-list-item-title>
+                  <v-list-item-title>¿Cuenta para el ELO?</v-list-item-title>
                   <v-list-item-subtitle>{{
-                    partida?.esTorneo ? "Sí" : "No"
+                    partida?.esElo ? "Sí" : "No"
                   }}</v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
