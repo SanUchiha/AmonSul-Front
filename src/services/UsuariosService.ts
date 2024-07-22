@@ -1,3 +1,4 @@
+import { EditarFaccionDTO } from "@/interfaces/Faccion";
 import { NewUserDTO } from "@/interfaces/Usuario";
 import { appsettings } from "@/settings/appsettings";
 import axios, { AxiosError } from "axios";
@@ -128,6 +129,28 @@ export const getDetalleUsuarioByEmail = async (email: string) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
+
+export const editarFaccion = async (body: EditarFaccionDTO) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.put(
+      baseUrl + "Usuario/modificar-faccion",
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

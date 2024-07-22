@@ -1,3 +1,5 @@
+import { Faccion } from "./Faccion";
+
 export interface NewUserDTO {
   NombreUsuario: string;
   PrimerApellido: string;
@@ -36,6 +38,7 @@ export interface UsuarioViewDTO {
   ciudad?: string;
   fechaRegistro: string;
   fechaNacimiento: string;
+  faccion: Faccion;
   idFaccion?: number;
   telefono?: string;
 }

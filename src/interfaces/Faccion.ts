@@ -6,3 +6,8 @@ export interface Faccion {
 export interface RegistrarFaccionDTO {
   nombreFaccion: string;
 }
+
+export interface EditarFaccionDTO {
+  idFaccion: number;
+  idUsuario: number;
+}

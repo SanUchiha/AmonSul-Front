@@ -21,8 +21,7 @@
                     label="Nombre"
                     v-model="user!.nombreUsuario"
                     readonly
-                  >
-                  </v-text-field>
+                  ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
                 <v-col cols="12" class="d-flex justify-space-between">
@@ -50,8 +49,6 @@
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
-
-                <v-divider></v-divider>
                 <v-col cols="12" class="d-flex justify-space-between">
                   <v-text-field
                     label="Nick"
@@ -70,25 +67,20 @@
                 <v-divider></v-divider>
                 <v-col cols="12" class="d-flex justify-space-between">
                   <v-text-field
-                    label="Fecha de Registro"
-                    v-model="user!.fechaRegistro"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-divider></v-divider>
-                <v-col cols="12" class="d-flex justify-space-between">
-                  <v-text-field
                     label="Fecha de nacimiento"
                     v-model="user!.fechaNacimiento"
                     readonly
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
-                <v-col cols="12" class="d-flex justify-space-between">
+                <v-col cols="12">
                   <v-text-field
-                    label="Facción"
-                    v-model="user!.idFaccion"
+                    ref="nombreFaccionField"
+                    label="Comunidad de juego"
+                    v-model="selectedFaccionName"
                     readonly
+                    append-inner-icon="mdi-pencil"
+                    @click:append-inner="openEditFaccionDialog"
                   ></v-text-field>
                 </v-col>
                 <v-divider></v-divider>
@@ -105,38 +97,154 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Modal for editing faction -->
+    <v-dialog v-model="editFaccionDialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Editar Comunidad de juego</span>
+        </v-card-title>
+        <v-card-text>
+          <v-combobox
+            v-model="selectedFaccionName"
+            :items="faccionesCombo"
+            item-value="idFaccion"
+            label="Selecciona una comunidad"
+          ></v-combobox>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" @click="closeEditFaccionDialog"
+            >Cancelar</v-btn
+          >
+          <v-btn color="blue darken-1" @click="saveFaccion">Guardar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="feedbackDialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{ feedbackTitle }}</span>
+        </v-card-title>
+        <v-card-text>
+          <p>{{ feedbackMessage }}</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" @click="closeFeedbackDialog">
+            Cerrar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
-import { getUsuario } from "@/services/UsuariosService";
+import { editarFaccion, getUsuario } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
+import { getFacciones } from "@/services/FaccionesService";
+import { EditarFaccionDTO, Faccion } from "@/interfaces/Faccion";
 
 const user = ref<UsuarioViewDTO>();
 const loading = ref(true);
 const { getUser } = useAuth();
-const error = ref<string | null>(null); // Estado de error
+const email = ref<string>(await getUser.value!);
+const facciones = ref<Faccion[]>([]);
+const editFaccionDialog = ref(false);
+const selectedFaccionName = ref<string>("");
+const faccionesCombo = ref<string[]>([]);
+
+const feedbackDialog = ref(false);
+const feedbackMessage = ref("");
+const feedbackTitle = ref("");
 
 onMounted(async () => {
-  const email: any = await getUser.value;
-  if (!email) {
-    error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
-    console.log(error.value);
-    loading.value = false;
-    return;
-  }
   try {
-    const response = await getUsuario(email);
-    user.value = response;
+    user.value = await getUsuario(email.value);
+    facciones.value = await getFacciones();
+    const faccionEncontrada: Faccion | undefined = facciones.value.find(
+      (f) => f.idFaccion === user.value?.idFaccion
+    );
+    if (faccionEncontrada) {
+      user.value!.faccion = faccionEncontrada;
+      selectedFaccionName.value = faccionEncontrada.nombreFaccion;
+    }
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   } finally {
     loading.value = false;
   }
 });
+
+const openEditFaccionDialog = () => {
+  editFaccionDialog.value = true;
+  faccionesCombo.value = facciones.value.map((x) => x.nombreFaccion);
+};
+
+const closeEditFaccionDialog = () => {
+  editFaccionDialog.value = false;
+};
+
+const saveFaccion = async () => {
+  console.log(user.value);
+
+  const faccionSelected: Faccion = facciones.value.find(
+    (x) => x.nombreFaccion === selectedFaccionName.value
+  )!;
+
+  const body: EditarFaccionDTO = {
+    idFaccion: faccionSelected.idFaccion,
+    idUsuario: user.value!.idUsuario,
+  };
+
+  console.log(body);
+
+  try {
+    const response = await editarFaccion(body);
+    console.log(response);
+    feedbackTitle.value = "Éxito";
+    feedbackMessage.value =
+      "La comunidad de juego ha sido actualizada correctamente.";
+
+    user.value = await getUsuario(email.value);
+    facciones.value = await getFacciones();
+    const faccionEncontrada: Faccion | undefined = facciones.value.find(
+      (f) => f.idFaccion === user.value?.idFaccion
+    );
+    if (faccionEncontrada) {
+      user.value!.faccion = faccionEncontrada;
+      selectedFaccionName.value = faccionEncontrada.nombreFaccion;
+    }
+  } catch (error) {
+    console.error("Error al editar la facción:", error);
+    feedbackTitle.value = "Error";
+    feedbackMessage.value =
+      "Ha habido un problema al actualizar la comunidad de juego.";
+
+    user.value = await getUsuario(email.value);
+    facciones.value = await getFacciones();
+    const faccionEncontrada: Faccion | undefined = facciones.value.find(
+      (f) => f.idFaccion === user.value?.idFaccion
+    );
+    if (faccionEncontrada) {
+      user.value!.faccion = faccionEncontrada;
+      selectedFaccionName.value = faccionEncontrada.nombreFaccion;
+    }
+  }
+
+  closeEditFaccionDialog();
+  feedbackDialog.value = true;
+};
+
+const closeFeedbackDialog = () => {
+  feedbackDialog.value = false;
+};
 </script>
 
 <style scoped>
