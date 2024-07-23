@@ -7,6 +7,7 @@ export interface InscripcionUsuarioDTO {
   idInscripcion: number;
   idTorneo: number;
   idUsuario: number;
+  nick: string;
   estadoInscripcion: string;
   fechaInscripcion: string;
   estadoLista: string;

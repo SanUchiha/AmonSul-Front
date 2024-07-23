@@ -1,75 +1,138 @@
 <template>
   <v-container>
-    <v-row justify="center">
-      <v-col cols="12" md="8">
-        <v-card v-if="torneo">
-          <v-img :src="torneo.cartelTorneo" height="200px" />
-          <v-card-title align="center">{{ torneo.nombreTorneo }}</v-card-title>
-          <v-card-subtitle>{{ torneo.lugarTorneo }}</v-card-subtitle>
-          <v-card-text>
-            <p><strong>Descripción:</strong> {{ torneo.descripcionTorneo }}</p>
-            <p><strong>Estado:</strong> {{ torneo.estadoTorneo }}</p>
-            <p>
-              <strong>Fecha de Inicio:</strong>
-              {{ formatDate(torneo.fechaInicioTorneo) }} a las
-              {{ torneo.horaInicioTorneo }}
-            </p>
-            <p>
-              <strong>Fecha de Fin:</strong>
-              {{ formatDate(torneo.fechaFinTorneo) }} a las
-              {{ torneo.horaFinTorneo }}
-            </p>
-            <p>
-              <strong>Fecha Fin de Inscripción:</strong>
-              {{ formatDate(torneo.fechaFinInscripcion) }}
-            </p>
-            <p>
-              <strong>Entrega de Listas:</strong>
-              {{ formatDate(torneo.fechaEntregaListas) }}
-            </p>
-            <p><strong>Precio:</strong> {{ torneo.precioTorneo }}€</p>
-            <p>
-              <strong>Límite de Participantes:</strong>
-              {{ torneo.limiteParticipantes || "Sin límite" }}
-            </p>
-            <p><strong>Tipo de Torneo:</strong> {{ torneo.tipoTorneo }}</p>
-            <p>
-              <strong>Número de Partidas:</strong> {{ torneo.numeroPartidas }}
-            </p>
-            <p><strong>Puntos del Torneo:</strong> {{ torneo.puntosTorneo }}</p>
-            <p><strong>Métodos de Pago:</strong> {{ torneo.metodosPago }}</p>
-          </v-card-text>
+    <v-card>
+      <v-tabs v-model="tab" color="primary" grow>
+        <v-tab value="one">
+          <v-icon icon="mdi-eye-outline"></v-icon>
+        </v-tab>
+        <v-tab value="two"> <v-icon icon="mdi-account-group"></v-icon> </v-tab>
+      </v-tabs>
 
-          <v-card-actions>
-            <v-btn
-              variant="outlined"
-              color="blue lighten-2"
-              @click="descargarBases"
-              block
-            >
-              Descargar Bases
-            </v-btn>
-          </v-card-actions>
+      <v-card-text>
+        <v-tabs-window v-model="tab">
+          <v-tabs-window-item value="one">
+            <v-card v-if="torneo">
+              <v-img :src="torneo.cartelTorneo" height="200px" />
+              <v-card-title align="center">{{
+                torneo.nombreTorneo
+              }}</v-card-title>
+              <v-card-subtitle align="center">{{
+                torneo.lugarTorneo
+              }}</v-card-subtitle>
+              <v-card-text>
+                <p>
+                  <strong>Descripción:</strong> {{ torneo.descripcionTorneo }}
+                </p>
+                <p>
+                  <strong>Fecha:</strong>
+                  {{ formatDate(torneo.fechaInicioTorneo) }} a las
+                  {{ torneo.horaInicioTorneo }}
+                </p>
+                <!-- <p>
+            <strong>Fecha de Fin:</strong>
+            {{ formatDate(torneo.fechaFinTorneo) }} a las
+            {{ torneo.horaFinTorneo }}
+          </p> -->
+                <p>
+                  <strong>Inscripción hasta:</strong>
+                  {{ formatDate(torneo.fechaFinInscripcion) }}
+                </p>
+                <p>
+                  <strong>Entrega de Listas:</strong>
+                  {{ formatDate(torneo.fechaEntregaListas) }}
+                </p>
+                <p><strong>Precio:</strong> {{ torneo.precioTorneo }}€</p>
+                <p>
+                  <strong>Límite de Participantes:</strong>
+                  {{ torneo.limiteParticipantes || "Sin límite" }}
+                </p>
+                <p>
+                  <strong>Número de Partidas:</strong>
+                  {{ torneo.numeroPartidas }}
+                </p>
+                <p>
+                  <strong>Puntos del Torneo:</strong> {{ torneo.puntosTorneo }}
+                </p>
+              </v-card-text>
 
-          <v-divider class="my-3"></v-divider>
+              <v-card-actions>
+                <v-btn
+                  variant="outlined"
+                  color="blue lighten-2"
+                  @click="descargarBases"
+                  block
+                >
+                  Descargar Bases
+                </v-btn>
+              </v-card-actions>
 
-          <v-card-actions>
-            <v-btn variant="outlined" color="orange lighten-2" @click="goBack">
-              Volver
-            </v-btn>
-            <div v-if="!estaApuntado">
-              <v-btn
-                variant="tonal"
-                color="success lighten-1"
-                @click="showModalResponse"
-                >Apúntate</v-btn
+              <v-divider class="my-3"></v-divider>
+
+              <v-card-actions>
+                <v-btn
+                  variant="outlined"
+                  color="orange lighten-2"
+                  @click="goBack"
+                >
+                  Volver
+                </v-btn>
+                <div v-if="!estaApuntado">
+                  <v-btn
+                    variant="tonal"
+                    color="success lighten-1"
+                    @click="showModalResponse"
+                    >Apúntate</v-btn
+                  >
+                </div>
+                <div v-else class="color-text">
+                  Ya estás apúntado a este torneo
+                </div>
+              </v-card-actions>
+            </v-card>
+          </v-tabs-window-item>
+
+          <v-tabs-window-item value="two">
+            <v-card flat>
+              <v-card-title class="d-flex align-center pe-2"
+                >Participantes
+
+                <v-spacer></v-spacer>
+
+                <v-text-field
+                  v-model="search"
+                  density="compact"
+                  label="Search"
+                  prepend-inner-icon="mdi-magnify"
+                  variant="solo-filled"
+                  flat
+                  hide-details
+                  single-line
+                ></v-text-field>
+              </v-card-title>
+
+              <v-divider></v-divider>
+              <v-divider></v-divider>
+              <v-data-table
+                v-model:search="search"
+                :items="participantes"
+                :loading="loading"
+                :headers="headers"
+                class="custom-table"
+                item-key="nick"
               >
-            </div>
-            <div v-else class="color-text">Ya estás apúntado a este torneo</div>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+                <template v-slot:item="{ item }">
+                  <tr @click="goToUserDetail(item.nick)" class="clickable-row">
+                    <td>
+                      <v-chip color="orange" dark>{{ item.nick }}</v-chip>
+                    </td>
+                  </tr>
+                </template>
+              </v-data-table>
+            </v-card>
+          </v-tabs-window-item>
+        </v-tabs-window>
+      </v-card-text>
+    </v-card>
 
     <ResponseInscripcion :isVisible="showModal" @close="handleCloseModal" />
   </v-container>
@@ -82,6 +145,7 @@ import { Torneo } from "@/interfaces/Torneo";
 import { descargarBasesTorneo, getTorneo } from "@/services/TorneosService";
 import ResponseInscripcion from "@/components/Torneos/ResponseInscripcion.vue";
 import {
+  getInscripcionesTorneo,
   getInscripcionesUser,
   registrarInscripcion,
 } from "@/services/InscripcionesService";
@@ -95,21 +159,40 @@ const { getidUsuario } = useAuth();
 const route = useRoute();
 const router = useRouter();
 const torneo = ref<Torneo>();
+const participantes = ref<InscripcionUsuarioDTO[]>([]);
 const showModal = ref(false);
 const idUsuario = ref<string>(getidUsuario.value!);
 const idTorneo = ref<number>();
 const estaApuntado = ref<boolean>(false);
 const torneosApuntado = ref<InscripcionUsuarioDTO[]>();
+const tab = ref(0);
+
+const search = ref<string>("");
+const loading = ref<boolean>(true);
+
+const headers = [{ title: "Nick", key: "nick" }];
+
+const goToUserDetail = (nick: string) => {
+  router.push({ name: "detalle-jugador", params: { Nick: nick } });
+};
 
 onMounted(async () => {
   idTorneo.value = Number(route.params.idTorneo);
   torneo.value = await getTorneo(idTorneo.value);
-  // comprobar si ya esta apuntado
+  participantes.value = await getInscripcionesTorneo(idTorneo.value);
+
+  console.log(participantes.value);
+
+  // Obtener participantes (reemplaza 'getParticipantes' con la función adecuada si es diferente)
+  // participantes.value = await getParticipantes(idTorneo.value);
+
+  // Comprobar si ya está apuntado
   torneosApuntado.value = await getInscripcionesUser(idUsuario.value);
 
   torneosApuntado.value!.forEach((element) => {
     if (element.idTorneo == idTorneo.value) estaApuntado.value = true;
   });
+  loading.value = false;
 });
 
 watch(
