@@ -15,29 +15,33 @@
                 label="Correo electrónico"
                 type="email"
                 required
+                class="my-4"
               ></v-text-field>
               <v-text-field
                 v-model="password"
                 label="Contraseña"
                 type="password"
                 required
+                class="my-4"
               ></v-text-field>
-              <v-row justify="center" class="my-4">
+              <v-row justify="center" class="my-4 ga-5">
                 <v-btn
                   color="blue darken-1"
                   variant="outlined"
                   :disabled="loading"
+                  size="large"
+                  class="login-form__button"
                   @click="handleLogin"
-                  class="mr-4"
                 >
                   Iniciar sesión
                 </v-btn>
                 <v-btn
                   color="blue darken-1"
-                  variant="outlined"
+                  variant="text"
+                  size="large"
                   to="registro-usuario"
                   :disabled="loading"
-                  class="mr-4"
+                  class="login-form__button"
                 >
                   Nuevo usuario
                 </v-btn>
@@ -57,8 +61,9 @@
       </v-col>
     </v-row>
 
-    <ErrorLogin :isVisible="dialog" @update:isVisible="dialog = $event" />
+    <ErrorLogin v-if="dialog" :isVisible="dialog" @update:isVisible="dialog = $event" />
     <ResponseLogin
+      v-if="dialogOk"
       :isVisible="dialogOk"
       @update:isVisible="handleOkClick = $event"
     />
@@ -115,7 +120,7 @@ const handleOkClick = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .overlay {
   position: fixed;
   top: 0;
@@ -137,6 +142,16 @@ const handleOkClick = () => {
 
 .login-form {
   position: relative; /* Asegura que el formulario esté por encima de la capa de fondo */
+
+  @media screen and (max-width: 720px){
+    height: 100%;
+  }
+
+  &__button {
+    @media screen and (max-width: 720px){
+      width: calc(100% - 24px);
+    }
+  }
 }
 
 .progress-linear-margin {

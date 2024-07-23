@@ -1,62 +1,48 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer v-if="isAuthenticated" v-model="drawer" app>
       <v-btn icon @click.stop="drawer = false" class="close-drawer-btn">
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <v-list>
         <v-list-item link to="/dashboard" v-if="isAuthenticated">
-          <v-list-item-icon>
+          <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-view-dashboard</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
             <v-list-item-title>Dashboard</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/torneos" v-if="isAuthenticated">
-          <v-list-item-icon>
+          <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-trophy</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
             <v-list-item-title>Torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/jugadores" v-if="isAuthenticated">
-          <v-list-item-icon>
+          <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-account-group</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
             <v-list-item-title>Usuarios</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/partidas-amistosas" v-if="isAuthenticated">
-          <v-list-item-icon>
+          <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-gamepad-variant</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
             <v-list-item-title>Mis Partidas</v-list-item-title>
           </v-list-item-content> </v-list-item
         ><v-list-item link to="/mis-torneos" v-if="isAuthenticated">
-          <v-list-item-icon>
+          <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-gamepad-variant</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
             <v-list-item-title>Mis Torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/elo" v-if="isAuthenticated">
-          <v-list-item-icon>
+          <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-cog</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
             <v-list-item-title>Elo</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/perfil-usuario" v-if="isAuthenticated">
-          <v-list-item-icon>
+          <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-cog</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
             <v-list-item-title>Perfil</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -64,7 +50,7 @@
     </v-navigation-drawer>
 
     <v-app-bar app>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon v-if="isAuthenticated" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Amon sûl</v-toolbar-title>
       <v-btn icon to="contacto" disabled>
         <v-icon>mdi-email</v-icon>

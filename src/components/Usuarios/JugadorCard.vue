@@ -2,57 +2,54 @@
   <div v-if="loading" class="center">
     <ProgressCircular />
   </div>
-  <div v-else class="center">
-    <v-card class="jugador-card">
-      <v-card-title class="title">
-        <div class="title">
-          <h3 v-if="usuario.nick.length <= 26">{{ usuario.nick }}</h3>
-          <h3 v-else>{{ usuario.nick.substring(0, 23) + "..." }}</h3>
-          <p class="subtitle">{{ nombreFaccionSelected }}</p>
-        </div>
-      </v-card-title>
-      <v-card-text>
-        <v-divider></v-divider>
-        <div class="stats-container">
-          <v-row>
-            <v-col class="stat-item">
-              <v-icon color="primary">mdi-gamepad-variant</v-icon>
-              <p>{{ usuario.numeroPartidasJugadas }}</p>
-            </v-col>
-            <v-col class="stat-item">
-              <v-icon color="green">mdi-trophy</v-icon>
-              <p class="victoria">{{ usuario.partidasGanadas }}</p>
-            </v-col>
-            <v-col class="stat-item">
-              <v-icon color="yellow">mdi-handshake</v-icon>
-              <p class="empate">{{ usuario.partidasEmpatadas }}</p>
-            </v-col>
-            <v-col class="stat-item">
-              <v-icon color="red">mdi-alert-circle</v-icon>
-              <p class="derrota">{{ usuario.partidasPerdidas }}</p>
-            </v-col>
-          </v-row>
-        </div>
-        <v-divider></v-divider>
-        <div class="stats-container">
-          <v-row>
-            <v-col class="stat-item">
-              <v-icon color="blue">mdi-star</v-icon>
-              <p>{{ usuario.puntuacionElo }}</p>
-            </v-col>
-            <v-col class="stat-item">
-              <v-icon color="purple">mdi-medal</v-icon>
-              <p>Puesto: {{ usuario.clasificacionElo }}</p>
-            </v-col>
-            <v-col class="stat-item">
-              <v-icon color="orange">mdi-percent</v-icon>
-              <p>Victorias: {{ porcentajeVictorias }}%</p>
-            </v-col>
-          </v-row>
-        </div>
-      </v-card-text>
-    </v-card>
-  </div>
+  <v-card v-else class="jugador-card">
+    <v-card-title class="title">
+      <div class="title">
+        <h3 @click="goToDetalle">{{ usuario.nick.length <= 26 ? usuario.nick : usuario.nick.substring(0, 23) + "..." }}</h3>
+        <p class="subtitle">{{ getFaccionName }}</p>
+      </div>
+    </v-card-title>
+    <v-card-text>
+      <v-divider></v-divider>
+      <div class="stats-container">
+        <v-row>
+          <v-col class="stat-item">
+            <v-icon color="primary">mdi-gamepad-variant</v-icon>
+            <p>{{ usuario.numeroPartidasJugadas }}</p>
+          </v-col>
+          <v-col class="stat-item">
+            <v-icon color="green">mdi-trophy</v-icon>
+            <p class="victoria">{{ usuario.partidasGanadas }}</p>
+          </v-col>
+          <v-col class="stat-item">
+            <v-icon color="yellow">mdi-handshake</v-icon>
+            <p class="empate">{{ usuario.partidasEmpatadas }}</p>
+          </v-col>
+          <v-col class="stat-item">
+            <v-icon color="red">mdi-alert-circle</v-icon>
+            <p class="derrota">{{ usuario.partidasPerdidas }}</p>
+          </v-col>
+        </v-row>
+      </div>
+      <v-divider></v-divider>
+      <div class="stats-container">
+        <v-row>
+          <v-col class="stat-item">
+            <v-icon color="blue">mdi-star</v-icon>
+            <p>{{ usuario.puntuacionElo }}</p>
+          </v-col>
+          <v-col class="stat-item">
+            <v-icon color="purple">mdi-medal</v-icon>
+            <p>Puesto: {{ usuario.clasificacionElo }}</p>
+          </v-col>
+          <v-col class="stat-item">
+            <v-icon color="orange">mdi-percent</v-icon>
+            <p>Victorias: {{ porcentajeVictorias }}%</p>
+          </v-col>
+        </v-row>
+      </div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script setup lang="ts">
@@ -67,11 +64,15 @@ const props = defineProps<{ usuario: ViewUsuarioPartidaDTO }>();
 const router = useRouter();
 const loading = ref(true);
 
-const nombreFaccionSelected = ref<string | undefined>("");
+const rawListaFacciones = ref<Array<Faccion> | undefined>();
 
 const goToDetalle = () => {
-  router.push(`/detalle-jugador/${props.usuario.nick}`);
+  router.push({ name: "detalle-jugador", params: { Nick: props.usuario.nick } });
 };
+
+const getFaccionName = computed(() => {
+  return rawListaFacciones.value?.find((u) => u.idFaccion == props.usuario.idFaccion)?.nombreFaccion;
+});
 
 const porcentajeVictorias = computed(() => {
   return props.usuario.numeroPartidasJugadas > 0
@@ -84,10 +85,8 @@ const porcentajeVictorias = computed(() => {
 
 onMounted(async () => {
   try {
-    var rawListaFacciones: Faccion[] = await getFacciones();
-    nombreFaccionSelected.value = await rawListaFacciones.find(
-      (u) => u.idFaccion == props.usuario.idFaccion
-    )?.nombreFaccion;
+    rawListaFacciones.value = await getFacciones();
+
   } catch (error) {
     console.error("Error al obtener la facción:", error);
   } finally {
@@ -100,7 +99,6 @@ onMounted(async () => {
 .jugador-card {
   max-width: 100%;
   min-width: 300px;
-  margin: 16px;
 }
 
 .subtitle {
