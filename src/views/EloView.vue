@@ -1,6 +1,8 @@
 <template>
-  <v-container>
-    <div v-if="isLoading" class="loading"></div>
+  <v-container class="text-center">
+    <div v-if="isLoading">
+      <ProgressCircular />
+    </div>
     <div v-else>
       <SparklineElo :email="correo" class="separated" />
       <TablaClasificacionElo class="separated" />
@@ -15,6 +17,7 @@ import TablaClasificacionElo from "@/components/Elo/TablaClasificacionElo.vue";
 import { onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
+import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
 
 const { getUser } = useAuth();
 const error = ref<string | null>(null);

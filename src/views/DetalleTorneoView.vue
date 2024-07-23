@@ -11,84 +11,90 @@
       <v-card-text>
         <v-tabs-window v-model="tab">
           <v-tabs-window-item value="one">
-            <v-card v-if="torneo">
-              <v-img :src="torneo.cartelTorneo" height="200px" />
-              <v-card-title align="center">{{
-                torneo.nombreTorneo
-              }}</v-card-title>
-              <v-card-subtitle align="center">{{
-                torneo.lugarTorneo
-              }}</v-card-subtitle>
-              <v-card-text>
-                <p>
-                  <strong>Descripción:</strong> {{ torneo.descripcionTorneo }}
-                </p>
-                <p>
-                  <strong>Fecha:</strong>
-                  {{ formatDate(torneo.fechaInicioTorneo) }} a las
-                  {{ torneo.horaInicioTorneo }}
-                </p>
-                <!-- <p>
+            <v-row justify="center">
+              <v-col cols="12" md="12">
+                <v-card v-if="torneo">
+                  <v-img :src="torneo.cartelTorneo" height="200px" />
+                  <v-card-title align="center">{{
+                    torneo.nombreTorneo
+                  }}</v-card-title>
+                  <v-card-subtitle align="center">{{
+                    torneo.lugarTorneo
+                  }}</v-card-subtitle>
+                  <v-card-text>
+                    <p>
+                      <strong>Descripción:</strong>
+                      {{ torneo.descripcionTorneo }}
+                    </p>
+                    <p>
+                      <strong>Fecha:</strong>
+                      {{ formatDate(torneo.fechaInicioTorneo) }} a las
+                      {{ torneo.horaInicioTorneo }}
+                    </p>
+                    <!-- <p>
             <strong>Fecha de Fin:</strong>
             {{ formatDate(torneo.fechaFinTorneo) }} a las
             {{ torneo.horaFinTorneo }}
           </p> -->
-                <p>
-                  <strong>Inscripción hasta:</strong>
-                  {{ formatDate(torneo.fechaFinInscripcion) }}
-                </p>
-                <p>
-                  <strong>Entrega de Listas:</strong>
-                  {{ formatDate(torneo.fechaEntregaListas) }}
-                </p>
-                <p><strong>Precio:</strong> {{ torneo.precioTorneo }}€</p>
-                <p>
-                  <strong>Límite de Participantes:</strong>
-                  {{ torneo.limiteParticipantes || "Sin límite" }}
-                </p>
-                <p>
-                  <strong>Número de Partidas:</strong>
-                  {{ torneo.numeroPartidas }}
-                </p>
-                <p>
-                  <strong>Puntos del Torneo:</strong> {{ torneo.puntosTorneo }}
-                </p>
-              </v-card-text>
+                    <p>
+                      <strong>Inscripción hasta:</strong>
+                      {{ formatDate(torneo.fechaFinInscripcion) }}
+                    </p>
+                    <p>
+                      <strong>Entrega de Listas:</strong>
+                      {{ formatDate(torneo.fechaEntregaListas) }}
+                    </p>
+                    <p><strong>Precio:</strong> {{ torneo.precioTorneo }}€</p>
+                    <p>
+                      <strong>Límite de Participantes:</strong>
+                      {{ torneo.limiteParticipantes || "Sin límite" }}
+                    </p>
+                    <p>
+                      <strong>Número de Partidas:</strong>
+                      {{ torneo.numeroPartidas }}
+                    </p>
+                    <p>
+                      <strong>Puntos del Torneo:</strong>
+                      {{ torneo.puntosTorneo }}
+                    </p>
+                  </v-card-text>
 
-              <v-card-actions>
-                <v-btn
-                  variant="outlined"
-                  color="blue lighten-2"
-                  @click="descargarBases"
-                  block
-                >
-                  Descargar Bases
-                </v-btn>
-              </v-card-actions>
+                  <v-card-actions>
+                    <v-btn
+                      variant="outlined"
+                      color="blue lighten-2"
+                      @click="descargarBases"
+                      block
+                    >
+                      Descargar Bases
+                    </v-btn>
+                  </v-card-actions>
 
-              <v-divider class="my-3"></v-divider>
+                  <v-divider class="my-3"></v-divider>
 
-              <v-card-actions>
-                <v-btn
-                  variant="outlined"
-                  color="orange lighten-2"
-                  @click="goBack"
-                >
-                  Volver
-                </v-btn>
-                <div v-if="!estaApuntado">
-                  <v-btn
-                    variant="tonal"
-                    color="success lighten-1"
-                    @click="showModalResponse"
-                    >Apúntate</v-btn
-                  >
-                </div>
-                <div v-else class="color-text">
-                  Ya estás apúntado a este torneo
-                </div>
-              </v-card-actions>
-            </v-card>
+                  <v-card-actions>
+                    <v-btn
+                      variant="outlined"
+                      color="orange lighten-2"
+                      @click="goBack"
+                    >
+                      Volver
+                    </v-btn>
+                    <div v-if="!estaApuntado">
+                      <v-btn
+                        variant="tonal"
+                        color="success lighten-1"
+                        @click="showModalResponse"
+                        >Apúntate</v-btn
+                      >
+                    </div>
+                    <div v-else class="color-text">
+                      Ya estás apúntado a este torneo
+                    </div>
+                  </v-card-actions>
+                </v-card>
+              </v-col>
+            </v-row>
           </v-tabs-window-item>
 
           <v-tabs-window-item value="two">
