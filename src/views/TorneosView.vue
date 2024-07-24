@@ -9,8 +9,8 @@
         </v-row>
       </div>
       <div v-else>
-        <div v-if="listaTorneos.length < 1">No hay tornes proximamente...</div>
-        <v-window v-model="activeTorneo" show-arrows>
+        <div v-if="listaTorneos.length < 1">No hay torneos próximamente...</div>
+        <v-window v-model="activeTorneo">
           <v-window-item
             v-for="torneo in listaTorneos"
             :key="torneo.idTorneo"
@@ -19,6 +19,28 @@
             <TorneoCard :torneo="torneo" />
           </v-window-item>
         </v-window>
+        <v-card-actions class="justify-space-between">
+          <v-btn icon="mdi-chevron-left" variant="plain" @click="prev"></v-btn>
+          <v-item-group v-model="activeTorneo" class="text-center" mandatory>
+            <v-item
+              v-for="torneo in listaTorneos"
+              :key="`btn-${torneo.idTorneo}`"
+              v-slot="{ isSelected, toggle }"
+              :value="torneo.idTorneo"
+            >
+              <v-btn
+                :variant="isSelected ? 'outlined' : 'text'"
+                icon="mdi-record"
+                :class="{
+                  'active-pointer': isSelected,
+                  'inactive-pointer': !isSelected,
+                }"
+                @click="toggle"
+              ></v-btn>
+            </v-item>
+          </v-item-group>
+          <v-btn icon="mdi-chevron-right" variant="plain" @click="next"></v-btn>
+        </v-card-actions>
       </div>
     </v-row>
   </v-container>
@@ -34,6 +56,29 @@ import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
 const listaTorneos = ref<Torneo[]>([]);
 const isLoading = ref(true);
 const activeTorneo = ref<number | null>(null);
+const contador = ref<number>(0);
+
+const prev = () => {
+  if (listaTorneos.value.length === 0) return;
+  const currentIndex = listaTorneos.value.findIndex(
+    (t) => t.idTorneo === activeTorneo.value
+  );
+  activeTorneo.value =
+    currentIndex - 1 < 0
+      ? listaTorneos.value[listaTorneos.value.length - 1].idTorneo
+      : listaTorneos.value[currentIndex - 1].idTorneo;
+};
+
+const next = () => {
+  if (listaTorneos.value.length === 0) return;
+  const currentIndex = listaTorneos.value.findIndex(
+    (t) => t.idTorneo === activeTorneo.value
+  );
+  activeTorneo.value =
+    currentIndex + 1 >= listaTorneos.value.length
+      ? listaTorneos.value[0].idTorneo
+      : listaTorneos.value[currentIndex + 1].idTorneo;
+};
 
 onMounted(async () => {
   listaTorneos.value = await getTorneos();
@@ -42,13 +87,21 @@ onMounted(async () => {
       new Date(a.fechaInicioTorneo).getTime() -
       new Date(b.fechaInicioTorneo).getTime()
   );
-  isLoading.value = false;
   if (listaTorneos.value.length > 0) {
     activeTorneo.value = listaTorneos.value[0].idTorneo;
   }
+
+  contador.value = listaTorneos.value.length;
+
+  isLoading.value = false;
 });
 </script>
 
 <style scoped>
-/* Puedes añadir estilos adicionales si es necesario */
+.active-pointer {
+  color: #ffb74d;
+}
+.inactive-pointer {
+  color: gray;
+}
 </style>
