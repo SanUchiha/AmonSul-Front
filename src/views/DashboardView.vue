@@ -166,7 +166,7 @@ const initializeComponent = async () => {
 onMounted(initializeComponent);
 
 const handleFormCreateMatch = () => {
-  router.push("registrar-partida");
+  router.push({ name: "registrar-partida" });
 };
 </script>
 
@@ -195,7 +195,7 @@ const handleFormCreateMatch = () => {
   &__button {
     background-color: #632687;
 
-    @media screen and (max-width: 720px){
+    @media screen and (max-width: 720px) {
       width: 100%;
     }
   }

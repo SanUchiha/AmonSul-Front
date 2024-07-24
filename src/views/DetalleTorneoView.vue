@@ -205,7 +205,7 @@ watch(
   () => showModal.value,
   (newValue) => {
     if (!newValue) {
-      router.push("/mis-torneos");
+      router.push({ name: "mis-torneos" });
     }
   }
 );

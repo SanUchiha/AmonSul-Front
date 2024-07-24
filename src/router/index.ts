@@ -15,6 +15,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
 import EloView from "@/views/EloView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
+import DetalleInscripcionView from "@/views/DetalleInscripcionView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -22,6 +23,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/detalle-jugador/:Nick",
     name: "detalle-jugador",
     component: DetalleJugadorView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/detalle-inscripcion/:idTorneo",
+    name: "detalle-inscripcion",
+    component: DetalleInscripcionView,
     meta: { requiresAuth: true },
   },
   {
