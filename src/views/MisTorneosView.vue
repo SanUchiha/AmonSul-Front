@@ -54,7 +54,7 @@
       <v-card>
         <v-card-title class="headline">Lista</v-card-title>
         <v-card-text>
-          <div v-if="lista.length < 1">
+          <div v-if="!hasLista">
             <v-textarea
               v-model="listaText"
               label="Ingrese la lista"
@@ -75,7 +75,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <div v-if="lista.length < 1">
+          <div v-if="!hasLista">
             <v-btn color="primary" @click="enviarLista">Enviar</v-btn>
           </div>
           <div v-else>
@@ -125,54 +125,47 @@ const listaText = ref<string>("");
 const currentInscripcionId = ref<number | null>(null);
 const lista = ref<string>("");
 const idLista = ref<number>();
+const hasLista = ref<boolean>(false);
 
 const verDetalleInscripcion = (idInscripcion: number) => {
   router.push(`/detalle-inscripcion/${idInscripcion}`);
 };
 
 const enviarLista = async () => {
-  console.log("Lista enviada para la inscripción:");
-  console.log("Contenido de la lista:", listaText.value);
-
   const requestLista: CrearListaTorneoRequestDTO = {
     idInscripcion: currentInscripcionId.value!,
     listaData: listaText.value,
   };
 
-  console.log(requestLista);
-
-  const response = await subirListaTorneo(requestLista);
+  await subirListaTorneo(requestLista);
 
   showVerListaModal.value = false;
 };
 
 const modificarLista = async () => {
-  console.log("Lista modificada para la inscripción:");
-  console.log("Contenido de la lista:", listaText.value);
-
   const requestLista: ModificarListaTorneoRequestDTO = {
     idInscripcion: currentInscripcionId.value!,
     listaData: listaText.value,
     idLista: idLista.value!,
   };
 
-  console.log(requestLista);
-
-  const response = await modificarListaTorneo(requestLista);
+  await modificarListaTorneo(requestLista);
 
   showVerListaModal.value = false;
 };
 
 const verLista = async (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
-  lista.value = "Prueva ";
-  listaText.value = lista.value;
 
-  const response = await verlista(currentInscripcionId.value);
+  try {
+    const response = await verlista(currentInscripcionId.value);
+    hasLista.value = true;
 
-  console.log(response);
-  listaText.value = response.listaData;
-  idLista.value = response.idLista;
+    listaText.value = response.listaData;
+    idLista.value = response.idLista;
+  } catch {
+    //
+  }
 
   showVerListaModal.value = true;
 };
