@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto my-3" max-width="100%">
+  <v-card class="torneo-card mx-auto my-3" max-width="300px">
     <v-img :src="torneo.cartelTorneo" height="200px" contain></v-img>
 
     <v-divider class="my-3"></v-divider>
@@ -63,9 +63,10 @@ const goToDetalle = () => {
 
 <style scoped>
 /* Ajustes generales para la tarjeta */
-.v-card {
-  display: flex;
-  flex-direction: column;
+.torneo-card {
+  width: 100%; /* Asegura que la tarjeta use todo el ancho disponible del contenedor */
+  max-width: 300px; /* Ancho máximo de la tarjeta */
+  box-sizing: border-box; /* Incluye el padding y el border en el ancho total */
 }
 
 /* Asegura que la imagen se adapte bien en pantallas pequeñas */
