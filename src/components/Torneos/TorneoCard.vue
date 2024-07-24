@@ -1,14 +1,11 @@
 <template>
   <v-card class="mx-auto my-3" max-width="100%">
-    <!-- Imagen del torneo -->
     <v-img :src="torneo.cartelTorneo" height="200px" contain></v-img>
 
     <v-divider class="my-3"></v-divider>
 
-    <!-- Título del torneo -->
     <v-card-title>{{ torneo.nombreTorneo }}</v-card-title>
 
-    <!-- Subtítulos con iconos -->
     <v-card-subtitle>
       <v-icon left>mdi-map-marker</v-icon>
       Lugar: {{ torneo.lugarTorneo }}

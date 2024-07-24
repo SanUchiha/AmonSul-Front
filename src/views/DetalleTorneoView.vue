@@ -80,16 +80,21 @@
                     >
                       Volver
                     </v-btn>
-                    <div v-if="!estaApuntado">
-                      <v-btn
-                        variant="tonal"
-                        color="success lighten-1"
-                        @click="showModalResponse"
-                        >Apúntate</v-btn
-                      >
+                    <div v-if="isTorneoCompletado" class="color-text">
+                      ¡COMPLETO!
                     </div>
-                    <div v-else class="color-text">
-                      Ya estás apúntado a este torneo
+                    <div v-else>
+                      <div v-if="!estaApuntado">
+                        <v-btn
+                          variant="tonal"
+                          color="success lighten-1"
+                          @click="showModalResponse"
+                          >Apúntate</v-btn
+                        >
+                      </div>
+                      <div v-else class="color-text">
+                        Ya estás apúntado a este torneo
+                      </div>
                     </div>
                   </v-card-actions>
                 </v-card>
@@ -170,6 +175,7 @@ const showModal = ref(false);
 const idUsuario = ref<string>(getidUsuario.value!);
 const idTorneo = ref<number>();
 const estaApuntado = ref<boolean>(false);
+const isTorneoCompletado = ref<boolean>(false);
 const torneosApuntado = ref<InscripcionUsuarioDTO[]>();
 const tab = ref(0);
 
@@ -187,17 +193,17 @@ onMounted(async () => {
   torneo.value = await getTorneo(idTorneo.value);
   participantes.value = await getInscripcionesTorneo(idTorneo.value);
 
-  console.log(participantes.value);
-
-  // Obtener participantes (reemplaza 'getParticipantes' con la función adecuada si es diferente)
-  // participantes.value = await getParticipantes(idTorneo.value);
-
   // Comprobar si ya está apuntado
   torneosApuntado.value = await getInscripcionesUser(idUsuario.value);
 
   torneosApuntado.value!.forEach((element) => {
     if (element.idTorneo == idTorneo.value) estaApuntado.value = true;
   });
+
+  //comprobar si quedan plazas
+  if (participantes.value.length >= torneo.value!.limiteParticipantes!)
+    isTorneoCompletado.value = true;
+
   loading.value = false;
 });
 
