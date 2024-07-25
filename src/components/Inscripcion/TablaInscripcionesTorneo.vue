@@ -11,9 +11,9 @@
         <td>{{ torneo.nombreTorneo }}</td>
         <td class="text-center">
           <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
-            <v-icon color="primary">mdi-eye</v-icon>
+            <v-icon color="orange">mdi-eye</v-icon>
           </v-btn>
-          <v-btn icon @click="verLista(torneo.idInscripcion)">
+          <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
             <v-icon color="primary">mdi-file-send</v-icon>
           </v-btn>
           <v-btn icon @click="eliminarInscripcion(torneo.idInscripcion)">
@@ -39,67 +39,24 @@
   <ModalSuccess
     :isVisible="showSuccessModalLista"
     message="Lista enviada con éxito."
-    @update:isVisible="showSuccessModal = $event"
+    @update:isVisible="showSuccessModalLista = $event"
   />
 
   <ModalError
     :isVisible="showErrorModalLista"
     message="No se ha podido enviar la lista eliminar. Contacta con el administrador."
-    @update:isVisible="showSuccessModal = $event"
+    @update:isVisible="showErrorModalLista = $event"
   />
 
   <ModalLista
+    v-if="currentInscripcionId !== null"
     :isVisible="showVerListaModal"
     :hasLista="hasLista"
-    :listaText="listaText"
-    :idInscripcion="currentInscripcionId ?? 0"
+    :idInscripcion="currentInscripcionId"
     @update:isVisible="showVerListaModal = $event"
     @enviarLista="handleEnviarLista"
     @modificarLista="handleModificarLista"
   />
-
-  {{ showErrorModalLista }}
-  {{ listaText }}
-  {{ hasLista }}
-  {{ showVerListaModal }}
-  {{ showSuccessModalLista }}
-  <!-- <v-dialog v-model="showVerListaModal" max-width="500">
-    <v-card>
-      <v-card-title class="headline">Lista</v-card-title>
-      <v-card-text>
-        <div v-if="!hasLista">
-          <v-textarea
-            v-model="listaText"
-            label="Ingrese la lista"
-            rows="10"
-            clear-icon="mdi-close-circle"
-            clearable
-          ></v-textarea>
-        </div>
-        <div v-else>
-          <v-textarea
-            v-model="listaText"
-            label="Tu lista"
-            rows="10"
-            clear-icon="mdi-close-circle"
-            clearable
-          ></v-textarea>
-        </div>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <div v-if="!hasLista">
-          <v-btn color="primary" @click="enviarLista">Enviar</v-btn>
-        </div>
-        <div v-else>
-          <v-btn color="primary" @click="modificarLista">Modificar</v-btn>
-        </div>
-        <v-btn color="secondary" @click="showVerListaModal = false"
-          >Cancelar</v-btn
-        >
-      </v-card-actions>
-    </v-card>
-  </v-dialog> -->
 </template>
 
 <script setup lang="ts">
@@ -117,7 +74,6 @@ import {
 import {
   subirListaTorneo,
   modificarListaTorneo,
-  getlista,
 } from "@/services/ListasService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
@@ -162,9 +118,9 @@ const enviarLista = async () => {
       showSuccessModalLista.value = true;
     } catch {
       showErrorModalLista.value = true;
+    } finally {
+      showVerListaModal.value = false;
     }
-    showSuccessModalLista.value = false;
-    showVerListaModal.value = false;
   }
 };
 
@@ -181,25 +137,18 @@ const modificarLista = async () => {
       showSuccessModalLista.value = true;
     } catch {
       showErrorModalLista.value = true;
+    } finally {
+      showVerListaModal.value = false;
     }
-    showSuccessModalLista.value = false;
-    showVerListaModal.value = false;
   }
 };
 
-const verLista = async (idInscripcion: number) => {
+const handleVerLista = async (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
+  await verLista();
+};
 
-  try {
-    const response = await getlista(currentInscripcionId.value);
-    hasLista.value = true;
-
-    listaText.value = response.listaData;
-    idLista.value = response.idLista;
-  } catch {
-    //
-  }
-
+const verLista = async () => {
   showVerListaModal.value = true;
 };
 

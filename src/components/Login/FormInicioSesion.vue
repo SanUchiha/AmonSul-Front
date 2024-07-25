@@ -51,7 +51,7 @@
                   :size="24"
                   :width="2"
                   indeterminate
-                  color="primary"
+                  color="blue darken-1"
                   class="progress-linear-margin"
                 ></v-progress-linear>
               </v-row>
@@ -61,7 +61,11 @@
       </v-col>
     </v-row>
 
-    <ErrorLogin v-if="dialog" :isVisible="dialog" @update:isVisible="dialog = $event" />
+    <ErrorLogin
+      v-if="dialog"
+      :isVisible="dialog"
+      @update:isVisible="dialog = $event"
+    />
     <ResponseLogin
       v-if="dialogOk"
       :isVisible="dialogOk"
@@ -143,12 +147,12 @@ const handleOkClick = () => {
 .login-form {
   position: relative; /* Asegura que el formulario esté por encima de la capa de fondo */
 
-  @media screen and (max-width: 720px){
+  @media screen and (max-width: 720px) {
     height: 100%;
   }
 
   &__button {
-    @media screen and (max-width: 720px){
+    @media screen and (max-width: 720px) {
       width: calc(100% - 24px);
     }
   }

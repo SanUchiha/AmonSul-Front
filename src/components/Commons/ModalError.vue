@@ -1,11 +1,18 @@
 <template>
   <v-dialog v-model="internalIsVisible" max-width="400">
     <v-card>
-      <v-card-title class="headline">Error</v-card-title>
-      <v-card-text>{{ message }}</v-card-text>
+      <v-card-title class="text-center">
+        <v-icon color="red" icon="mdi-dice-1"></v-icon>
+        Error
+        <v-icon color="red" icon="mdi-dice-1"></v-icon>
+      </v-card-title>
+
+      <v-divider class="my-3"></v-divider>
+
+      <v-card-text class="text-center">{{ message }}</v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="close">OK</v-btn>
+        <v-btn color="primary" variant="outlined" @click="close">OK</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

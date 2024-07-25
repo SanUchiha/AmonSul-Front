@@ -43,7 +43,6 @@ import { defineProps, defineEmits, ref, watch, onMounted } from "vue";
 const props = defineProps<{
   isVisible: boolean;
   hasLista: boolean;
-  listaText: string;
   idInscripcion: number;
 }>();
 

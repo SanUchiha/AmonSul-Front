@@ -1,11 +1,20 @@
 <template>
   <v-dialog v-model="internalIsVisible" max-width="400">
     <v-card>
-      <v-card-title class="headline">Éxito</v-card-title>
-      <v-card-text>{{ message }}</v-card-text>
+      <v-card-title class="text-center">
+        <v-icon color="purple" icon="mdi-dice-6"></v-icon>
+        Éxito
+        <v-icon color="purple" icon="mdi-dice-6"></v-icon>
+      </v-card-title>
+
+      <v-divider class="my-3"></v-divider>
+
+      <v-card-text class="text-center">{{ message }}</v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="close">OK</v-btn>
+        <v-btn color="blue darken-1" variant="outlined" @click="close"
+          >OK</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
