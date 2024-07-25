@@ -23,12 +23,18 @@
 
           <v-tabs-window v-model="tab">
             <!-- Tab 1. 
+             spark
            Jugador card
            ultima partida jugada
            ultimo torneo jugado -->
             <v-tabs-window-item value="one">
               <v-row justify="center">
                 <v-col cols="12" md="12">
+                  <v-row dense>
+                    <v-col cols="12" md="12" class="text-center">
+                      <SparklineElo :email="usuarioData.email" />
+                    </v-col>
+                  </v-row>
                   <v-row dense>
                     <v-col cols="12" md="12" class="text-center">
                       <JugadorCard :usuario="usuarioData" />
@@ -111,6 +117,7 @@
               <TablaInscripcionesTorneo
                 :isLoading="isLoading"
                 :listaTorneos="usuarioData.inscripcionesTorneo"
+                :idUsuario="usuarioData.idUsuario"
               />
             </v-tabs-window-item>
           </v-tabs-window>
@@ -132,17 +139,19 @@ import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "../components/Commons/ProgressCircular.vue";
 import { getUsuarioData } from "@/services/UsuariosService";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
+import SparklineElo from "@/components/Elo/SparklineElo.vue";
 
-const tab = ref<number>(0);
+const tab = ref<string>("one");
 
 const isLoading = ref(true);
 const { getUser, getidUsuario } = useAuth();
 const router = useRouter();
+const route = useRoute();
 const emailUsuario = ref<string>(getUser.value ?? "null");
-const idUsuarioLogger = ref<string>(getidUsuario.value!);
+const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const usuarioData = ref<UsuarioDataDTO>({
   idUsuario: 0,
   nick: "",
@@ -150,9 +159,6 @@ const usuarioData = ref<UsuarioDataDTO>({
     idFaccion: 0,
     nombreFaccion: "",
   },
-  PartidasValidadas: [],
-  PartidasPendientes: [],
-  Elos: [],
   inscripcionesTorneo: [],
   clasificacionElo: 0,
   puntuacionElo: 0,
@@ -160,6 +166,10 @@ const usuarioData = ref<UsuarioDataDTO>({
   partidasGanadas: 0,
   partidasEmpatadas: 0,
   partidasPerdidas: 0,
+  email: "",
+  partidasValidadas: [],
+  partidasPendientes: [],
+  elos: [],
 });
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
@@ -223,17 +233,22 @@ const cargarPartidasPendientes = async () => {
 };
 
 const initializeComponent = async () => {
-  isLoading.value = true;
-  try {
-    usuarioData.value = await getUsuarioData(parseInt(idUsuarioLogger.value!));
-    console.log(usuarioData.value.inscripcionesTorneo);
-    validMatches.value = usuarioData.value?.PartidasValidadas ?? [];
-    pendingMatches.value = usuarioData.value?.PartidasPendientes ?? [];
-  } catch (error) {
-    console.error(error);
-    router.push("error");
-  } finally {
-    isLoading.value = false;
+  if (idUsuarioLogger.value) {
+    isLoading.value = true;
+    try {
+      usuarioData.value = await getUsuarioData(parseInt(idUsuarioLogger.value));
+      validMatches.value = usuarioData.value?.partidasValidadas ?? [];
+      pendingMatches.value = usuarioData.value?.partidasPendientes ?? [];
+
+      if (route.params.tab) {
+        tab.value = route.params.tab as string;
+      }
+    } catch (error) {
+      console.error(error);
+      router.push("error");
+    } finally {
+      isLoading.value = false;
+    }
   }
 };
 

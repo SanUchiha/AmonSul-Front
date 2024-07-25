@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading" class="center">
+  <div v-if="isLoading" class="center">
     <ProgressCircular />
   </div>
   <div v-else class="center">
@@ -36,16 +36,11 @@
 <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
 import { getEloUsuario } from "@/services/EloService";
-import { useAuth } from "@/composables/useAuth";
-import { useRouter } from "vue-router";
 import ProgressCircular from "../Commons/ProgressCircular.vue";
 
-const props = defineProps<{ email: any }>();
+const props = defineProps<{ email: string }>();
 
-const { getUser } = useAuth();
-const router = useRouter();
-const error = ref<string | null>(null);
-const loading = ref(true);
+const isLoading = ref(true);
 
 const gradients = ref<string[][]>([
   ["#222"],
@@ -73,12 +68,6 @@ const resultadoActual = ref<number>();
 
 onMounted(async () => {
   try {
-    const email: any = await getUser.value;
-    if (!email) {
-      error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
-      router.push("error");
-      return;
-    }
     const response = await getEloUsuario(props.email);
     const elos = response.elos.map(
       (elo: { puntuacionElo: unknown }) => elo.puntuacionElo
@@ -92,7 +81,7 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error al obtener datos del usuario:", error);
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 });
 </script>

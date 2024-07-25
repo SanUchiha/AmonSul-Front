@@ -1,28 +1,50 @@
 <template>
-  <v-table :loading="isLoading">
-    <thead>
-      <tr>
-        <th>Torneo</th>
-        <th class="text-center">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
-        <td>{{ torneo.nombreTorneo }}</td>
-        <td class="text-center">
-          <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
-            <v-icon color="orange">mdi-eye</v-icon>
-          </v-btn>
-          <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
-            <v-icon color="primary">mdi-file-send</v-icon>
-          </v-btn>
-          <v-btn icon @click="eliminarInscripcion(torneo.idInscripcion)">
-            <v-icon color="red">mdi-cancel</v-icon>
-          </v-btn>
-        </td>
-      </tr>
-    </tbody>
-  </v-table>
+  <div v-if="!hasAcciones">
+    <v-table :loading="isLoading">
+      <thead>
+        <tr>
+          <th>Torneo</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
+          <td>{{ torneo.nombreTorneo }}</td>
+          <td class="text-center">
+            <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
+              <v-icon color="orange">mdi-eye</v-icon>
+            </v-btn>
+          </td>
+        </tr>
+      </tbody>
+    </v-table>
+  </div>
+  <div v-if="hasAcciones">
+    <v-table :loading="isLoading">
+      <thead>
+        <tr>
+          <th>Torneo</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
+          <td>{{ torneo.nombreTorneo }}</td>
+          <td class="text-center">
+            <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
+              <v-icon color="orange">mdi-eye</v-icon>
+            </v-btn>
+            <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
+              <v-icon color="primary">mdi-file-send</v-icon>
+            </v-btn>
+            <v-btn icon @click="eliminarInscripcion(torneo.idInscripcion)">
+              <v-icon color="red">mdi-cancel</v-icon>
+            </v-btn>
+          </td>
+        </tr>
+      </tbody>
+    </v-table>
+  </div>
 
   <ModalSuccess
     :isVisible="showSuccessModal"
@@ -33,7 +55,7 @@
   <ModalError
     :isVisible="showErrorModal"
     message="No se ha podido eliminar. Contacta con el administrador."
-    @update:isVisible="showSuccessModal = $event"
+    @update:isVisible="showErrorModal = $event"
   />
 
   <ModalSuccess
@@ -78,10 +100,12 @@ import {
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import ModalLista from "./ModalLista.vue";
+import { useAuth } from "@/composables/useAuth";
 
 const props = defineProps<{
   isLoading: boolean;
   listaTorneos: InscripcionUsuarioDTO[];
+  idUsuario: number;
 }>();
 
 const currentInscripcionId = ref<number | null>(null);
@@ -96,6 +120,10 @@ const showErrorModal = ref<boolean>(false);
 const showVerListaModal = ref<boolean>(false);
 const showSuccessModalLista = ref<boolean>(false);
 const showErrorModalLista = ref<boolean>(false);
+
+const hasAcciones = ref<boolean>(false);
+const { getidUsuario } = useAuth();
+const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 
 const verDetalleInscripcion = (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
@@ -181,6 +209,11 @@ const handleModificarLista = async (listaData: string) => {
 
 onMounted(async () => {
   listaTorneos.value = props.listaTorneos;
+  if (idUsuarioLogger.value != null) {
+    if (props.idUsuario === parseInt(idUsuarioLogger.value)) {
+      hasAcciones.value = true;
+    }
+  }
 });
 </script>
 

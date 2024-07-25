@@ -1,5 +1,6 @@
 export interface UsuarioElo {
   nick: string;
+  idUsuario: number;
   elo: number;
   partidas: number;
   ganadas: number;
@@ -9,6 +10,7 @@ export interface UsuarioElo {
 
 export interface UsuarioEloTablaClasificacion {
   nick: string;
+  idUsuario: number;
   elo: number;
   partidas: number;
   ganadas: number;

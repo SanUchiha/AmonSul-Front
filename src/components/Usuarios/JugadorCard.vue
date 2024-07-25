@@ -75,7 +75,7 @@ const rawListaFacciones = ref<Array<FaccionDTO> | undefined>();
 const goToDetalle = () => {
   router.push({
     name: "detalle-jugador",
-    params: { Nick: props.usuario.nick },
+    params: { idUsuario: props.usuario.idUsuario },
   });
 };
 

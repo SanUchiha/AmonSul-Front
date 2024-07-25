@@ -29,7 +29,7 @@
       item-key="nick"
     >
       <template v-slot:item="{ item }">
-        <tr @click="goToUserDetail(item.nick)" class="clickable-row">
+        <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
           <td>{{ item.clasificacion }}</td>
 
           <td>{{ item.nick }}</td>
@@ -80,8 +80,8 @@ const headers = [
   { title: "Jugadas", key: "partidas" },
 ];
 
-const goToUserDetail = (nick: string) => {
-  router.push({ name: "detalle-jugador", params: { Nick: nick } });
+const goToUserDetail = (idUsuario: number) => {
+  router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
 };
 
 onMounted(async () => {
@@ -99,7 +99,7 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
   } finally {
-    loading.value = false; // Indica que la carga ha finalizado
+    loading.value = false;
   }
 });
 </script>

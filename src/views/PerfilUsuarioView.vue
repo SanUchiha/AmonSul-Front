@@ -202,7 +202,7 @@ const saveFaccion = async () => {
   };
 
   try {
-    const response = await editarFaccion(body);
+    await editarFaccion(body);
     feedbackTitle.value = "Éxito";
     feedbackMessage.value =
       "La comunidad de juego ha sido actualizada correctamente.";

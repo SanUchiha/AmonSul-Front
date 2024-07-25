@@ -92,9 +92,7 @@
                           >Apúntate</v-btn
                         >
                       </div>
-                      <div v-else class="color-text">
-                        Ya estás apúntado a este torneo
-                      </div>
+                      <div v-else class="color-text">Ya estás apúntado</div>
                     </div>
                   </v-card-actions>
                 </v-card>
@@ -132,7 +130,10 @@
                 item-key="nick"
               >
                 <template v-slot:item="{ item }">
-                  <tr @click="goToUserDetail(item.nick)" class="clickable-row">
+                  <tr
+                    @click="goToUserDetail(item.idUsuario)"
+                    class="clickable-row"
+                  >
                     <td>
                       <v-chip color="orange" dark>{{ item.nick }}</v-chip>
                     </td>
@@ -145,7 +146,17 @@
       </v-card-text>
     </v-card>
 
-    <ResponseInscripcion :isVisible="showModal" @close="handleCloseModal" />
+    <ModalSuccess
+      :isVisible="showSuccessModal"
+      message="Te has registrado con éxito."
+      @update:isVisible="showSuccessModal = $event"
+    />
+
+    <ModalError
+      :isVisible="showErrorModal"
+      message="No se ha podido registrar la inscripción. Contacta con el administrador."
+      @update:isVisible="showErrorModal = $event"
+    />
   </v-container>
 </template>
 
@@ -154,7 +165,6 @@ import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Torneo } from "@/interfaces/Torneo";
 import { descargarBasesTorneo, getTorneo } from "@/services/TorneosService";
-import ResponseInscripcion from "@/components/Torneos/ResponseInscripcion.vue";
 import {
   getInscripcionesTorneo,
   getInscripcionesUser,
@@ -165,14 +175,15 @@ import {
   CrearInscripcionDTO,
   InscripcionUsuarioDTO,
 } from "@/interfaces/Inscripcion";
+import ModalError from "@/components/Commons/ModalError.vue";
+import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 
 const { getidUsuario } = useAuth();
 const route = useRoute();
 const router = useRouter();
 const torneo = ref<Torneo>();
 const participantes = ref<InscripcionUsuarioDTO[]>([]);
-const showModal = ref(false);
-const idUsuario = ref<string>(getidUsuario.value!);
+const idUsuario = ref<string | null>(getidUsuario.value);
 const idTorneo = ref<number>();
 const estaApuntado = ref<boolean>(false);
 const isTorneoCompletado = ref<boolean>(false);
@@ -184,38 +195,46 @@ const loading = ref<boolean>(true);
 
 const headers = [{ title: "Nick", key: "nick" }];
 
-const goToUserDetail = (nick: string) => {
-  router.push({ name: "detalle-jugador", params: { Nick: nick } });
+const showSuccessModal = ref<boolean>(false);
+const showErrorModal = ref<boolean>(false);
+
+const goToUserDetail = (idUsuario: number) => {
+  router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
 };
 
 onMounted(async () => {
-  idTorneo.value = Number(route.params.idTorneo);
-  torneo.value = await getTorneo(idTorneo.value);
-  participantes.value = await getInscripcionesTorneo(idTorneo.value);
+  if (idUsuario.value != null) {
+    idTorneo.value = Number(route.params.idTorneo);
+    torneo.value = await getTorneo(idTorneo.value);
+    participantes.value = await getInscripcionesTorneo(idTorneo.value);
 
-  // Comprobar si ya está apuntado
-  torneosApuntado.value = await getInscripcionesUser(idUsuario.value);
+    // Comprobar si ya está apuntado
+    torneosApuntado.value = await getInscripcionesUser(idUsuario.value);
 
-  torneosApuntado.value!.forEach((element) => {
-    if (element.idTorneo == idTorneo.value) estaApuntado.value = true;
-  });
+    if (torneosApuntado.value != null) {
+      torneosApuntado.value.forEach((element) => {
+        if (element.idTorneo == idTorneo.value) estaApuntado.value = true;
+      });
 
-  //comprobar si quedan plazas
+      //comprobar si quedan plazas
 
-  if (
-    participantes.value.length >= torneo.value!.limiteParticipantes! &&
-    torneo.value?.limiteParticipantes != null
-  )
-    isTorneoCompletado.value = true;
+      if (torneo.value && torneo.value.limiteParticipantes)
+        if (
+          participantes.value.length >= torneo.value.limiteParticipantes &&
+          torneo.value?.limiteParticipantes != null
+        )
+          isTorneoCompletado.value = true;
 
-  loading.value = false;
+      loading.value = false;
+    }
+  }
 });
 
 watch(
-  () => showModal.value,
+  () => showSuccessModal.value,
   (newValue) => {
     if (!newValue) {
-      router.push({ name: "mis-torneos" });
+      router.push({ name: "dashboard", params: { tab: "three" } });
     }
   }
 );
@@ -227,14 +246,16 @@ const goBack = () => router.go(-1);
 
 const descargarBases = async () => {
   try {
-    const blob = await descargarBasesTorneo(idTorneo.value!);
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Bases_Torneo_${torneo.value?.nombreTorneo}.pdf`;
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
+    if (idTorneo.value) {
+      const blob = await descargarBasesTorneo(idTorneo.value);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Bases_Torneo_${torneo.value?.nombreTorneo}.pdf`;
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    }
   } catch (error) {
     console.error("Error descargando el archivo:", error);
     alert("Error al descargar el archivo. Por favor, inténtelo de nuevo.");
@@ -242,21 +263,18 @@ const descargarBases = async () => {
 };
 
 const showModalResponse = async () => {
-  try {
-    const body: CrearInscripcionDTO = {
-      idUsuario: parseInt(idUsuario.value),
-      idTorneo: idTorneo.value!,
-    };
-    await registrarInscripcion(body);
-    showModal.value = true;
-  } catch {
-    alert("Error en la inscripción. Habla con el administrador.");
+  if (idUsuario.value && idTorneo.value) {
+    try {
+      const body: CrearInscripcionDTO = {
+        idUsuario: parseInt(idUsuario.value),
+        idTorneo: idTorneo.value,
+      };
+      await registrarInscripcion(body);
+      showSuccessModal.value = true;
+    } catch {
+      showErrorModal.value = true;
+    }
   }
-  showModal.value = true;
-};
-
-const handleCloseModal = () => {
-  showModal.value = false;
 };
 </script>
 

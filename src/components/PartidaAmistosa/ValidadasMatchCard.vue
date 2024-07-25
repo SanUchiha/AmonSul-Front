@@ -4,7 +4,9 @@
   </div>
   <div v-else>
     <v-card :class="cardColorClass" @click="goToDetallePartida">
-      <v-card-title>Rival: {{ nickRival }}</v-card-title>
+      <v-card-title
+        >{{ match.nickUsuario1 }} - {{ match.nickUsuario2 }}</v-card-title
+      >
       <v-card-text>
         Resultado: {{ match.resultadoUsuario1 }} - {{ match.resultadoUsuario2 }}
       </v-card-text>
@@ -12,7 +14,7 @@
         <p>{{ match.puntosPartida }} puntos</p>
         Escenario: {{ match.escenarioPartida || "No disponible" }}
       </v-card-text>
-
+      {{ resultado }}
       <v-card-text>
         <p>Fecha: {{ fechaPartidaFormateada }}</p>
       </v-card-text>
@@ -22,41 +24,27 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted, defineEmits, computed } from "vue";
+import { defineProps, ref, onMounted, computed } from "vue";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
-import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "../Commons/ProgressCircular.vue";
-import { getUsuario } from "@/services/UsuariosService";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
-import { UsuarioViewDTO } from "@/interfaces/Usuario";
 
 const loading = ref(true);
-const { getUser } = useAuth();
 const error = ref<string | null>(null);
 const router = useRouter();
 
-const nickRival = ref<string>("");
 const resultado = ref<string>("");
 const fechaPartidaFormateada = ref<string>("");
-const userOwner = ref<UsuarioViewDTO | null>(null);
 
-const props = defineProps<{ match: ViewPartidaAmistosaDTO }>();
-const emit = defineEmits(["partidaValidada"]);
+const props = defineProps<{
+  match: ViewPartidaAmistosaDTO;
+  idUsuario: number;
+}>();
 
 const initializeComponent = async () => {
   try {
-    const email: any = await getUser.value;
-    if (!email) {
-      throw new Error(
-        "No se pudo obtener el usuario. Por favor, inicie sesión."
-      );
-    }
-
-    userOwner.value = await getUsuario(email);
-
     setResultado();
-    setRivalNick();
     fechaPartidaFormateada.value = await formatFechaSpa(
       props.match.fechaPartida
     );
@@ -71,18 +59,10 @@ const initializeComponent = async () => {
 const setResultado = () => {
   if (props.match.ganadorPartidaNick == null) {
     resultado.value = "Empate";
-  } else if (props.match.ganadorPartidaNick == userOwner.value?.nick) {
+  } else if (props.match.ganadorPartida == props.idUsuario) {
     resultado.value = "Victoria";
   } else {
     resultado.value = "Derrota";
-  }
-};
-
-const setRivalNick = () => {
-  if (props.match.nickUsuario1 === userOwner.value?.nick) {
-    nickRival.value = props.match.nickUsuario2;
-  } else {
-    nickRival.value = props.match.nickUsuario1;
   }
 };
 

@@ -4,7 +4,7 @@
 
     <v-divider class="my-3"></v-divider>
 
-    <v-card-title>{{ torneo.nombreTorneo }}</v-card-title>
+    <v-card-title class="torneo-titulo">{{ torneo.nombreTorneo }}</v-card-title>
 
     <v-card-subtitle>
       <v-icon left>mdi-map-marker</v-icon>
@@ -50,7 +50,6 @@ import { useRouter } from "vue-router";
 const props = defineProps<{ torneo: Torneo }>();
 const router = useRouter();
 const fechaTorneo = ref<string>("");
-const img = ref<string>("");
 
 onMounted(async () => {
   fechaTorneo.value = await formatFechaSpa(props.torneo.fechaInicioTorneo);
@@ -62,21 +61,26 @@ const goToDetalle = () => {
 </script>
 
 <style scoped>
-/* Ajustes generales para la tarjeta */
 .torneo-card {
-  width: 100%; /* Asegura que la tarjeta use todo el ancho disponible del contenedor */
-  max-width: 300px; /* Ancho máximo de la tarjeta */
-  box-sizing: border-box; /* Incluye el padding y el border en el ancho total */
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
 }
 
-/* Asegura que la imagen se adapte bien en pantallas pequeñas */
 .v-img {
   width: 100%;
   max-width: 100%;
 }
 
-/* Ajustes del botón para que ocupe todo el ancho disponible */
 .v-btn {
   width: 100%;
+}
+
+.torneo-titulo {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }
 </style>

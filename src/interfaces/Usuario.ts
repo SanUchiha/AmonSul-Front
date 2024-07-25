@@ -70,10 +70,11 @@ export interface ViewUsuarioPartidaDTO {
 export interface UsuarioDataDTO {
   idUsuario: number;
   nick: string;
+  email: string;
   faccion: FaccionDTO;
-  PartidasValidadas: ViewPartidaAmistosaDTO[];
-  PartidasPendientes: ViewPartidaAmistosaDTO[];
-  Elos: EloDTO[];
+  partidasValidadas: ViewPartidaAmistosaDTO[];
+  partidasPendientes: ViewPartidaAmistosaDTO[];
+  elos: EloDTO[];
   inscripcionesTorneo: InscripcionUsuarioDTO[];
   clasificacionElo: number;
   puntuacionElo: number;

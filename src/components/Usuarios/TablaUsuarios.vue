@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/valid-v-slot -->
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2"
@@ -29,7 +28,7 @@
       item-key="nick"
     >
       <template v-slot:item="{ item }">
-        <tr @click="goToUserDetail(item.nick)" class="clickable-row">
+        <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
           <td>{{ item.nick }}</td>
           <td>{{ item.nombreFaccion }}</td>
           <td>{{ item.ciudad }}</td>
@@ -40,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { Faccion } from "@/interfaces/Faccion";
+import { FaccionDTO } from "@/interfaces/Faccion";
 import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { getFacciones } from "@/services/FaccionesService";
 import { getUsuarios } from "@/services/UsuariosService";
@@ -65,8 +64,8 @@ const headers = [
   { title: "CIUDAD", key: "ciudad" },
 ];
 
-const goToUserDetail = (nick: string) => {
-  router.push({ name: "detalle-jugador", params: { Nick: nick } });
+const goToUserDetail = (idUsuario: number) => {
+  router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
 };
 
 onMounted(async () => {
@@ -77,7 +76,7 @@ onMounted(async () => {
     items.value = data;
     items.value = items.value.sort((a, b) => b.puntuacionElo - a.puntuacionElo);
 
-    var rawListaFacciones: Faccion[] = await getFacciones();
+    var rawListaFacciones: FaccionDTO[] = await getFacciones();
 
     items.value.forEach((usuario) => {
       const faccion = rawListaFacciones.find(
