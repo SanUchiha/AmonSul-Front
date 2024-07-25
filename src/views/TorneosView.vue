@@ -93,6 +93,9 @@ onMounted(async () => {
 
   contador.value = listaTorneos.value.length;
 
+  console.log("lista de torneos", listaTorneos.value);
+  console.log("torneosActivo", activeTorneo.value);
+
   isLoading.value = false;
 });
 </script>

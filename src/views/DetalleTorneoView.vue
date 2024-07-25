@@ -201,7 +201,11 @@ onMounted(async () => {
   });
 
   //comprobar si quedan plazas
-  if (participantes.value.length >= torneo.value!.limiteParticipantes!)
+
+  if (
+    participantes.value.length >= torneo.value!.limiteParticipantes! &&
+    torneo.value?.limiteParticipantes != null
+  )
     isTorneoCompletado.value = true;
 
   loading.value = false;
