@@ -16,3 +16,8 @@ export interface UsuarioEloTablaClasificacion {
   perdidas: number;
   clasificacion: number;
 }
+
+export interface EloDTO {
+  puntuacionElo: number;
+  fechaElo: string;
+}

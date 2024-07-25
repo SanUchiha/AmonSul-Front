@@ -23,7 +23,7 @@
             <v-list-item-title>Usuarios</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link to="/partidas-amistosas" v-if="isAuthenticated">
+        <!-- <v-list-item link to="/partidas-amistosas" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-gamepad-variant</v-icon>
             <v-list-item-title>Mis Partidas</v-list-item-title>
@@ -33,7 +33,7 @@
             <v-icon>mdi-gamepad-variant</v-icon>
             <v-list-item-title>Mis Torneos</v-list-item-title>
           </v-list-item-content>
-        </v-list-item>
+        </v-list-item> -->
         <v-list-item link to="/elo" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-cog</v-icon>
@@ -50,7 +50,10 @@
     </v-navigation-drawer>
 
     <v-app-bar app>
-      <v-app-bar-nav-icon v-if="isAuthenticated" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        v-if="isAuthenticated"
+        @click.stop="drawer = !drawer"
+      ></v-app-bar-nav-icon>
       <v-toolbar-title>Amon sûl</v-toolbar-title>
       <v-btn icon to="contacto" disabled>
         <v-icon>mdi-email</v-icon>

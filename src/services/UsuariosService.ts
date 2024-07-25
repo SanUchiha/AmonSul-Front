@@ -139,6 +139,24 @@ export const getDetalleUsuarioByEmail = async (email: string) => {
   }
 };
 
+export const getUsuarioData = async (idUsuario: number) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(baseUrl + "Usuario/Data/" + idUsuario, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw error as AxiosError;
+    } else {
+      throw new Error("Ocurrió un error desconocido");
+    }
+  }
+};
+
 export const editarFaccion = async (body: EditarFaccionDTO) => {
   try {
     const token = localStorage.getItem("token");

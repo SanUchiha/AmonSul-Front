@@ -1,4 +1,7 @@
-import { Faccion } from "./Faccion";
+import { EloDTO, UsuarioElo } from "./Elo";
+import { FaccionDTO } from "./Faccion";
+import { InscripcionUsuarioDTO } from "./Inscripcion";
+import { ViewPartidaAmistosaDTO } from "./Partidas";
 
 export interface NewUserDTO {
   NombreUsuario: string;
@@ -38,7 +41,7 @@ export interface UsuarioViewDTO {
   ciudad?: string;
   fechaRegistro: string;
   fechaNacimiento: string;
-  faccion: Faccion;
+  faccion: FaccionDTO;
   idFaccion?: number;
   telefono?: string;
 }
@@ -62,4 +65,20 @@ export interface ViewUsuarioPartidaDTO {
   partidasPerdidas: number;
   puntuacionElo: number;
   clasificacionElo: number;
+}
+
+export interface UsuarioDataDTO {
+  idUsuario: number;
+  nick: string;
+  faccion: FaccionDTO;
+  PartidasValidadas: ViewPartidaAmistosaDTO[];
+  PartidasPendientes: ViewPartidaAmistosaDTO[];
+  Elos: EloDTO[];
+  inscripcionesTorneo: InscripcionUsuarioDTO[];
+  clasificacionElo: number;
+  puntuacionElo: number;
+  numeroPartidasJugadas: number;
+  partidasGanadas: number;
+  partidasEmpatadas: number;
+  partidasPerdidas: number;
 }

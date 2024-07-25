@@ -1,12 +1,18 @@
 <template>
-  <div v-if="loading" class="center">
+  <div v-if="isLoading" class="center">
     <ProgressCircular />
   </div>
   <v-card v-else class="jugador-card">
     <v-card-title class="title">
       <div class="title">
-        <h3 @click="goToDetalle">{{ usuario.nick.length <= 26 ? usuario.nick : usuario.nick.substring(0, 23) + "..." }}</h3>
-        <p class="subtitle">{{ getFaccionName }}</p>
+        <h3 @click="goToDetalle">
+          {{
+            usuario.nick.length <= 26
+              ? usuario.nick
+              : usuario.nick.substring(0, 23) + "..."
+          }}
+        </h3>
+        <p class="subtitle">{{ usuario.faccion.nombreFaccion }}</p>
       </div>
     </v-card-title>
     <v-card-text>
@@ -53,26 +59,25 @@
 </template>
 
 <script setup lang="ts">
-import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
+import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { computed, defineProps, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { Faccion } from "@/interfaces/Faccion";
+import { FaccionDTO } from "@/interfaces/Faccion";
 import { getFacciones } from "@/services/FaccionesService";
 import ProgressCircular from "../Commons/ProgressCircular.vue";
 
-const props = defineProps<{ usuario: ViewUsuarioPartidaDTO }>();
+const props = defineProps<{ usuario: UsuarioDataDTO }>();
 const router = useRouter();
-const loading = ref(true);
+const isLoading = ref(true);
 
-const rawListaFacciones = ref<Array<Faccion> | undefined>();
+const rawListaFacciones = ref<Array<FaccionDTO> | undefined>();
 
 const goToDetalle = () => {
-  router.push({ name: "detalle-jugador", params: { Nick: props.usuario.nick } });
+  router.push({
+    name: "detalle-jugador",
+    params: { Nick: props.usuario.nick },
+  });
 };
-
-const getFaccionName = computed(() => {
-  return rawListaFacciones.value?.find((u) => u.idFaccion == props.usuario.idFaccion)?.nombreFaccion;
-});
 
 const porcentajeVictorias = computed(() => {
   return props.usuario.numeroPartidasJugadas > 0
@@ -86,11 +91,10 @@ const porcentajeVictorias = computed(() => {
 onMounted(async () => {
   try {
     rawListaFacciones.value = await getFacciones();
-
   } catch (error) {
     console.error("Error al obtener la facción:", error);
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 });
 </script>

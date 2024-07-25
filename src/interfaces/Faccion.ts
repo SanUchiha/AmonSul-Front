@@ -1,4 +1,4 @@
-export interface Faccion {
+export interface FaccionDTO {
   idFaccion: number;
   nombreFaccion: string;
 }
