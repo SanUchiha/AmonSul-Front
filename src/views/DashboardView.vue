@@ -135,20 +135,6 @@ import { getUsuarioData } from "@/services/UsuariosService";
 import { useRouter } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
-import {
-  CrearListaTorneoRequestDTO,
-  ModificarListaTorneoRequestDTO,
-} from "@/interfaces/Lista";
-import {
-  cancelarInscripcion,
-  getInscripcionesUser,
-} from "@/services/InscripcionesService";
-import {
-  subirListaTorneo,
-  modificarListaTorneo,
-  verlista,
-} from "@/services/ListasService";
-import { InscripcionUsuarioDTO } from "@/interfaces/Inscripcion";
 
 const tab = ref<number>(0);
 
@@ -205,17 +191,6 @@ const cardClass = computed(() => {
     ? "victoria-card"
     : "derrota-card";
 });
-
-const showSuccessModal = ref<boolean>(false);
-const showErrorModal = ref<boolean>(false);
-const showVerListaModal = ref<boolean>(false);
-
-const currentInscripcionId = ref<number | null>(null);
-const currentTorneoId = ref<number | null>(null);
-const listaText = ref<string>("");
-const idLista = ref<number>();
-const hasLista = ref<boolean>(false);
-const listaTorneos = ref<InscripcionUsuarioDTO[]>([]);
 
 const cargarPartidasValidadas = async () => {
   try {

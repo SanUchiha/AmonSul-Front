@@ -24,29 +24,46 @@
     </tbody>
   </v-table>
 
-  <v-dialog v-model="showSuccessModal" max-width="400">
-    <v-card>
-      <v-card-title class="headline">Éxito</v-card-title>
-      <v-card-text>Eliminado con éxito.</v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="showSuccessModal = false">OK</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <ModalSuccess
+    :isVisible="showSuccessModal"
+    message="Eliminado con éxito."
+    @update:isVisible="showSuccessModal = $event"
+  />
 
-  <v-dialog v-model="showErrorModal" max-width="400">
-    <v-card>
-      <v-card-title class="headline">Error</v-card-title>
-      <v-card-text>No se ha podido eliminar. Intente nuevamente.</v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="showErrorModal = false">OK</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <ModalError
+    :isVisible="showErrorModal"
+    message="No se ha podido eliminar. Contacta con el administrador."
+    @update:isVisible="showSuccessModal = $event"
+  />
 
-  <v-dialog v-model="showVerListaModal" max-width="500">
+  <ModalSuccess
+    :isVisible="showSuccessModalLista"
+    message="Lista enviada con éxito."
+    @update:isVisible="showSuccessModal = $event"
+  />
+
+  <ModalError
+    :isVisible="showErrorModalLista"
+    message="No se ha podido enviar la lista eliminar. Contacta con el administrador."
+    @update:isVisible="showSuccessModal = $event"
+  />
+
+  <ModalLista
+    :isVisible="showVerListaModal"
+    :hasLista="hasLista"
+    :listaText="listaText"
+    :idInscripcion="currentInscripcionId ?? 0"
+    @update:isVisible="showVerListaModal = $event"
+    @enviarLista="handleEnviarLista"
+    @modificarLista="handleModificarLista"
+  />
+
+  {{ showErrorModalLista }}
+  {{ listaText }}
+  {{ hasLista }}
+  {{ showVerListaModal }}
+  {{ showSuccessModalLista }}
+  <!-- <v-dialog v-model="showVerListaModal" max-width="500">
     <v-card>
       <v-card-title class="headline">Lista</v-card-title>
       <v-card-text>
@@ -82,7 +99,7 @@
         >
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </v-dialog> -->
 </template>
 
 <script setup lang="ts">
@@ -100,8 +117,11 @@ import {
 import {
   subirListaTorneo,
   modificarListaTorneo,
-  verlista,
+  getlista,
 } from "@/services/ListasService";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import ModalError from "../Commons/ModalError.vue";
+import ModalLista from "./ModalLista.vue";
 
 const props = defineProps<{
   isLoading: boolean;
@@ -118,6 +138,8 @@ const listaTorneos = ref<InscripcionUsuarioDTO[]>([]);
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showVerListaModal = ref<boolean>(false);
+const showSuccessModalLista = ref<boolean>(false);
+const showErrorModalLista = ref<boolean>(false);
 
 const verDetalleInscripcion = (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
@@ -129,33 +151,47 @@ const verDetalleInscripcion = (idInscripcion: number) => {
 };
 
 const enviarLista = async () => {
-  const requestLista: CrearListaTorneoRequestDTO = {
-    idInscripcion: currentInscripcionId.value!,
-    listaData: listaText.value,
-  };
+  if (currentInscripcionId.value !== null) {
+    const requestLista: CrearListaTorneoRequestDTO = {
+      idInscripcion: currentInscripcionId.value,
+      listaData: listaText.value,
+    };
 
-  await subirListaTorneo(requestLista);
-
-  showVerListaModal.value = false;
+    try {
+      await subirListaTorneo(requestLista);
+      showSuccessModalLista.value = true;
+    } catch {
+      showErrorModalLista.value = true;
+    }
+    showSuccessModalLista.value = false;
+    showVerListaModal.value = false;
+  }
 };
 
 const modificarLista = async () => {
-  const requestLista: ModificarListaTorneoRequestDTO = {
-    idInscripcion: currentInscripcionId.value!,
-    listaData: listaText.value,
-    idLista: idLista.value!,
-  };
+  if (currentInscripcionId.value !== null && idLista.value != null) {
+    const requestLista: ModificarListaTorneoRequestDTO = {
+      idInscripcion: currentInscripcionId.value,
+      listaData: listaText.value,
+      idLista: idLista.value,
+    };
 
-  await modificarListaTorneo(requestLista);
-
-  showVerListaModal.value = false;
+    try {
+      await modificarListaTorneo(requestLista);
+      showSuccessModalLista.value = true;
+    } catch {
+      showErrorModalLista.value = true;
+    }
+    showSuccessModalLista.value = false;
+    showVerListaModal.value = false;
+  }
 };
 
 const verLista = async (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
 
   try {
-    const response = await verlista(currentInscripcionId.value);
+    const response = await getlista(currentInscripcionId.value);
     hasLista.value = true;
 
     listaText.value = response.listaData;
@@ -182,6 +218,16 @@ const eliminarInscripcion = async (idInscripcion: number) => {
   } catch {
     showErrorModal.value = true;
   }
+};
+
+const handleEnviarLista = async (listaData: string) => {
+  listaText.value = listaData;
+  await enviarLista();
+};
+
+const handleModificarLista = async (listaData: string) => {
+  listaText.value = listaData;
+  await modificarLista();
 };
 
 onMounted(async () => {

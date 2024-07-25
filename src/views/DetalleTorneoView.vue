@@ -243,7 +243,6 @@ const showModalResponse = async () => {
       idUsuario: parseInt(idUsuario.value),
       idTorneo: idTorneo.value!,
     };
-    console.log("innx", body);
     await registrarInscripcion(body);
     showModal.value = true;
   } catch {

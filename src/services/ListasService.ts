@@ -45,7 +45,7 @@ export const modificarListaTorneo = async (
   }
 };
 
-export const verlista = async (idInscripcion: number) => {
+export const getlista = async (idInscripcion: number) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.get(baseUrl + "inscripcion/" + idInscripcion, {

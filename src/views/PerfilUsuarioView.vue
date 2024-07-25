@@ -149,13 +149,13 @@ import { onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
 import { getFacciones } from "@/services/FaccionesService";
-import { EditarFaccionDTO, Faccion } from "@/interfaces/Faccion";
+import { EditarFaccionDTO, FaccionDTO } from "@/interfaces/Faccion";
 
 const user = ref<UsuarioViewDTO>();
 const loading = ref(true);
 const { getUser } = useAuth();
 const email = ref<string>(await getUser.value!);
-const facciones = ref<Faccion[]>([]);
+const facciones = ref<FaccionDTO[]>([]);
 const editFaccionDialog = ref(false);
 const selectedFaccionName = ref<string>("");
 const faccionesCombo = ref<string[]>([]);
@@ -168,7 +168,7 @@ onMounted(async () => {
   try {
     user.value = await getUsuario(email.value);
     facciones.value = await getFacciones();
-    const faccionEncontrada: Faccion | undefined = facciones.value.find(
+    const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
       (f) => f.idFaccion === user.value?.idFaccion
     );
     if (faccionEncontrada) {
@@ -192,9 +192,7 @@ const closeEditFaccionDialog = () => {
 };
 
 const saveFaccion = async () => {
-  console.log(user.value);
-
-  const faccionSelected: Faccion = facciones.value.find(
+  const faccionSelected: FaccionDTO = facciones.value.find(
     (x) => x.nombreFaccion === selectedFaccionName.value
   )!;
 
@@ -203,18 +201,15 @@ const saveFaccion = async () => {
     idUsuario: user.value!.idUsuario,
   };
 
-  console.log(body);
-
   try {
     const response = await editarFaccion(body);
-    console.log(response);
     feedbackTitle.value = "Éxito";
     feedbackMessage.value =
       "La comunidad de juego ha sido actualizada correctamente.";
 
     user.value = await getUsuario(email.value);
     facciones.value = await getFacciones();
-    const faccionEncontrada: Faccion | undefined = facciones.value.find(
+    const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
       (f) => f.idFaccion === user.value?.idFaccion
     );
     if (faccionEncontrada) {
@@ -229,7 +224,7 @@ const saveFaccion = async () => {
 
     user.value = await getUsuario(email.value);
     facciones.value = await getFacciones();
-    const faccionEncontrada: Faccion | undefined = facciones.value.find(
+    const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
       (f) => f.idFaccion === user.value?.idFaccion
     );
     if (faccionEncontrada) {
