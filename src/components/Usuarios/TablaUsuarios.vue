@@ -74,7 +74,7 @@ onMounted(async () => {
 
     const data = await getUsuarios();
     items.value = data;
-    items.value = items.value.sort((a, b) => b.puntuacionElo - a.puntuacionElo);
+    items.value = items.value.sort((a, b) => a.nick.localeCompare(b.nick));
 
     var rawListaFacciones: FaccionDTO[] = await getFacciones();
 
