@@ -101,12 +101,11 @@
                 <ValidadasMatchCard
                   v-for="match in validMatches"
                   :key="match.idPartidaAmistosa"
+                  :idUsuario="parseInt(idUsuarioLogger!)"
                   :match="match"
                   class="mb-4"
                   @partidaValidada="cargarPartidasValidadas"
                 />
-                {{ validMatches.length }}
-                {{ isLoading }}
               </div>
               <div v-else>
                 <h3>No tienes partidas validadas</h3>
@@ -145,7 +144,7 @@ import { useRouter, useRoute } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
-import ValidadasMatchCard from "@/components/Usuarios/ValidadasMatchCard";
+import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 
 const tab = ref<string>("one");
 
