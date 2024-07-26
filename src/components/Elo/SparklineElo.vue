@@ -1,8 +1,8 @@
 <template>
-  <div v-if="isLoading" class="center">
+  <div v-if="isLoading " class="center">
     <ProgressCircular />
   </div>
-  <div v-else class="center">
+  <div v-else-if="value.length > 1" class="center">
     <v-card class="mx-auto text-center">
       <v-card-text>
         <v-sheet>
