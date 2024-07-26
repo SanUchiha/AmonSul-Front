@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/valid-v-slot -->
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2"
@@ -62,7 +61,7 @@ const props = defineProps<{
   facciones: FaccionDTO[];
 }>();
 
-const equipos = ref<Array<any>>([])
+const equipos = ref<Array<any>>([]);
 
 const search = ref<string>("");
 
@@ -77,27 +76,42 @@ const headers = [
 ];
 
 const groupByEquipos = () => {
-  const jugadoresPorEquipo = Object.groupBy(props.items, ({ idFaccion }) => idFaccion);
-  if (!Object.keys(jugadoresPorEquipo).length) return
+  const jugadoresPorEquipo = Object.groupBy(
+    props.items,
+    ({ idFaccion }) => idFaccion
+  );
+  if (!Object.keys(jugadoresPorEquipo).length) return;
   for (const [key, value] of Object.entries(jugadoresPorEquipo)) {
-    const nombre = props.facciones.find(faccion => faccion.idFaccion === value[0].idFaccion)?.nombreFaccion
-    const elo = (value.reduce((a, b) => a + b.puntuacionElo, 0) / value.length).toFixed(2)
-    const ganadas = value.reduce((a, b) => a + b.partidasGanadas, 0)
-    const empatadas = value.reduce((a, b) => a + b.partidasEmpatadas, 0)
-    const perdidas = value.reduce((a, b) => a + b.partidasPerdidas, 0)
-    const partidas = ganadas + empatadas + perdidas
-    if (nombre) equipos.value.push({equipo: nombre, elo, ganadas, empatadas, perdidas, partidas})
+    const nombre = props.facciones.find(
+      (faccion) => faccion.idFaccion === value[0].idFaccion
+    )?.nombreFaccion;
+    const elo = (
+      value.reduce((a, b) => a + b.puntuacionElo, 0) / value.length
+    ).toFixed(2);
+    const ganadas = value.reduce((a, b) => a + b.partidasGanadas, 0);
+    const empatadas = value.reduce((a, b) => a + b.partidasEmpatadas, 0);
+    const perdidas = value.reduce((a, b) => a + b.partidasPerdidas, 0);
+    const partidas = ganadas + empatadas + perdidas;
+    if (nombre)
+      equipos.value.push({
+        equipo: nombre,
+        elo,
+        ganadas,
+        empatadas,
+        perdidas,
+        partidas,
+      });
   }
-  equipos.value = equipos.value.sort((a, b) => b.elo - a.elo)
+  equipos.value = equipos.value.sort((a, b) => b.elo - a.elo);
   equipos.value = equipos.value.map((item, index) => ({
     ...item,
     clasificacion: index + 1,
-  }))
-}
+  }));
+};
 
 onMounted(() => {
-  groupByEquipos()
-})
+  groupByEquipos();
+});
 
 watch(
   () => props.items,
@@ -105,9 +119,6 @@ watch(
     groupByEquipos();
   }
 );
-
-
-
 </script>
 
 <style scoped>

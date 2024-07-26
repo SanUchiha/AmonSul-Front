@@ -105,6 +105,8 @@
                   class="mb-4"
                   @partidaValidada="cargarPartidasValidadas"
                 />
+                {{ validMatches.length }}
+                {{ isLoading }}
               </div>
               <div v-else>
                 <h3>No tienes partidas validadas</h3>
@@ -143,6 +145,7 @@ import { useRouter, useRoute } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
+import ValidadasMatchCard from "@/components/Usuarios/ValidadasMatchCard";
 
 const tab = ref<string>("one");
 
@@ -207,6 +210,8 @@ const cargarPartidasValidadas = async () => {
     isLoading.value = true;
     const responseValidadas = await getPartidasValidadas(emailUsuario.value);
 
+    validMatches.value = responseValidadas;
+
     ultimaPartida.value = responseValidadas[responseValidadas.length - 1];
   } catch (error) {
     console.error("Error al obtener las partidas validadas:", error);
@@ -238,6 +243,9 @@ const initializeComponent = async () => {
     try {
       usuarioData.value = await getUsuarioData(parseInt(idUsuarioLogger.value));
       validMatches.value = usuarioData.value?.partidasValidadas ?? [];
+
+      ultimaPartida.value = validMatches.value[validMatches.value.length - 1];
+
       pendingMatches.value = usuarioData.value?.partidasPendientes ?? [];
 
       if (route.params.tab) {
