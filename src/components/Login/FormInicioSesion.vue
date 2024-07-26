@@ -1,7 +1,11 @@
 <template>
   <v-container class="login-form">
     <div class="overlay" v-if="loading"></div>
-
+    <!-- <v-row justify="center">
+      <v-col cols="12" md="4">
+        <LogoNameAmonSulSVG />
+      </v-col>
+    </v-row> -->
     <v-row justify="center">
       <v-col cols="12" md="6">
         <v-card>
@@ -82,6 +86,7 @@ import { useAuth } from "@/composables/useAuth";
 import ErrorLogin from "./ErrorLogin.vue";
 import { AxiosResponse } from "axios";
 import ResponseLogin from "./ResponseLogin.vue";
+// import LogoNameAmonSulSVG from '@/assets/icons/logo_name.svg';
 
 const email = ref("");
 const password = ref("");
