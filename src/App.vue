@@ -54,6 +54,7 @@
         v-if="isAuthenticated"
         @click.stop="drawer = !drawer"
       ></v-app-bar-nav-icon>
+      <LogoSVG class="icon" />
       <v-toolbar-title>Amon sûl</v-toolbar-title>
       <v-btn icon to="contacto" disabled>
         <v-icon>mdi-email</v-icon>
@@ -89,6 +90,7 @@ import { ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
 import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
+import LogoSVG from '@/assets/icons/logo.svg';
 
 const { logout } = useAuth();
 const router = useRouter();
@@ -105,5 +107,10 @@ const handleLogout = async () => {
 <style scoped>
 .close-drawer-btn {
   margin: 10px;
+}
+
+.icon {
+  width: 30px;
+  margin-left: 20px;
 }
 </style>
