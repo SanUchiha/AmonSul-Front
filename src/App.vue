@@ -54,8 +54,10 @@
         v-if="isAuthenticated"
         @click.stop="drawer = !drawer"
       ></v-app-bar-nav-icon>
-      <v-toolbar-title><LogoAmonSulSVG class="icon" /><NameAmonSulSVG class="name" /></v-toolbar-title>
-      <v-btn icon to="contacto" disabled>
+      <v-toolbar-title
+        ><LogoAmonSulSVG class="icon" /><NameAmonSulSVG class="name"
+      /></v-toolbar-title>
+      <v-btn icon to="contacto">
         <v-icon>mdi-email</v-icon>
       </v-btn>
       <v-btn
@@ -89,8 +91,8 @@ import { ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
 import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
-import LogoAmonSulSVG from '@/assets/icons/logo_amonsul.svg';
-import NameAmonSulSVG from '@/assets/icons/name_amonsul.svg';
+import LogoAmonSulSVG from "@/assets/icons/logo_amonsul.svg";
+import NameAmonSulSVG from "@/assets/icons/name_amonsul.svg";
 
 const { logout } = useAuth();
 const router = useRouter();
