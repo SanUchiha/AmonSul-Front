@@ -124,9 +124,12 @@ const emit = defineEmits(["partidaValidada"]);
 
 onMounted(async () => {
   try {
-    usuario.value = await getUsuario(emailUsuario.value);
-    nickJugadorUno.value = await getNickById(props.match.idUsuario1);
-    nickJugadorDos.value = await getNickById(props.match.idUsuario2);
+    const responseUsuario = await getUsuario(emailUsuario.value);
+    usuario.value = responseUsuario.data;
+    const responseJugadorUno = await getNickById(props.match.idUsuario1);
+    nickJugadorUno.value = responseJugadorUno.data;
+    const responseJugadorDos = await getNickById(props.match.idUsuario2);
+    nickJugadorDos.value = responseJugadorDos.data;
     fechaFormateada.value = await formatFechaSpa(props.match.fechaPartida);
     await controlValidacionesPartidas();
   } catch (err) {

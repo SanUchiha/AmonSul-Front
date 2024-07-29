@@ -63,7 +63,7 @@ import {
   VTextField,
 } from "vuetify/components";
 
-const props = defineProps<{
+defineProps<{
   items: UsuarioEloTablaClasificacion[];
 }>();
 

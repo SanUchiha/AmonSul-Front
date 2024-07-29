@@ -205,11 +205,14 @@ const goToUserDetail = (idUsuario: number) => {
 onMounted(async () => {
   if (idUsuario.value != null) {
     idTorneo.value = Number(route.params.idTorneo);
-    torneo.value = await getTorneo(idTorneo.value);
-    participantes.value = await getInscripcionesTorneo(idTorneo.value);
+    const responseTorneo = await getTorneo(idTorneo.value);
+    torneo.value = responseTorneo.data
+    const responseInscripcion = await getInscripcionesTorneo(idTorneo.value);
+    participantes.value = responseInscripcion.data;
 
     // Comprobar si ya está apuntado
-    torneosApuntado.value = await getInscripcionesUser(idUsuario.value);
+    const responseInscriptionesUser = await getInscripcionesUser(idUsuario.value);
+    torneosApuntado.value = responseInscriptionesUser.data;
 
     if (torneosApuntado.value != null) {
       torneosApuntado.value.forEach((element) => {

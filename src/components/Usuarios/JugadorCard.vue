@@ -90,7 +90,8 @@ const porcentajeVictorias = computed(() => {
 
 onMounted(async () => {
   try {
-    rawListaFacciones.value = await getFacciones();
+    const response = await getFacciones();
+    rawListaFacciones.value = response.data;
   } catch (error) {
     console.error("Error al obtener la facción:", error);
   } finally {

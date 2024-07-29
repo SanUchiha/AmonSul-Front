@@ -22,7 +22,7 @@
           </v-tabs>
 
           <v-tabs-window v-model="tab">
-            <!-- Tab 1. 
+            <!-- Tab 1.
              spark
            Jugador card
            ultima partida jugada
@@ -111,7 +111,7 @@
                 <h3>No tienes partidas validadas</h3>
               </div>
             </v-tabs-window-item>
-            <!-- tab 3. 
+            <!-- tab 3.
            Inscription a los tornoes (mis torneos)
            Lista de partidas -->
             <v-tabs-window-item value="three">
@@ -209,9 +209,9 @@ const cargarPartidasValidadas = async () => {
     isLoading.value = true;
     const responseValidadas = await getPartidasValidadas(emailUsuario.value);
 
-    validMatches.value = responseValidadas;
+    validMatches.value = responseValidadas.data;
 
-    ultimaPartida.value = responseValidadas[responseValidadas.length - 1];
+    ultimaPartida.value = responseValidadas.data[responseValidadas.length - 1];
   } catch (error) {
     console.error("Error al obtener las partidas validadas:", error);
   } finally {
@@ -222,9 +222,10 @@ const cargarPartidasValidadas = async () => {
 const cargarPartidasPendientes = async () => {
   try {
     isLoading.value = true;
-    pendingMatches.value = await getPartidasPendientesValidar(
+    const responsePendingMatches = await getPartidasPendientesValidar(
       emailUsuario.value
     );
+    pendingMatches.value = responsePendingMatches.data;
     pendingMatches.value = pendingMatches.value.reverse();
   } catch (error) {
     console.error(
@@ -240,7 +241,8 @@ const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
     isLoading.value = true;
     try {
-      usuarioData.value = await getUsuarioData(parseInt(idUsuarioLogger.value));
+      const usuarioResponse = await getUsuarioData(parseInt(idUsuarioLogger.value));
+      usuarioData.value = usuarioResponse.data
       validMatches.value = usuarioData.value?.partidasValidadas ?? [];
 
       ultimaPartida.value = validMatches.value[validMatches.value.length - 1];

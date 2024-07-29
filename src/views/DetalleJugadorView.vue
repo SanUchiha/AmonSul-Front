@@ -22,7 +22,7 @@
           </v-tabs>
 
           <v-tabs-window v-model="tab">
-            <!-- Tab 1. 
+            <!-- Tab 1.
              spark
            Jugador card -->
             <v-tabs-window-item value="one">
@@ -61,7 +61,7 @@
                 <h3>No tienes partidas validadas</h3>
               </div>
             </v-tabs-window-item>
-            <!-- tab 3. 
+            <!-- tab 3.
            Inscription a los tornoes (mis torneos)
            Lista de partidas -->
             <v-tabs-window-item value="three">
@@ -91,13 +91,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
 import {
-  getPartidasPendientesValidar,
   getPartidasValidadas,
 } from "@/services/PartidasAmistosasService";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
@@ -143,7 +142,7 @@ const cargarPartidasValidadas = async () => {
       usuarioData.value.email
     );
 
-    ultimaPartida.value = responseValidadas[responseValidadas.length - 1];
+    ultimaPartida.value = responseValidadas.data[responseValidadas.data.length - 1];
   } catch (error) {
     console.error("Error al obtener las partidas validadas:", error);
   } finally {
@@ -158,10 +157,10 @@ const initializeComponent = async () => {
     const usuarioResponse = await getUsuarioData(parseInt(idRecibido));
 
     // Verifica la estructura de usuarioResponse
-    if (usuarioResponse) {
-      usuarioData.value = usuarioResponse;
-      validMatches.value = usuarioResponse.partidasValidadas;
-      pendingMatches.value = usuarioResponse.partidasPendientes;
+    if (usuarioResponse.data) {
+      usuarioData.value = usuarioResponse.data;
+      validMatches.value = usuarioResponse.data.partidasValidadas;
+      pendingMatches.value = usuarioResponse.data.partidasPendientes;
     }
   } catch (error) {
     console.error(error);

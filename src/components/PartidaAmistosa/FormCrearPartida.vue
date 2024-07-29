@@ -184,7 +184,8 @@ const loadNicks = async () => {
   loadingNicks.value = true;
 
   try {
-    rawListaUsuarios.value = await getUsuarios();
+    const responseUsuarios = await getUsuarios();
+    rawListaUsuarios.value = responseUsuarios.data
     listaUsuarios.value = rawListaUsuarios.value;
     listaUsuarios.value = listaUsuarios.value.filter(
       (u) => u.email != emailOwner.value
