@@ -48,3 +48,18 @@ export const descargarBasesTorneo = async (idTorneo: number) => {
     throw error;
   }
 };
+
+export const getTorneosCreadosUsuario = async (idUsuario: string) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(BASE_URL + "Torneo/creados/" + idUsuario, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error recuperando torneos creados por el usuario:", error);
+    throw error;
+  }
+};

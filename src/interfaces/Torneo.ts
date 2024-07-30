@@ -23,3 +23,9 @@ export interface Torneo {
   horaFinTorneo: string; // Hora de fin del torneo (HH:mm)
   limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
 }
+
+export interface TorneoPropioDTO {
+  idTorneo: number; // Identificador único del torneo (PK)
+  idUsuario: number; // ID del usuario administrador del torneo (FK)
+  nombreTorneo: string; // Nombre del torneo
+}

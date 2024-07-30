@@ -23,21 +23,16 @@
             <v-list-item-title>Usuarios</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <!-- <v-list-item link to="/partidas-amistosas" v-if="isAuthenticated">
-          <v-list-item-content class="d-flex ga-2">
-            <v-icon>mdi-gamepad-variant</v-icon>
-            <v-list-item-title>Mis Partidas</v-list-item-title>
-          </v-list-item-content> </v-list-item
-        ><v-list-item link to="/mis-torneos" v-if="isAuthenticated">
-          <v-list-item-content class="d-flex ga-2">
-            <v-icon>mdi-gamepad-variant</v-icon>
-            <v-list-item-title>Mis Torneos</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item> -->
         <v-list-item link to="/elo" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-cog</v-icon>
             <v-list-item-title>Elo</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link to="/gestion-torneos" v-if="isAuthenticated">
+          <v-list-item-content class="d-flex ga-2">
+            <v-icon>mdi mdi-cogs</v-icon>
+            <v-list-item-title>Gestión Torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/perfil-usuario" v-if="isAuthenticated">
