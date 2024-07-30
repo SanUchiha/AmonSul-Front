@@ -1,6 +1,5 @@
 import ContactoView from "@/views/ContactoView.vue";
 import DetalleJugadorView from "@/views/DetalleJugadorView.vue";
-import DetallePartidasView from "@/views/DetallePartidasView.vue";
 import DetalleToneoLiveView from "@/views/DetalleToneoLiveView.vue";
 import DetalleTorneoView from "@/views/DetalleTorneoView.vue";
 import InicioSesionView from "@/views/InicioSesionView.vue";
@@ -55,12 +54,7 @@ const routes: Array<RouteRecordRaw> = [
     component: EloView,
     meta: { requiresAuth: true },
   },
-  {
-    path: "/detalle-partida/:idPartida",
-    name: "detalle-partida",
-    component: DetallePartidasView,
-    meta: { requiresAuth: true },
-  },
+
   {
     path: "/detalle-torneo/:idTorneo",
     name: "detalle-torneo",

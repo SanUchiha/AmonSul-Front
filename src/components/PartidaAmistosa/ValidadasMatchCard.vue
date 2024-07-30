@@ -3,7 +3,7 @@
     <ProgressCircular />
   </div>
   <div v-else>
-    <v-card :class="cardColorClass" @click="goToDetallePartida">
+    <v-card :class="cardColorClass" @click="goToDetallePartida()">
       <v-card-title
         >{{ match.nickUsuario1 }} - {{ match.nickUsuario2 }}</v-card-title
       >
@@ -20,6 +20,11 @@
       </v-card-text>
     </v-card>
     <div v-if="error" class="error">{{ error }}</div>
+    <ModalDetallePartida
+      v-if="showModalDetallePartida"
+      :partida="match"
+      @close="closeModalDetallePartida"
+    />
   </div>
 </template>
 
@@ -29,6 +34,7 @@ import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import ProgressCircular from "../Commons/ProgressCircular.vue";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
+import ModalDetallePartida from "@/components/PartidaAmistosa/ModalDetallePartida.vue";
 
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -41,6 +47,8 @@ const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
   idUsuario: number;
 }>();
+
+const showModalDetallePartida = ref(false);
 
 const initializeComponent = async () => {
   try {
@@ -80,10 +88,11 @@ const cardColorClass = computed(() => {
 });
 
 const goToDetallePartida = () => {
-  router.push({
-    name: "detalle-partida",
-    params: { idPartida: props.match.idPartidaAmistosa },
-  });
+  showModalDetallePartida.value = true;
+};
+
+const closeModalDetallePartida = () => {
+  showModalDetallePartida.value = false;
 };
 
 onMounted(initializeComponent);
