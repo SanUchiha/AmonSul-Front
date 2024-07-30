@@ -22,7 +22,7 @@
     <v-data-table
       v-model:search="search"
       :items="items"
-      :loading="loading"
+      :loading="isLoading"
       :headers="headers"
       class="custom-table"
       item-key="idTorneo"
@@ -33,6 +33,7 @@
           <td>
             <v-btn @click="viewDetails(item.idTorneo)" icon="mdi-eye"> </v-btn>
             <v-btn
+              :disabled="isDisabled"
               @click="deleteTournament(item.idTorneo)"
               color="error"
               icon="mdi-close"
@@ -64,7 +65,9 @@ const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 
 const search = ref<string>("");
 const items = ref<TorneoPropioDTO[]>([]);
-const loading = ref<boolean>(true);
+const isLoading = ref<boolean>(true);
+const isDisabled = ref(true);
+
 const router = useRouter();
 
 const headers = [{ title: "NOMBRE", key: "nombreTorneo" }];
@@ -86,13 +89,15 @@ onMounted(async () => {
   try {
     items.value = [];
 
-    const data = await getTorneosCreadosUsuario(idUsuarioLogger.value!);
-    console.log(data);
-    items.value = data;
+    const responseTorneosCreados = await getTorneosCreadosUsuario(
+      idUsuarioLogger.value!
+    );
+
+    items.value = responseTorneosCreados.data;
   } catch (error) {
     console.error("Error recuperando torneos creados por el usuario:", error);
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 });
 </script>

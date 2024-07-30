@@ -8,9 +8,9 @@
             <v-btn
               color="blue darken-1"
               variant="outlined"
-              :disabled="isLoading"
               size="large"
               class="login-form__button"
+              :disabled="isDisabled"
               @click="handlerCrearTorneo"
             >
               Crear torneo
@@ -43,6 +43,7 @@ const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const modalCreacionTorneos = ref<boolean>(false);
 
 const isLoading = ref(false);
+const isDisabled = ref(true);
 
 const handlerCrearTorneo = () => {
   modalCreacionTorneos.value = true;
