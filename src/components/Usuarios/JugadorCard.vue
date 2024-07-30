@@ -90,6 +90,7 @@ const porcentajeVictorias = computed(() => {
 
 onMounted(async () => {
   try {
+    isLoading.value = true;
     const response = await getFacciones();
     rawListaFacciones.value = response.data;
   } catch (error) {

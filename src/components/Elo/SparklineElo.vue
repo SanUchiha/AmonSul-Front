@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoading " class="center">
+  <div v-if="isLoading" class="center">
     <ProgressCircular />
   </div>
   <div v-else-if="value.length > 1" class="center">
@@ -68,6 +68,7 @@ const resultadoActual = ref<number>();
 
 onMounted(async () => {
   try {
+    isLoading.value = true;
     const response = await getEloUsuario(props.email);
     const elos = response.data.elos.map(
       (elo: { puntuacionElo: unknown }) => elo.puntuacionElo

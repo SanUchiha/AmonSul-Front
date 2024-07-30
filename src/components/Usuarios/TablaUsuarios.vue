@@ -22,7 +22,7 @@
     <v-data-table
       v-model:search="search"
       :items="items"
-      :loading="loading"
+      :loading="isLoading"
       :headers="headers"
       class="custom-table"
       item-key="nick"
@@ -55,7 +55,7 @@ import {
 
 const search = ref<string>("");
 const items = ref<ViewUsuarioPartidaDTO[]>([]);
-const loading = ref<boolean>(true);
+const isLoading = ref<boolean>(true);
 const router = useRouter();
 
 const headers = [
@@ -70,6 +70,8 @@ const goToUserDetail = (idUsuario: number) => {
 
 onMounted(async () => {
   try {
+    isLoading.value = true;
+
     items.value = [];
 
     const data = await getUsuarios();
@@ -77,7 +79,7 @@ onMounted(async () => {
     items.value = items.value.sort((a, b) => a.nick.localeCompare(b.nick));
 
     const response = await getFacciones();
-    var rawListaFacciones: FaccionDTO[] = response.data
+    var rawListaFacciones: FaccionDTO[] = response.data;
 
     items.value.forEach((usuario) => {
       const faccion = rawListaFacciones.find(
@@ -89,7 +91,7 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 });
 </script>

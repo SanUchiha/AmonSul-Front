@@ -87,6 +87,8 @@ const deleteTournament = async (idTorneo: number) => {
 
 onMounted(async () => {
   try {
+    isLoading.value = true;
+
     items.value = [];
 
     const responseTorneosCreados = await getTorneosCreadosUsuario(

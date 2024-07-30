@@ -21,7 +21,11 @@
         </v-tabs-window-item>
 
         <v-tabs-window-item value="two" v-if="tab === 'two'">
-          <TablaClasificacionEloEquipos class="separated" :items="usuarios" :facciones="facciones" />
+          <TablaClasificacionEloEquipos
+            class="separated"
+            :items="usuarios"
+            :facciones="facciones"
+          />
         </v-tabs-window-item>
       </v-tabs-window>
     </div>
@@ -52,9 +56,10 @@ const correo = ref<string>(``);
 const isLoading = ref<boolean>(true);
 const eloClasificacion = ref<UsuarioEloTablaClasificacion[]>([]);
 const usuarios = ref<ViewUsuarioPartidaDTO[]>([]);
-const facciones = ref<FaccionDTO[]>([])
+const facciones = ref<FaccionDTO[]>([]);
 
 onMounted(async () => {
+  isLoading.value = true;
   try {
     const email: any = await getUser.value;
     if (!email) {
@@ -64,20 +69,20 @@ onMounted(async () => {
     }
     correo.value = email;
     const responseClasificacionElo = await getClasifiacionElo();
-    eloClasificacion.value = responseClasificacionElo.data
-    eloClasificacion.value = eloClasificacion.value.sort((a, b) => b.elo - a.elo);
+    eloClasificacion.value = responseClasificacionElo.data;
+    eloClasificacion.value = eloClasificacion.value.sort(
+      (a, b) => b.elo - a.elo
+    );
 
     eloClasificacion.value = eloClasificacion.value.map((item, index) => ({
       ...item,
       clasificacion: index + 1,
     }));
 
-    isLoading.value = false;
-
     const faccionesResponse = await getFacciones();
     facciones.value = faccionesResponse.data;
     const usuariosResponse = await getUsuarios();
-    usuarios.value = usuariosResponse.data
+    usuarios.value = usuariosResponse.data;
   } catch {
     console.error("Error al obtener datos del usuario:", error);
   } finally {

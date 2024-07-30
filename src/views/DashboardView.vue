@@ -211,7 +211,8 @@ const cargarPartidasValidadas = async () => {
 
     validMatches.value = responseValidadas.data;
 
-    ultimaPartida.value = responseValidadas.data[responseValidadas.length - 1];
+    ultimaPartida.value =
+      responseValidadas.data[responseValidadas.data.length - 1];
   } catch (error) {
     console.error("Error al obtener las partidas validadas:", error);
   } finally {
@@ -241,8 +242,10 @@ const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
     isLoading.value = true;
     try {
-      const usuarioResponse = await getUsuarioData(parseInt(idUsuarioLogger.value));
-      usuarioData.value = usuarioResponse.data
+      const usuarioResponse = await getUsuarioData(
+        parseInt(idUsuarioLogger.value)
+      );
+      usuarioData.value = usuarioResponse.data;
       validMatches.value = usuarioData.value?.partidasValidadas ?? [];
 
       ultimaPartida.value = validMatches.value[validMatches.value.length - 1];

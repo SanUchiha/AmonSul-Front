@@ -31,11 +31,6 @@
                       {{ formatDate(torneo.fechaInicioTorneo) }} a las
                       {{ torneo.horaInicioTorneo }}
                     </p>
-                    <!-- <p>
-            <strong>Fecha de Fin:</strong>
-            {{ formatDate(torneo.fechaFinTorneo) }} a las
-            {{ torneo.horaFinTorneo }}
-          </p> -->
                     <p>
                       <strong>Inscripción hasta:</strong>
                       {{ formatDate(torneo.fechaFinInscripcion) }}
@@ -124,7 +119,7 @@
               <v-data-table
                 v-model:search="search"
                 :items="participantes"
-                :loading="loading"
+                :loading="isLoading"
                 :headers="headers"
                 class="custom-table"
                 item-key="nick"
@@ -191,7 +186,7 @@ const torneosApuntado = ref<InscripcionUsuarioDTO[]>();
 const tab = ref(0);
 
 const search = ref<string>("");
-const loading = ref<boolean>(true);
+const isLoading = ref<boolean>(true);
 
 const headers = [{ title: "Nick", key: "nick" }];
 
@@ -203,15 +198,18 @@ const goToUserDetail = (idUsuario: number) => {
 };
 
 onMounted(async () => {
+  isLoading.value = true;
   if (idUsuario.value != null) {
     idTorneo.value = Number(route.params.idTorneo);
     const responseTorneo = await getTorneo(idTorneo.value);
-    torneo.value = responseTorneo.data
+    torneo.value = responseTorneo.data;
     const responseInscripcion = await getInscripcionesTorneo(idTorneo.value);
     participantes.value = responseInscripcion.data;
 
     // Comprobar si ya está apuntado
-    const responseInscriptionesUser = await getInscripcionesUser(idUsuario.value);
+    const responseInscriptionesUser = await getInscripcionesUser(
+      idUsuario.value
+    );
     torneosApuntado.value = responseInscriptionesUser.data;
 
     if (torneosApuntado.value != null) {
@@ -228,9 +226,10 @@ onMounted(async () => {
         )
           isTorneoCompletado.value = true;
 
-      loading.value = false;
+      isLoading.value = false;
     }
   }
+  isLoading.value = false;
 });
 
 watch(
@@ -250,8 +249,8 @@ const goBack = () => router.go(-1);
 const descargarBases = async () => {
   try {
     if (idTorneo.value) {
-      const blob = await descargarBasesTorneo(idTorneo.value);
-      const url = window.URL.createObjectURL(blob);
+      const response = await descargarBasesTorneo(idTorneo.value);
+      const url = window.URL.createObjectURL(response.data);
       const a = document.createElement("a");
       a.href = url;
       a.download = `Bases_Torneo_${torneo.value?.nombreTorneo}.pdf`;

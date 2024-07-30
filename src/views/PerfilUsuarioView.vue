@@ -7,7 +7,7 @@
             <h2>Configuración</h2>
           </v-card-title>
           <v-card-text>
-            <div v-if="loading">
+            <div v-if="isLoading">
               <v-row justify="center" align="center" style="height: 100px">
                 <v-col cols="12" class="text-center">
                   <ProgressCircular />
@@ -152,7 +152,7 @@ import { getFacciones } from "@/services/FaccionesService";
 import { EditarFaccionDTO, FaccionDTO } from "@/interfaces/Faccion";
 
 const user = ref<UsuarioViewDTO>();
-const loading = ref(true);
+const isLoading = ref(true);
 const { getUser } = useAuth();
 const email = ref<string>(await getUser.value!);
 const facciones = ref<FaccionDTO[]>([]);
@@ -166,6 +166,8 @@ const feedbackTitle = ref("");
 
 onMounted(async () => {
   try {
+    isLoading.value = true;
+
     const responseUsuario = await getUsuario(email.value);
     user.value = responseUsuario.data;
     const faccionesResponse = await getFacciones();
@@ -180,7 +182,7 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 });
 

@@ -81,8 +81,10 @@ const next = () => {
 };
 
 onMounted(async () => {
+  isLoading.value = true;
+
   const responseTorneos = await getTorneos();
-  listaTorneos.value = responseTorneos.data
+  listaTorneos.value = responseTorneos.data;
   listaTorneos.value = listaTorneos.value.sort(
     (a, b) =>
       new Date(a.fechaInicioTorneo).getTime() -

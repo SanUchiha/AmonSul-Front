@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading" class="center">
+  <div v-if="isLoading" class="center">
     <ProgressCircular />
   </div>
   <div v-else class="center">
@@ -102,7 +102,7 @@ import ModalResponsePartidaValidada from "./ModalResponsePartidaValidada.vue";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 
-const loading = ref(true);
+const isLoading = ref(true);
 const { getUser } = useAuth();
 const error = ref<string | null>(null);
 const nickJugadorUno = ref<string>("");
@@ -124,6 +124,8 @@ const emit = defineEmits(["partidaValidada"]);
 
 onMounted(async () => {
   try {
+    isLoading.value = true;
+
     const responseUsuario = await getUsuario(emailUsuario.value);
     usuario.value = responseUsuario.data;
     const responseJugadorUno = await getNickById(props.match.idUsuario1);
@@ -136,7 +138,7 @@ onMounted(async () => {
     router.push("error");
     error.value = "Error al cargar los datos";
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 });
 
@@ -164,7 +166,7 @@ const cancelPartida = async () => {
     router.push("error");
     error.value = "Error al cancelar la partida";
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 };
 const handleModalAccepted = () => {

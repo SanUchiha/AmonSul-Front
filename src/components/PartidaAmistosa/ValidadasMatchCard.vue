@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading" class="center">
+  <div v-if="isLoading" class="center">
     <ProgressCircular />
   </div>
   <div v-else>
@@ -36,7 +36,7 @@ import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
 import ModalDetallePartida from "@/components/PartidaAmistosa/ModalDetallePartida.vue";
 
-const loading = ref(true);
+const isLoading = ref(true);
 const error = ref<string | null>(null);
 const router = useRouter();
 
@@ -52,6 +52,7 @@ const showModalDetallePartida = ref(false);
 
 const initializeComponent = async () => {
   try {
+    isLoading.value = true;
     setResultado();
     fechaPartidaFormateada.value = await formatFechaSpa(
       props.match.fechaPartida
@@ -60,7 +61,7 @@ const initializeComponent = async () => {
     error.value = (err as Error).message;
     router.push("error");
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 };
 
