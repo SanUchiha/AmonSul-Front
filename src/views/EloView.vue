@@ -1,7 +1,7 @@
 <template>
   <v-container class="text-center">
     <div v-if="isLoading">
-      <ProgressCircular />
+      <LoadingGandalf />
     </div>
     <div v-else>
       <v-tabs v-model="tab" color="primary" grow>
@@ -45,7 +45,7 @@ import { getUsuarios } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
-import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
+import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 
 const tab = ref<string>("one");
 

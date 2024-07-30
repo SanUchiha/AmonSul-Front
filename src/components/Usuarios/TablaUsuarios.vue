@@ -1,41 +1,46 @@
 <template>
-  <v-card flat>
-    <v-card-title class="d-flex align-center pe-2"
-      >Usuarios
+  <div v-if="isLoading">
+    <LoadingGandalf />
+  </div>
+  <div v-else>
+    <v-card flat>
+      <v-card-title class="d-flex align-center pe-2"
+        >Usuarios
 
-      <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
 
-      <v-text-field
-        v-model="search"
-        density="compact"
-        label="Search"
-        prepend-inner-icon="mdi-magnify"
-        variant="solo-filled"
-        flat
-        hide-details
-        single-line
-      ></v-text-field>
-    </v-card-title>
+        <v-text-field
+          v-model="search"
+          density="compact"
+          label="Search"
+          prepend-inner-icon="mdi-magnify"
+          variant="solo-filled"
+          flat
+          hide-details
+          single-line
+        ></v-text-field>
+      </v-card-title>
 
-    <v-divider></v-divider>
-    <v-divider></v-divider>
-    <v-data-table
-      v-model:search="search"
-      :items="items"
-      :loading="isLoading"
-      :headers="headers"
-      class="custom-table"
-      item-key="nick"
-    >
-      <template v-slot:item="{ item }">
-        <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
-          <td>{{ item.nick }}</td>
-          <td>{{ item.nombreFaccion }}</td>
-          <td>{{ item.ciudad }}</td>
-        </tr>
-      </template>
-    </v-data-table>
-  </v-card>
+      <v-divider></v-divider>
+      <v-divider></v-divider>
+      <v-data-table
+        v-model:search="search"
+        :items="items"
+        :loading="isLoading"
+        :headers="headers"
+        class="custom-table"
+        item-key="nick"
+      >
+        <template v-slot:item="{ item }">
+          <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
+            <td>{{ item.nick }}</td>
+            <td>{{ item.nombreFaccion }}</td>
+            <td>{{ item.ciudad }}</td>
+          </tr>
+        </template>
+      </v-data-table>
+    </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -52,6 +57,7 @@ import {
   VDivider,
   VTextField,
 } from "vuetify/components";
+import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const search = ref<string>("");
 const items = ref<ViewUsuarioPartidaDTO[]>([]);

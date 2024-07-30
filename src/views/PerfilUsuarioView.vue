@@ -10,7 +10,7 @@
             <div v-if="isLoading">
               <v-row justify="center" align="center" style="height: 100px">
                 <v-col cols="12" class="text-center">
-                  <ProgressCircular />
+                  <LoadingGandalf />
                 </v-col>
               </v-row>
             </div>
@@ -147,9 +147,9 @@ import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import { editarFaccion, getUsuario } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
-import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
 import { getFacciones } from "@/services/FaccionesService";
 import { EditarFaccionDTO, FaccionDTO } from "@/interfaces/Faccion";
+import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 
 const user = ref<UsuarioViewDTO>();
 const isLoading = ref(true);

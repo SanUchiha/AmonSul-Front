@@ -1,47 +1,55 @@
 <template>
   <v-container>
-    <v-row dense justify="center" style="height: 100vh">
-      <div v-if="isLoading">
-        <v-row justify="center" style="height: 100px">
-          <v-col cols="12" class="text-center">
-            <ProgressCircular />
-          </v-col>
-        </v-row>
-      </div>
-      <div v-else>
-        <div v-if="listaTorneos.length < 1">No hay torneos próximamente...</div>
-        <v-window v-model="activeTorneo">
-          <v-window-item
-            v-for="torneo in listaTorneos"
-            :key="torneo.idTorneo"
-            :value="torneo.idTorneo"
-          >
-            <TorneoCard :torneo="torneo" />
-          </v-window-item>
-        </v-window>
-        <v-card-actions class="justify-space-between">
-          <v-btn icon="mdi-chevron-left" variant="plain" @click="prev"></v-btn>
-          <v-item-group v-model="activeTorneo" class="text-center" mandatory>
-            <v-item
+    <v-row dense>
+      <v-col cols="12" md="12" class="text-center">
+        <div v-if="isLoading">
+          <LoadingGandalf />
+        </div>
+        <div v-else>
+          <div v-if="listaTorneos.length < 1">
+            No hay torneos próximamente...
+          </div>
+          <v-window v-model="activeTorneo">
+            <v-window-item
               v-for="torneo in listaTorneos"
-              :key="`btn-${torneo.idTorneo}`"
-              v-slot="{ isSelected, toggle }"
+              :key="torneo.idTorneo"
               :value="torneo.idTorneo"
             >
-              <v-btn
-                :variant="isSelected ? 'outlined' : 'text'"
-                icon="mdi-record"
-                :class="{
-                  'active-pointer': isSelected,
-                  'inactive-pointer': !isSelected,
-                }"
-                @click="toggle"
-              ></v-btn>
-            </v-item>
-          </v-item-group>
-          <v-btn icon="mdi-chevron-right" variant="plain" @click="next"></v-btn>
-        </v-card-actions>
-      </div>
+              <TorneoCard :torneo="torneo" />
+            </v-window-item>
+          </v-window>
+          <v-card-actions class="justify-space-between">
+            <v-btn
+              icon="mdi-chevron-left"
+              variant="plain"
+              @click="prev"
+            ></v-btn>
+            <v-item-group v-model="activeTorneo" class="text-center" mandatory>
+              <v-item
+                v-for="torneo in listaTorneos"
+                :key="`btn-${torneo.idTorneo}`"
+                v-slot="{ isSelected, toggle }"
+                :value="torneo.idTorneo"
+              >
+                <v-btn
+                  :variant="isSelected ? 'outlined' : 'text'"
+                  icon="mdi-record"
+                  :class="{
+                    'active-pointer': isSelected,
+                    'inactive-pointer': !isSelected,
+                  }"
+                  @click="toggle"
+                ></v-btn>
+              </v-item>
+            </v-item-group>
+            <v-btn
+              icon="mdi-chevron-right"
+              variant="plain"
+              @click="next"
+            ></v-btn>
+          </v-card-actions>
+        </div>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -51,7 +59,7 @@ import { Torneo } from "@/interfaces/Torneo";
 import { getTorneos } from "@/services/TorneosService";
 import { onMounted, ref } from "vue";
 import TorneoCard from "@/components/Torneos/TorneoCard.vue";
-import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
+import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 
 const listaTorneos = ref<Torneo[]>([]);
 const isLoading = ref(true);

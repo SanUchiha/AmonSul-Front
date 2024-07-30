@@ -3,7 +3,7 @@
     <v-row dense>
       <v-col cols="12" md="12" class="text-center">
         <div v-if="isLoading">
-          <ProgressCircular />
+          <LoadingGandalf />
         </div>
         <div v-else>
           <!-- tabs
@@ -95,15 +95,13 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
-import ProgressCircular from "@/components/Commons/ProgressCircular.vue";
-import {
-  getPartidasValidadas,
-} from "@/services/PartidasAmistosasService";
+import { getPartidasValidadas } from "@/services/PartidasAmistosasService";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { getUsuarioData } from "@/services/UsuariosService";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
+import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 
 const tab = ref<string>("one");
 
@@ -142,7 +140,8 @@ const cargarPartidasValidadas = async () => {
       usuarioData.value.email
     );
 
-    ultimaPartida.value = responseValidadas.data[responseValidadas.data.length - 1];
+    ultimaPartida.value =
+      responseValidadas.data[responseValidadas.data.length - 1];
   } catch (error) {
     console.error("Error al obtener las partidas validadas:", error);
   } finally {

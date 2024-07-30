@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading" class="center">
-    <ProgressCircular />
+    <LoadingGandalf />
   </div>
   <div v-else class="center">
     <v-card class="center-card pa-4">
@@ -91,7 +91,6 @@ import {
   ViewPartidaAmistosaDTO,
 } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
-import ProgressCircular from "../Commons/ProgressCircular.vue";
 import { getNickById, getUsuario } from "@/services/UsuariosService";
 import { useRouter } from "vue-router";
 import {
@@ -101,6 +100,7 @@ import {
 import ModalResponsePartidaValidada from "./ModalResponsePartidaValidada.vue";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
+import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const isLoading = ref(true);
 const { getUser } = useAuth();

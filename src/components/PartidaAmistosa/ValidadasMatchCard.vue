@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading" class="center">
-    <ProgressCircular />
+    <LoadingGandalf />
   </div>
   <div v-else>
     <v-card :class="cardColorClass" @click="goToDetallePartida()">
@@ -31,10 +31,10 @@
 <script setup lang="ts">
 import { defineProps, ref, onMounted, computed } from "vue";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
-import ProgressCircular from "../Commons/ProgressCircular.vue";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
 import ModalDetallePartida from "@/components/PartidaAmistosa/ModalDetallePartida.vue";
+import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);

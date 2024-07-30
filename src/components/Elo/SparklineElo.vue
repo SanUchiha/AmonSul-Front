@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading" class="center">
-    <ProgressCircular />
+    <LoadingGandalf />
   </div>
   <div v-else-if="value.length > 1" class="center">
     <v-card class="mx-auto text-center">
@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
 import { getEloUsuario } from "@/services/EloService";
-import ProgressCircular from "../Commons/ProgressCircular.vue";
+import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const props = defineProps<{ email: string }>();
 

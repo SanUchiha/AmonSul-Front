@@ -12,7 +12,7 @@
 import { ref, onMounted } from "vue";
 
 const phrase = ref(
-  "Un mago nunca llega tarde; ni pronto; llega exactamente cuando se lo propone"
+  "Un mago nunca llega tarde; ni pronto; llega exactamente cuando se lo propone."
 );
 const displayText = ref("");
 

@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading" class="center">
-    <ProgressCircular />
+    <LoadingGandalf />
   </div>
   <v-card v-else class="jugador-card">
     <v-card-title class="title">
@@ -64,7 +64,7 @@ import { computed, defineProps, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { FaccionDTO } from "@/interfaces/Faccion";
 import { getFacciones } from "@/services/FaccionesService";
-import ProgressCircular from "../Commons/ProgressCircular.vue";
+import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const props = defineProps<{ usuario: UsuarioDataDTO }>();
 const router = useRouter();
