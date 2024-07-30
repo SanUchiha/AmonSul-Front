@@ -3,7 +3,7 @@
     <v-row dense>
       <v-col cols="12" md="12" class="text-center">
         <div v-if="isLoading">
-          <ProgressCircular />
+          <SpinnerGandalf />
         </div>
         <div v-else>
           <!-- tabs
@@ -145,6 +145,7 @@ import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
+import SpinnerGandalf from "@/components/Commons/SpinnerGandalf.vue";
 
 const tab = ref<string>("one");
 
