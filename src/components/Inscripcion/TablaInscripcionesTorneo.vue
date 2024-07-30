@@ -186,9 +186,8 @@ const eliminarInscripcion = async (idInscripcion: number) => {
 
     if (response.request?.status === 200) {
       showSuccessModal.value = true;
-      listaTorneos.value = await getInscripcionesUser(
-        listaTorneos.value[0].idUsuario.toString()
-      );
+      const responseInscriptionesUser = await getInscripcionesUser(listaTorneos.value[0].idUsuario.toString());
+      listaTorneos.value = responseInscriptionesUser.data
     } else {
       showErrorModal.value = true;
     }

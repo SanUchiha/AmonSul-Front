@@ -1,39 +1,13 @@
-import { appsettings } from "@/settings/appsettings";
-import axios, { AxiosError } from "axios";
 import { RegistrarFaccionDTO } from "../interfaces/Faccion";
-
-const baseUrl: string = appsettings.apiUrl;
+import { http } from './index'
 
 export const getFacciones = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await axios.get(baseUrl + "Faccion", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw error as AxiosError;
-    } else {
-      throw new Error("Ocurrió un error desconocido");
-    }
-  }
+  return http.get('Faccion')
 };
 
 export const registrarFaccion = async (nombreFaccionString: string) => {
-  try {
-    const body: RegistrarFaccionDTO = {
-      nombreFaccion: nombreFaccionString,
-    };
-    const response = await axios.post(baseUrl + "Faccion/Registrar", body);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw error as AxiosError;
-    } else {
-      throw new Error("Ocurrió un error desconocido");
-    }
-  }
+  const body: RegistrarFaccionDTO = {
+    nombreFaccion: nombreFaccionString,
+  };
+  return http.post('Faccion/Registrar', body)
 };

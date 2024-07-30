@@ -266,7 +266,7 @@ const loadFacciones = async () => {
   loading.value = true;
   try {
     const response = await getFacciones();
-    listaFacciones.value = response;
+    listaFacciones.value = response.data;
     nombreFacciones.value = listaFacciones.value
       .map((f) => f.nombreFaccion)
       .sort();
@@ -295,7 +295,7 @@ const addFaccion = async () => {
       dialogDuplicado.value = true;
     else {
       const response = await registrarFaccion(nuevaFaccion.value);
-      if (!response) alert("Error del servidor");
+      if (!response.data) alert("Error del servidor");
     }
 
     dialogAddFaccion.value = false;

@@ -14,7 +14,7 @@
                 </v-col>
               </v-row>
             </div>
-            <div v-else>
+            <div v-else-if="user">
               <v-row>
                 <v-col cols="12" class="d-flex justify-space-between">
                   <v-text-field
@@ -166,8 +166,10 @@ const feedbackTitle = ref("");
 
 onMounted(async () => {
   try {
-    user.value = await getUsuario(email.value);
-    facciones.value = await getFacciones();
+    const responseUsuario = await getUsuario(email.value);
+    user.value = responseUsuario.data;
+    const faccionesResponse = await getFacciones();
+    facciones.value = faccionesResponse.data;
     const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
       (f) => f.idFaccion === user.value?.idFaccion
     );
@@ -207,8 +209,10 @@ const saveFaccion = async () => {
     feedbackMessage.value =
       "La comunidad de juego ha sido actualizada correctamente.";
 
-    user.value = await getUsuario(email.value);
-    facciones.value = await getFacciones();
+    const responseUsuario = await getUsuario(email.value);
+    user.value = responseUsuario.data;
+    const faccionesResponse = await getFacciones();
+    facciones.value = faccionesResponse.data;
     const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
       (f) => f.idFaccion === user.value?.idFaccion
     );
@@ -222,8 +226,10 @@ const saveFaccion = async () => {
     feedbackMessage.value =
       "Ha habido un problema al actualizar la comunidad de juego.";
 
-    user.value = await getUsuario(email.value);
-    facciones.value = await getFacciones();
+    const responseUsuario = await getUsuario(email.value);
+    user.value = responseUsuario.data;
+    const faccionesResponse = await getFacciones();
+    facciones.value = faccionesResponse.data;
     const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
       (f) => f.idFaccion === user.value?.idFaccion
     );

@@ -121,7 +121,8 @@ const goBack = () => {
 onMounted(async () => {
   const idPartida = route.params.idPartida as string;
   try {
-    const partidaData = await getById(idPartida);
+    const responsePartida = await getById(idPartida);
+    const partidaData = responsePartida.data;
     if (partidaData && partidaData.fechaPartida) {
       partidaData.fechaPartida = await formatFechaSpa(partidaData.fechaPartida);
     }

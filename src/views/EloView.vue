@@ -63,7 +63,8 @@ onMounted(async () => {
       return;
     }
     correo.value = email;
-    eloClasificacion.value = await getClasifiacionElo();
+    const responseClasificacionElo = await getClasifiacionElo();
+    eloClasificacion.value = responseClasificacionElo.data
     eloClasificacion.value = eloClasificacion.value.sort((a, b) => b.elo - a.elo);
 
     eloClasificacion.value = eloClasificacion.value.map((item, index) => ({
@@ -73,8 +74,10 @@ onMounted(async () => {
 
     isLoading.value = false;
 
-    facciones.value = await getFacciones();
-    usuarios.value = await getUsuarios();
+    const faccionesResponse = await getFacciones();
+    facciones.value = faccionesResponse.data;
+    const usuariosResponse = await getUsuarios();
+    usuarios.value = usuariosResponse.data
   } catch {
     console.error("Error al obtener datos del usuario:", error);
   } finally {

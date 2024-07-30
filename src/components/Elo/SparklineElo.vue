@@ -69,7 +69,7 @@ const resultadoActual = ref<number>();
 onMounted(async () => {
   try {
     const response = await getEloUsuario(props.email);
-    const elos = response.elos.map(
+    const elos = response.data.elos.map(
       (elo: { puntuacionElo: unknown }) => elo.puntuacionElo
     );
 

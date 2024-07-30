@@ -73,10 +73,11 @@ onMounted(async () => {
     items.value = [];
 
     const data = await getUsuarios();
-    items.value = data;
+    items.value = data.data;
     items.value = items.value.sort((a, b) => a.nick.localeCompare(b.nick));
 
-    var rawListaFacciones: FaccionDTO[] = await getFacciones();
+    const response = await getFacciones();
+    var rawListaFacciones: FaccionDTO[] = response.data
 
     items.value.forEach((usuario) => {
       const faccion = rawListaFacciones.find(

@@ -74,7 +74,7 @@ const modificarLista = () => {
 onMounted(async () => {
   try {
     const response = await getlista(props.idInscripcion);
-    internalLista.value = response.listaData;
+    internalLista.value = response.data.listaData;
   } catch {
     //
   }
