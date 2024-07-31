@@ -48,7 +48,7 @@
                           messageUltimaPartida
                         }}</v-card-text>
                         <v-card-text v-else
-                          >No tienes aún partida registrada</v-card-text
+                          >No tiene aún partida registrada</v-card-text
                         >
                       </v-card>
                     </v-col>
@@ -58,7 +58,7 @@
                     <v-col cols="12" md="12" class="text-center">
                       <v-card>
                         <v-card-title>Último torneo</v-card-title>
-                        <v-card-text>No has jugado aún torneos.</v-card-text>
+                        <v-card-text>No ha jugado aún torneos.</v-card-text>
                       </v-card>
                     </v-col>
                   </v-row>
@@ -82,7 +82,7 @@
 
               <v-divider class="my-3"></v-divider>
 
-              <div v-if="pendingMatches.length > 0">
+              <div v-if="pendingMatches.length > 0 && !isLoadingPending">
                 <PendingMatchCard
                   v-for="match in pendingMatches"
                   :key="match.idPartidaAmistosa"
@@ -97,7 +97,7 @@
 
               <v-divider class="my-3"></v-divider>
 
-              <div v-if="!isLoading && validMatches.length > 0">
+              <div v-if="!isLoadingValidadas && validMatches.length > 0">
                 <ValidadasMatchCard
                   v-for="match in validMatches"
                   :key="match.idPartidaAmistosa"
@@ -177,6 +177,9 @@ const usuarioData = ref<UsuarioDataDTO>({
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 
+const isLoadingPending = ref<boolean>(false);
+const isLoadingValidadas = ref<boolean>(false);
+
 const ultimaPartida = ref<ViewPartidaAmistosaDTO | null>(null);
 
 const messageUltimaPartida = computed(() => {
@@ -206,7 +209,7 @@ const cardClass = computed(() => {
 
 const cargarPartidasValidadas = async () => {
   try {
-    isLoading.value = true;
+    isLoadingValidadas.value = true;
     const responseValidadas = await getPartidasValidadas(emailUsuario.value);
 
     validMatches.value = responseValidadas.data;
@@ -216,15 +219,15 @@ const cargarPartidasValidadas = async () => {
   } catch (error) {
     console.error("Error al obtener las partidas validadas:", error);
   } finally {
-    isLoading.value = false;
+    isLoadingValidadas.value = false;
   }
 };
 
 const cargarPartidasPendientes = async () => {
   try {
-    isLoading.value = true;
+    isLoadingPending.value = true;
     const responsePendingMatches = await getPartidasPendientesValidar(
-      emailUsuario.value
+      parseInt(idUsuarioLogger.value!)
     );
     pendingMatches.value = responsePendingMatches.data;
     pendingMatches.value = pendingMatches.value.reverse();
@@ -234,7 +237,7 @@ const cargarPartidasPendientes = async () => {
       error
     );
   } finally {
-    isLoading.value = false;
+    isLoadingPending.value = false;
   }
 };
 

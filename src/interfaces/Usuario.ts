@@ -51,6 +51,12 @@ export interface Jugador {
   nick: string;
 }
 
+export interface UsuarioNickDTO {
+  idUsuario: number;
+  nick: string;
+  email: string;
+}
+
 export interface ViewUsuarioPartidaDTO {
   idUsuario: number;
   email: string;

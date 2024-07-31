@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading" class="center">
-    <LoadingGandalf />
+    <!-- <LoadingGandalf /> -->
   </div>
   <div v-else-if="value.length > 1" class="center">
     <v-card class="mx-auto text-center">

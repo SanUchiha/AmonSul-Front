@@ -1,6 +1,6 @@
 <template>
   <v-container class="login-form">
-    <div class="overlay" v-if="loading"></div>
+    <div class="overlay" v-if="isLoading"></div>
 
     <v-row justify="center">
       <v-col cols="12" md="6">
@@ -19,7 +19,7 @@
                 required
               ></v-combobox>
               <v-progress-linear
-                v-if="loadingNicks"
+                v-if="isLoadingNicks"
                 indeterminate
                 color="primary"
                 class="progress-linear-margin"
@@ -112,13 +112,13 @@
                   variant="outlined"
                   color="blue darken-1"
                   to="dashboard"
-                  :disabled="loading"
+                  :disabled="isLoading"
                   class="mr-4"
                 >
                   Volver
                 </v-btn>
               </v-row>
-              <v-row justify="center" v-if="loading" class="mt-3">
+              <v-row justify="center" v-if="isLoading" class="mt-3">
                 <v-progress-linear
                   :size="24"
                   :width="2"
@@ -133,32 +133,39 @@
       </v-col>
     </v-row>
 
-    <ResponseNuevaPartida
-      :isVisible="dialogOk"
-      @update:isVisible="handleOkClick = $event"
+    <ModalSuccess
+      :isVisible="showSuccessModal"
+      message="Partida creada con exito."
+      @update:isVisible="showSuccessModal = $event"
+    />
+
+    <ModalError
+      :isVisible="showErrorModal"
+      message="No se ha podido crear la partida."
+      @update:isVisible="showErrorModal = $event"
     />
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import { useRouter } from "vue-router";
-import { getUsuarios } from "@/services/UsuariosService";
+import { getNicks } from "@/services/UsuariosService";
 import { registrarPartida } from "@/services/PartidasAmistosasService";
-import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
+import { UsuarioNickDTO } from "@/interfaces/Usuario";
 import { CreatePartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
 import { appsettings } from "@/settings/appsettings";
-import ResponseNuevaPartida from "./ResponseNuevaPartida.vue";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import ModalError from "../Commons/ModalError.vue";
 
 const router = useRouter();
 const { getUser } = useAuth();
-const dialogOk = ref(false);
-const loading = ref(false);
-const loadingNicks = ref(false);
+const isLoading = ref(false);
+const isLoadingNicks = ref(false);
 const loadingEjercitos = ref(false);
 const loadingEscenarios = ref(false);
-const listaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
+const listaUsuarios = ref<UsuarioNickDTO[]>([]);
 const listadoNicks = ref<string[]>([]);
 const listadoEjercitos = ref<string[]>([]);
 const listaEscenarios = ref<string[]>([]);
@@ -173,49 +180,48 @@ const esTorneo = ref<boolean>(false);
 const esElo = ref<boolean>(false);
 const puntosPartida = ref<number | null>(null);
 const emailOwner = ref<string>(await getUser.value!);
-const rawListaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
+
+const showErrorModal = ref<boolean>(false);
+const showSuccessModal = ref<boolean>(false);
 
 const rules = {
   required: (value: string | null) => !!value || "Este campo es obligatorio.",
 };
 
 const loadNicks = async () => {
-  loading.value = true;
-  loadingNicks.value = true;
+  //isLoadingNick.value = true;
+  isLoadingNicks.value = true;
 
   try {
-    const responseUsuarios = await getUsuarios();
-    rawListaUsuarios.value = responseUsuarios.data
-    listaUsuarios.value = rawListaUsuarios.value;
-    listaUsuarios.value = listaUsuarios.value.filter(
-      (u) => u.email != emailOwner.value
-    );
+    const responseNicks = await getNicks();
+    listaUsuarios.value = responseNicks.data;
+
     listadoNicks.value = listaUsuarios.value.map((f) => f.nick).sort();
   } catch (error) {
     console.log("Error al obtener los nicks:", error);
   } finally {
-    loading.value = false;
-    loadingNicks.value = false;
+    isLoading.value = false;
+    isLoadingNicks.value = false;
   }
 };
 
 const loadEjercitos = async () => {
-  loading.value = true;
+  isLoading.value = true;
   loadingEjercitos.value = true;
 
   listadoEjercitos.value = await appsettings.ejercitos;
 
-  loading.value = false;
+  isLoading.value = false;
   loadingEjercitos.value = false;
 };
 
 const loadEscenarios = async () => {
-  loading.value = true;
+  isLoading.value = true;
   loadingEscenarios.value = true;
 
   listaEscenarios.value = await appsettings.escenarios;
 
-  loading.value = false;
+  isLoading.value = false;
   loadingEscenarios.value = false;
 };
 
@@ -244,43 +250,50 @@ const validateForm = () => {
 };
 
 const handlerNuevaPartida = async () => {
-  dialogOk.value = false;
-  loading.value = true;
+  isLoading.value = true;
 
-  const usuarioCreador: ViewUsuarioPartidaDTO | undefined =
-    await rawListaUsuarios.value.find((u) => u.email == emailOwner.value);
+  if (listaUsuarios.value != null) {
+    const usuarioCreador: UsuarioNickDTO | undefined = listaUsuarios.value.find(
+      (u) => u.email == emailOwner.value
+    );
 
-  const rival: ViewUsuarioPartidaDTO | undefined =
-    await listaUsuarios.value.find((u) => u.nick == nickDosSelected.value);
+    const rival: UsuarioNickDTO | undefined = listaUsuarios.value.find(
+      (u) => u.nick == nickDosSelected.value
+    );
 
-  const nuevaPartida: CreatePartidaAmistosaDTO = {
-    IdUsuario1: usuarioCreador!.idUsuario,
-    IdUsuario2: rival!.idUsuario,
-    resultadoUsuario1: puntosJugadorUno.value ?? 0,
-    resultadoUsuario2: puntosJugadorDos.value ?? 0,
-    puntosPartida: puntosPartida.value ?? 0,
-    esMatchedPlayPartida: checkEsMatchedPlay.value ?? false,
-    escenarioPartida: escenarioSelected.value,
-    esTorneo: esTorneo.value ?? false,
-    ejercitoUsuario1: ejercitoPropio.value,
-    ejercitoUsuario2: ejercitoRival.value,
-    esElo: esElo.value ?? false,
-  };
+    const nuevaPartida: CreatePartidaAmistosaDTO = {
+      IdUsuario1: usuarioCreador!.idUsuario,
+      IdUsuario2: rival!.idUsuario,
+      resultadoUsuario1: puntosJugadorUno.value ?? 0,
+      resultadoUsuario2: puntosJugadorDos.value ?? 0,
+      puntosPartida: puntosPartida.value ?? 0,
+      esMatchedPlayPartida: checkEsMatchedPlay.value ?? false,
+      escenarioPartida: escenarioSelected.value,
+      esTorneo: esTorneo.value ?? false,
+      ejercitoUsuario1: ejercitoPropio.value,
+      ejercitoUsuario2: ejercitoRival.value,
+      esElo: esElo.value ?? false,
+    };
 
-  try {
-    await registrarPartida(nuevaPartida);
-    dialogOk.value = true;
-  } catch (error: any) {
-    router.push("error");
-  } finally {
-    loading.value = false;
+    try {
+      await registrarPartida(nuevaPartida);
+      showSuccessModal.value = true;
+    } catch (error: any) {
+      showErrorModal.value = true;
+    } finally {
+      isLoading.value = false;
+    }
   }
 };
 
-const handleOkClick = () => {
-  dialogOk.value = false;
-  router.push("dashboard");
-};
+watch(
+  [showSuccessModal, showErrorModal],
+  ([newShowSuccessModal, newShowErrorModal]) => {
+    if (!newShowSuccessModal && !newShowErrorModal) {
+      router.push("dashboard");
+    }
+  }
+);
 </script>
 
 <style scoped>

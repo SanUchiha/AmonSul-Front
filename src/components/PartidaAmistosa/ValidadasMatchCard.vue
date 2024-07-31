@@ -1,31 +1,26 @@
 <template>
-  <div v-if="isLoading" class="center">
-    <LoadingGandalf />
-  </div>
-  <div v-else>
-    <v-card :class="cardColorClass" @click="goToDetallePartida()">
-      <v-card-title
-        >{{ match.nickUsuario1 }} - {{ match.nickUsuario2 }}</v-card-title
-      >
-      <v-card-text>
-        Resultado: {{ match.resultadoUsuario1 }} - {{ match.resultadoUsuario2 }}
-      </v-card-text>
-      <v-card-text>
-        <p>{{ match.puntosPartida }} puntos</p>
-        Escenario: {{ match.escenarioPartida || "No disponible" }}
-      </v-card-text>
-      {{ resultado }}
-      <v-card-text>
-        <p>Fecha: {{ fechaPartidaFormateada }}</p>
-      </v-card-text>
-    </v-card>
-    <div v-if="error" class="error">{{ error }}</div>
-    <ModalDetallePartida
-      v-if="showModalDetallePartida"
-      :partida="match"
-      @close="closeModalDetallePartida"
-    />
-  </div>
+  <v-card :class="cardColorClass" @click="goToDetallePartida()">
+    <v-card-title
+      >{{ match.nickUsuario1 }} - {{ match.nickUsuario2 }}</v-card-title
+    >
+    <v-card-text>
+      Resultado: {{ match.resultadoUsuario1 }} - {{ match.resultadoUsuario2 }}
+    </v-card-text>
+    <v-card-text>
+      <p>{{ match.puntosPartida }} puntos</p>
+      Escenario: {{ match.escenarioPartida || "No disponible" }}
+    </v-card-text>
+    {{ resultado }}
+    <v-card-text>
+      <p>Fecha: {{ fechaPartidaFormateada }}</p>
+    </v-card-text>
+  </v-card>
+  <div v-if="error" class="error">{{ error }}</div>
+  <ModalDetallePartida
+    v-if="showModalDetallePartida"
+    :partida="match"
+    @close="closeModalDetallePartida"
+  />
 </template>
 
 <script setup lang="ts">
@@ -34,7 +29,6 @@ import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
 import ModalDetallePartida from "@/components/PartidaAmistosa/ModalDetallePartida.vue";
-import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);

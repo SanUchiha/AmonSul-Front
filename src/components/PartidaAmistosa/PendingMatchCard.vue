@@ -1,8 +1,5 @@
 <template>
-  <div v-if="isLoading" class="center">
-    <LoadingGandalf />
-  </div>
-  <div v-else class="center">
+  <div class="center">
     <v-card class="center-card pa-4">
       <v-card-title class="d-flex align-center justify-center">
         {{ nickJugadorUno }} vs {{ nickJugadorDos }}
@@ -76,6 +73,18 @@
         </v-row>
       </v-card-actions>
     </v-card>
+
+    <ModalSuccess
+      :isVisible="showSuccessModal"
+      message="Partida eliminada con exito."
+      @update:isVisible="showSuccessModal = $event"
+    />
+
+    <ModalError
+      :isVisible="showErrorModal"
+      message="No se ha podido eliminar la partida. Contacta con el administrador."
+      @update:isVisible="showErrorModal = $event"
+    />
     <ModalResponsePartidaValidada
       :visible="modalVisible"
       @update:visible="modalVisible = $event"
@@ -100,7 +109,8 @@ import {
 import ModalResponsePartidaValidada from "./ModalResponsePartidaValidada.vue";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
-import LoadingGandalf from "../Commons/LoadingGandalf.vue";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import ModalError from "../Commons/ModalError.vue";
 
 const isLoading = ref(true);
 const { getUser } = useAuth();
@@ -115,6 +125,9 @@ const IsValidadaRival = ref<boolean>(false);
 const IsValidadaOwner = ref<boolean>(false);
 const emailUsuario = ref<string>(getUser.value ?? "null");
 const usuario = ref<UsuarioViewDTO>();
+
+const showSuccessModal = ref<boolean>(false);
+const showErrorModal = ref<boolean>(false);
 
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
@@ -161,9 +174,10 @@ const goToDetallePartida = () => {
 const cancelPartida = async () => {
   try {
     await cancelarPartida(props.match.idPartidaAmistosa);
+    showSuccessModal.value = true;
     emit("partidaValidada");
   } catch (err) {
-    router.push("error");
+    showErrorModal.value = true;
     error.value = "Error al cancelar la partida";
   } finally {
     isLoading.value = false;
