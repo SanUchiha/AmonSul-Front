@@ -98,7 +98,6 @@ const isFormValid = computed(() => {
 const submitForm = async () => {
   if (isFormValid.value) {
     try {
-      console.log(consulta.value);
       await sendEmailContacto(consulta.value);
       showSuccessModal.value = true;
     } catch (error) {

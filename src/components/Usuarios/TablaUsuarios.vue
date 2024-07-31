@@ -79,7 +79,6 @@ onMounted(async () => {
     items.value = [];
 
     const data = await getUsuariosFast();
-    console.log(data);
     items.value = data.data;
     items.value = items.value.sort((a, b) => a.nick.localeCompare(b.nick));
   } catch (error) {
