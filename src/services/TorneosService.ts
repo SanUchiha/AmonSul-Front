@@ -9,7 +9,7 @@ export const getTorneo = async (idTorneo: number) => {
 };
 
 export const descargarBasesTorneo = async (idTorneo: number) => {
-  return http.get(`Torneo/bases/${idTorneo}`);
+  return http.get(`Torneo/bases/${idTorneo}`, { responseType: "blob" });
 };
 
 export const getTorneosCreadosUsuario = async (idUsuario: string) => {
