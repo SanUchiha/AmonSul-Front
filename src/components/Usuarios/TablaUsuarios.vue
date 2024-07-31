@@ -45,10 +45,8 @@
 
 <script setup lang="ts">
 import { FaccionDTO } from "@/interfaces/Faccion";
-import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { getFacciones } from "@/services/FaccionesService";
-import { getUsuarios } from "@/services/UsuariosService";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, defineProps } from "vue";
 import { useRouter } from "vue-router";
 import {
   VDataTable,
@@ -59,8 +57,15 @@ import {
 } from "vuetify/components";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
+const props = defineProps({
+  usuarios: {
+    type: Array,
+    required: true,
+  },
+});
+
 const search = ref<string>("");
-const items = ref<ViewUsuarioPartidaDTO[]>([]);
+const items = ref<any[]>([]);
 const isLoading = ref<boolean>(true);
 const router = useRouter();
 
@@ -78,10 +83,7 @@ onMounted(async () => {
   try {
     isLoading.value = true;
 
-    items.value = [];
-
-    const data = await getUsuarios();
-    items.value = data.data;
+    items.value = props.usuarios;
     items.value = items.value.sort((a, b) => a.nick.localeCompare(b.nick));
 
     const response = await getFacciones();
