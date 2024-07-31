@@ -52,17 +52,16 @@
 </template>
 
 <script setup lang="ts">
-import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
-import { FaccionDTO } from "@/interfaces/Faccion";
 import { ref, defineProps, watch, onMounted } from "vue";
+import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
+import { FaccionDTO } from "@/interfaces/Faccion";
 
 const props = defineProps<{
-  items: ViewUsuarioPartidaDTO[];
+  items: UsuarioEloTablaClasificacion[];
   facciones: FaccionDTO[];
 }>();
 
 const equipos = ref<Array<any>>([]);
-
 const search = ref<string>("");
 
 const headers = [
@@ -76,23 +75,33 @@ const headers = [
 ];
 
 const groupByEquipos = () => {
+  if (!props.items || !props.items.length) return;
+
   const jugadoresPorEquipo = Object.groupBy(
     props.items,
     ({ idFaccion }) => idFaccion
   );
+
   if (!Object.keys(jugadoresPorEquipo).length) return;
+
+  equipos.value = [];
+
   for (const [key, value] of Object.entries(jugadoresPorEquipo)) {
-    const nombre = props.facciones.find(
-      (faccion) => faccion.idFaccion === value[0].idFaccion
-    )?.nombreFaccion;
-    const elo = (
-      value.reduce((a, b) => a + b.puntuacionElo, 0) / value.length
-    ).toFixed(2);
-    const ganadas = value.reduce((a, b) => a + b.partidasGanadas, 0);
-    const empatadas = value.reduce((a, b) => a + b.partidasEmpatadas, 0);
-    const perdidas = value.reduce((a, b) => a + b.partidasPerdidas, 0);
-    const partidas = ganadas + empatadas + perdidas;
-    if (nombre)
+    if (value) {
+      const nombre = props.facciones.find(
+        (faccion) => faccion.idFaccion === value[0].idFaccion
+      )?.nombreFaccion;
+
+      if (!nombre) continue;
+
+      const elo = (value.reduce((a, b) => a + b.elo, 0) / value.length).toFixed(
+        2
+      );
+      const ganadas = value.reduce((a, b) => a + b.ganadas, 0);
+      const empatadas = value.reduce((a, b) => a + b.empatadas, 0);
+      const perdidas = value.reduce((a, b) => a + b.perdidas, 0);
+      const partidas = ganadas + empatadas + perdidas;
+
       equipos.value.push({
         equipo: nombre,
         elo,
@@ -101,8 +110,10 @@ const groupByEquipos = () => {
         perdidas,
         partidas,
       });
+    }
   }
-  equipos.value = equipos.value.sort((a, b) => b.elo - a.elo);
+
+  equipos.value.sort((a, b) => parseFloat(b.elo) - parseFloat(a.elo));
   equipos.value = equipos.value.map((item, index) => ({
     ...item,
     clasificacion: index + 1,
@@ -115,8 +126,10 @@ onMounted(() => {
 
 watch(
   () => props.items,
-  () => {
-    groupByEquipos();
+  (newItems) => {
+    if (newItems && newItems.length) {
+      groupByEquipos();
+    }
   }
 );
 </script>

@@ -23,7 +23,7 @@
         <v-tabs-window-item value="two" v-if="tab === 'two'">
           <TablaClasificacionEloEquipos
             class="separated"
-            :items="usuarios"
+            :items="eloClasificacion"
             :facciones="facciones"
           />
         </v-tabs-window-item>
@@ -38,10 +38,8 @@ import TablaClasificacionElo from "@/components/Elo/TablaClasificacionElo.vue";
 import TablaClasificacionEloEquipos from "@/components/Elo/TablaClasificacionEloEquipos.vue";
 import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
 import { FaccionDTO } from "@/interfaces/Faccion";
-import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { getClasifiacionElo } from "@/services/EloService";
 import { getFacciones } from "@/services/FaccionesService";
-import { getUsuarios } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
@@ -55,7 +53,6 @@ const router = useRouter();
 const correo = ref<string>(``);
 const isLoading = ref<boolean>(true);
 const eloClasificacion = ref<UsuarioEloTablaClasificacion[]>([]);
-const usuarios = ref<ViewUsuarioPartidaDTO[]>([]);
 const facciones = ref<FaccionDTO[]>([]);
 
 onMounted(async () => {
@@ -81,8 +78,8 @@ onMounted(async () => {
 
     const faccionesResponse = await getFacciones();
     facciones.value = faccionesResponse.data;
-    const usuariosResponse = await getUsuarios();
-    usuarios.value = usuariosResponse.data;
+    //const usuariosResponse = await getUsuarios();
+    //usuarios.value = eloClasificacion.value;
   } catch {
     console.error("Error al obtener datos del usuario:", error);
   } finally {

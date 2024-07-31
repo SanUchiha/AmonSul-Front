@@ -36,7 +36,6 @@
 <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
 import { getEloUsuario } from "@/services/EloService";
-import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const props = defineProps<{ email: string }>();
 

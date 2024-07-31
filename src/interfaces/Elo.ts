@@ -17,6 +17,7 @@ export interface UsuarioEloTablaClasificacion {
   empatadas: number;
   perdidas: number;
   clasificacion: number;
+  idFaccion: number;
 }
 
 export interface EloDTO {
