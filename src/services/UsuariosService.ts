@@ -18,6 +18,10 @@ export const getUsuarios = async () => {
   return http.get(`Usuario/All`);
 };
 
+export const getUsuariosFast = async () => {
+  return http.get(`Usuario`);
+};
+
 export const getNicks = async () => {
   return http.get(`Usuario/Nicks`);
 };

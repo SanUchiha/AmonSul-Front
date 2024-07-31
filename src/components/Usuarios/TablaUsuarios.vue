@@ -34,7 +34,7 @@
         <template v-slot:item="{ item }">
           <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
             <td>{{ item.nick }}</td>
-            <td>{{ item.nombreFaccion }}</td>
+            <td>{{ item.faccion?.nombreFaccion || "N/A" }}</td>
             <td>{{ item.ciudad }}</td>
           </tr>
         </template>
@@ -44,10 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import { FaccionDTO } from "@/interfaces/Faccion";
-import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
-import { getFacciones } from "@/services/FaccionesService";
-import { getUsuarios } from "@/services/UsuariosService";
+import { UsuarioDTO } from "@/interfaces/Usuario";
+import { getUsuariosFast } from "@/services/UsuariosService";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import {
@@ -60,13 +58,13 @@ import {
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const search = ref<string>("");
-const items = ref<ViewUsuarioPartidaDTO[]>([]);
+const items = ref<UsuarioDTO[]>([]);
 const isLoading = ref<boolean>(true);
 const router = useRouter();
 
 const headers = [
   { title: "NICK", key: "nick", class: "blue lighten-5" },
-  { title: "FACCIÓN", key: "nombreFaccion" },
+  { title: "FACCIÓN", key: "faccion.nombreFaccion" },
   { title: "CIUDAD", key: "ciudad" },
 ];
 
@@ -80,20 +78,10 @@ onMounted(async () => {
 
     items.value = [];
 
-    const data = await getUsuarios();
+    const data = await getUsuariosFast();
+    console.log(data);
     items.value = data.data;
     items.value = items.value.sort((a, b) => a.nick.localeCompare(b.nick));
-
-    const response = await getFacciones();
-    var rawListaFacciones: FaccionDTO[] = response.data;
-
-    items.value.forEach((usuario) => {
-      const faccion = rawListaFacciones.find(
-        (f) => f.idFaccion === usuario.idFaccion
-      );
-      if (faccion) usuario.nombreFaccion = faccion.nombreFaccion;
-      else usuario.nombreFaccion = "N/A";
-    });
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
   } finally {

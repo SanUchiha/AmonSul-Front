@@ -73,6 +73,13 @@ export interface ViewUsuarioPartidaDTO {
   clasificacionElo: number;
 }
 
+export interface UsuarioDTO {
+  idUsuario: number;
+  nick: string;
+  ciudad?: string | null;
+  faccion: FaccionDTO;
+}
+
 export interface UsuarioDataDTO {
   idUsuario: number;
   nick: string;
