@@ -76,25 +76,20 @@
 
     <ModalSuccess
       :isVisible="showSuccessModal"
-      message="Partida eliminada con exito."
+      message="Partida validada con exito."
       @update:isVisible="showSuccessModal = $event"
     />
 
     <ModalError
       :isVisible="showErrorModal"
-      message="No se ha podido eliminar la partida. Contacta con el administrador."
+      message="No se ha podido validar la partida. Contacta con el administrador."
       @update:isVisible="showErrorModal = $event"
-    />
-    <ModalResponsePartidaValidada
-      :visible="modalVisible"
-      @update:visible="modalVisible = $event"
-      @modalAccepted="handleModalAccepted"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted, defineEmits } from "vue";
+import { defineProps, ref, onMounted, defineEmits, watch } from "vue";
 import {
   ValidarPartidaDTO,
   ViewPartidaAmistosaDTO,
@@ -106,7 +101,6 @@ import {
   cancelarPartida,
   ValidarPartida,
 } from "@/services/PartidasAmistosasService";
-import ModalResponsePartidaValidada from "./ModalResponsePartidaValidada.vue";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
@@ -119,7 +113,6 @@ const nickJugadorUno = ref<string>("");
 const nickJugadorDos = ref<string>("");
 const validarPartidaDTO = ref<ValidarPartidaDTO>();
 const router = useRouter();
-const modalVisible = ref<boolean>(false);
 const fechaFormateada = ref<string>("");
 const IsValidadaRival = ref<boolean>(false);
 const IsValidadaOwner = ref<boolean>(false);
@@ -161,7 +154,7 @@ const validarPartida = async () => {
     idPartida: props.match.idPartidaAmistosa,
   };
   await ValidarPartida(validarPartidaDTO.value);
-  modalVisible.value = true;
+  showSuccessModal.value = true;
 };
 
 const goToDetallePartida = () => {
@@ -183,10 +176,12 @@ const cancelPartida = async () => {
     isLoading.value = false;
   }
 };
-const handleModalAccepted = () => {
-  modalVisible.value = false;
-  emit("partidaValidada");
-};
+
+watch(showSuccessModal, (newValue) => {
+  if (!newValue) {
+    emit("partidaValidada");
+  }
+});
 
 const controlValidacionesPartidas = () => {
   if (

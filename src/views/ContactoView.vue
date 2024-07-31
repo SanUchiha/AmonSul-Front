@@ -43,24 +43,32 @@
                 </v-col>
               </v-row>
             </v-form>
-            <v-alert v-if="successMessage" type="success" dismissible>{{
-              successMessage
-            }}</v-alert>
-            <v-alert v-if="errorMessage" type="error" dismissible>{{
-              errorMessage
-            }}</v-alert>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
+
+    <ModalSuccess
+      :isVisible="showSuccessModal"
+      message="Consulta enviada con exito."
+      @update:isVisible="showSuccessModal = $event"
+    />
+
+    <ModalError
+      :isVisible="showErrorModal"
+      message="No se ha podido enviar la consulta. Contacta con el administrador."
+      @update:isVisible="showErrorModal = $event"
+    />
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { ContactForm } from "@/interfaces/Contacto";
 import { sendEmailContacto } from "@/services/ContactoService";
 import { useRouter } from "vue-router";
+import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
+import ModalError from "@/components/Commons/ModalError.vue";
 
 const consulta = ref<ContactForm>({
   email: "",
@@ -69,8 +77,8 @@ const consulta = ref<ContactForm>({
 
 const router = useRouter();
 
-const successMessage = ref<string | null>(null);
-const errorMessage = ref<string | null>(null);
+const showSuccessModal = ref<boolean>(false);
+const showErrorModal = ref<boolean>(false);
 
 const rules = {
   required: (value: string) => !!value || "Requerido.",
@@ -91,21 +99,19 @@ const submitForm = async () => {
   if (isFormValid.value) {
     try {
       console.log(consulta.value);
-
       await sendEmailContacto(consulta.value);
-      consulta.value;
-      successMessage.value = "Tu mensaje ha sido enviado con éxito.";
-      errorMessage.value = null;
-
-      router.push("inicio-sesion");
+      showSuccessModal.value = true;
     } catch (error) {
-      errorMessage.value = "No se ha podido enviar la consulta.";
+      showErrorModal.value = true;
     }
-  } else {
-    errorMessage.value =
-      "Por favor, completa todos los campos correctamente antes de enviar.";
   }
 };
+
+watch(showSuccessModal, (newValue) => {
+  if (!newValue) {
+    router.push("inicio-sesion");
+  }
+});
 </script>
 
 <style scoped lang="scss">
