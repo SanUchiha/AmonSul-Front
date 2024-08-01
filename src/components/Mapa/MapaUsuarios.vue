@@ -1,6 +1,6 @@
 <template>
   <v-container id="chart-container">
-    <p>{{ total }}</p>
+    <v-alert :text="total" icon="mdi-account" v-if="total"></v-alert>
     <svg id="map-1" :width="currentWidth" :height="currentHeight"></svg>
   </v-container>
 </template>
@@ -66,9 +66,9 @@ const createChart = async () => {
       if (d.users > 16) {
         return 'wrapper__purple'
       } else if (d.users > 11) {
-        return 'wrapper__darkslateblue'
-      } else if (d.users > 7) {
         return 'wrapper__darkblue'
+      } else if (d.users > 7) {
+        return 'wrapper__darkslateblue'
       } else if (d.users > 3) {
         return 'wrapper__blue'
       } else if (d.users > 0) {
