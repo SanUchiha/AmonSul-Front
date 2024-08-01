@@ -56,6 +56,10 @@ const createChart = async () => {
   const spain = await d3.json(url)
 
   spain.features = spain.features.map((item) => {
+    if (item.properties.cod_prov === "35") {
+      console.log(item)
+      total.value = `${users.value[parseInt(item.properties.cod_prov)]?.length || 0} usuarios de ${item.properties.name}`
+    }
     return {
       ...item,
       users: users.value[parseInt(item.properties.cod_prov)]?.length,
@@ -94,21 +98,22 @@ const createChart = async () => {
 onMounted(async () => {
   users.value = [...props.usersView]
   users.value = users.value.map((user) => {
-    if (!poblaciones.some(
-          (poblacion) =>
-            poblacion.label
-              .toLowerCase()
-              .replace(/\s/g, '')
-              .normalize('NFD')
-              .replace(/[\u0300-\u036f]/g, '') ===
-            user.ciudad
-              .toLowerCase()
-              .replace(/\s/g, '')
-              .normalize('NFD')
-              .replace(/[\u0300-\u036f]/g, '')
-        )) {
-    console.log(user.ciudad, '(idUsuario)', user.idUsuario)
-    }
+    // Log Usuarios no detectados
+    // if (!poblaciones.some(
+    //       (poblacion) =>
+    //         poblacion.label
+    //           .toLowerCase()
+    //           .replace(/\s/g, '')
+    //           .normalize('NFD')
+    //           .replace(/[\u0300-\u036f]/g, '') ===
+    //         user.ciudad
+    //           .toLowerCase()
+    //           .replace(/\s/g, '')
+    //           .normalize('NFD')
+    //           .replace(/[\u0300-\u036f]/g, '')
+    //     )) {
+    //   console.log(user.ciudad, '(idUsuario)', user.idUsuario)
+    // }
     return {
       id: user.idUsuario,
       comunidad: parseInt(
@@ -155,33 +160,33 @@ onMounted(async () => {
 }
 .wrapper {
   &__purple {
-    fill: purple;
-    background: purple;
+    fill: #4a235a;
+    background: #4a235a;
   }
 
   &__darkslateblue {
-    fill: darkslateblue;
-    background: darkslateblue;
+    fill: #1b4f72;
+    background: #1b4f72;
   }
 
   &__darkblue {
-    fill: darkblue;
-    background: darkblue;
+    fill: #2e86c1;
+    background: #2e86c1;
   }
 
   &__blue {
-    fill: blue;
-    background: blue;
+    fill: #5dade2;
+    background: #5dade2;
   }
 
   &__lightblue {
-    fill: lightblue;
-    background: darkblue;
+    fill: #aed6f1;
+    background: #aed6f1;
   }
 
   &__white {
-    fill: lightcyan;
-    background: lightcyan;
+    fill: #ebf5fb;
+    background: #ebf5fb;
   }
 }
 </style>
