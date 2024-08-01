@@ -1087,7 +1087,12 @@ const poblaciones = [
   {
     "parent_code": "03",
     "code": "3",
-    "label": "Jávea/Xàbia"
+    "label": "Xàbia"
+  },
+  {
+    "parent_code": "03",
+    "code": "3",
+    "label": "Jávea"
   },
   {
     "parent_code": "03",
@@ -15857,7 +15862,12 @@ const poblaciones = [
   {
     "parent_code": "20",
     "code": "7",
-    "label": "Donostia/San Sebastián"
+    "label": "Donostia"
+  },
+  {
+    "parent_code": "20",
+    "code": "7",
+    "label": "San Sebastián"
   },
   {
     "parent_code": "20",
@@ -17007,7 +17017,7 @@ const poblaciones = [
   {
     "parent_code": "22",
     "code": "3",
-    "label": "Fueva, La"
+    "label": "La Fueva"
   },
   {
     "parent_code": "22",
@@ -17017,7 +17027,7 @@ const poblaciones = [
   {
     "parent_code": "22",
     "code": "1",
-    "label": "Grado, El"
+    "label": "El Grado"
   },
   {
     "parent_code": "22",
@@ -17217,7 +17227,7 @@ const poblaciones = [
   {
     "parent_code": "22",
     "code": "0",
-    "label": "Peñas de Riglos, Las"
+    "label": "Las Peñas de Riglos"
   },
   {
     "parent_code": "22",
@@ -17267,7 +17277,7 @@ const poblaciones = [
   {
     "parent_code": "22",
     "code": "5",
-    "label": "Puebla de Castro, La"
+    "label": "La Puebla de Castro"
   },
   {
     "parent_code": "22",
@@ -17287,7 +17297,7 @@ const poblaciones = [
   {
     "parent_code": "22",
     "code": "8",
-    "label": "Pueyo de Araguás, El"
+    "label": "El Pueyo de Araguás"
   },
   {
     "parent_code": "22",
@@ -17422,7 +17432,7 @@ const poblaciones = [
   {
     "parent_code": "22",
     "code": "2",
-    "label": "Sotonera, La"
+    "label": "La Sotonera"
   },
   {
     "parent_code": "22",
@@ -17672,7 +17682,7 @@ const poblaciones = [
   {
     "parent_code": "23",
     "code": "3",
-    "label": "Carolina, La"
+    "label": "La Carolina"
   },
   {
     "parent_code": "23",
@@ -18062,7 +18072,7 @@ const poblaciones = [
   {
     "parent_code": "24",
     "code": "5",
-    "label": "Antigua, La"
+    "label": "La Antigua"
   },
   {
     "parent_code": "24",
@@ -23077,7 +23087,7 @@ const poblaciones = [
   {
     "parent_code": "30",
     "code": "3",
-    "label": "Unión, La"
+    "label": "La Unión"
   },
   {
     "parent_code": "30",

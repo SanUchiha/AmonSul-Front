@@ -94,6 +94,21 @@ const createChart = async () => {
 onMounted(async () => {
   users.value = [...props.usersView]
   users.value = users.value.map((user) => {
+    if (!poblaciones.some(
+          (poblacion) =>
+            poblacion.label
+              .toLowerCase()
+              .replace(/\s/g, '')
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '') ===
+            user.ciudad
+              .toLowerCase()
+              .replace(/\s/g, '')
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+        )) {
+    console.log(user.ciudad, '(idUsuario)', user.idUsuario)
+    }
     return {
       id: user.idUsuario,
       comunidad: parseInt(
