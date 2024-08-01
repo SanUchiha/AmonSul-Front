@@ -1,5 +1,8 @@
 <template>
   <v-container id="chart-container">
+    <div v-if="isLoading">
+      <LoadingGandalf />
+    </div>
     <v-alert :text="total" icon="mdi-account" v-if="total"></v-alert>
     <svg id="map-1" :width="currentWidth" :height="currentHeight"></svg>
   </v-container>
@@ -9,6 +12,7 @@
 import { onMounted, ref, defineProps } from 'vue'
 import * as d3 from 'd3'
 import poblaciones from '@/settings/poblaciones'
+import LoadingGandalf from "../Commons/LoadingGandalf.vue"
 
 
 const props = defineProps({
@@ -22,6 +26,7 @@ const total = ref('')
 const users = ref([])
 const currentWidth = ref('300')
 const currentHeight = ref('300')
+const isLoading = ref(true)
 
 
 const createChart = async () => {
@@ -83,6 +88,7 @@ const createChart = async () => {
 
   // Para cada grupo añadimos el path correspondiente
   group.append('path').attr('d', path).attr('class', 'province')
+  isLoading.value = false
 }
 
 onMounted(async () => {
