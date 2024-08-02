@@ -85,13 +85,13 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted, defineEmits } from "vue";
+import { defineProps, ref, onMounted, defineEmits, computed, ComputedRef } from "vue";
 import {
   ValidarPartidaDTO,
   ViewPartidaAmistosaDTO,
 } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
-import { getNickById, getUsuario } from "@/services/UsuariosService";
+import { getNickById } from "@/services/UsuariosService";
 import { useRouter } from "vue-router";
 import {
   cancelarPartida,
@@ -101,7 +101,9 @@ import ModalResponsePartidaValidada from "./ModalResponsePartidaValidada.vue";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
+import { useUsuariosStore } from '@/store/usuarios';
 
+const usuariosStore = useUsuariosStore();
 const isLoading = ref(true);
 const { getUser } = useAuth();
 const error = ref<string | null>(null);
@@ -114,7 +116,8 @@ const fechaFormateada = ref<string>("");
 const IsValidadaRival = ref<boolean>(false);
 const IsValidadaOwner = ref<boolean>(false);
 const emailUsuario = ref<string>(getUser.value ?? "null");
-const usuario = ref<UsuarioViewDTO>();
+const usuario: ComputedRef<UsuarioViewDTO> = computed(() => usuariosStore.usuario)
+
 
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
@@ -125,9 +128,9 @@ const emit = defineEmits(["partidaValidada"]);
 onMounted(async () => {
   try {
     isLoading.value = true;
-
-    const responseUsuario = await getUsuario(emailUsuario.value);
-    usuario.value = responseUsuario.data;
+    if (!usuario.value.idUsuario) {
+      await usuariosStore.requestUsuario(emailUsuario.value);
+    }
     const responseJugadorUno = await getNickById(props.match.idUsuario1);
     nickJugadorUno.value = responseJugadorUno.data;
     const responseJugadorDos = await getNickById(props.match.idUsuario2);

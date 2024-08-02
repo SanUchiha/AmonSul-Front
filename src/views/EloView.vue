@@ -41,11 +41,13 @@ import { FaccionDTO } from "@/interfaces/Faccion";
 import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { getClasifiacionElo } from "@/services/EloService";
 import { getFacciones } from "@/services/FaccionesService";
-import { getUsuarios } from "@/services/UsuariosService";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, ComputedRef } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import { useUsuariosStore } from '@/store/usuarios';
+
+const usuariosStore = useUsuariosStore();
 
 const tab = ref<string>("one");
 
@@ -55,8 +57,9 @@ const router = useRouter();
 const correo = ref<string>(``);
 const isLoading = ref<boolean>(true);
 const eloClasificacion = ref<UsuarioEloTablaClasificacion[]>([]);
-const usuarios = ref<ViewUsuarioPartidaDTO[]>([]);
 const facciones = ref<FaccionDTO[]>([]);
+const usuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(() => usuariosStore.usuarios)
+
 
 onMounted(async () => {
   isLoading.value = true;
@@ -81,8 +84,9 @@ onMounted(async () => {
 
     const faccionesResponse = await getFacciones();
     facciones.value = faccionesResponse.data;
-    const usuariosResponse = await getUsuarios();
-    usuarios.value = usuariosResponse.data;
+    if (!usuarios.value.length) {
+      await usuariosStore.requestUsuarios()
+    }
   } catch {
     console.error("Error al obtener datos del usuario:", error);
   } finally {

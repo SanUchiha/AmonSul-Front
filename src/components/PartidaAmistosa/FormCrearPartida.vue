@@ -141,15 +141,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive,computed, ComputedRef } from "vue";
 import { useRouter } from "vue-router";
-import { getUsuarios } from "@/services/UsuariosService";
 import { registrarPartida } from "@/services/PartidasAmistosasService";
 import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { CreatePartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
 import { appsettings } from "@/settings/appsettings";
 import ResponseNuevaPartida from "./ResponseNuevaPartida.vue";
+import { useUsuariosStore } from '@/store/usuarios';
+
+const usuariosStore = useUsuariosStore();
 
 const router = useRouter();
 const { getUser } = useAuth();
@@ -173,7 +175,7 @@ const esTorneo = ref<boolean>(false);
 const esElo = ref<boolean>(false);
 const puntosPartida = ref<number | null>(null);
 const emailOwner = ref<string>(await getUser.value!);
-const rawListaUsuarios = ref<ViewUsuarioPartidaDTO[]>([]);
+const rawListaUsuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(() => usuariosStore.usuarios)
 
 const rules = {
   required: (value: string | null) => !!value || "Este campo es obligatorio.",
@@ -184,9 +186,10 @@ const loadNicks = async () => {
   loadingNicks.value = true;
 
   try {
-    const responseUsuarios = await getUsuarios();
-    rawListaUsuarios.value = responseUsuarios.data
-    listaUsuarios.value = rawListaUsuarios.value;
+    if (!rawListaUsuarios.value.length) {
+      await usuariosStore.requestUsuarios()
+    }
+    listaUsuarios.value = [...rawListaUsuarios.value];
     listaUsuarios.value = listaUsuarios.value.filter(
       (u) => u.email != emailOwner.value
     );

@@ -129,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, ComputedRef } from "vue";
 import {
   getPartidasPendientesValidar,
   getPartidasValidadas,
@@ -138,15 +138,16 @@ import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { useAuth } from "@/composables/useAuth";
-import { getUsuarioData } from "@/services/UsuariosService";
 import { useRouter, useRoute } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import { useUsuariosStore } from '@/store/usuarios';
 
 const tab = ref<string>("one");
+const usuariosStore = useUsuariosStore();
 
 const isLoading = ref(true);
 const { getUser, getidUsuario } = useAuth();
@@ -154,25 +155,8 @@ const router = useRouter();
 const route = useRoute();
 const emailUsuario = ref<string>(getUser.value ?? "null");
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
-const usuarioData = ref<UsuarioDataDTO>({
-  idUsuario: 0,
-  nick: "",
-  faccion: {
-    idFaccion: 0,
-    nombreFaccion: "",
-  },
-  inscripcionesTorneo: [],
-  clasificacionElo: 0,
-  puntuacionElo: 0,
-  numeroPartidasJugadas: 0,
-  partidasGanadas: 0,
-  partidasEmpatadas: 0,
-  partidasPerdidas: 0,
-  email: "",
-  partidasValidadas: [],
-  partidasPendientes: [],
-  elos: [],
-});
+const usuarioData: ComputedRef<UsuarioDataDTO> = computed(() => usuariosStore.usuarioData)
+
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
@@ -242,10 +226,10 @@ const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
     isLoading.value = true;
     try {
-      const usuarioResponse = await getUsuarioData(
-        parseInt(idUsuarioLogger.value)
-      );
-      usuarioData.value = usuarioResponse.data;
+      if (!usuarioData.value.idUsuario) {
+        await usuariosStore.requestUsuarioData(parseInt(idUsuarioLogger.value))
+      }
+
       validMatches.value = usuarioData.value?.partidasValidadas ?? [];
 
       ultimaPartida.value = validMatches.value[validMatches.value.length - 1];
