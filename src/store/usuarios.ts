@@ -111,7 +111,7 @@ export const useUsuariosStore = defineStore('usuarios', {
       return new Promise((resolve, reject) => {
         UsuariosService.getNickById(idUsuario)
           .then((response: any) => {
-            resolve(response)
+            resolve(response.data)
           })
           .catch((err: any) => {
             reject(err)

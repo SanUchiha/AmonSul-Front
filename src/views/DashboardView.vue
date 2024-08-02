@@ -226,9 +226,7 @@ const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
     isLoading.value = true;
     try {
-      if (!usuarioData.value.idUsuario) {
-        await usuariosStore.requestUsuarioData(parseInt(idUsuarioLogger.value))
-      }
+      await usuariosStore.requestUsuarioData(parseInt(idUsuarioLogger.value))
 
       validMatches.value = usuarioData.value?.partidasValidadas ?? [];
 

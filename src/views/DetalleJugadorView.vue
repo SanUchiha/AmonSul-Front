@@ -136,9 +136,7 @@ const initializeComponent = async () => {
   isLoading.value = true;
   try {
     const idRecibido = String(route.params.idUsuario);
-    if (!usuarioData.value.idUsuario) {
-      await usuariosStore.requestUsuarioData(parseInt(idRecibido))
-    }
+    await usuariosStore.requestUsuarioData(parseInt(idRecibido))
 
     // Verifica la estructura de usuarioResponse
     if (usuarioData.value.idUsuario) {

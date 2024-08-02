@@ -91,7 +91,6 @@ import {
   ViewPartidaAmistosaDTO,
 } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
-import { getNickById } from "@/services/UsuariosService";
 import { useRouter } from "vue-router";
 import {
   cancelarPartida,
@@ -131,10 +130,8 @@ onMounted(async () => {
     if (!usuario.value.idUsuario) {
       await usuariosStore.requestUsuario(emailUsuario.value);
     }
-    const responseJugadorUno = await getNickById(props.match.idUsuario1);
-    nickJugadorUno.value = responseJugadorUno.data;
-    const responseJugadorDos = await getNickById(props.match.idUsuario2);
-    nickJugadorDos.value = responseJugadorDos.data;
+    nickJugadorUno.value = await usuariosStore.requestNickById(props.match.idUsuario1);
+    nickJugadorDos.value = await usuariosStore.requestNickById(props.match.idUsuario2);
     fechaFormateada.value = await formatFechaSpa(props.match.fechaPartida);
     await controlValidacionesPartidas();
   } catch (err) {
