@@ -148,18 +148,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from "vue";
+import { ref, reactive, watch, computed, ComputedRef } from "vue";
 import { useRouter } from "vue-router";
-import { getNicks } from "@/services/UsuariosService";
 import { registrarPartida } from "@/services/PartidasAmistosasService";
-import { UsuarioNickDTO } from "@/interfaces/Usuario";
+import { UsuarioNickDTO, ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 import { CreatePartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
 import { appsettings } from "@/settings/appsettings";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
-import ResponseNuevaPartida from "./ResponseNuevaPartida.vue";
-import { useUsuariosStore } from '@/store/usuarios';
+import { useUsuariosStore } from "@/store/usuarios";
 
 const usuariosStore = useUsuariosStore();
 
@@ -187,7 +185,9 @@ const emailOwner = ref<string>(await getUser.value!);
 
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
-const rawListaUsuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(() => usuariosStore.usuarios)
+const rawListaUsuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(
+  () => usuariosStore.usuarios
+);
 
 const rules = {
   required: (value: string | null) => !!value || "Este campo es obligatorio.",
@@ -199,7 +199,7 @@ const loadNicks = async () => {
 
   try {
     if (!rawListaUsuarios.value.length) {
-      await usuariosStore.requestUsuarios()
+      await usuariosStore.requestUsuarios();
     }
     listaUsuarios.value = [...rawListaUsuarios.value];
     listaUsuarios.value = listaUsuarios.value.filter(

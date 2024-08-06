@@ -22,23 +22,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, ComputedRef } from 'vue'
-import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
-import TablaUsuarios from '@/components/Usuarios/TablaUsuarios.vue'
-import MapaUsuarios from '@/components/Mapa/MapaUsuarios.vue'
-import { getUsuariosFast } from "@/services/UsuariosService";
-import { useUsuariosStore } from '@/store/usuarios';
+import { onMounted, ref, computed, ComputedRef } from "vue";
+import { UsuarioDTO } from "@/interfaces/Usuario";
+import TablaUsuarios from "@/components/Usuarios/TablaUsuarios.vue";
+import MapaUsuarios from "@/components/Mapa/MapaUsuarios.vue";
+import { useUsuariosStore } from "@/store/usuarios";
 
 const usuariosStore = useUsuariosStore();
 
-const users: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(() => usuariosStore.usuarios)
+const users: ComputedRef<UsuarioDTO[]> = computed(() => usuariosStore.usuarios);
 const tab = ref("one");
 
 onMounted(async () => {
-  const data = await getUsuariosFast()
-  users.value = data.data
+  // const data = await getUsuariosFast();
+  // users.value = data.data;
   if (!users.value.length) {
-    await usuariosStore.requestUsuarios()
+    await usuariosStore.requestUsuarios();
   }
-})
+});
 </script>

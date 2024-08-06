@@ -198,7 +198,7 @@ import ResponseNuevoUsuario from "../RegistroUsuarios/ResponseNuevoUsuario.vue";
 import { getFacciones, registrarFaccion } from "@/services/FaccionesService";
 import { Faccion } from "@/interfaces/Faccion";
 import ModalMessageError from "../Commons/ModalMessageError.vue";
-import { useUsuariosStore } from '@/store/usuarios';
+import { useUsuariosStore } from "@/store/usuarios";
 
 const usuariosStore = useUsuariosStore();
 
@@ -270,7 +270,7 @@ const loadFacciones = async () => {
     const response = await getFacciones();
     listaFacciones.value = response.data;
     nombreFacciones.value = listaFacciones.value
-      .map((f) => f.nombreFaccion)
+      .map((f: { nombreFaccion: any }) => f.nombreFaccion)
       .sort();
   } catch (error) {
     console.log("Error al obtener las facciones:", error);

@@ -12,7 +12,9 @@
               : usuario.nick.substring(0, 23) + "..."
           }}
         </h3>
-        <p class="subtitle">{{ usuario.faccion.nombreFaccion }}</p>
+        <p class="subtitle">
+          {{ usuario.faccion?.nombreFaccion || "Sin comunidad" }}
+        </p>
       </div>
     </v-card-title>
     <v-card-text>

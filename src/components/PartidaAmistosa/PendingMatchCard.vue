@@ -89,8 +89,15 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted, defineEmits, watch } from "vue";
-import { defineProps, ref, onMounted, defineEmits, computed, ComputedRef } from "vue";
+import {
+  defineProps,
+  ref,
+  onMounted,
+  defineEmits,
+  watch,
+  computed,
+  ComputedRef,
+} from "vue";
 import {
   ValidarPartidaDTO,
   ViewPartidaAmistosaDTO,
@@ -105,8 +112,7 @@ import { formatFechaSpa } from "@/utils/Fecha";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
-import LoadingGandalf from "../Commons/LoadingGandalf.vue";
-import { useUsuariosStore } from '@/store/usuarios';
+import { useUsuariosStore } from "@/store/usuarios";
 
 const usuariosStore = useUsuariosStore();
 const isLoading = ref(true);
@@ -120,8 +126,9 @@ const fechaFormateada = ref<string>("");
 const IsValidadaRival = ref<boolean>(false);
 const IsValidadaOwner = ref<boolean>(false);
 const emailUsuario = ref<string>(getUser.value ?? "null");
-const usuario: ComputedRef<UsuarioViewDTO> = computed(() => usuariosStore.usuario)
-
+const usuario: ComputedRef<UsuarioViewDTO> = computed(
+  () => usuariosStore.usuario
+);
 
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
@@ -138,8 +145,12 @@ onMounted(async () => {
     if (!usuario.value.idUsuario) {
       await usuariosStore.requestUsuario(emailUsuario.value);
     }
-    nickJugadorUno.value = await usuariosStore.requestNickById(props.match.idUsuario1);
-    nickJugadorDos.value = await usuariosStore.requestNickById(props.match.idUsuario2);
+    nickJugadorUno.value = await usuariosStore.requestNickById(
+      props.match.idUsuario1
+    );
+    nickJugadorDos.value = await usuariosStore.requestNickById(
+      props.match.idUsuario2
+    );
     fechaFormateada.value = await formatFechaSpa(props.match.fechaPartida);
     await controlValidacionesPartidas();
   } catch (err) {
