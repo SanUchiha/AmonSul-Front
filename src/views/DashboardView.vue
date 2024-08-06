@@ -239,7 +239,7 @@ const initializeComponent = async () => {
       }
     } catch (error) {
       console.error(error);
-      router.push("error");
+      router.push({ name: "error" });
     } finally {
       isLoading.value = false;
     }

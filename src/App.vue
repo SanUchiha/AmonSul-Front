@@ -97,7 +97,7 @@ const { isAuthenticated } = useAuth();
 
 const handleLogout = async () => {
   await logout();
-  router.push("inicio-sesion");
+  router.push({ name: "inicio-sesion" });
 };
 </script>
 

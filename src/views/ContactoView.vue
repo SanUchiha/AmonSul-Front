@@ -97,7 +97,7 @@ const submitForm = async () => {
       successMessage.value = "Tu mensaje ha sido enviado con éxito.";
       errorMessage.value = null;
 
-      router.push("inicio-sesion");
+      router.push({ name: "inicio-sesion" });
     } catch (error) {
       errorMessage.value = "No se ha podido enviar la consulta.";
     }

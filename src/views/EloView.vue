@@ -67,7 +67,7 @@ onMounted(async () => {
     const email: any = await getUser.value;
     if (!email) {
       error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
-      router.push("error");
+      router.push({ name: "error" });
       return;
     }
     correo.value = email;

@@ -372,12 +372,12 @@ const handlerNewUser = async () => {
           dialogEmail.value = true;
         else dialogNick.value = true;
       } else if (axiosError.request) {
-        router.push("error");
+        router.push({ name: "error" });
       } else {
-        router.push("error");
+        router.push({ name: "error" });
       }
     } else {
-      router.push("error");
+      router.push({ name: "error" });
     }
   } finally {
     loading.value = false;

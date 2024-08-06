@@ -135,7 +135,7 @@ onMounted(async () => {
     fechaFormateada.value = await formatFechaSpa(props.match.fechaPartida);
     await controlValidacionesPartidas();
   } catch (err) {
-    router.push("error");
+    router.push({ name: "error" });
     error.value = "Error al cargar los datos";
   } finally {
     isLoading.value = false;
@@ -163,7 +163,7 @@ const cancelPartida = async () => {
     await cancelarPartida(props.match.idPartidaAmistosa);
     emit("partidaValidada");
   } catch (err) {
-    router.push("error");
+    router.push({ name: "error" });
     error.value = "Error al cancelar la partida";
   } finally {
     isLoading.value = false;

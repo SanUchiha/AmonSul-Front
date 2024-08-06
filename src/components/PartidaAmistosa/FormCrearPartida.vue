@@ -274,7 +274,7 @@ const handlerNuevaPartida = async () => {
     await registrarPartida(nuevaPartida);
     dialogOk.value = true;
   } catch (error: any) {
-    router.push("error");
+    router.push({ name: "error" });
   } finally {
     loading.value = false;
   }
@@ -282,7 +282,7 @@ const handlerNuevaPartida = async () => {
 
 const handleOkClick = () => {
   dialogOk.value = false;
-  router.push("dashboard");
+  router.push({ name: "dashboard" });
 };
 </script>
 
