@@ -100,6 +100,11 @@ const submitForm = async () => {
     try {
       await sendEmailContacto(consulta.value);
       showSuccessModal.value = true;
+      consulta.value;
+      successMessage.value = "Tu mensaje ha sido enviado con éxito.";
+      errorMessage.value = null;
+
+      router.push({ name: "inicio-sesion" });
     } catch (error) {
       showErrorModal.value = true;
     }

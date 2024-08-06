@@ -158,6 +158,10 @@ import { useAuth } from "@/composables/useAuth";
 import { appsettings } from "@/settings/appsettings";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
+import ResponseNuevaPartida from "./ResponseNuevaPartida.vue";
+import { useUsuariosStore } from '@/store/usuarios';
+
+const usuariosStore = useUsuariosStore();
 
 const router = useRouter();
 const { getUser } = useAuth();
@@ -183,6 +187,7 @@ const emailOwner = ref<string>(await getUser.value!);
 
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
+const rawListaUsuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(() => usuariosStore.usuarios)
 
 const rules = {
   required: (value: string | null) => !!value || "Este campo es obligatorio.",
@@ -193,9 +198,13 @@ const loadNicks = async () => {
   isLoadingNicks.value = true;
 
   try {
-    const responseNicks = await getNicks();
-    listaUsuarios.value = responseNicks.data;
-
+    if (!rawListaUsuarios.value.length) {
+      await usuariosStore.requestUsuarios()
+    }
+    listaUsuarios.value = [...rawListaUsuarios.value];
+    listaUsuarios.value = listaUsuarios.value.filter(
+      (u) => u.email != emailOwner.value
+    );
     listadoNicks.value = listaUsuarios.value.map((f) => f.nick).sort();
   } catch (error) {
     console.log("Error al obtener los nicks:", error);

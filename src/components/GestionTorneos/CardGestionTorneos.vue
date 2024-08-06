@@ -33,12 +33,6 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuth } from "@/composables/useAuth";
-
-const router = useRouter();
-const { getidUsuario } = useAuth();
-const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 
 const modalCreacionTorneos = ref<boolean>(false);
 

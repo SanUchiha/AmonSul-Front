@@ -143,15 +143,16 @@
 </template>
 
 <script setup lang="ts">
-import { UsuarioViewDTO } from "@/interfaces/Usuario";
-import { editarFaccion, getUsuario } from "@/services/UsuariosService";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, ComputedRef } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { getFacciones } from "@/services/FaccionesService";
 import { EditarFaccionDTO, FaccionDTO } from "@/interfaces/Faccion";
+import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import { useUsuariosStore } from '@/store/usuarios';
 
-const user = ref<UsuarioViewDTO>();
+const usuariosStore = useUsuariosStore();
+
 const isLoading = ref(true);
 const { getUser } = useAuth();
 const email = ref<string>(await getUser.value!);
@@ -164,21 +165,29 @@ const feedbackDialog = ref(false);
 const feedbackMessage = ref("");
 const feedbackTitle = ref("");
 
+const user: ComputedRef<UsuarioViewDTO> = computed(() => usuariosStore.usuario)
+
+const actualizarFaccion = async () => {
+  const faccionesResponse = await getFacciones();
+  facciones.value = faccionesResponse.data;
+  const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
+    (f) => f.idFaccion === user.value?.idFaccion
+  );
+  if (faccionEncontrada) {
+    usuariosStore.setUsuarioFaccion(faccionEncontrada)
+    selectedFaccionName.value = faccionEncontrada.nombreFaccion;
+  }
+}
+
 onMounted(async () => {
   try {
     isLoading.value = true;
-
-    const responseUsuario = await getUsuario(email.value);
-    user.value = responseUsuario.data;
-    const faccionesResponse = await getFacciones();
-    facciones.value = faccionesResponse.data;
-    const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
-      (f) => f.idFaccion === user.value?.idFaccion
-    );
-    if (faccionEncontrada) {
-      user.value!.faccion = faccionEncontrada;
-      selectedFaccionName.value = faccionEncontrada.nombreFaccion;
+    if (!user.value.idUsuario) {
+      await usuariosStore.requestUsuario(email.value);
     }
+
+    actualizarFaccion()
+
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   } finally {
@@ -202,43 +211,26 @@ const saveFaccion = async () => {
 
   const body: EditarFaccionDTO = {
     idFaccion: faccionSelected.idFaccion,
-    idUsuario: user.value!.idUsuario,
+    idUsuario: user.value.idUsuario,
   };
 
   try {
-    await editarFaccion(body);
+    await usuariosStore.setFaccion(body);
     feedbackTitle.value = "Éxito";
     feedbackMessage.value =
       "La comunidad de juego ha sido actualizada correctamente.";
 
-    const responseUsuario = await getUsuario(email.value);
-    user.value = responseUsuario.data;
-    const faccionesResponse = await getFacciones();
-    facciones.value = faccionesResponse.data;
-    const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
-      (f) => f.idFaccion === user.value?.idFaccion
-    );
-    if (faccionEncontrada) {
-      user.value!.faccion = faccionEncontrada;
-      selectedFaccionName.value = faccionEncontrada.nombreFaccion;
-    }
+    await usuariosStore.requestUsuario(email.value);
+    actualizarFaccion()
   } catch (error) {
     console.error("Error al editar la facción:", error);
     feedbackTitle.value = "Error";
     feedbackMessage.value =
       "Ha habido un problema al actualizar la comunidad de juego.";
 
-    const responseUsuario = await getUsuario(email.value);
-    user.value = responseUsuario.data;
-    const faccionesResponse = await getFacciones();
-    facciones.value = faccionesResponse.data;
-    const faccionEncontrada: FaccionDTO | undefined = facciones.value.find(
-      (f) => f.idFaccion === user.value?.idFaccion
-    );
-    if (faccionEncontrada) {
-      user.value!.faccion = faccionEncontrada;
-      selectedFaccionName.value = faccionEncontrada.nombreFaccion;
-    }
+
+    await usuariosStore.requestUsuario(email.value);
+    actualizarFaccion()
   }
 
   closeEditFaccionDialog();

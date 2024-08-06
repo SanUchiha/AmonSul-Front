@@ -43,7 +43,7 @@ watch(
 const handlerOk = () => {
   emits("update:isVisible", false);
   internalVisible.value = false;
-  router.push("dashboard");
+  router.push({ name: "dashboard" });
 };
 
 const handleEscapeKey = (event: KeyboardEvent) => {

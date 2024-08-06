@@ -110,7 +110,7 @@ const handleLogin = async () => {
   try {
     const response: string | AxiosResponse = await login(credentials);
     if (typeof response === "string") {
-      router.push("error");
+      router.push({ name: "error" });
     } else {
       if (!response.data.isAccess) {
         dialog.value = true;

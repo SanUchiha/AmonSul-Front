@@ -8,7 +8,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { TorneoPropioDTO } from "@/interfaces/Torneo";
 
 const route = useRoute();
 const idTorneo = ref<number>();
