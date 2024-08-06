@@ -79,7 +79,7 @@
           <v-btn
             color="orange"
             variant="outlined"
-            class="login-form__button"
+            class="login-form__button mt-4"
             @click="goBack"
           >
             Volver
