@@ -89,13 +89,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted, defineEmits, watch } from "vue";
+import { defineProps, ref, onMounted, defineEmits, computed, ComputedRef } from "vue";
 import {
   ValidarPartidaDTO,
   ViewPartidaAmistosaDTO,
 } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
-import { getNickById, getUsuario } from "@/services/UsuariosService";
 import { useRouter } from "vue-router";
 import {
   cancelarPartida,
@@ -105,7 +104,10 @@ import { formatFechaSpa } from "@/utils/Fecha";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
+import LoadingGandalf from "../Commons/LoadingGandalf.vue";
+import { useUsuariosStore } from '@/store/usuarios';
 
+const usuariosStore = useUsuariosStore();
 const isLoading = ref(true);
 const { getUser } = useAuth();
 const error = ref<string | null>(null);
@@ -117,7 +119,8 @@ const fechaFormateada = ref<string>("");
 const IsValidadaRival = ref<boolean>(false);
 const IsValidadaOwner = ref<boolean>(false);
 const emailUsuario = ref<string>(getUser.value ?? "null");
-const usuario = ref<UsuarioViewDTO>();
+const usuario: ComputedRef<UsuarioViewDTO> = computed(() => usuariosStore.usuario)
+
 
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
@@ -131,17 +134,15 @@ const emit = defineEmits(["partidaValidada"]);
 onMounted(async () => {
   try {
     isLoading.value = true;
-
-    const responseUsuario = await getUsuario(emailUsuario.value);
-    usuario.value = responseUsuario.data;
-    const responseJugadorUno = await getNickById(props.match.idUsuario1);
-    nickJugadorUno.value = responseJugadorUno.data;
-    const responseJugadorDos = await getNickById(props.match.idUsuario2);
-    nickJugadorDos.value = responseJugadorDos.data;
+    if (!usuario.value.idUsuario) {
+      await usuariosStore.requestUsuario(emailUsuario.value);
+    }
+    nickJugadorUno.value = await usuariosStore.requestNickById(props.match.idUsuario1);
+    nickJugadorDos.value = await usuariosStore.requestNickById(props.match.idUsuario2);
     fechaFormateada.value = await formatFechaSpa(props.match.fechaPartida);
     await controlValidacionesPartidas();
   } catch (err) {
-    router.push("error");
+    router.push({ name: "error" });
     error.value = "Error al cargar los datos";
   } finally {
     isLoading.value = false;
@@ -171,6 +172,7 @@ const cancelPartida = async () => {
     emit("partidaValidada");
   } catch (err) {
     showErrorModal.value = true;
+    router.push({ name: "error" });
     error.value = "Error al cancelar la partida";
   } finally {
     isLoading.value = false;

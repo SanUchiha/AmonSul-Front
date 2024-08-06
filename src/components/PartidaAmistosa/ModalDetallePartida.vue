@@ -98,7 +98,7 @@
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { defineProps, ref, watch, defineEmits } from "vue";
 
-const props = defineProps<{
+defineProps<{
   partida: ViewPartidaAmistosaDTO;
 }>();
 

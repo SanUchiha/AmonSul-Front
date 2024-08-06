@@ -79,7 +79,7 @@
           <v-btn
             color="orange"
             variant="outlined"
-            class="login-form__button"
+            class="login-form__button mt-4"
             @click="goBack"
           >
             Volver
@@ -91,42 +91,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, ComputedRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import { getPartidasValidadas } from "@/services/PartidasAmistosasService";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
-import { getUsuarioData } from "@/services/UsuariosService";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import { useUsuariosStore } from '@/store/usuarios';
 
 const tab = ref<string>("one");
+const usuariosStore = useUsuariosStore();
 
 const isLoading = ref(true);
 const router = useRouter();
 const route = useRoute();
-const usuarioData = ref<UsuarioDataDTO>({
-  idUsuario: 0,
-  nick: "",
-  faccion: {
-    idFaccion: 0,
-    nombreFaccion: "",
-  },
-  inscripcionesTorneo: [],
-  clasificacionElo: 0,
-  puntuacionElo: 0,
-  numeroPartidasJugadas: 0,
-  partidasGanadas: 0,
-  partidasEmpatadas: 0,
-  partidasPerdidas: 0,
-  email: "",
-  partidasValidadas: [],
-  partidasPendientes: [],
-  elos: [],
-});
+const usuarioData: ComputedRef<UsuarioDataDTO> = computed(() => usuariosStore.usuarioData)
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
@@ -153,17 +136,16 @@ const initializeComponent = async () => {
   isLoading.value = true;
   try {
     const idRecibido = String(route.params.idUsuario);
-    const usuarioResponse = await getUsuarioData(parseInt(idRecibido));
+    await usuariosStore.requestUsuarioData(parseInt(idRecibido))
 
     // Verifica la estructura de usuarioResponse
-    if (usuarioResponse.data) {
-      usuarioData.value = usuarioResponse.data;
-      validMatches.value = usuarioResponse.data.partidasValidadas;
-      pendingMatches.value = usuarioResponse.data.partidasPendientes;
+    if (usuarioData.value.idUsuario) {
+      validMatches.value = usuarioData.value.partidasValidadas;
+      pendingMatches.value = usuarioData.value.partidasPendientes;
     }
   } catch (error) {
     console.error(error);
-    router.push("error");
+    router.push({ name: "error" });
   } finally {
     isLoading.value = false;
   }

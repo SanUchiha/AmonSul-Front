@@ -40,10 +40,13 @@ import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
 import { FaccionDTO } from "@/interfaces/Faccion";
 import { getClasifiacionElo } from "@/services/EloService";
 import { getFacciones } from "@/services/FaccionesService";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, ComputedRef } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import { useUsuariosStore } from '@/store/usuarios';
+
+const usuariosStore = useUsuariosStore();
 
 const tab = ref<string>("one");
 
@@ -54,6 +57,8 @@ const correo = ref<string>(``);
 const isLoading = ref<boolean>(true);
 const eloClasificacion = ref<UsuarioEloTablaClasificacion[]>([]);
 const facciones = ref<FaccionDTO[]>([]);
+const usuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(() => usuariosStore.usuarios)
+
 
 onMounted(async () => {
   isLoading.value = true;
@@ -61,7 +66,7 @@ onMounted(async () => {
     const email: any = await getUser.value;
     if (!email) {
       error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
-      router.push("error");
+      router.push({ name: "error" });
       return;
     }
     correo.value = email;
@@ -78,8 +83,9 @@ onMounted(async () => {
 
     const faccionesResponse = await getFacciones();
     facciones.value = faccionesResponse.data;
-    //const usuariosResponse = await getUsuarios();
-    //usuarios.value = eloClasificacion.value;
+    if (!usuarios.value.length) {
+      await usuariosStore.requestUsuarios()
+    }
   } catch {
     console.error("Error al obtener datos del usuario:", error);
   } finally {

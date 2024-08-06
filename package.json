@@ -13,6 +13,7 @@
     "core-js": "^3.8.3",
     "d3": "^7.9.0",
     "material-design-icons-iconfont": "^6.7.0",
+    "pinia": "^2.2.0",
     "sass": "^1.75.0",
     "sass-loader": "^14.2.1",
     "vue": "^3.2.13",

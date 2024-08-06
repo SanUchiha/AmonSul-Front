@@ -191,7 +191,6 @@
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { NewUserDTO } from "@/interfaces/Usuario";
-import { newUser } from "@/services/UsuariosService";
 import { AxiosError } from "axios";
 import ErrorNick from "../RegistroUsuarios/ErrorNick.vue";
 import ErrorEmail from "../RegistroUsuarios/ErrorEmail.vue";
@@ -199,6 +198,9 @@ import ResponseNuevoUsuario from "../RegistroUsuarios/ResponseNuevoUsuario.vue";
 import { getFacciones, registrarFaccion } from "@/services/FaccionesService";
 import { Faccion } from "@/interfaces/Faccion";
 import ModalMessageError from "../Commons/ModalMessageError.vue";
+import { useUsuariosStore } from '@/store/usuarios';
+
+const usuariosStore = useUsuariosStore();
 
 const nombre = ref("");
 const primerApellido = ref("");
@@ -359,7 +361,7 @@ const handlerNewUser = async () => {
     Telefono: telefono.value,
   };
   try {
-    await newUser(newUserDTO);
+    await usuariosStore.postUser(newUserDTO);
     dialogOk.value = true;
   } catch (error: any) {
     if (error.isAxiosError) {
@@ -370,12 +372,12 @@ const handlerNewUser = async () => {
           dialogEmail.value = true;
         else dialogNick.value = true;
       } else if (axiosError.request) {
-        router.push("error");
+        router.push({ name: "error" });
       } else {
-        router.push("error");
+        router.push({ name: "error" });
       }
     } else {
-      router.push("error");
+      router.push({ name: "error" });
     }
   } finally {
     loading.value = false;

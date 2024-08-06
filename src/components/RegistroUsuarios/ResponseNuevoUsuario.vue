@@ -44,7 +44,7 @@ watch(
 const handlerOk = () => {
   emits("update:isVisible", false);
   internalVisible.value = false;
-  router.push("inicio-sesion");
+  router.push({ name: "inicio-sesion" });
 };
 
 const handleEscapeKey = (event: KeyboardEvent) => {

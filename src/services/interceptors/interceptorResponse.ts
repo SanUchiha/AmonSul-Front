@@ -22,15 +22,15 @@ const funcErrors = (
   const token = localStorage.getItem("token");
   if (errorCode === 403) {
     if (!token) {
-      router.push("inicio-sesion");
+      router.push({ name: "inicio-sesion" });
     }
     else {
-      router.push("error");
+      router.push({ name: "error" });
     }
   }
-  else if (errorCode === 500) { router.push("error"); }
-  else if (errorCode === 401) { router.push("inicio-sesion"); }
-  else if (errorCode === 404) { router.push("inicio-sesion"); }
+  else if (errorCode === 500) { router.push({ name: "error" }); }
+  else if (errorCode === 401) { router.push({ name: "inicio-sesion" }); }
+  else if (errorCode === 404) { router.push({ name: "inicio-sesion" }); }
 }
 
 export const interceptorResponseError = (

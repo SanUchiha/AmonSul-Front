@@ -12,7 +12,7 @@
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const goToLogin = () => router.push("inicio-sesion");
+const goToLogin = () => router.push({ name: "inicio-sesion" });
 const goToRegistration = () => router.push("registro-usuario");
 const goToContact = () => router.push("contacto");
 </script>
