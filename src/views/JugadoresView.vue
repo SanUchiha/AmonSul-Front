@@ -26,13 +26,13 @@ import { onMounted, ref } from 'vue'
 
 import TablaUsuarios from '@/components/Usuarios/TablaUsuarios.vue'
 import MapaUsuarios from '@/components/Mapa/MapaUsuarios.vue'
-import { getUsuarios } from '@/services/UsuariosService'
+import { getUsuariosFast } from "@/services/UsuariosService";
 
 const users = ref([])
 const tab = ref("one");
 
 onMounted(async () => {
-  const data = await getUsuarios()
+  const data = await getUsuariosFast()
   users.value = data.data
 })
 </script>

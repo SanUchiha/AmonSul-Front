@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { UsuarioDTO } from "@/interfaces/Usuario";
-import { getUsuariosFast } from "@/services/UsuariosService";
+
 import { onMounted, ref, defineProps } from "vue";
 import { useRouter } from "vue-router";
 import {
@@ -82,11 +82,7 @@ const goToUserDetail = (idUsuario: number) => {
 onMounted(async () => {
   try {
     isLoading.value = true;
-
-    items.value = [];
-
-    const data = await getUsuariosFast();
-    items.value = data.data;
+    items.value = [...props.usuarios];
     items.value = items.value.sort((a, b) => a.nick.localeCompare(b.nick));
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
