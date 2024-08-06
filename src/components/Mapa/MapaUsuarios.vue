@@ -45,7 +45,7 @@ const createChart = async () => {
     .geoMercator()
     .scale(currentWidth.value > 800 ? 2600 : 1200)
     .center([-1, currentWidth.value > 800 ? 42 : 40])
-    .translate([width / 1.7, height / 2])
+    .translate([width / 1.6, height / 2])
 
   // Creamos el path añadiendo la proyección
   let path = d3.geoPath(projection)
@@ -72,18 +72,22 @@ const createChart = async () => {
     .enter()
     .append('g')
     .attr('class', (d) => {
+      let classList = ''
+      if (d.properties.name === 'Las Palmas') {
+        classList = 'canarias '
+      }
       if (d.users > 16) {
-        return 'wrapper__purple'
+        return `${classList}wrapper__purple`
       } else if (d.users > 11) {
-        return 'wrapper__darkblue'
+        return `${classList}wrapper__darkblue`
       } else if (d.users > 7) {
-        return 'wrapper__darkslateblue'
+        return `${classList}wrapper__darkslateblue`
       } else if (d.users > 3) {
-        return 'wrapper__blue'
+        return `${classList}wrapper__blue`
       } else if (d.users > 0) {
-        return 'wrapper__lightblue'
+        return `${classList}wrapper__lightblue`
       } else {
-        return 'wrapper__white'
+        return `${classList}wrapper__white`
       }
     })
   .on('click', (d) => {
@@ -150,6 +154,14 @@ onMounted(async () => {
   stroke: green;
   stroke-width: 2px;
   stroke-dasharray: none;
+}
+
+.canarias {
+  transform: translate(15%, -60%);
+
+  @media screen and (max-width: 720px) {
+    transform: translate(30%, -60%);
+  }
 }
 
 .graticule {
