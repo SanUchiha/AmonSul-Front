@@ -57,7 +57,6 @@ const createChart = async () => {
 
   spain.features = spain.features.map((item) => {
     if (item.properties.cod_prov === "35") {
-      console.log(item)
       total.value = `${users.value[parseInt(item.properties.cod_prov)]?.length || 0} usuarios de ${item.properties.name}`
     }
     return {
