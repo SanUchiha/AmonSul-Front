@@ -57,6 +57,13 @@ import {
 } from "vuetify/components";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
+const props = defineProps({
+  usuarios: {
+    type: Array,
+    required: true,
+  },
+});
+
 const search = ref<string>("");
 const items = ref<UsuarioDTO[]>([]);
 const isLoading = ref<boolean>(true);
