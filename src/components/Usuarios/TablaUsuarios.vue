@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import { UsuarioDTO } from "@/interfaces/Usuario";
 import { getUsuariosFast } from "@/services/UsuariosService";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, defineProps } from "vue";
 import { useRouter } from "vue-router";
 import {
   VDataTable,
