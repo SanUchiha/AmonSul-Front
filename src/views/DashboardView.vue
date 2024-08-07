@@ -110,6 +110,7 @@
               <div v-else>
                 <h3>No tienes partidas validadas</h3>
               </div>
+              <v-divider class="my-3"></v-divider>
             </v-tabs-window-item>
             <!-- tab 3.
            Inscription a los tornoes (mis torneos)
@@ -144,7 +145,7 @@ import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcione
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import { useUsuariosStore } from '@/store/usuarios';
+import { useUsuariosStore } from "@/store/usuarios";
 
 const tab = ref<string>("one");
 const usuariosStore = useUsuariosStore();
@@ -155,8 +156,9 @@ const router = useRouter();
 const route = useRoute();
 const emailUsuario = ref<string>(getUser.value ?? "null");
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
-const usuarioData: ComputedRef<UsuarioDataDTO> = computed(() => usuariosStore.usuarioData)
-
+const usuarioData: ComputedRef<UsuarioDataDTO> = computed(
+  () => usuariosStore.usuarioData
+);
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
@@ -229,7 +231,7 @@ const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
     isLoading.value = true;
     try {
-      await usuariosStore.requestUsuarioData(parseInt(idUsuarioLogger.value))
+      await usuariosStore.requestUsuarioData(parseInt(idUsuarioLogger.value));
 
       validMatches.value = usuarioData.value?.partidasValidadas ?? [];
 

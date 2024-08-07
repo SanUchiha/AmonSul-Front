@@ -60,6 +60,7 @@
               <div v-else>
                 <h3>No tienes partidas validadas</h3>
               </div>
+              <v-divider class="my-3"></v-divider>
             </v-tabs-window-item>
             <!-- tab 3.
            Inscription a los tornoes (mis torneos)
@@ -101,7 +102,7 @@ import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import { useUsuariosStore } from '@/store/usuarios';
+import { useUsuariosStore } from "@/store/usuarios";
 
 const tab = ref<string>("one");
 const usuariosStore = useUsuariosStore();
@@ -109,7 +110,9 @@ const usuariosStore = useUsuariosStore();
 const isLoading = ref(true);
 const router = useRouter();
 const route = useRoute();
-const usuarioData: ComputedRef<UsuarioDataDTO> = computed(() => usuariosStore.usuarioData)
+const usuarioData: ComputedRef<UsuarioDataDTO> = computed(
+  () => usuariosStore.usuarioData
+);
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
@@ -136,7 +139,7 @@ const initializeComponent = async () => {
   isLoading.value = true;
   try {
     const idRecibido = String(route.params.idUsuario);
-    await usuariosStore.requestUsuarioData(parseInt(idRecibido))
+    await usuariosStore.requestUsuarioData(parseInt(idRecibido));
 
     // Verifica la estructura de usuarioResponse
     if (usuarioData.value.idUsuario) {

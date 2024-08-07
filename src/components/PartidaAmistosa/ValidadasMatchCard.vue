@@ -15,6 +15,9 @@
       <p>Fecha: {{ fechaPartidaFormateada }}</p>
     </v-card-text>
   </v-card>
+
+  <v-spacer class="my-3"></v-spacer>
+
   <div v-if="error" class="error">{{ error }}</div>
   <ModalDetallePartida
     v-if="showModalDetallePartida"

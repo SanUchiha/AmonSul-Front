@@ -43,7 +43,7 @@
               <v-combobox
                 v-model="ejercitoPropio"
                 :items="listadoEjercitos"
-                label="¿Que llevaba tú?"
+                label="¿Que llevabas tú?"
                 @click="loadEjercitos"
                 :rules="[rules.required]"
                 required
@@ -162,7 +162,7 @@ import { useUsuariosStore } from "@/store/usuarios";
 const usuariosStore = useUsuariosStore();
 
 const router = useRouter();
-const { getUser } = useAuth();
+const { getUser, getidUsuario } = useAuth();
 const isLoading = ref(false);
 const isLoadingNicks = ref(false);
 const loadingEjercitos = ref(false);
@@ -182,6 +182,7 @@ const esTorneo = ref<boolean>(false);
 const esElo = ref<boolean>(false);
 const puntosPartida = ref<number | null>(null);
 const emailOwner = ref<string>(await getUser.value!);
+const idUsuario = ref<string>(await getidUsuario.value!);
 
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
@@ -262,17 +263,17 @@ const handlerNuevaPartida = async () => {
   isLoading.value = true;
 
   if (listaUsuarios.value != null) {
-    const usuarioCreador: UsuarioNickDTO | undefined = listaUsuarios.value.find(
-      (u) => u.email == emailOwner.value
-    );
-
     const rival: UsuarioNickDTO | undefined = listaUsuarios.value.find(
       (u) => u.nick == nickDosSelected.value
     );
 
+    if (!rival)
+      throw new Error(`Rival with nick ${nickDosSelected.value} not found`);
+    if (!parseInt(idUsuario.value)) throw new Error(`Usuario not found`);
+
     const nuevaPartida: CreatePartidaAmistosaDTO = {
-      IdUsuario1: usuarioCreador!.idUsuario,
-      IdUsuario2: rival!.idUsuario,
+      IdUsuario1: parseInt(idUsuario.value),
+      IdUsuario2: rival.idUsuario,
       resultadoUsuario1: puntosJugadorUno.value ?? 0,
       resultadoUsuario2: puntosJugadorDos.value ?? 0,
       puntosPartida: puntosPartida.value ?? 0,
@@ -287,7 +288,7 @@ const handlerNuevaPartida = async () => {
     try {
       await registrarPartida(nuevaPartida);
       showSuccessModal.value = true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       showErrorModal.value = true;
     } finally {
       isLoading.value = false;
