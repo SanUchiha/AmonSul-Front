@@ -94,7 +94,7 @@
               ></v-switch>
               <v-text-field
                 v-model="puntosPartida"
-                label="¿Ha cuantos puntos has jugado?"
+                label="¿A cuantos puntos has jugado?"
                 type="number"
                 :rules="[rules.required]"
                 required
