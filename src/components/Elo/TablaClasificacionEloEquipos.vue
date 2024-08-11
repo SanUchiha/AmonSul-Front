@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2"
-      >Clasificación ELO Equipos
+      >Equipos
 
       <v-spacer></v-spacer>
 

@@ -28,4 +28,33 @@ export interface TorneoPropioDTO {
   idTorneo: number; // Identificador único del torneo (PK)
   idUsuario: number; // ID del usuario administrador del torneo (FK)
   nombreTorneo: string; // Nombre del torneo
+  estadoTorneo: string; // Estado del torneo
+}
+
+export interface TorneoGestionInfoDTO {
+  torneo: TorneoCreadoDTO;
+  inscripciones: InscripcionTorneoCreadoDTO[];
+}
+
+export interface TorneoCreadoDTO {
+  idTorneo: number;
+  idUsuario: number;
+  nombreTorneo: string;
+  limiteParticipantes?: number | null;
+  numeroPartidas: number;
+  estadoTorneo: string;
+  fechaEntregaListas?: string | null;
+  fechaFinInscripcion?: string | null;
+}
+
+export interface InscripcionTorneoCreadoDTO {
+  idInscripcion: number;
+  idUsuario?: number | null;
+  nick?: string | null;
+  estadoInscripcion?: string | null;
+  fechaInscripcion?: string | null;
+  listaData?: string | null;
+  estadoLista?: string | null;
+  fechaEntrega?: string | null;
+  esPago?: boolean | null;
 }

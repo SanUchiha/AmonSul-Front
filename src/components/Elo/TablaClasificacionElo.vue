@@ -2,7 +2,7 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2"
-      >Clasificación ELO
+      >Individual
 
       <v-spacer></v-spacer>
 
@@ -83,7 +83,6 @@ const headers = [
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
 };
-
 </script>
 
 <style scoped>
