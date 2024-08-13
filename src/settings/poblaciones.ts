@@ -1292,7 +1292,12 @@ const poblaciones = [
   {
     "parent_code": "03",
     "code": "5",
-    "label": "San Vicente del Raspeig/Sant Vicent del Raspeig"
+    "label": "San Vicente del Raspeig"
+  },
+  {
+    "parent_code": "03",
+    "code": "5",
+    "label": "Sant Vicent del Raspeig"
   },
   {
     "parent_code": "03",
@@ -4192,7 +4197,17 @@ const poblaciones = [
   {
     "parent_code": "07",
     "code": "7",
-    "label": "Palma "
+    "label": "Palma"
+  },
+  {
+    "parent_code": "07",
+    "code": "7",
+    "label": "Palma de Mallorca"
+  },
+  {
+    "parent_code": "07",
+    "code": "7",
+    "label": "Mallorca"
   },
   {
     "parent_code": "07",
