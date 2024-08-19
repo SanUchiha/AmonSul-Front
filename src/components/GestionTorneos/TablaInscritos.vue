@@ -12,74 +12,121 @@
         flat
         hide-details
         single-line
-      ></v-text-field>
+      />
     </v-card-title>
 
-    <v-divider></v-divider>
     <v-divider></v-divider>
 
     <v-data-table
       v-model:search="search"
-      :items="torneo?.inscripciones"
+      :items="localInscripciones"
       :headers="headers"
       class="custom-table"
       item-key="nick"
+      v-if="localInscripciones.length > 0"
     >
       <template v-slot:item="{ item }">
-        <tr>
+        <tr @click="handleRowClick(item)">
+          <!-- nick -->
           <td>{{ item.nick }}</td>
-          <td>{{ item.estadoInscripcion }}</td>
+
+          <!-- estado inscripcion -->
+          <td>
+            <v-chip
+              :color="formattedEstadoInscripcion(item.estadoInscripcion).color"
+              dark
+            >
+              {{ formattedEstadoInscripcion(item.estadoInscripcion).text }}
+            </v-chip>
+          </td>
+
+          <!-- fecha de la inscripcion -->
           <td>
             <v-chip
               :color="
-                getChipColor(
+                chipColor(
                   item.fechaInscripcion,
                   torneo?.torneo.fechaFinInscripcion
                 )
               "
               dark
             >
-              {{ formatDate(item.fechaInscripcion) }}
+              {{ formattedDate(item.fechaInscripcion) }}
             </v-chip>
           </td>
+
+          <!-- estado de la lista -->
           <td>
-            <v-chip v-if="item.estadoLista" color="blue" dark>{{
-              item.estadoLista
-            }}</v-chip>
-            <v-chip v-else color="red" dark>No entregada</v-chip>
+            <v-chip :color="formattedEstadoLista(item.estadoLista).color" dark>
+              {{ formattedEstadoLista(item.estadoLista).text }}
+            </v-chip>
           </td>
+
+          <!-- fecha entrega de la lista -->
           <td>
             <v-chip
               :color="
-                getChipColor(
-                  item.fechaEntrega,
-                  torneo?.torneo.fechaEntregaListas
-                )
+                chipColor(item.fechaEntrega, torneo?.torneo.fechaEntregaListas)
               "
               dark
             >
-              {{ formatDate(item.fechaEntrega) }}
+              {{ formattedDate(item.fechaEntrega) }}
             </v-chip>
           </td>
+
+          <!-- estado del pago -->
           <td>
-            <v-chip v-if="!item.esPago" color="red" dark>No pagado</v-chip>
-            <v-chip v-else color="blue" dark>Pagado</v-chip>
+            <v-chip :color="formattedEstadoPago(item.esPago).color" dark>
+              {{ formattedEstadoPago(item.esPago).text }}
+            </v-chip>
           </td>
         </tr>
       </template>
     </v-data-table>
+    <div v-else class="text-center pa-4">No hay inscripciones disponibles</div>
   </v-card>
+
+  <ModalDetalleInscripcion
+    v-if="showModal"
+    :inscripcion="selectedInscripcion"
+    @close="closeModal"
+    @update-inscripcion="handleUpdateInscripcion"
+    @eliminar-inscripcion="handleEliminarInscripcion"
+  />
 </template>
 
 <script setup lang="ts">
-import { TorneoGestionInfoDTO } from "@/interfaces/Torneo";
-import { ref, defineProps } from "vue";
+import { ref, computed, watch, defineEmits } from "vue";
+import { defineProps } from "vue";
+import ModalDetalleInscripcion from "./ModalDetalleInscripcion.vue";
+import {
+  InscripcionTorneoCreadoDTO,
+  TorneoGestionInfoDTO,
+} from "@/interfaces/Torneo";
 
+// Define las propiedades
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 
-const search = ref<string>("");
+// Crear una copia reactiva de las inscripciones
+const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 
-const headers = ref([
+watch(
+  () => props.torneo?.inscripciones,
+  (newInscripciones) => {
+    if (newInscripciones) {
+      localInscripciones.value = [...newInscripciones];
+    }
+  },
+  { immediate: true } // Esto asegura que la copia se haga inmediatamente cuando se recibe el prop
+);
+
+const emit = defineEmits(["inscripcionEliminada"]);
+
+const search = ref<string>("");
+const showModal = ref(false);
+const selectedInscripcion = ref<InscripcionTorneoCreadoDTO | null>(null);
+
+const headers = computed(() => [
   { title: "Nick", key: "nick" },
   { title: "Estado Inscripción", key: "estadoInscripcion" },
   { title: "Fecha Inscripción", key: "fechaInscripcion" },
@@ -88,12 +135,11 @@ const headers = ref([
   { title: "Pagado", key: "esPago" },
 ]);
 
-const formatDate = (date: string | null | undefined) => {
-  if (!date) return "N/A";
-  return new Date(date).toLocaleDateString();
+const formattedDate = (date: string | null | undefined) => {
+  return date ? new Date(date).toLocaleDateString() : "N/A";
 };
 
-const getChipColor = (
+const chipColor = (
   inscriptionDate: string | null | undefined,
   referenceDate: string | null | undefined
 ) => {
@@ -102,4 +148,72 @@ const getChipColor = (
     ? "blue"
     : "yellow";
 };
+
+const formattedEstadoInscripcion = (estado: string) => {
+  if (estado === "EN PROCESO") {
+    return { text: "EN PROCESO", color: "red" };
+  } else if (estado === "COMPLETADA") {
+    return { text: "COMPLETADA", color: "blue" };
+  }
+  return { text: "Desconocido", color: "gray" };
+};
+
+const formattedEstadoPago = (estado: string) => {
+  if (estado === "NO") {
+    return { text: "NO", color: "red" };
+  } else if (estado === "SI") {
+    return { text: "SI", color: "blue" };
+  }
+  return { text: "Desconocido", color: "gray" };
+};
+
+const formattedEstadoLista = (estado: string) => {
+  switch (estado) {
+    case "NO ENTREGADA":
+      return { text: "NO ENTREGADA", color: "red" };
+    case "ENTREGADA":
+      return { text: "ENTREGADA", color: "blue" };
+    case "ILEGAL":
+      return { text: "ILEGAL", color: "red" };
+    case "OK":
+      return { text: "OK", color: "blue" };
+    default:
+      return { text: "Desconocido", color: "gray" };
+  }
+};
+
+const handleRowClick = (item: InscripcionTorneoCreadoDTO) => {
+  selectedInscripcion.value = item;
+  showModal.value = true;
+};
+
+const handleUpdateInscripcion = (payload: {
+  field: keyof InscripcionTorneoCreadoDTO;
+  value: any;
+}) => {
+  if (selectedInscripcion.value) {
+    (selectedInscripcion.value[payload.field] as unknown) = payload.value;
+  }
+};
+
+const handleEliminarInscripcion = (idInscripcion: number) => {
+  console.log("entra");
+  const index = localInscripciones.value.findIndex(
+    (inscripcion) => inscripcion.idInscripcion === idInscripcion
+  );
+  if (index !== -1) {
+    localInscripciones.value.splice(index, 1);
+    emit("inscripcionEliminada", idInscripcion);
+  }
+};
+
+// Cierra el modal
+const closeModal = () => {
+  showModal.value = false;
+  selectedInscripcion.value = null;
+};
 </script>
+
+<style scoped>
+/* Añadir estilos personalizados si es necesario */
+</style>

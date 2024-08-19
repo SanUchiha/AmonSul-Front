@@ -3,7 +3,11 @@
     <div>
       <CardGestionTorneo :torneo="torneo" />
 
-      <TablaInscritos :torneo="torneo" />
+      <!-- Escucha el evento inscripcionEliminada -->
+      <TablaInscritos
+        :torneo="torneo"
+        @inscripcionEliminada="handleInscripcionEliminada"
+      />
     </div>
   </v-container>
 </template>
@@ -39,4 +43,14 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+// Función para manejar el evento inscripcionEliminada
+const handleInscripcionEliminada = (idInscripcion: number) => {
+  if (torneo.value) {
+    // Actualiza las inscripciones eliminando la inscripción correspondiente
+    torneo.value.inscripciones = torneo.value.inscripciones.filter(
+      (inscripcion) => inscripcion.idInscripcion !== idInscripcion
+    );
+  }
+};
 </script>

@@ -16,3 +16,18 @@ export interface InscripcionUsuarioDTO {
   esPago: boolean;
   nombreTorneo: string;
 }
+
+export interface UpdateEstadoInscripcionDTO {
+  idInscripcion: number;
+  estadoInscripcion: string;
+}
+
+export interface UpdateEstadoListaDTO {
+  idInscripcion: number;
+  estadoLista: string;
+}
+
+export interface UpdateEstadoPagoDTO {
+  idInscripcion: number;
+  esPago: string;
+}
