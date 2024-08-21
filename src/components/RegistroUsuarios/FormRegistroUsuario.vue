@@ -273,7 +273,7 @@ const loadFacciones = async () => {
       .map((f: { nombreFaccion: any }) => f.nombreFaccion)
       .sort();
   } catch (error) {
-    console.log("Error al obtener las facciones:", error);
+    console.error("Error al obtener las facciones:", error);
   } finally {
     loading.value = false;
   }
@@ -303,7 +303,7 @@ const addFaccion = async () => {
     dialogAddFaccion.value = false;
     loadFacciones();
   } catch (error) {
-    console.log("Error al registrar una nueva facción:", error);
+    console.error("Error al registrar una nueva facción:", error);
   } finally {
     loading.value = false;
     dialogAddFaccion.value = false;

@@ -196,8 +196,6 @@ const logChange = async (
   field: "estadoInscripcion" | "estadoLista" | "esPago",
   value: string | boolean
 ) => {
-  console.log("Entramos cambiar el estado de: " + field);
-  console.log("Entramos cambiar el estado de: " + value);
   try {
     //inscripcion
     if (field === "estadoInscripcion") {
@@ -237,8 +235,6 @@ const logChange = async (
       showSuccessModalPago.value = true;
       emit("update-inscripcion", { field, value: estado });
     }
-
-    console.log(`Actualización exitosa en ${field}:`, value);
   } catch (error) {
     console.error(`Error actualizando ${field}:`, error);
     showErrorModal.value = true;

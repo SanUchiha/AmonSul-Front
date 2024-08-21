@@ -197,7 +197,6 @@ const handleUpdateInscripcion = (payload: {
 };
 
 const handleEliminarInscripcion = (idInscripcion: number) => {
-  console.log("entra");
   const index = localInscripciones.value.findIndex(
     (inscripcion) => inscripcion.idInscripcion === idInscripcion
   );
