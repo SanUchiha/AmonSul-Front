@@ -1,58 +1,49 @@
 <template>
-  <div v-if="isLoading">
-    <LoadingGandalf />
-  </div>
-  <div v-else>
-    <CardGestionTorneos />
+  <v-card flat>
+    <v-card-title class="d-flex align-center pe-2"
+      >Torneos
 
-    <v-divider class="my-3"></v-divider>
-    <v-card flat>
-      <v-card-title class="d-flex align-center pe-2"
-        >Torneos
+      <v-spacer></v-spacer>
 
-        <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        density="compact"
+        label="Search"
+        prepend-inner-icon="mdi-magnify"
+        variant="solo-filled"
+        flat
+        hide-details
+        single-line
+      ></v-text-field>
+    </v-card-title>
 
-        <v-text-field
-          v-model="search"
-          density="compact"
-          label="Search"
-          prepend-inner-icon="mdi-magnify"
-          variant="solo-filled"
-          flat
-          hide-details
-          single-line
-        ></v-text-field>
-      </v-card-title>
-
-      <v-divider></v-divider>
-      <v-divider></v-divider>
-      <v-data-table
-        v-model:search="search"
-        :items="items"
-        :loading="isLoading"
-        :headers="headers"
-        class="custom-table"
-        item-key="idTorneo"
-      >
-        <template v-slot:item="{ item }">
-          <tr>
-            <td>{{ item.nombreTorneo }}</td>
-            <td>
-              <v-btn @click="viewDetails(item.idTorneo)" icon="mdi-eye">
-              </v-btn>
-              <v-btn
-                :disabled="isDisabled"
-                @click="deleteTournament(item.idTorneo)"
-                color="error"
-                icon="mdi-close"
-              >
-              </v-btn>
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
-    </v-card>
-  </div>
+    <v-divider></v-divider>
+    <v-divider></v-divider>
+    <v-data-table
+      v-model:search="search"
+      :items="items"
+      :loading="isLoading"
+      :headers="headers"
+      class="custom-table"
+      item-key="idTorneo"
+    >
+      <template v-slot:item="{ item }">
+        <tr>
+          <td>{{ item.nombreTorneo }}</td>
+          <td>
+            <v-btn @click="viewDetails(item.idTorneo)" icon="mdi-eye"> </v-btn>
+            <v-btn
+              :disabled="isDisabled"
+              @click="deleteTournament(item.idTorneo)"
+              color="error"
+              icon="mdi-close"
+            >
+            </v-btn>
+          </td>
+        </tr>
+      </template>
+    </v-data-table>
+  </v-card>
 </template>
 
 <script setup lang="ts">
@@ -68,8 +59,6 @@ import {
 } from "vuetify/components";
 import { useAuth } from "@/composables/useAuth";
 import { getTorneosCreadosUsuario } from "@/services/TorneosService";
-import LoadingGandalf from "../Commons/LoadingGandalf.vue";
-import CardGestionTorneos from "./CardGestionTorneos.vue";
 
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);

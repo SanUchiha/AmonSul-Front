@@ -13,5 +13,9 @@ export const descargarBasesTorneo = async (idTorneo: number) => {
 };
 
 export const getTorneosCreadosUsuario = async (idUsuario: string) => {
-  return http.get(`Torneo/creados/${idUsuario}`);
+  return http.get(`Torneo/Gestion/Creados/${idUsuario}`);
+};
+
+export const getInfoTorneoCreado = async (idTorneo: number) => {
+  return http.get(`Torneo/Gestion/Info-torneo/${idTorneo}`);
 };

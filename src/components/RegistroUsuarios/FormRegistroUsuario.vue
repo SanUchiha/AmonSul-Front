@@ -196,9 +196,9 @@ import ErrorNick from "../RegistroUsuarios/ErrorNick.vue";
 import ErrorEmail from "../RegistroUsuarios/ErrorEmail.vue";
 import ResponseNuevoUsuario from "../RegistroUsuarios/ResponseNuevoUsuario.vue";
 import { getFacciones, registrarFaccion } from "@/services/FaccionesService";
-import { Faccion } from "@/interfaces/Faccion";
 import ModalMessageError from "../Commons/ModalMessageError.vue";
 import { useUsuariosStore } from "@/store/usuarios";
+import { FaccionDTO } from "@/interfaces/Faccion";
 
 const usuariosStore = useUsuariosStore();
 
@@ -219,7 +219,7 @@ const dialogDuplicado = ref(false);
 const dialogAddFaccion = ref(false);
 const loading = ref(false);
 const telefono = ref("");
-const listaFacciones = ref<Faccion[]>([]);
+const listaFacciones = ref<FaccionDTO[]>([]);
 const nombreFacciones = ref<string[]>([]);
 const faccionSelected = ref<string>("");
 const nuevaFaccion = ref<string>("");
@@ -273,7 +273,7 @@ const loadFacciones = async () => {
       .map((f: { nombreFaccion: any }) => f.nombreFaccion)
       .sort();
   } catch (error) {
-    console.log("Error al obtener las facciones:", error);
+    console.error("Error al obtener las facciones:", error);
   } finally {
     loading.value = false;
   }
@@ -303,7 +303,7 @@ const addFaccion = async () => {
     dialogAddFaccion.value = false;
     loadFacciones();
   } catch (error) {
-    console.log("Error al registrar una nueva facción:", error);
+    console.error("Error al registrar una nueva facción:", error);
   } finally {
     loading.value = false;
     dialogAddFaccion.value = false;
@@ -321,7 +321,7 @@ const validateForm = () => {
   errors.ciudad = !ciudad.value;
   errors.fechaNacimiento =
     !fechaNacimiento.value || !rules.validDate(fechaNacimiento.value);
-  errors.telefono = telefono.value && !rules.phone(telefono.value);
+  errors.telefono = !!telefono.value && !rules.phone(telefono.value);
 
   const formIsValid = Object.values(errors).every((error) => !error);
 
@@ -356,7 +356,7 @@ const handlerNewUser = async () => {
     Rol: "JUGADOR",
     Nick: nick.value,
     Ciudad: ciudad.value,
-    idFaccion: idFaccionSelected.value,
+    idFaccion: idFaccionSelected.value!,
     FechaNacimiento: formatFecha(fechaNacimiento.value),
     Telefono: telefono.value,
   };

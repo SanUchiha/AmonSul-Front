@@ -208,7 +208,7 @@ const loadNicks = async () => {
     );
     listadoNicks.value = listaUsuarios.value.map((f) => f.nick).sort();
   } catch (error) {
-    console.log("Error al obtener los nicks:", error);
+    console.error("Error al obtener los nicks:", error);
   } finally {
     isLoading.value = false;
     isLoadingNicks.value = false;

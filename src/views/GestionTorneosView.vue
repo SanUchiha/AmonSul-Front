@@ -1,11 +1,14 @@
 <template>
   <v-container>
-    <TablaInscripcionesPropioTorneo />
+    <CardGestionTorneos />
+    <v-divider class="my-3"></v-divider>
+    <TablaTorneosCreados />
   </v-container>
 </template>
 
 <script setup lang="ts">
-import TablaInscripcionesPropioTorneo from "@/components/GestionTorneos/TablaInscripcionesPropioTorneo.vue";
+import CardGestionTorneos from "@/components/GestionTorneos/CardGestionTorneos.vue";
+import TablaTorneosCreados from "@/components/GestionTorneos/TablaTorneosCreados.vue";
 </script>
 
 <style scoped></style>

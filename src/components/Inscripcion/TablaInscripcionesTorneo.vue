@@ -34,12 +34,12 @@
             <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
               <v-icon color="orange">mdi-eye</v-icon>
             </v-btn>
-            <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
+            <!-- <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
               <v-icon color="primary">mdi-file-send</v-icon>
-            </v-btn>
-            <v-btn icon @click="eliminarInscripcion(torneo.idInscripcion)">
+            </v-btn> -->
+            <!-- <v-btn icon @click="eliminarInscripcion(torneo.idInscripcion)">
               <v-icon color="red">mdi-cancel</v-icon>
-            </v-btn>
+            </v-btn> -->
           </td>
         </tr>
       </tbody>
@@ -79,6 +79,12 @@
     @enviarLista="handleEnviarLista"
     @modificarLista="handleModificarLista"
   />
+
+  <ModalInscripcion
+    v-if="showModalInscripcion"
+    :idInscripcion="currentInscripcionId"
+    @close="closeModal"
+  />
 </template>
 
 <script setup lang="ts">
@@ -101,6 +107,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import ModalLista from "./ModalLista.vue";
 import { useAuth } from "@/composables/useAuth";
+import ModalInscripcion from "./ModalInscripcion.vue";
 
 const props = defineProps<{
   isLoading: boolean;
@@ -121,6 +128,8 @@ const showVerListaModal = ref<boolean>(false);
 const showSuccessModalLista = ref<boolean>(false);
 const showErrorModalLista = ref<boolean>(false);
 
+const showModalInscripcion = ref<boolean>(false);
+
 const hasAcciones = ref<boolean>(false);
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
@@ -131,7 +140,10 @@ const verDetalleInscripcion = (idInscripcion: number) => {
     listaTorneos.value.find(
       (i) => i.idInscripcion == currentInscripcionId.value
     )?.idTorneo ?? null;
-  router.push(`/detalle-torneo/${currentTorneoId.value}`);
+
+  console.log(currentInscripcionId.value);
+  console.log(currentTorneoId.value);
+  showModalInscripcion.value = true;
 };
 
 const enviarLista = async () => {
@@ -186,8 +198,10 @@ const eliminarInscripcion = async (idInscripcion: number) => {
 
     if (response.request?.status === 200) {
       showSuccessModal.value = true;
-      const responseInscriptionesUser = await getInscripcionesUser(listaTorneos.value[0].idUsuario.toString());
-      listaTorneos.value = responseInscriptionesUser.data
+      const responseInscriptionesUser = await getInscripcionesUser(
+        listaTorneos.value[0].idUsuario.toString()
+      );
+      listaTorneos.value = responseInscriptionesUser.data;
     } else {
       showErrorModal.value = true;
     }
@@ -214,6 +228,11 @@ onMounted(async () => {
     }
   }
 });
+
+// Cierra el modal
+const closeModal = () => {
+  showModalInscripcion.value = false;
+};
 </script>
 
 <style scoped>

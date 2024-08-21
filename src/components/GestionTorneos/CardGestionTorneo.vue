@@ -1,0 +1,37 @@
+<template>
+  <v-card v-if="torneo" class="mb-4">
+    <v-card-title>{{ torneo.torneo.nombreTorneo }}</v-card-title>
+    <v-card-text>
+      <p><strong>Plazas Restantes:</strong> {{ plazasRestantes }}</p>
+      <p>
+        <strong>Fin Entrega de Listas:</strong>
+        {{ formatDate(torneo.torneo.fechaEntregaListas) }}
+      </p>
+      <p>
+        <strong>Fin de Inscripción:</strong>
+        {{ formatDate(torneo.torneo.fechaFinInscripcion) }}
+      </p>
+    </v-card-text>
+  </v-card>
+</template>
+
+<script setup lang="ts">
+import { TorneoGestionInfoDTO } from "@/interfaces/Torneo";
+import { computed, defineProps } from "vue";
+
+const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
+
+const plazasRestantes = computed(() => {
+  if (!props.torneo || props.torneo.inscripciones.length === null) {
+    return "Sin límite";
+  }
+  return (
+    props.torneo.torneo.limiteParticipantes! - props.torneo.inscripciones.length
+  );
+});
+
+const formatDate = (date: string | null | undefined) => {
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString();
+};
+</script>
