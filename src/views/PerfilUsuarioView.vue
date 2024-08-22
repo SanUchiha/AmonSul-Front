@@ -4,7 +4,7 @@
       <v-col cols="12" md="6">
         <v-card>
           <v-card-title>
-            <h2>Configuración</h2>
+            <h2>Perfil usuario</h2>
           </v-card-title>
           <v-card-text>
             <div v-if="isLoading">
@@ -91,6 +91,17 @@
                     readonly
                   ></v-text-field>
                 </v-col>
+
+                <v-col cols="12" class="d-flex justify-space-between">
+                  <v-btn
+                    variant="outlined"
+                    color="blue darken-1"
+                    @click="handleCambiarPassword"
+                    class="login-form__remember-password"
+                  >
+                    Cambiar la contraseña
+                  </v-btn>
+                </v-col>
               </v-row>
             </div>
           </v-card-text>
@@ -123,6 +134,9 @@
       </v-card>
     </v-dialog>
 
+    <!-- Modal para modificar la contraseña -->
+    <ModalCambiarPass v-if="showModalCambiarPass" @close="closeModal" />
+
     <v-dialog v-model="feedbackDialog" max-width="500px">
       <v-card>
         <v-card-title>
@@ -149,7 +163,8 @@ import { getFacciones } from "@/services/FaccionesService";
 import { EditarFaccionDTO, FaccionDTO } from "@/interfaces/Faccion";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import { useUsuariosStore } from '@/store/usuarios';
+import { useUsuariosStore } from "@/store/usuarios";
+import ModalCambiarPass from "@/components/Perfil/ModalCambiarPass.vue";
 
 const usuariosStore = useUsuariosStore();
 
@@ -165,7 +180,9 @@ const feedbackDialog = ref(false);
 const feedbackMessage = ref("");
 const feedbackTitle = ref("");
 
-const user: ComputedRef<UsuarioViewDTO> = computed(() => usuariosStore.usuario)
+const showModalCambiarPass = ref(false);
+
+const user: ComputedRef<UsuarioViewDTO> = computed(() => usuariosStore.usuario);
 
 const actualizarFaccion = async () => {
   const faccionesResponse = await getFacciones();
@@ -174,10 +191,10 @@ const actualizarFaccion = async () => {
     (f) => f.idFaccion === user.value?.idFaccion
   );
   if (faccionEncontrada) {
-    usuariosStore.setUsuarioFaccion(faccionEncontrada)
+    usuariosStore.setUsuarioFaccion(faccionEncontrada);
     selectedFaccionName.value = faccionEncontrada.nombreFaccion;
   }
-}
+};
 
 onMounted(async () => {
   try {
@@ -186,8 +203,7 @@ onMounted(async () => {
       await usuariosStore.requestUsuario(email.value);
     }
 
-    actualizarFaccion()
-
+    actualizarFaccion();
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   } finally {
@@ -221,16 +237,15 @@ const saveFaccion = async () => {
       "La comunidad de juego ha sido actualizada correctamente.";
 
     await usuariosStore.requestUsuario(email.value);
-    actualizarFaccion()
+    actualizarFaccion();
   } catch (error) {
     console.error("Error al editar la facción:", error);
     feedbackTitle.value = "Error";
     feedbackMessage.value =
       "Ha habido un problema al actualizar la comunidad de juego.";
 
-
     await usuariosStore.requestUsuario(email.value);
-    actualizarFaccion()
+    actualizarFaccion();
   }
 
   closeEditFaccionDialog();
@@ -239,6 +254,14 @@ const saveFaccion = async () => {
 
 const closeFeedbackDialog = () => {
   feedbackDialog.value = false;
+};
+
+const handleCambiarPassword = () => {
+  showModalCambiarPass.value = true;
+};
+
+const closeModal = () => {
+  showModalCambiarPass.value = false;
 };
 </script>
 

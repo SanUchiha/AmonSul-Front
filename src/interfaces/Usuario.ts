@@ -1,4 +1,4 @@
-import { EloDTO, UsuarioElo } from "./Elo";
+import { EloDTO } from "./Elo";
 import { FaccionDTO } from "./Faccion";
 import { InscripcionUsuarioDTO } from "./Inscripcion";
 import { ViewPartidaAmistosaDTO } from "./Partidas";
@@ -95,4 +95,10 @@ export interface UsuarioDataDTO {
   partidasGanadas: number;
   partidasEmpatadas: number;
   partidasPerdidas: number;
+}
+
+export interface UsuarioCambioPassDTO {
+  idUsuario: number;
+  oldPass: string;
+  newPass: string;
 }

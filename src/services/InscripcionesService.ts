@@ -35,13 +35,13 @@ export const getInscripcionesTorneo = async (idTorneo: number) => {
 export const updateEstadoInscripcion = async (
   nuevaEstado: UpdateEstadoInscripcionDTO
 ) => {
-  return http.post(`Inscripcion/Estado-Inscripcion`, nuevaEstado);
+  return http.put(`Inscripcion/Estado-Inscripcion`, nuevaEstado);
 };
 
 export const updateEstadoLista = async (nuevaEstado: UpdateEstadoListaDTO) => {
-  return http.post(`Inscripcion/Estado-Lista`, nuevaEstado);
+  return http.put(`Inscripcion/Estado-Lista`, nuevaEstado);
 };
 
 export const updateEstadoPago = async (nuevaEstado: UpdateEstadoPagoDTO) => {
-  return http.post(`Inscripcion/Estado-Pago`, nuevaEstado);
+  return http.put(`Inscripcion/Estado-Pago`, nuevaEstado);
 };

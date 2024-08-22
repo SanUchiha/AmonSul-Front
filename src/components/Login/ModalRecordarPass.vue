@@ -70,7 +70,7 @@ const emit = defineEmits<{
 }>();
 
 const show = ref<boolean>(true);
-const email = ref<string>("jose.a.sanchez.molina@gmail.com");
+const email = ref<string>("");
 
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);

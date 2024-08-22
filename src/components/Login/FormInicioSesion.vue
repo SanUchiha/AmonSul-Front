@@ -146,7 +146,6 @@ const handleForgotPassword = () => {
   showModalRecordarPass.value = true;
 };
 
-// Cierra el modal
 const closeModal = () => {
   showModalRecordarPass.value = false;
 };

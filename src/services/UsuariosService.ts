@@ -1,5 +1,5 @@
 import { EditarFaccionDTO } from "@/interfaces/Faccion";
-import { NewUserDTO } from "@/interfaces/Usuario";
+import { NewUserDTO, UsuarioCambioPassDTO } from "@/interfaces/Usuario";
 import { http } from "./index";
 
 export const newUser = async (newUser: NewUserDTO) => {
@@ -48,6 +48,10 @@ export const getUsuarioData = async (idUsuario: number) => {
 
 export const editarFaccion = async (body: EditarFaccionDTO) => {
   return http.put(`Usuario/modificar-faccion`, body);
+};
+
+export const cambiarPass = async (body: UsuarioCambioPassDTO) => {
+  return http.put(`Usuario/Cambiar-Pass`, body);
 };
 
 export const recordarPass = async (email: string) => {

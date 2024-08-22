@@ -3,15 +3,15 @@
     <v-table :loading="isLoading">
       <thead>
         <tr>
-          <th>Torneo</th>
-          <th class="text-center">Acciones</th>
+          <th class="text-center">Nombre torneo</th>
+          <th class="text-center">Detalle torneo</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
           <td>{{ torneo.nombreTorneo }}</td>
           <td class="text-center">
-            <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
+            <v-btn icon @click="verDetalleTorneo(torneo.idTorneo)">
               <v-icon color="orange">mdi-eye</v-icon>
             </v-btn>
           </td>
@@ -23,8 +23,8 @@
     <v-table :loading="isLoading">
       <thead>
         <tr>
-          <th>Torneo</th>
-          <th class="text-center">Acciones</th>
+          <th class="text-center">Nombre torneo</th>
+          <th class="text-center">Inscripción</th>
         </tr>
       </thead>
       <tbody>
@@ -142,6 +142,10 @@ const verDetalleInscripcion = (idInscripcion: number) => {
     )?.idTorneo ?? null;
 
   showModalInscripcion.value = true;
+};
+
+const verDetalleTorneo = (idTorneo: number) => {
+  router.push({ name: "detalle-torneo", params: { idTorneo } });
 };
 
 const enviarLista = async () => {
