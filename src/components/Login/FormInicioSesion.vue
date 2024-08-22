@@ -1,11 +1,6 @@
 <template>
   <v-container class="login-form">
-    <div class="overlay" v-if="loading"></div>
-    <!-- <v-row justify="center">
-      <v-col cols="12" md="4">
-        <LogoNameAmonSulSVG />
-      </v-col>
-    </v-row> -->
+    <div class="overlay" v-if="isLoading"></div>
     <v-row justify="center">
       <v-col cols="12" md="6">
         <v-card>
@@ -28,11 +23,12 @@
                 required
                 class="my-4"
               ></v-text-field>
+
               <v-row justify="center" class="my-4 ga-5">
                 <v-btn
                   color="blue darken-1"
                   variant="outlined"
-                  :disabled="loading"
+                  :disabled="isLoading"
                   size="large"
                   class="login-form__button"
                   @click="handleLogin"
@@ -41,16 +37,17 @@
                 </v-btn>
                 <v-btn
                   color="blue darken-1"
-                  variant="text"
+                  variant="outlined"
                   size="large"
                   to="registro-usuario"
-                  :disabled="loading"
+                  :disabled="isLoading"
                   class="login-form__button"
                 >
                   Nuevo usuario
                 </v-btn>
               </v-row>
-              <v-row justify="center" v-if="loading" class="mt-3">
+
+              <v-row justify="center" v-if="isLoading" class="mt-3">
                 <v-progress-linear
                   :size="24"
                   :width="2"
@@ -58,6 +55,18 @@
                   color="blue darken-1"
                   class="progress-linear-margin"
                 ></v-progress-linear>
+              </v-row>
+
+              <!-- Botón de recordar contraseña -->
+              <v-row justify="center" class="my-2">
+                <v-btn
+                  variant="text"
+                  color="blue darken-1"
+                  @click="handleForgotPassword"
+                  class="login-form__remember-password"
+                >
+                  ¿Desea recordar la contraseña?
+                </v-btn>
               </v-row>
             </v-form>
           </v-card-text>
@@ -75,6 +84,9 @@
       :isVisible="dialogOk"
       @update:isVisible="handleOkClick = $event"
     />
+
+    <!-- Aquí se incluye el modal -->
+    <ModalRecordarPass v-if="showModalRecordarPass" @close="closeModal" />
   </v-container>
 </template>
 
@@ -86,7 +98,7 @@ import { useAuth } from "@/composables/useAuth";
 import ErrorLogin from "./ErrorLogin.vue";
 import { AxiosResponse } from "axios";
 import ResponseLogin from "./ResponseLogin.vue";
-// import LogoNameAmonSulSVG from '@/assets/icons/logo_name.svg';
+import ModalRecordarPass from "./ModalRecordarPass.vue";
 
 const email = ref("");
 const password = ref("");
@@ -95,12 +107,13 @@ const router = useRouter();
 const dialog = ref(false);
 const dialogOk = ref(false);
 
-const loading = ref(false);
+const isLoading = ref(false);
+const showModalRecordarPass = ref(false);
 
 const handleLogin = async () => {
   dialog.value = false;
   dialogOk.value = false;
-  loading.value = true;
+  isLoading.value = true;
 
   var credentials: RequestLoginDTO = {
     email: email.value,
@@ -121,11 +134,21 @@ const handleLogin = async () => {
   } catch (error) {
     console.error(error);
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 };
+
 const handleOkClick = () => {
   dialogOk.value = false;
+};
+
+const handleForgotPassword = () => {
+  showModalRecordarPass.value = true;
+};
+
+// Cierra el modal
+const closeModal = () => {
+  showModalRecordarPass.value = false;
 };
 </script>
 
@@ -160,6 +183,11 @@ const handleOkClick = () => {
     @media screen and (max-width: 720px) {
       width: calc(100% - 24px);
     }
+  }
+
+  &__remember-password {
+    font-size: 12px;
+    text-transform: none; /* Para que no convierta el texto a mayúsculas */
   }
 }
 

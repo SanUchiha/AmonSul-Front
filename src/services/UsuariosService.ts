@@ -49,6 +49,11 @@ export const getUsuarioData = async (idUsuario: number) => {
 export const editarFaccion = async (body: EditarFaccionDTO) => {
   return http.put(`Usuario/modificar-faccion`, body);
 };
+
+export const recordarPass = async (email: string) => {
+  return http.get(`Usuario/Recordar-Pass/${email}`);
+};
+
 class UsuariosService {
   static newUser = (newUser: NewUserDTO) => {
     return http.post(`Usuario/Registrar`, newUser);

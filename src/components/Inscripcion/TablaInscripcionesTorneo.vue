@@ -141,8 +141,6 @@ const verDetalleInscripcion = (idInscripcion: number) => {
       (i) => i.idInscripcion == currentInscripcionId.value
     )?.idTorneo ?? null;
 
-  console.log(currentInscripcionId.value);
-  console.log(currentTorneoId.value);
   showModalInscripcion.value = true;
 };
 

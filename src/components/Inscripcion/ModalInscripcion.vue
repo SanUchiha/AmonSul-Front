@@ -6,7 +6,7 @@
     <v-dialog v-model="show" max-width="800px">
       <v-card>
         <v-card-title class="modal-title">
-          <h3>Nick del jugador</h3>
+          <h3>Detalle inscripción</h3>
           <v-spacer></v-spacer>
           <v-btn icon @click="close" class="close-button">
             <v-icon>mdi-close</v-icon>
