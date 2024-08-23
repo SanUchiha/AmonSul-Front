@@ -1,5 +1,9 @@
 import { EditarFaccionDTO } from "@/interfaces/Faccion";
-import { NewUserDTO, UsuarioCambioPassDTO } from "@/interfaces/Usuario";
+import {
+  AceptarProteccionDatos,
+  NewUserDTO,
+  UsuarioCambioPassDTO,
+} from "@/interfaces/Usuario";
 import { http } from "./index";
 
 export const newUser = async (newUser: NewUserDTO) => {
@@ -52,6 +56,10 @@ export const editarFaccion = async (body: EditarFaccionDTO) => {
 
 export const cambiarPass = async (body: UsuarioCambioPassDTO) => {
   return http.put(`Usuario/Cambiar-Pass`, body);
+};
+
+export const aceptarProteccionDatos = async (body: AceptarProteccionDatos) => {
+  return http.put(`Usuario/Proteccion-Datos`, body);
 };
 
 export const recordarPass = async (email: string) => {

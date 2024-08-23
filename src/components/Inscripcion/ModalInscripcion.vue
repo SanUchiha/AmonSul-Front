@@ -95,12 +95,10 @@ import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 import { getIncripcionById } from "@/services/InscripcionesService";
 import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
 
-// Definir las propiedades y eventos
 const props = defineProps<{
   idInscripcion: number | null;
 }>();
 
-// ModalDetalleInscripcion.vue
 const emit = defineEmits<{
   (e: "close"): void;
 }>();

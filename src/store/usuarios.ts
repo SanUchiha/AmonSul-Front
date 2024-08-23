@@ -53,6 +53,7 @@ export const useUsuariosStore = defineStore("usuarios", {
       partidasGanadas: 0,
       partidasEmpatadas: 0,
       partidasPerdidas: 0,
+      proteccionDatos: null,
     },
   }),
   actions: {

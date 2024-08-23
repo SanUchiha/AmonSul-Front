@@ -1,6 +1,11 @@
 <template>
   <v-container class="text-center">
-    <v-row dense>
+    <!-- Modal proteccion de datos -->
+    <ModalProteccionDatos
+      v-if="showProteccionDatosModal"
+      @modalClosed="handleModalClosed"
+    />
+    <v-row dense v-if="!showProteccionDatosModal">
       <v-col cols="12" md="12" class="text-center">
         <div v-if="isLoading">
           <LoadingGandalf />
@@ -146,6 +151,7 @@ import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
+import ModalProteccionDatos from "@/components/Usuarios/ModalProteccionDatos.vue";
 
 const tab = ref<string>("one");
 const usuariosStore = useUsuariosStore();
@@ -193,6 +199,8 @@ const cardClass = computed(() => {
     : "derrota-card";
 });
 
+const showProteccionDatosModal = ref<boolean>(false);
+
 const cargarPartidasValidadas = async () => {
   try {
     isLoadingValidadas.value = true;
@@ -232,6 +240,9 @@ const initializeComponent = async () => {
     isLoading.value = true;
     try {
       await usuariosStore.requestUsuarioData(parseInt(idUsuarioLogger.value));
+      if (!usuariosStore.usuarioData.proteccionDatos) {
+        showProteccionDatosModal.value = true;
+      }
 
       validMatches.value = usuarioData.value?.partidasValidadas ?? [];
 
@@ -255,6 +266,12 @@ onMounted(initializeComponent);
 
 const handleFormCreateMatch = () => {
   router.push({ name: "registrar-partida" });
+};
+
+const handleModalClosed = () => {
+  showProteccionDatosModal.value = false;
+  isLoading.value = true;
+  initializeComponent();
 };
 </script>
 

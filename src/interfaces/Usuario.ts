@@ -95,10 +95,16 @@ export interface UsuarioDataDTO {
   partidasGanadas: number;
   partidasEmpatadas: number;
   partidasPerdidas: number;
+  proteccionDatos: boolean | null;
 }
 
 export interface UsuarioCambioPassDTO {
   idUsuario: number;
   oldPass: string;
   newPass: string;
+}
+
+export interface AceptarProteccionDatos {
+  idUsuario: number;
+  proteccionDatos: boolean;
 }
