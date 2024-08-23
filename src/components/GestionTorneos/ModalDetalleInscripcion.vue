@@ -142,6 +142,9 @@
     message="No se ha podido actualizar la inscripción. Contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
+
+  <!-- Modal de Carga -->
+  <LoadingModal :isVisible="isLoading" @update:isVisible="isLoading = $event" />
 </template>
 
 <script setup lang="ts">
@@ -155,6 +158,7 @@ import {
 import { defineProps, ref, watch, defineEmits } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
+import LoadingModal from "../Commons/LoadingModal.vue";
 
 // Definir las propiedades y eventos
 const props = defineProps<{
@@ -174,6 +178,7 @@ const emit = defineEmits<{
 const show = ref(true);
 const showLista = ref(false);
 const localInscripcion = ref({ ...props.inscripcion });
+const isLoading = ref(false);
 
 const estadoInscripcionOptions = ["EN PROCESO", "COMPLETADA"] as const;
 const estadoListaOptions = [
@@ -196,6 +201,7 @@ const logChange = async (
   field: "estadoInscripcion" | "estadoLista" | "esPago",
   value: string | boolean
 ) => {
+  isLoading.value = true;
   try {
     //inscripcion
     if (field === "estadoInscripcion") {
@@ -207,6 +213,7 @@ const logChange = async (
         estadoInscripcion: estado,
       });
       showSuccessModalInscripcion.value = true;
+      isLoading.value = false;
       emit("update-inscripcion", { field, value: estado });
 
       //lista
@@ -221,6 +228,7 @@ const logChange = async (
         estadoLista: estado,
       });
       showSuccessModalLista.value = true;
+      isLoading.value = false;
       emit("update-inscripcion", { field, value: estado });
 
       //Pago
@@ -233,13 +241,15 @@ const logChange = async (
         esPago: estado,
       });
       showSuccessModalPago.value = true;
+      isLoading.value = false;
       emit("update-inscripcion", { field, value: estado });
     }
   } catch (error) {
     console.error(`Error actualizando ${field}:`, error);
     showErrorModal.value = true;
+    isLoading.value = false;
   } finally {
-    //
+    isLoading.value = false;
   }
 };
 
@@ -326,5 +336,13 @@ watch(
 
 .v-list-item {
   margin-bottom: 16px;
+}
+
+.lotr-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  width: 100%;
 }
 </style>
