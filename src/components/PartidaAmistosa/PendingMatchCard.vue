@@ -1,6 +1,6 @@
 <template>
   <div class="center">
-    <v-card class="center-card pa-4">
+    <v-card class="center-card pa-4" v-if="!isLoading">
       <v-card-title class="d-flex align-center justify-center">
         {{ nickJugadorUno }} vs {{ nickJugadorDos }}
       </v-card-title>
@@ -41,24 +41,24 @@
           <v-col class="text-center">
             <div v-if="!IsValidadaOwner">
               <v-btn
+                :disabled="isLoading"
                 variant="outlined"
                 color="green darken-1"
                 @click="validarPartida"
                 class="mx-auto"
               >
                 <v-icon left>mdi-check</v-icon>
-
                 Validar
               </v-btn>
 
               <v-btn
+                :disabled="isLoading"
                 variant="outlined"
                 color="red darken-1"
                 @click="cancelPartida"
                 class="mx-auto mt-2"
               >
                 <v-icon left>mdi-close</v-icon>
-
                 Cancelar
               </v-btn>
             </div>
@@ -73,6 +73,11 @@
         </v-row>
       </v-card-actions>
     </v-card>
+    <v-progress-circular
+      v-else
+      indeterminate
+      color="blue darken-1"
+    ></v-progress-circular>
 
     <ModalSuccess
       :isVisible="showSuccessModal"
@@ -117,7 +122,6 @@ import { useUsuariosStore } from "@/store/usuarios";
 const usuariosStore = useUsuariosStore();
 const isLoading = ref(true);
 const { getUser } = useAuth();
-const error = ref<string | null>(null);
 const nickJugadorUno = ref<string | unknown>("");
 const nickJugadorDos = ref<string | unknown>("");
 const validarPartidaDTO = ref<ValidarPartidaDTO>();
@@ -136,38 +140,48 @@ const showErrorModal = ref<boolean>(false);
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
 }>();
-
 const emit = defineEmits(["partidaValidada"]);
 
 onMounted(async () => {
+  isLoading.value = true;
+
   try {
-    isLoading.value = true;
     if (!usuario.value.idUsuario) {
       await usuariosStore.requestUsuario(emailUsuario.value);
     }
-    nickJugadorUno.value = await usuariosStore.requestNickById(
-      props.match.idUsuario1
-    );
-    nickJugadorDos.value = await usuariosStore.requestNickById(
-      props.match.idUsuario2
-    );
-    fechaFormateada.value = await formatFechaSpa(props.match.fechaPartida);
-    await controlValidacionesPartidas();
+    const [nick1, nick2, fecha] = await Promise.all([
+      usuariosStore.requestNickById(props.match.idUsuario1),
+      usuariosStore.requestNickById(props.match.idUsuario2),
+      formatFechaSpa(props.match.fechaPartida),
+    ]);
+
+    nickJugadorUno.value = nick1;
+    nickJugadorDos.value = nick2;
+    fechaFormateada.value = fecha;
+
+    controlValidacionesPartidas();
   } catch (err) {
-    router.push({ name: "error" });
-    error.value = "Error al cargar los datos";
+    console.error(err);
   } finally {
     isLoading.value = false;
   }
 });
 
 const validarPartida = async () => {
+  isLoading.value = true;
   validarPartidaDTO.value = {
     emailJugador: emailUsuario.value,
     idPartida: props.match.idPartidaAmistosa,
   };
-  await ValidarPartida(validarPartidaDTO.value);
-  showSuccessModal.value = true;
+  try {
+    await ValidarPartida(validarPartidaDTO.value);
+    showSuccessModal.value = true;
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const goToDetallePartida = () => {
@@ -184,8 +198,6 @@ const cancelPartida = async () => {
     emit("partidaValidada");
   } catch (err) {
     showErrorModal.value = true;
-    router.push({ name: "error" });
-    error.value = "Error al cancelar la partida";
   } finally {
     isLoading.value = false;
   }
