@@ -50,7 +50,7 @@
             <v-list-item-content>
               <v-list-item-title>
                 <v-icon>mdi-trophy</v-icon>
-                {{ partida?.ganadorPartidaNick }}
+                {{ partida?.ganadorPartidaNick ?? "Empate" }}
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
@@ -58,7 +58,8 @@
           <v-list-item>
             <v-list-item-content>
               <v-list-item-title>
-                <v-icon>mdi-calendar</v-icon> {{ partida?.fechaPartida }}
+                <v-icon>mdi-calendar</v-icon>
+                {{ formattedFecha }}
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
@@ -96,15 +97,16 @@
 
 <script setup lang="ts">
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
-import { defineProps, ref, watch, defineEmits } from "vue";
+import { formatFechaSpa } from "@/utils/Fecha";
+import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
 
-defineProps<{
+const props = defineProps<{
   partida: ViewPartidaAmistosaDTO;
 }>();
-
 const emit = defineEmits<{ (event: "close"): void }>();
 
 const show = ref(true);
+const formattedFecha = ref<string | null>(null);
 
 const close = () => {
   show.value = false;
@@ -114,6 +116,12 @@ const close = () => {
 watch(show, (newValue) => {
   if (!newValue) {
     emit("close");
+  }
+});
+
+onMounted(async () => {
+  if (props.partida?.fechaPartida) {
+    formattedFecha.value = await formatFechaSpa(props.partida.fechaPartida);
   }
 });
 </script>

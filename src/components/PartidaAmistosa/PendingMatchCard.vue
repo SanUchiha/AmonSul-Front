@@ -80,15 +80,33 @@
     ></v-progress-circular>
 
     <ModalSuccess
-      :isVisible="showSuccessModal"
+      :isVisible="showSuccessValidarModal"
       message="Partida validada con exito."
-      @update:isVisible="showSuccessModal = $event"
+      @update:isVisible="showSuccessValidarModal = $event"
     />
 
     <ModalError
-      :isVisible="showErrorModal"
+      :isVisible="showErrorValidarModal"
       message="No se ha podido validar la partida. Contacta con el administrador."
-      @update:isVisible="showErrorModal = $event"
+      @update:isVisible="showErrorValidarModal = $event"
+    />
+
+    <ModalSuccess
+      :isVisible="showSuccessCancelarModal"
+      message="Partida cancelada con exito."
+      @update:isVisible="showSuccessCancelarModal = $event"
+    />
+
+    <ModalError
+      :isVisible="showErrorCancelarModal"
+      message="No se ha podido cancelar la partida. Contacta con el administrador."
+      @update:isVisible="showErrorCancelarModal = $event"
+    />
+
+    <ModalDetallePartida
+      v-if="showModalDetallePartida"
+      :partida="match"
+      @close="closeModalDetallePartida"
     />
   </div>
 </template>
@@ -108,7 +126,6 @@ import {
   ViewPartidaAmistosaDTO,
 } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
-import { useRouter } from "vue-router";
 import {
   cancelarPartida,
   ValidarPartida,
@@ -118,6 +135,7 @@ import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useUsuariosStore } from "@/store/usuarios";
+import ModalDetallePartida from "./ModalDetallePartida.vue";
 
 const usuariosStore = useUsuariosStore();
 const isLoading = ref(true);
@@ -125,7 +143,6 @@ const { getUser } = useAuth();
 const nickJugadorUno = ref<string | unknown>("");
 const nickJugadorDos = ref<string | unknown>("");
 const validarPartidaDTO = ref<ValidarPartidaDTO>();
-const router = useRouter();
 const fechaFormateada = ref<string>("");
 const IsValidadaRival = ref<boolean>(false);
 const IsValidadaOwner = ref<boolean>(false);
@@ -134,8 +151,13 @@ const usuario: ComputedRef<UsuarioViewDTO> = computed(
   () => usuariosStore.usuario
 );
 
-const showSuccessModal = ref<boolean>(false);
-const showErrorModal = ref<boolean>(false);
+const showSuccessValidarModal = ref<boolean>(false);
+const showErrorValidarModal = ref<boolean>(false);
+
+const showSuccessCancelarModal = ref<boolean>(false);
+const showErrorCancelarModal = ref<boolean>(false);
+
+const showModalDetallePartida = ref<boolean>(false);
 
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
@@ -175,35 +197,37 @@ const validarPartida = async () => {
   };
   try {
     await ValidarPartida(validarPartidaDTO.value);
-    showSuccessModal.value = true;
+    showSuccessValidarModal.value = true;
   } catch (error) {
     console.error(error);
-    showErrorModal.value = true;
+    showErrorValidarModal.value = true;
   } finally {
     isLoading.value = false;
   }
 };
 
 const goToDetallePartida = () => {
-  router.push({
-    name: "detalle-partida",
-    params: { idPartida: props.match.idPartidaAmistosa },
-  });
+  showModalDetallePartida.value = true;
+};
+
+const closeModalDetallePartida = () => {
+  showModalDetallePartida.value = false;
 };
 
 const cancelPartida = async () => {
   try {
+    isLoading.value = true;
     await cancelarPartida(props.match.idPartidaAmistosa);
-    showSuccessModal.value = true;
+    showSuccessCancelarModal.value = true;
     emit("partidaValidada");
   } catch (err) {
-    showErrorModal.value = true;
+    showErrorCancelarModal.value = true;
   } finally {
     isLoading.value = false;
   }
 };
 
-watch(showSuccessModal, (newValue) => {
+watch(showSuccessValidarModal, (newValue) => {
   if (!newValue) {
     emit("partidaValidada");
   }
