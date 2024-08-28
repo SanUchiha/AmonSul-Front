@@ -6,48 +6,42 @@
           <LoadingGandalf />
         </div>
         <div v-else>
-          <div v-if="listaTorneos.length < 1">
-            No hay torneos próximamente...
-          </div>
-          <v-window v-model="activeTorneo">
-            <v-window-item
-              v-for="torneo in listaTorneos"
-              :key="torneo.idTorneo"
-              :value="torneo.idTorneo"
-            >
-              <TorneoCard :torneo="torneo" />
-            </v-window-item>
-          </v-window>
-          <v-card-actions class="justify-space-between">
-            <v-btn
-              icon="mdi-chevron-left"
-              variant="plain"
-              @click="prev"
-            ></v-btn>
-            <v-item-group v-model="activeTorneo" class="text-center" mandatory>
-              <v-item
-                v-for="torneo in listaTorneos"
-                :key="`btn-${torneo.idTorneo}`"
-                v-slot="{ isSelected, toggle }"
-                :value="torneo.idTorneo"
-              >
-                <v-btn
-                  :variant="isSelected ? 'outlined' : 'text'"
-                  icon="mdi-record"
-                  :class="{
-                    'active-pointer': isSelected,
-                    'inactive-pointer': !isSelected,
-                  }"
-                  @click="toggle"
-                ></v-btn>
-              </v-item>
-            </v-item-group>
-            <v-btn
-              icon="mdi-chevron-right"
-              variant="plain"
-              @click="next"
-            ></v-btn>
-          </v-card-actions>
+          <v-tabs v-model="tab" color="primary" grow>
+            <v-tab value="proximos"> Próximos </v-tab>
+            <v-tab value="pasados"> Pasados </v-tab>
+          </v-tabs>
+          <v-tabs-window v-model="tab">
+            <v-tabs-window-item value="proximos">
+              <div v-if="torneosFuturos.length < 1">
+                No hay torneos próximos...
+              </div>
+              <v-row v-else dense>
+                <v-col
+                  v-for="torneo in torneosFuturos"
+                  :key="torneo.idTorneo"
+                  cols="12"
+                  md="4"
+                >
+                  <TorneoCard :torneo="torneo" />
+                </v-col>
+              </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="pasados">
+              <div v-if="torneosPasados.length < 1">
+                No hay torneos pasados...
+              </div>
+              <v-row v-else dense>
+                <v-col
+                  v-for="torneo in torneosPasados"
+                  :key="torneo.idTorneo"
+                  cols="12"
+                  md="4"
+                >
+                  <TorneoCard :torneo="torneo" />
+                </v-col>
+              </v-row>
+            </v-tabs-window-item>
+          </v-tabs-window>
         </div>
       </v-col>
     </v-row>
@@ -62,47 +56,30 @@ import TorneoCard from "@/components/Torneos/TorneoCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 
 const listaTorneos = ref<Torneo[]>([]);
+const torneosFuturos = ref<Torneo[]>([]);
+const torneosPasados = ref<Torneo[]>([]);
 const isLoading = ref(true);
-const activeTorneo = ref<number | null>(null);
-const contador = ref<number>(0);
-
-const prev = () => {
-  if (listaTorneos.value.length === 0) return;
-  const currentIndex = listaTorneos.value.findIndex(
-    (t) => t.idTorneo === activeTorneo.value
-  );
-  activeTorneo.value =
-    currentIndex - 1 < 0
-      ? listaTorneos.value[listaTorneos.value.length - 1].idTorneo
-      : listaTorneos.value[currentIndex - 1].idTorneo;
-};
-
-const next = () => {
-  if (listaTorneos.value.length === 0) return;
-  const currentIndex = listaTorneos.value.findIndex(
-    (t) => t.idTorneo === activeTorneo.value
-  );
-  activeTorneo.value =
-    currentIndex + 1 >= listaTorneos.value.length
-      ? listaTorneos.value[0].idTorneo
-      : listaTorneos.value[currentIndex + 1].idTorneo;
-};
+const tab = ref(0);
 
 onMounted(async () => {
   isLoading.value = true;
 
   const responseTorneos = await getTorneos();
   listaTorneos.value = responseTorneos.data;
-  listaTorneos.value = listaTorneos.value.sort(
-    (a, b) =>
-      new Date(a.fechaInicioTorneo).getTime() -
-      new Date(b.fechaInicioTorneo).getTime()
-  );
-  if (listaTorneos.value.length > 0) {
-    activeTorneo.value = listaTorneos.value[0].idTorneo;
-  }
 
-  contador.value = listaTorneos.value.length;
+  const now = new Date().getTime();
+
+  torneosFuturos.value = listaTorneos.value
+    .filter((torneo) => new Date(torneo.fechaInicioTorneo).getTime() > now)
+    .sort(
+      (a, b) =>
+        new Date(a.fechaInicioTorneo).getTime() -
+        new Date(b.fechaInicioTorneo).getTime()
+    );
+
+  torneosPasados.value = listaTorneos.value.filter(
+    (torneo) => new Date(torneo.fechaInicioTorneo).getTime() <= now
+  );
 
   isLoading.value = false;
 });
