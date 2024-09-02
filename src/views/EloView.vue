@@ -5,21 +5,20 @@
     </div>
     <div v-else>
       <v-tabs v-model="tab" color="primary" grow>
-        <v-tab value="1"> Global </v-tab>
-        <v-tab value="2"> Mensual </v-tab>
-        <v-tab value="3"> Equipos </v-tab>
+        <v-tab value="Global"> Global </v-tab>
+        <v-tab value="Mensual"> Mensual </v-tab>
+        <v-tab value="Equipos"> Equipos </v-tab>
       </v-tabs>
 
       <v-tabs-window v-model="tab">
         <!-- TAB 1. -->
-        <v-tabs-window-item value="1" v-if="tab === '1'">
+        <v-tabs-window-item value="Global" v-if="tab === 'Global'">
           <SparklineElo :email="correo" class="separated" />
           <TablaClasificacionElo class="separated" :items="eloClasificacion" />
         </v-tabs-window-item>
 
         <!-- TAB 2. -->
-        <v-tabs-window-item value="2" v-if="tab === '2'">
-          <SparklineElo :email="correo" class="separated" />
+        <v-tabs-window-item value="Mensual" v-if="tab === 'Mensual'">
           <TablaClasificacionElo
             class="separated"
             :items="eloClasificacionMensual"
@@ -27,7 +26,7 @@
         </v-tabs-window-item>
 
         <!-- TAB 3. -->
-        <v-tabs-window-item value="3" v-if="tab === '3'">
+        <v-tabs-window-item value="Equipos" v-if="tab === 'Equipos'">
           <TablaClasificacionEloEquipos
             class="separated"
             :items="eloClasificacion"
@@ -59,7 +58,7 @@ import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 
 const usuariosStore = useUsuariosStore();
 
-const tab = ref<string>("1");
+const tab = ref<string>("Mensual");
 
 const { getUser } = useAuth();
 const error = ref<string | null>(null);
