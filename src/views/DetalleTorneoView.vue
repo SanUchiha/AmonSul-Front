@@ -84,6 +84,7 @@
                           variant="tonal"
                           color="success lighten-1"
                           @click="showModalResponse"
+                          :disabled="isRegistering"
                           >Apúntate</v-btn
                         >
                       </div>
@@ -192,6 +193,7 @@ const headers = [{ title: "Nick", key: "nick" }];
 
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
+const isRegistering = ref<boolean>(false);
 
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
@@ -265,6 +267,7 @@ const descargarBases = async () => {
 
 const showModalResponse = async () => {
   if (idUsuario.value && idTorneo.value) {
+    isRegistering.value = true; // Deshabilitar el botón
     try {
       const body: CrearInscripcionDTO = {
         idUsuario: parseInt(idUsuario.value),
@@ -274,6 +277,8 @@ const showModalResponse = async () => {
       showSuccessModal.value = true;
     } catch {
       showErrorModal.value = true;
+    } finally {
+      isRegistering.value = false; // Habilitar el botón nuevamente
     }
   }
 };
