@@ -5,22 +5,29 @@
     </div>
     <div v-else>
       <v-tabs v-model="tab" color="primary" grow>
-        <v-tab value="one">
-          <v-icon icon="mdi-account"></v-icon>
-        </v-tab>
-        <v-tab value="two">
-          <v-icon icon="mdi-account-group"></v-icon>
-        </v-tab>
+        <v-tab value="1"> Global </v-tab>
+        <v-tab value="2"> Mensual </v-tab>
+        <v-tab value="3"> Equipos </v-tab>
       </v-tabs>
 
       <v-tabs-window v-model="tab">
         <!-- TAB 1. -->
-        <v-tabs-window-item value="one" v-if="tab === 'one'">
+        <v-tabs-window-item value="1" v-if="tab === '1'">
           <SparklineElo :email="correo" class="separated" />
           <TablaClasificacionElo class="separated" :items="eloClasificacion" />
         </v-tabs-window-item>
 
-        <v-tabs-window-item value="two" v-if="tab === 'two'">
+        <!-- TAB 2. -->
+        <v-tabs-window-item value="2" v-if="tab === '2'">
+          <SparklineElo :email="correo" class="separated" />
+          <TablaClasificacionElo
+            class="separated"
+            :items="eloClasificacionMensual"
+          />
+        </v-tabs-window-item>
+
+        <!-- TAB 3. -->
+        <v-tabs-window-item value="3" v-if="tab === '3'">
           <TablaClasificacionEloEquipos
             class="separated"
             :items="eloClasificacion"
@@ -38,7 +45,10 @@ import TablaClasificacionElo from "@/components/Elo/TablaClasificacionElo.vue";
 import TablaClasificacionEloEquipos from "@/components/Elo/TablaClasificacionEloEquipos.vue";
 import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
 import { FaccionDTO } from "@/interfaces/Faccion";
-import { getClasifiacionElo } from "@/services/EloService";
+import {
+  getClasifiacionElo,
+  getClasifiacionEloMensual,
+} from "@/services/EloService";
 import { getFacciones } from "@/services/FaccionesService";
 import { onMounted, ref, computed, ComputedRef } from "vue";
 import { useAuth } from "@/composables/useAuth";
@@ -49,7 +59,7 @@ import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 
 const usuariosStore = useUsuariosStore();
 
-const tab = ref<string>("one");
+const tab = ref<string>("1");
 
 const { getUser } = useAuth();
 const error = ref<string | null>(null);
@@ -57,6 +67,7 @@ const router = useRouter();
 const correo = ref<string>(``);
 const isLoading = ref<boolean>(true);
 const eloClasificacion = ref<UsuarioEloTablaClasificacion[]>([]);
+const eloClasificacionMensual = ref<UsuarioEloTablaClasificacion[]>([]);
 const facciones = ref<FaccionDTO[]>([]);
 const usuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(
   () => usuariosStore.usuarios
@@ -65,6 +76,7 @@ const usuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(
 onMounted(async () => {
   isLoading.value = true;
   try {
+    // Obtener el usuario
     const email: any = await getUser.value;
     if (!email) {
       error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
@@ -72,24 +84,47 @@ onMounted(async () => {
       return;
     }
     correo.value = email;
-    const responseClasificacionElo = await getClasifiacionElo();
-    eloClasificacion.value = responseClasificacionElo.data;
-    eloClasificacion.value = eloClasificacion.value.sort(
+
+    // Hacer peticiones en paralelo
+    const [
+      responseClasificacionElo,
+      faccionesResponse,
+      responseClasificacionEloMensual,
+    ] = await Promise.all([
+      getClasifiacionElo(),
+      getFacciones(),
+      getClasifiacionEloMensual(),
+    ]);
+
+    // Procesar la clasificación ELO
+    eloClasificacion.value = responseClasificacionElo.data.sort(
       (a, b) => b.elo - a.elo
     );
-
     eloClasificacion.value = eloClasificacion.value.map((item, index) => ({
       ...item,
       clasificacion: index + 1,
     }));
 
-    const faccionesResponse = await getFacciones();
+    // Procesar las facciones
     facciones.value = faccionesResponse.data;
+
+    // Procesar la clasificación ELO mensual
+    eloClasificacionMensual.value = responseClasificacionEloMensual.data.sort(
+      (a, b) => b.elo - a.elo
+    );
+    eloClasificacionMensual.value = eloClasificacionMensual.value.map(
+      (item, index) => ({
+        ...item,
+        clasificacion: index + 1,
+      })
+    );
+
+    // Obtener los usuarios si no se han cargado
     if (!usuarios.value.length) {
       await usuariosStore.requestUsuarios();
     }
-  } catch {
-    console.error("Error al obtener datos del usuario:", error);
+  } catch (err) {
+    console.error("Error al obtener datos del usuario:", error.value);
   } finally {
     isLoading.value = false;
   }
