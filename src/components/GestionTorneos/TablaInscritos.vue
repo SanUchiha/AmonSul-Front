@@ -97,12 +97,7 @@
 
     <!-- boton para generar los pairing pasandole el id del torneo -->
     <div class="text-center pa-4">
-      <v-btn
-        :disabled="isLoading || localInscripciones.length === 0"
-        @click="openConfigModal"
-        color="primary"
-        large
-      >
+      <v-btn :disabled="true" @click="openConfigModal" color="primary" large>
         Configurar Primera Ronda
       </v-btn>
     </div>
