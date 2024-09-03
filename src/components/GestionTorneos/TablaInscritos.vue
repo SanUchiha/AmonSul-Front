@@ -17,13 +17,24 @@
 
     <v-divider></v-divider>
 
+    <div v-if="isLoading" class="text-center pa-4">
+      Cargando inscripciones...
+    </div>
+
+    <div
+      v-else-if="!isLoading && localInscripciones.length === 0"
+      class="text-center pa-4"
+    >
+      No hay inscripciones para este torneo
+    </div>
+
     <v-data-table
+      v-else
       v-model:search="search"
       :items="localInscripciones"
       :headers="headers"
       class="custom-table"
       item-key="nick"
-      v-if="localInscripciones.length > 0"
     >
       <template v-slot:item="{ item }">
         <tr @click="handleRowClick(item)">
@@ -83,7 +94,24 @@
         </tr>
       </template>
     </v-data-table>
-    <div v-else class="text-center pa-4">No hay inscripciones disponibles</div>
+
+    <!-- boton para generar los pairing pasandole el id del torneo -->
+    <div class="text-center pa-4">
+      <v-btn
+        :disabled="isLoading || localInscripciones.length === 0"
+        @click="openConfigModal"
+        color="primary"
+        large
+      >
+        Configurar Primera Ronda
+      </v-btn>
+    </div>
+
+    <ModalParametrosPrimeraRonda
+      :isVisible="showConfigModal"
+      @close="closeConfigModal"
+      @confirm="handleConfigConfirm"
+    />
   </v-card>
 
   <ModalDetalleInscripcion
@@ -103,12 +131,31 @@ import {
   InscripcionTorneoCreadoDTO,
   TorneoGestionInfoDTO,
 } from "@/interfaces/Torneo";
+import ModalParametrosPrimeraRonda from "./ModalParametrosPrimeraRonda.vue";
 
 // Define las propiedades
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 
 // Crear una copia reactiva de las inscripciones
 const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
+const isLoading = ref(true);
+
+const showConfigModal = ref(false);
+
+const openConfigModal = () => {
+  showConfigModal.value = true;
+};
+
+const closeConfigModal = () => {
+  showConfigModal.value = false;
+};
+
+const handleConfigConfirm = (configuracion: any) => {
+  console.log("Configuración confirmada:", configuracion);
+  closeConfigModal();
+
+  // Aquí puedes agregar la lógica para usar la configuración, como generar los pairings.
+};
 
 watch(
   () => props.torneo?.inscripciones,
@@ -116,8 +163,9 @@ watch(
     if (newInscripciones) {
       localInscripciones.value = [...newInscripciones];
     }
+    isLoading.value = false;
   },
-  { immediate: true } // Esto asegura que la copia se haga inmediatamente cuando se recibe el prop
+  { immediate: true }
 );
 
 const emit = defineEmits(["inscripcionEliminada"]);
@@ -210,6 +258,13 @@ const handleEliminarInscripcion = (idInscripcion: number) => {
 const closeModal = () => {
   showModal.value = false;
   selectedInscripcion.value = null;
+};
+
+const generatePairings = () => {
+  if (props.torneo) {
+    const torneoId = props.torneo.torneo.idTorneo;
+    console.log(`Generando pairings para el torneo con ID: ${torneoId}`);
+  }
 };
 </script>
 

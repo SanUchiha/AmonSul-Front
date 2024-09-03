@@ -11,6 +11,14 @@
         <strong>Fin de Inscripción:</strong>
         {{ formatDate(torneo.torneo.fechaFinInscripcion) }}
       </p>
+      <p>
+        <strong>Pagos: :</strong>
+        {{ pagosRealizados }}/{{ totalInscripciones }}
+      </p>
+      <p>
+        <strong>Listas: :</strong>
+        {{ listasEntregadas }}/{{ totalInscripciones }}
+      </p>
     </v-card-text>
   </v-card>
 </template>
@@ -28,6 +36,24 @@ const plazasRestantes = computed(() => {
   return (
     props.torneo.torneo.limiteParticipantes! - props.torneo.inscripciones.length
   );
+});
+
+const totalInscripciones = computed(() => {
+  return props.torneo ? props.torneo.inscripciones.length : 0;
+});
+
+const pagosRealizados = computed(() => {
+  if (!props.torneo) return 0;
+  return props.torneo.inscripciones.filter(
+    (inscripcion) => inscripcion.esPago === "SI"
+  ).length;
+});
+
+const listasEntregadas = computed(() => {
+  if (!props.torneo) return 0;
+  return props.torneo.inscripciones.filter(
+    (inscripcion) => inscripcion.estadoLista === "OK"
+  ).length;
 });
 
 const formatDate = (date: string | null | undefined) => {
