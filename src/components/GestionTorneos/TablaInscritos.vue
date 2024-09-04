@@ -97,13 +97,14 @@
 
     <!-- boton para generar los pairing pasandole el id del torneo -->
     <div class="text-center pa-4">
-      <v-btn :disabled="true" @click="openConfigModal" color="primary" large>
-        Configurar Primera Ronda
+      <v-btn @click="openConfigModal" color="primary" large>
+        Generar Ronda
       </v-btn>
     </div>
 
     <ModalParametrosPrimeraRonda
       :isVisible="showConfigModal"
+      :torneo="torneo"
       @close="closeConfigModal"
       @confirm="handleConfigConfirm"
     />

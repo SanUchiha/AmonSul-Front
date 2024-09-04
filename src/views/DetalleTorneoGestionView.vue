@@ -41,7 +41,6 @@ onMounted(async () => {
     router.push({ name: "error" });
   } finally {
     isLoading.value = false;
-    console.log(torneo.value);
   }
 });
 
