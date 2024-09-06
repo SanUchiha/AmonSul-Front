@@ -153,6 +153,22 @@
       message="No se ha podido registrar la inscripción. Contacta con el administrador."
       @update:isVisible="showErrorModal = $event"
     />
+
+    <!-- Spinner Modal -->
+    <v-dialog v-model="isRegistering" persistent width="300">
+      <v-card>
+        <v-card-text
+          class="d-flex justify-center align-center"
+          style="height: 150px"
+        >
+          <v-progress-circular
+            indeterminate
+            color="blue-lighten-3"
+            :size="57"
+          ></v-progress-circular>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -267,7 +283,7 @@ const descargarBases = async () => {
 
 const showModalResponse = async () => {
   if (idUsuario.value && idTorneo.value) {
-    isRegistering.value = true; // Deshabilitar el botón
+    isRegistering.value = true;
     try {
       const body: CrearInscripcionDTO = {
         idUsuario: parseInt(idUsuario.value),

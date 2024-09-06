@@ -146,7 +146,6 @@ const closeConfigModal = () => {
 };
 
 const handleConfigConfirm = (configuracion: any) => {
-  console.log("Configuración confirmada:", configuracion);
   closeConfigModal();
 
   // Aquí puedes agregar la lógica para usar la configuración, como generar los pairings.
@@ -258,7 +257,6 @@ const closeModal = () => {
 const generatePairings = () => {
   if (props.torneo) {
     const torneoId = props.torneo.torneo.idTorneo;
-    console.log(`Generando pairings para el torneo con ID: ${torneoId}`);
   }
 };
 </script>

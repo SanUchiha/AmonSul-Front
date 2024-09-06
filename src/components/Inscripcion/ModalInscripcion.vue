@@ -4,12 +4,12 @@
   </div>
   <div v-else class="center">
     <v-dialog v-model="show" max-width="800px">
-      <v-card>
+      <v-card elevation="8" class="rounded-modal">
         <v-card-title class="modal-title">
           <h3>Detalle inscripción</h3>
           <v-spacer></v-spacer>
           <v-btn icon @click="close" class="close-button">
-            <v-icon>mdi-close</v-icon>
+            <v-icon color="grey darken-1">mdi-close</v-icon>
           </v-btn>
         </v-card-title>
         <v-divider></v-divider>
@@ -21,13 +21,14 @@
               <v-list-item-title class="list-item-title">
                 LISTA: {{ inscripcionData?.estadoLista }}
               </v-list-item-title>
+              <v-btn
+                color="primary"
+                variant="tonal"
+                @click="handleVerLista(inscripcionData?.idInscripcion!)"
+              >
+                Envia/modifica tu lista
+              </v-btn>
             </v-list-item>
-            <v-btn
-              color="blue"
-              @click="handleVerLista(inscripcionData?.idInscripcion!)"
-            >
-              LISTA
-            </v-btn>
 
             <!-- Estado Pago -->
             <v-list-item>
@@ -46,7 +47,12 @@
             <!-- Botón para eliminar la inscripcion-->
             <v-list-item>
               <v-list-item-content>
-                <v-btn color="red" @click="eliminarInscripcion(idInscripcion!)">
+                <v-btn
+                  color="error"
+                  variant="tonal"
+                  @click="eliminarInscripcion(idInscripcion!)"
+                  class="elevated-btn"
+                >
                   Darse de baja del torneo
                 </v-btn>
               </v-list-item-content>
@@ -54,6 +60,21 @@
           </v-list>
         </v-card-text>
       </v-card>
+      <!-- Spinner Modal -->
+      <v-dialog v-model="isRegistering" persistent width="300">
+        <v-card>
+          <v-card-text
+            class="d-flex justify-center align-center"
+            style="height: 150px"
+          >
+            <v-progress-circular
+              indeterminate
+              color="blue-lighten-3"
+              :size="57"
+            ></v-progress-circular>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </v-dialog>
   </div>
 
@@ -91,7 +112,7 @@
 
   <ModalError
     :isVisible="showErrorModalLista"
-    message="No se ha podido enviar la lista eliminar. Contacta con el administrador."
+    message="No se ha podido enviar la lista. Contacta con el administrador."
     @update:isVisible="showErrorModalLista = $event"
   />
 </template>
@@ -119,15 +140,15 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "close"): void;
+  (e: "eliminar-inscripcion", idInscripcion: number): void;
 }>();
 
 const show = ref(true);
-const showLista = ref(false);
-
 const showSuccessModalEliminar = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 
 const isLoading = ref(true);
+const isRegistering = ref(false);
 
 const inscripcionData = ref<InscripcionTorneoCreadoDTO>();
 const currentInscripcionId = ref<number | null>(null);
@@ -156,6 +177,7 @@ const handleEnviarLista = async (listaData: string) => {
 
 const enviarLista = async () => {
   if (currentInscripcionId.value !== null) {
+    isRegistering.value = true;
     const requestLista: CrearListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       listaData: listaText.value,
@@ -169,8 +191,10 @@ const enviarLista = async () => {
       }
       hasLista.value = true;
     } catch {
+      isRegistering.value = false;
       showErrorModalLista.value = true;
     } finally {
+      isRegistering.value = false;
       showVerListaModal.value = false;
     }
   }
@@ -182,43 +206,30 @@ const handleModificarLista = async (listaData: string) => {
 };
 
 const modificarLista = async () => {
-  console.log(currentInscripcionId.value);
-  console.log(idLista.value);
+  isRegistering.value = true;
   if (currentInscripcionId.value !== null && idLista.value != null) {
     const requestLista: ModificarListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       listaData: listaText.value,
       idLista: idLista.value,
     };
-
     try {
       await modificarListaTorneo(requestLista);
       showSuccessModalLista.value = true;
     } catch {
+      isRegistering.value = false;
       showErrorModalLista.value = true;
     } finally {
+      isRegistering.value = false;
       showVerListaModal.value = false;
     }
-  } else {
-    console.log("entra aqui");
   }
 };
 
 const eliminarInscripcion = async (idInscripcion: number) => {
-  // try {
-  //   const response = await cancelarInscripcion(idInscripcion);
-  //   if (response.request?.status === 200) {
-  //     showSuccessModalEliminar.value = true;
-  //     emit("eliminar-inscripcion", idInscripcion.v);
-  //   } else {
-  //     showErrorModal.value = true;
-  //   }
-  // } catch {
-  //   showErrorModal.value = true;
-  // } finally {
-  //   show.value = false;
-  //   emit("close");
-  // }
+  emit("eliminar-inscripcion", idInscripcion);
+  show.value = false;
+  emit("close");
 };
 const close = () => {
   show.value = false;
@@ -230,7 +241,6 @@ onMounted(async () => {
     isLoading.value = true;
     const response = await getIncripcionById(props.idInscripcion!);
     inscripcionData.value = response.data;
-    console.log(inscripcionData.value);
   } catch (error) {
     console.error("Error al obtener datos de la inscripcion:", error);
   } finally {
@@ -259,5 +269,8 @@ onMounted(async () => {
 
 .v-list-item {
   margin-bottom: 16px;
+}
+.elevated-btn {
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 </style>

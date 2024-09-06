@@ -58,54 +58,40 @@
     @update:isVisible="showErrorModal = $event"
   />
 
-  <ModalSuccess
-    :isVisible="showSuccessModalLista"
-    message="Lista enviada con éxito."
-    @update:isVisible="showSuccessModalLista = $event"
-  />
-
-  <ModalError
-    :isVisible="showErrorModalLista"
-    message="No se ha podido enviar la lista eliminar. Contacta con el administrador."
-    @update:isVisible="showErrorModalLista = $event"
-  />
-
-  <ModalLista
-    v-if="currentInscripcionId !== null"
-    :isVisible="showVerListaModal"
-    :hasLista="hasLista"
-    :idInscripcion="currentInscripcionId"
-    @update:isVisible="showVerListaModal = $event"
-    @enviarLista="handleEnviarLista"
-    @modificarLista="handleModificarLista"
-  />
-
   <ModalInscripcion
     v-if="showModalInscripcion"
     :idInscripcion="currentInscripcionId"
+    @eliminar-inscripcion="eliminarInscripcion"
     @close="closeModal"
   />
+
+  <!-- Spinner Modal -->
+  <v-dialog v-model="isRegistering" persistent width="300">
+    <v-card>
+      <v-card-text
+        class="d-flex justify-center align-center"
+        style="height: 150px"
+      >
+        <v-progress-circular
+          indeterminate
+          color="blue-lighten-3"
+          :size="57"
+        ></v-progress-circular>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
 import { InscripcionUsuarioDTO } from "@/interfaces/Inscripcion";
-import {
-  CrearListaTorneoRequestDTO,
-  ModificarListaTorneoRequestDTO,
-} from "@/interfaces/Lista";
 import router from "@/router";
 import {
   cancelarInscripcion,
   getInscripcionesUser,
 } from "@/services/InscripcionesService";
-import {
-  subirListaTorneo,
-  modificarListaTorneo,
-} from "@/services/ListasService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
-import ModalLista from "./ModalLista.vue";
 import { useAuth } from "@/composables/useAuth";
 import ModalInscripcion from "./ModalInscripcion.vue";
 
@@ -115,19 +101,14 @@ const props = defineProps<{
   idUsuario: number;
 }>();
 
+const isRegistering = ref<boolean>(false);
+
 const currentInscripcionId = ref<number | null>(null);
 const currentTorneoId = ref<number | null>(null);
-const listaText = ref<string>("");
-const idLista = ref<number>();
-const hasLista = ref<boolean>(false);
 const listaTorneos = ref<InscripcionUsuarioDTO[]>([]);
 
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
-const showVerListaModal = ref<boolean>(false);
-const showSuccessModalLista = ref<boolean>(false);
-const showErrorModalLista = ref<boolean>(false);
-
 const showModalInscripcion = ref<boolean>(false);
 
 const hasAcciones = ref<boolean>(false);
@@ -148,53 +129,8 @@ const verDetalleTorneo = (idTorneo: number) => {
   router.push({ name: "detalle-torneo", params: { idTorneo } });
 };
 
-const enviarLista = async () => {
-  if (currentInscripcionId.value !== null) {
-    const requestLista: CrearListaTorneoRequestDTO = {
-      idInscripcion: currentInscripcionId.value,
-      listaData: listaText.value,
-    };
-
-    try {
-      await subirListaTorneo(requestLista);
-      showSuccessModalLista.value = true;
-    } catch {
-      showErrorModalLista.value = true;
-    } finally {
-      showVerListaModal.value = false;
-    }
-  }
-};
-
-const modificarLista = async () => {
-  if (currentInscripcionId.value !== null && idLista.value != null) {
-    const requestLista: ModificarListaTorneoRequestDTO = {
-      idInscripcion: currentInscripcionId.value,
-      listaData: listaText.value,
-      idLista: idLista.value,
-    };
-
-    try {
-      await modificarListaTorneo(requestLista);
-      showSuccessModalLista.value = true;
-    } catch {
-      showErrorModalLista.value = true;
-    } finally {
-      showVerListaModal.value = false;
-    }
-  }
-};
-
-const handleVerLista = async (idInscripcion: number) => {
-  currentInscripcionId.value = idInscripcion;
-  await verLista();
-};
-
-const verLista = async () => {
-  showVerListaModal.value = true;
-};
-
 const eliminarInscripcion = async (idInscripcion: number) => {
+  isRegistering.value = true;
   try {
     const response = await cancelarInscripcion(idInscripcion);
 
@@ -208,18 +144,11 @@ const eliminarInscripcion = async (idInscripcion: number) => {
       showErrorModal.value = true;
     }
   } catch {
+    isRegistering.value = false;
     showErrorModal.value = true;
+  } finally {
+    isRegistering.value = false;
   }
-};
-
-const handleEnviarLista = async (listaData: string) => {
-  listaText.value = listaData;
-  await enviarLista();
-};
-
-const handleModificarLista = async (listaData: string) => {
-  listaText.value = listaData;
-  await modificarLista();
 };
 
 onMounted(async () => {
