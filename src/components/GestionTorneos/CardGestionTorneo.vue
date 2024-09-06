@@ -16,8 +16,12 @@
         {{ pagosRealizados }}/{{ totalInscripciones }}
       </p>
       <p>
-        <strong>Listas: :</strong>
+        <strong>Listas entregadas: :</strong>
         {{ listasEntregadas }}/{{ totalInscripciones }}
+      </p>
+      <p>
+        <strong>Listas legales: :</strong>
+        {{ listasLegales }}/{{ totalInscripciones }}
       </p>
     </v-card-text>
   </v-card>
@@ -49,10 +53,17 @@ const pagosRealizados = computed(() => {
   ).length;
 });
 
-const listasEntregadas = computed(() => {
+const listasLegales = computed(() => {
   if (!props.torneo) return 0;
   return props.torneo.inscripciones.filter(
     (inscripcion) => inscripcion.estadoLista === "OK"
+  ).length;
+});
+
+const listasEntregadas = computed(() => {
+  if (!props.torneo) return 0;
+  return props.torneo.inscripciones.filter(
+    (inscripcion) => inscripcion.estadoLista === "ENTREGADA"
   ).length;
 });
 

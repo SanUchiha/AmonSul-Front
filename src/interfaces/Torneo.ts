@@ -57,4 +57,5 @@ export interface InscripcionTorneoCreadoDTO {
   estadoLista?: string | null;
   fechaEntrega?: string | null;
   esPago?: string | null;
+  idLista?: number | null;
 }
