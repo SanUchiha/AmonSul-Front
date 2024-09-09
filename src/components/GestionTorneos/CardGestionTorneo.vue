@@ -63,7 +63,10 @@ const listasLegales = computed(() => {
 const listasEntregadas = computed(() => {
   if (!props.torneo) return 0;
   return props.torneo.inscripciones.filter(
-    (inscripcion) => inscripcion.estadoLista === "ENTREGADA"
+    (inscripcion) =>
+      inscripcion.estadoLista === "ENTREGADA" ||
+      inscripcion.estadoLista === "OK" ||
+      inscripcion.estadoLista === "ILEGAL"
   ).length;
 });
 

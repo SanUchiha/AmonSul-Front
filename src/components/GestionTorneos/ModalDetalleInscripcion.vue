@@ -73,8 +73,15 @@
           <!-- Botón para ver la lista -->
           <div v-if="inscripcion?.listaData">
             <v-list-item>
-              <v-list-item-content>
-                <v-btn color="primary" @click="toggleLista"> Ver Lista </v-btn>
+              <v-list-item-content v-if="!showLista">
+                <v-btn color="primary" @click="toggleLista">
+                  Mostrar Lista
+                </v-btn>
+              </v-list-item-content>
+              <v-list-item-content v-else>
+                <v-btn color="primary" @click="toggleLista">
+                  Ocultar Lista
+                </v-btn>
               </v-list-item-content>
             </v-list-item>
 
@@ -82,11 +89,12 @@
             <v-expand-transition>
               <v-list-item v-if="showLista">
                 <v-list-item-content>
-                  <v-textarea
-                    v-model="localInscripcion.listaData"
-                    auto-grow
-                    readonly
-                  ></v-textarea>
+                  <img
+                    v-if="localInscripcion.listaData"
+                    :src="localInscripcion.listaData"
+                    alt="Imagen de la lista"
+                    style="max-width: 100%; height: auto"
+                  />
                 </v-list-item-content>
               </v-list-item>
             </v-expand-transition>
