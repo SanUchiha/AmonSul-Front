@@ -1,15 +1,15 @@
 <template>
   <v-container>
     <v-card>
+      <!-- Tabs -->
       <v-tabs v-model="tab" color="primary" grow>
-        <v-tab value="one">
-          <v-icon icon="mdi-eye-outline"></v-icon>
-        </v-tab>
-        <v-tab value="two"> <v-icon icon="mdi-account-group"></v-icon> </v-tab>
+        <v-tab value="one" aria-label="Información del Torneo"> Detalle </v-tab>
+        <v-tab value="two" aria-label="Participantes"> Inscritos </v-tab>
       </v-tabs>
 
       <v-card-text>
         <v-tabs-window v-model="tab">
+          <!-- Tab Información del Torneo -->
           <v-tabs-window-item value="one">
             <v-row justify="center">
               <v-col cols="12" md="12">
@@ -60,9 +60,8 @@
                       color="blue lighten-2"
                       @click="descargarBases"
                       block
+                      >Descargar Bases</v-btn
                     >
-                      Descargar Bases
-                    </v-btn>
                   </v-card-actions>
 
                   <v-divider class="my-3"></v-divider>
@@ -72,23 +71,33 @@
                       variant="outlined"
                       color="orange lighten-2"
                       @click="goBack"
+                      >Volver</v-btn
                     >
-                      Volver
-                    </v-btn>
-                    <div v-if="isTorneoCompletado" class="color-text">
+
+                    <!-- Verificación de la fecha de inscripción -->
+                    <div v-if="isInscripcionCerrada" class="color-text">
+                      ¡Plazo de inscripción cerrado!
+                    </div>
+                    <div
+                      v-else-if="inscripcionState === 'completo'"
+                      class="color-text"
+                    >
                       ¡COMPLETO!
                     </div>
+                    <div
+                      v-else-if="inscripcionState === 'apuntado'"
+                      class="color-text"
+                    >
+                      Ya estás apuntado
+                    </div>
                     <div v-else>
-                      <div v-if="!estaApuntado">
-                        <v-btn
-                          variant="tonal"
-                          color="success lighten-1"
-                          @click="showModalResponse"
-                          :disabled="isRegistering"
-                          >Apúntate</v-btn
-                        >
-                      </div>
-                      <div v-else class="color-text">Ya estás apúntado</div>
+                      <v-btn
+                        variant="tonal"
+                        color="success lighten-1"
+                        @click="showModalResponse"
+                        :disabled="isRegistering"
+                        >Apúntate</v-btn
+                      >
                     </div>
                   </v-card-actions>
                 </v-card>
@@ -96,17 +105,16 @@
             </v-row>
           </v-tabs-window-item>
 
+          <!-- Tab Participantes -->
           <v-tabs-window-item value="two">
             <v-card flat>
-              <v-card-title class="d-flex align-center pe-2"
-                >Participantes
-
+              <v-card-title class="d-flex align-center pe-2">
+                Participantes
                 <v-spacer></v-spacer>
-
                 <v-text-field
                   v-model="search"
                   density="compact"
-                  label="Search"
+                  label="Buscar"
                   prepend-inner-icon="mdi-magnify"
                   variant="solo-filled"
                   flat
@@ -116,7 +124,7 @@
               </v-card-title>
 
               <v-divider></v-divider>
-              <v-divider></v-divider>
+
               <v-data-table
                 v-model:search="search"
                 :items="participantes"
@@ -142,12 +150,14 @@
       </v-card-text>
     </v-card>
 
+    <!-- Modal Success -->
     <ModalSuccess
       :isVisible="showSuccessModal"
       message="Te has registrado con éxito."
       @update:isVisible="showSuccessModal = $event"
     />
 
+    <!-- Modal Error -->
     <ModalError
       :isVisible="showErrorModal"
       message="No se ha podido registrar la inscripción. Contacta con el administrador."
@@ -173,7 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Torneo } from "@/interfaces/Torneo";
 import { descargarBasesTorneo, getTorneo } from "@/services/TorneosService";
@@ -193,6 +203,7 @@ import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 const { getidUsuario } = useAuth();
 const route = useRoute();
 const router = useRouter();
+
 const torneo = ref<Torneo>();
 const participantes = ref<InscripcionUsuarioDTO[]>([]);
 const idUsuario = ref<string | null>(getidUsuario.value);
@@ -200,50 +211,64 @@ const idTorneo = ref<number>();
 const estaApuntado = ref<boolean>(false);
 const isTorneoCompletado = ref<boolean>(false);
 const torneosApuntado = ref<InscripcionUsuarioDTO[]>();
-const tab = ref(0);
 
+const tab = ref(0);
 const search = ref<string>("");
 const isLoading = ref<boolean>(true);
-
 const headers = [{ title: "Nick", key: "nick" }];
-
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const isRegistering = ref<boolean>(false);
+
+// Computed para gestionar el estado de inscripción
+const inscripcionState = computed(() => {
+  if (isTorneoCompletado.value) return "completo";
+  if (estaApuntado.value) return "apuntado";
+  return "noApuntado";
+});
+
+// Computed para verificar si el plazo de inscripción está cerrado
+const isInscripcionCerrada = computed(() => {
+  if (!torneo.value || !torneo.value.fechaFinInscripcion) return false;
+  const fechaActual = new Date();
+  const fechaFinInscripcion = new Date(torneo.value.fechaFinInscripcion);
+  return fechaActual > fechaFinInscripcion;
+});
 
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
 };
 
+// Montaje y obtención de datos
 onMounted(async () => {
   isLoading.value = true;
   if (idUsuario.value != null) {
     idTorneo.value = Number(route.params.idTorneo);
-    const responseTorneo = await getTorneo(idTorneo.value);
-    torneo.value = responseTorneo.data;
-    const responseInscripcion = await getInscripcionesTorneo(idTorneo.value);
-    participantes.value = responseInscripcion.data;
 
-    // Comprobar si ya está apuntado
-    const responseInscriptionesUser = await getInscripcionesUser(
-      idUsuario.value
-    );
+    // Paralelizar las solicitudes
+    const [responseTorneo, responseInscripcion, responseInscriptionesUser] =
+      await Promise.all([
+        getTorneo(idTorneo.value),
+        getInscripcionesTorneo(idTorneo.value),
+        getInscripcionesUser(idUsuario.value),
+      ]);
+
+    torneo.value = responseTorneo.data;
+    participantes.value = responseInscripcion.data;
     torneosApuntado.value = responseInscriptionesUser.data;
 
+    // Verificar si el usuario ya está apuntado
     if (torneosApuntado.value != null) {
       torneosApuntado.value.forEach((element) => {
-        if (element.idTorneo == idTorneo.value) estaApuntado.value = true;
+        if (element.idTorneo === idTorneo.value) estaApuntado.value = true;
       });
 
-      //comprobar si quedan plazas
-      if (torneo.value && torneo.value.limiteParticipantes)
-        if (
-          participantes.value.length >= torneo.value.limiteParticipantes &&
-          torneo.value?.limiteParticipantes != null
-        )
+      // Verificar si el torneo está completo
+      if (torneo.value && torneo.value.limiteParticipantes) {
+        if (participantes.value.length >= torneo.value.limiteParticipantes) {
           isTorneoCompletado.value = true;
-
-      isLoading.value = false;
+        }
+      }
     }
   }
   isLoading.value = false;
@@ -282,19 +307,23 @@ const descargarBases = async () => {
 };
 
 const showModalResponse = async () => {
-  if (idUsuario.value && idTorneo.value) {
-    isRegistering.value = true;
+  if (
+    idUsuario.value != null &&
+    idTorneo.value != null &&
+    !isInscripcionCerrada.value
+  ) {
+    const inscripcion: CrearInscripcionDTO = {
+      idUsuario: parseInt(idUsuario.value),
+      idTorneo: idTorneo.value!,
+    };
     try {
-      const body: CrearInscripcionDTO = {
-        idUsuario: parseInt(idUsuario.value),
-        idTorneo: idTorneo.value,
-      };
-      await registrarInscripcion(body);
+      isRegistering.value = true;
+      await registrarInscripcion(inscripcion);
       showSuccessModal.value = true;
-    } catch {
+    } catch (error) {
       showErrorModal.value = true;
     } finally {
-      isRegistering.value = false; // Habilitar el botón nuevamente
+      isRegistering.value = false;
     }
   }
 };
