@@ -101,5 +101,12 @@ export const appsettings = {
     "Assault upon Helm’s Deep",
     "Army of Dunland",
     "Helm’s Guard",
+    "Battle of Fornost",
+    "Army of Arnor",
+    "Host of the Witch-King",
+    "Army of Carn Dûm",
+    "Wolf pack of Angmar",
+    "Arathorn´s Stand",
+    "Buhrdûr´s Horde",
   ],
 };
