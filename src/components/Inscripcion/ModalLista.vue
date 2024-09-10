@@ -2,7 +2,22 @@
   <v-dialog v-model="internalIsVisible" max-width="500">
     <v-card>
       <v-card-title class="headline">Tu lista</v-card-title>
+
       <v-card-text>
+        <v-combobox
+          v-model="ejercitoSelected"
+          :items="listadoEjercitos"
+          label="¿Cuál es tu ejército principal?"
+          @click="loadEjercitos"
+          :rules="[rules.required]"
+          required
+        ></v-combobox>
+        <v-progress-linear
+          v-if="loadingEjercitos"
+          indeterminate
+          color="primary"
+          class="progress-linear-margin"
+        ></v-progress-linear>
         <div v-if="isLoading" class="loading-container">
           <!-- Indicador de carga -->
           <v-progress-circular
@@ -28,21 +43,38 @@
           </div>
         </div>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions style="display: flex; justify-content: space-between">
         <v-spacer></v-spacer>
         <div v-if="imageBase64">
-          <v-btn color="primary" @click="cambiarImagen">Cambiar</v-btn>
-          <v-btn color="primary" @click="enviarLista">Enviar</v-btn>
+          <v-btn variant="tonal" color="primary" @click="cambiarImagen"
+            >Cambiar</v-btn
+          >
+          <v-btn
+            variant="tonal"
+            color="primary"
+            @click="enviarLista"
+            :disabled="isSendButtonDisabled"
+            style="margin-right: 10px"
+            >Enviar</v-btn
+          >
         </div>
-        <v-btn color="secondary" @click="close">Cancelar</v-btn>
+        <v-btn
+          variant="tonal"
+          color="secondary"
+          @click="close"
+          style="margin-left: auto"
+          >Cancelar</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
+import { ObjetoListaDTO } from "@/interfaces/Lista";
 import { getlista } from "@/services/ListasService";
-import { defineProps, defineEmits, ref, watch, onMounted } from "vue";
+import { appsettings } from "@/settings/appsettings";
+import { defineProps, defineEmits, ref, watch, onMounted, computed } from "vue";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -55,6 +87,29 @@ const isLoading = ref(false);
 
 const imageBase64 = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+const ejercitoSelected = ref<string>("");
+const listadoEjercitos = ref<string[]>([]);
+const loadingEjercitos = ref(false);
+const isSendButtonDisabled = computed(() => {
+  return (
+    !ejercitoSelected.value ||
+    !listadoEjercitos.value.includes(ejercitoSelected.value)
+  );
+});
+
+const rules = {
+  required: (value: string | null) => !!value || "Este campo es obligatorio.",
+};
+
+const loadEjercitos = async () => {
+  isLoading.value = true;
+  loadingEjercitos.value = true;
+
+  listadoEjercitos.value = await appsettings.ejercitos;
+
+  isLoading.value = false;
+  loadingEjercitos.value = false;
+};
 
 const onImageSelected = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
@@ -100,8 +155,12 @@ const close = () => {
 };
 
 const enviarLista = () => {
-  if (props.hasLista) emit("modificarLista", imageBase64.value);
-  else emit("enviarLista", imageBase64.value);
+  const newLista: ObjetoListaDTO = {
+    listaData: imageBase64.value!,
+    ejercito: ejercitoSelected.value,
+  };
+  if (props.hasLista) emit("modificarLista", newLista);
+  else emit("enviarLista", newLista);
 };
 
 onMounted(async () => {
@@ -110,8 +169,9 @@ onMounted(async () => {
     try {
       const response = await getlista(props.idInscripcion);
       imageBase64.value = response.data.listaData;
+      ejercitoSelected.value = response.data.ejercito;
     } catch {
-      console.error("No se ha podido cargar la imagen");
+      console.error("No se ha podido cargar la lista");
     } finally {
       isLoading.value = false;
     }
@@ -130,5 +190,12 @@ onMounted(async () => {
   justify-content: center;
   align-items: center;
   height: 150px; /* Ajusta la altura según sea necesario */
+}
+.v-card-actions v-btn {
+  margin-right: 10px !important; /* Fuerza el margen entre los botones */
+}
+
+.v-card-actions v-btn:last-child {
+  margin-right: 0 !important; /* Asegura que el último botón no tenga margen */
 }
 </style>

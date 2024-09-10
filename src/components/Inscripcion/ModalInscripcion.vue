@@ -128,6 +128,7 @@ import ModalLista from "./ModalLista.vue";
 import {
   CrearListaTorneoRequestDTO,
   ModificarListaTorneoRequestDTO,
+  ObjetoListaDTO,
 } from "@/interfaces/Lista";
 import {
   modificarListaTorneo,
@@ -155,6 +156,7 @@ const currentInscripcionId = ref<number | null>(null);
 const showVerListaModal = ref<boolean>(false);
 const hasLista = ref<boolean>(false);
 const listaText = ref<string>("");
+const ejercito = ref<string>("");
 const showSuccessModalLista = ref<boolean>(false);
 const showErrorModalLista = ref<boolean>(false);
 const idLista = ref<number | null>();
@@ -170,17 +172,19 @@ const verLista = async () => {
   showVerListaModal.value = true;
 };
 
-const handleEnviarLista = async (listaData: string) => {
-  listaText.value = listaData;
-  await enviarLista();
+const handleEnviarLista = async (newLista: ObjetoListaDTO) => {
+  listaText.value = newLista.listaData;
+  ejercito.value = newLista.ejercito;
+  await enviarLista(newLista);
 };
 
-const enviarLista = async () => {
+const enviarLista = async (newLista: ObjetoListaDTO) => {
   if (currentInscripcionId.value !== null) {
     isRegistering.value = true;
     const requestLista: CrearListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       listaData: listaText.value,
+      ejercito: newLista.ejercito,
     };
 
     try {
@@ -200,18 +204,20 @@ const enviarLista = async () => {
   }
 };
 
-const handleModificarLista = async (listaData: string) => {
-  listaText.value = listaData;
-  await modificarLista();
+const handleModificarLista = async (newLista: ObjetoListaDTO) => {
+  ejercito.value = newLista.ejercito;
+  listaText.value = newLista.listaData;
+  await modificarLista(newLista);
 };
 
-const modificarLista = async () => {
+const modificarLista = async (newLista: ObjetoListaDTO) => {
   isRegistering.value = true;
   if (currentInscripcionId.value !== null && idLista.value != null) {
     const requestLista: ModificarListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       listaData: listaText.value,
       idLista: idLista.value,
+      ejercito: newLista.ejercito,
     };
     try {
       await modificarListaTorneo(requestLista);
