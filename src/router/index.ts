@@ -1,6 +1,6 @@
 import ContactoView from "@/views/ContactoView.vue";
 import DetalleJugadorView from "@/views/DetalleJugadorView.vue";
-import DetalleToneoLiveView from "@/views/DetalleToneoLiveView.vue";
+import TorneoLiveView from "@/views/TorneoLiveView.vue";
 import DetalleTorneoView from "@/views/DetalleTorneoView.vue";
 import InicioSesionView from "@/views/InicioSesionView.vue";
 import DashboardView from "@/views/DashboardView.vue";
@@ -15,6 +15,7 @@ import EloView from "@/views/EloView.vue";
 import DetalleInscripcionView from "@/views/DetalleInscripcionView.vue";
 import GestionTorneosView from "@/views/GestionTorneosView.vue";
 import DetalleTorneoGestionView from "@/views/DetalleTorneoGestionView.vue";
+import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -43,6 +44,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/detalle-torneo-live/:idTorneo",
+    name: "detalle-torneo-live",
+    component: DetalleTorneoLiveView,
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/registrar-partida",
     name: "registrar-partida",
     component: FormCrearPartida,
@@ -54,17 +61,17 @@ const routes: Array<RouteRecordRaw> = [
     component: EloView,
     meta: { requiresAuth: true },
   },
+  {
+    path: "/resultados-torneos",
+    name: "resultados-torneos",
+    component: TorneoLiveView,
+    meta: { requiresAuth: true },
+  },
 
   {
     path: "/detalle-torneo/:idTorneo",
     name: "detalle-torneo",
     component: DetalleTorneoView,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/detalle-torneo-live/:idTorneoLive",
-    name: "detalle-torneo-live",
-    component: DetalleToneoLiveView,
     meta: { requiresAuth: true },
   },
   {
