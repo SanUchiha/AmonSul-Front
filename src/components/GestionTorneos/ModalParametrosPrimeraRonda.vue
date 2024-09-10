@@ -27,9 +27,15 @@
             label="¿Se permite luz vs oscuridad?"
             required
           ></v-select> -->
+          <v-select
+            v-model="numeroRonda"
+            :items="rondas"
+            label="¿Qué ronda es?"
+            required
+          ></v-select>
           <v-checkbox
             v-model="mismaComunidadCheck"
-            label="¿Se permite emparejamientos de la misma comunidad?"
+            label="¿Se permite emparejamientos de la misma comunidad de juego?"
           ></v-checkbox>
 
           <v-checkbox
@@ -46,6 +52,19 @@
             v-model="retosCheck"
             label="¿Tenemos algun reto para esta ronda?"
           ></v-checkbox>
+
+          <v-radio-group
+            v-if="isImpares"
+            v-model="opcionImpares"
+            label="Los jugadores son impares. ¿Cómo quieres gestionarlo?"
+          >
+            <v-radio label="Añadir un jugador" value="añadirJugador"></v-radio>
+            <v-radio
+              label="Dejar emparejamiento incompleto"
+              value="incompleto"
+            ></v-radio>
+            <v-radio label="Hacer un bye" value="bye"></v-radio>
+          </v-radio-group>
 
           <div v-if="retosCheck">
             <v-combobox
@@ -106,8 +125,16 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="closeModal">Cancelar</v-btn>
-        <v-btn @click="confirmarConfiguracion" color="primary">Confirmar</v-btn>
+        <v-btn
+          :disabled="isGenerating"
+          @click="confirmarConfiguracion"
+          color="primary"
+          >Confirmar</v-btn
+        >
       </v-card-actions>
+      <div v-if="isGenerating">
+        <ProgressCircular />
+      </div>
     </v-card>
   </v-dialog>
 </template>
@@ -122,7 +149,9 @@ import {
   InscripcionTorneoCreadoDTO,
   TorneoGestionInfoDTO,
 } from "@/interfaces/Torneo";
+import { generarRonda } from "@/services/PartidaTorneoService";
 import { ref, defineProps, defineEmits, watch, onMounted, computed } from "vue";
+import ProgressCircular from "../Commons/ProgressCircular.vue";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -143,6 +172,9 @@ const mismaComunidadCheck = ref<boolean>(false);
 const luzVsOscCheck = ref<boolean>(false);
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
+const opcionImpares = ref<string | null>(null);
+const isImpares = ref<boolean>(false);
+const numeroRonda = ref<number>();
 
 const jugadoresObj = ref<InscripcionTorneoCreadoDTO[] | undefined>(
   props.torneo?.inscripciones
@@ -152,6 +184,8 @@ const jugador1 = ref<JugadorParaEmparejamiento>();
 const jugador2 = ref<JugadorParaEmparejamiento>();
 
 const tiposSiNo = ref<string[]>(["NO", "SI"]);
+const rondas = ref<number[]>();
+const isGenerating = ref<boolean>(false);
 
 const closeModal = () => {
   internalIsVisible.value = false;
@@ -165,7 +199,7 @@ const isAddEmparejamientoEnabled = computed(() => {
   return jugador1.value && jugador2.value && jugador1.value !== jugador2.value;
 });
 
-onMounted(() => {
+onMounted(async () => {
   if (props.torneo?.inscripciones) {
     jugadoresObj.value = props.torneo.inscripciones;
 
@@ -177,7 +211,18 @@ onMounted(() => {
       return await jugadoresNick.value.push(jugadorObj);
     });
   }
-  console.log(jugadoresNick);
+
+  if (props.torneo?.torneo.numeroPartidas) {
+    const totalRondas = props.torneo.torneo.numeroPartidas;
+    rondas.value = await Array.from({ length: totalRondas }, (_, i) => i + 1);
+  }
+
+  if (jugadoresObj.value && jugadoresObj.value.length % 2 !== 0) {
+    isImpares.value = true;
+  }
+
+  console.log("NICK: ", jugadoresNick.value);
+  console.log("RONDAS: ", rondas.value);
 });
 
 const addEmparejamiento = () => {
@@ -223,16 +268,40 @@ const removeEmparejamiento = (index: number) => {
   emparejamientos.value.splice(index, 1);
 };
 
-const confirmarConfiguracion = () => {
+const confirmarConfiguracion = async () => {
+  if (!props.torneo?.torneo.idTorneo) {
+    console.error("El idTorneo no está definido");
+    return;
+  }
+
+  // if (!numeroRonda.value) {
+  //   console.error("El número de ronda no está definido");
+  //   return;
+  // }
+
   const configuracion: GenerarRonda = {
     mismaComunidadCheck: mismaComunidadCheck.value,
     luzVsOscCheck: luzVsOscCheck.value,
     retosCheck: retosCheck.value,
     emparejamientos: emparejamientos.value,
     esEloCheck: esEloCheck.value,
+    opcionImpares: opcionImpares.value,
+    idTorneo: props.torneo?.torneo.idTorneo,
+    idRonda: 1,
   };
 
   console.log("Configuración final:", configuracion);
+
+  try {
+    isGenerating.value = true;
+    await generarRonda(configuracion);
+  } catch (error) {
+    isGenerating.value = false;
+
+    console.error(error);
+  } finally {
+    isGenerating.value = false;
+  }
 
   emit("confirm", configuracion);
   closeModal();

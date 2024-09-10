@@ -4,6 +4,9 @@ export interface GenerarRonda {
   mismaComunidadCheck: boolean;
   retosCheck: boolean;
   esEloCheck: boolean;
+  opcionImpares: string | null;
+  idTorneo: number;
+  idRonda: number;
 }
 
 export interface Emparejamiento {

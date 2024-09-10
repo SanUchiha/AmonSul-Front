@@ -96,11 +96,11 @@
     </v-data-table>
 
     <!-- boton para generar los pairing pasandole el id del torneo -->
-    <div class="text-center pa-4">
+    <!-- <div class="text-center pa-4">
       <v-btn @click="openConfigModal" color="primary" large>
         Generar Ronda
       </v-btn>
-    </div>
+    </div> -->
 
     <ModalParametrosPrimeraRonda
       :isVisible="showConfigModal"
