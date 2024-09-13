@@ -108,3 +108,11 @@ export interface AceptarProteccionDatos {
   idUsuario: number;
   proteccionDatos: boolean;
 }
+
+export interface UsuarioFastDTO {
+  ciudad: string;
+  faccion: FaccionDTO;
+  idFaccion: number;
+  idUsuario: number;
+  nick: string;
+}

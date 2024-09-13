@@ -96,17 +96,36 @@
     </v-data-table>
 
     <!-- boton para generar los pairing pasandole el id del torneo -->
-    <!-- <div class="text-center pa-4">
-      <v-btn @click="openConfigModal" color="primary" large>
+    <v-row justify="center" class="my-4 ga-5">
+      <v-btn
+        variant="tonal"
+        @click="openAddJugadorModal"
+        color="secondary"
+        size="large"
+      >
+        Añadir Jugador
+      </v-btn>
+      <v-btn
+        variant="tonal"
+        @click="openConfigModal"
+        color="primary"
+        size="large"
+      >
         Generar Ronda
       </v-btn>
-    </div> -->
+    </v-row>
 
     <ModalParametrosPrimeraRonda
       :isVisible="showConfigModal"
       :torneo="torneo"
       @close="closeConfigModal"
       @confirm="handleConfigConfirm"
+    />
+    <ModalAddJugadorTorneo
+      :isVisible="showAddJugadorModal"
+      :torneo="localTorneo"
+      @close="closeAddJugadorModal"
+      @confirm="handleAddJugadorConfirm"
     />
   </v-card>
 
@@ -116,6 +135,12 @@
     @close="closeModal"
     @update-inscripcion="handleUpdateInscripcion"
     @eliminar-inscripcion="handleEliminarInscripcion"
+  />
+
+  <ModalSuccess
+    :isVisible="showSuccessModal"
+    message="Jugador añadido correctamente."
+    @update:isVisible="showSuccessModal = $event"
   />
 </template>
 
@@ -128,6 +153,9 @@ import {
   TorneoGestionInfoDTO,
 } from "@/interfaces/Torneo";
 import ModalParametrosPrimeraRonda from "./ModalParametrosPrimeraRonda.vue";
+import ModalAddJugadorTorneo from "./ModalAddJugadorTorneo.vue";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import { getInfoTorneoCreado } from "@/services/TorneosService";
 
 // Define las propiedades
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
@@ -137,19 +165,44 @@ const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 const isLoading = ref(true);
 
 const showConfigModal = ref(false);
+const showAddJugadorModal = ref(false);
+const showSuccessModal = ref<boolean>(false);
+const localTorneo = ref<TorneoGestionInfoDTO>();
 
-const openConfigModal = () => {
+const openConfigModal = async () => {
+  isLoading.value = true;
+  try {
+    if (props.torneo?.torneo.idTorneo) {
+      const responseTorneo = await getInfoTorneoCreado(
+        props.torneo?.torneo.idTorneo
+      );
+      localTorneo.value = responseTorneo.data;
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isLoading.value = false;
+  }
   showConfigModal.value = true;
+};
+
+const openAddJugadorModal = () => {
+  showAddJugadorModal.value = true;
 };
 
 const closeConfigModal = () => {
   showConfigModal.value = false;
 };
+const closeAddJugadorModal = () => {
+  showAddJugadorModal.value = false;
+  showSuccessModal.value = true;
+};
 
-const handleConfigConfirm = (configuracion: any) => {
+const handleConfigConfirm = () => {
   closeConfigModal();
-
-  // Aquí puedes agregar la lógica para usar la configuración, como generar los pairings.
+};
+const handleAddJugadorConfirm = () => {
+  closeAddJugadorModal();
 };
 
 watch(
@@ -161,6 +214,15 @@ watch(
     isLoading.value = false;
   },
   { immediate: true }
+);
+
+watch(
+  () => showSuccessModal.value,
+  (newValue) => {
+    if (!newValue) {
+      window.location.reload();
+    }
+  }
 );
 
 const emit = defineEmits(["inscripcionEliminada"]);
@@ -249,19 +311,8 @@ const handleEliminarInscripcion = (idInscripcion: number) => {
   }
 };
 
-// Cierra el modal
 const closeModal = () => {
   showModal.value = false;
   selectedInscripcion.value = null;
 };
-
-const generatePairings = () => {
-  if (props.torneo) {
-    const torneoId = props.torneo.torneo.idTorneo;
-  }
-};
 </script>
-
-<style scoped>
-/* Añadir estilos personalizados si es necesario */
-</style>

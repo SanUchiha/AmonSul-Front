@@ -89,6 +89,8 @@
             <v-expand-transition>
               <v-list-item v-if="showLista">
                 <v-list-item-content>
+                  <h3>{{ localInscripcion.ejercito }}</h3>
+                  <v-spacer class="my-3"></v-spacer>
                   <img
                     v-if="localInscripcion.listaData"
                     :src="localInscripcion.listaData"
@@ -328,7 +330,12 @@ watch(
 .modal-title {
   display: flex;
   align-items: center;
+  align-items: center;
   font-size: 20px;
+}
+
+.modal-title h3 {
+  margin: 0; /* Elimina márgenes para un mejor centrado */
 }
 
 .list-item-title {

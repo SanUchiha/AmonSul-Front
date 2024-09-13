@@ -2,13 +2,13 @@
   <v-card v-if="torneo" class="mb-4">
     <v-card-title>{{ torneo.torneo.nombreTorneo }}</v-card-title>
     <v-card-text>
-      <p><strong>Plazas Restantes:</strong> {{ plazasRestantes }}</p>
+      <p><strong>Plazas restantes:</strong> {{ plazasRestantes }}</p>
       <p>
-        <strong>Fin Entrega de Listas:</strong>
+        <strong>Fin entrega de listas:</strong>
         {{ formatDate(torneo.torneo.fechaEntregaListas) }}
       </p>
       <p>
-        <strong>Fin de Inscripción:</strong>
+        <strong>Fin de inscripción:</strong>
         {{ formatDate(torneo.torneo.fechaFinInscripcion) }}
       </p>
       <p>

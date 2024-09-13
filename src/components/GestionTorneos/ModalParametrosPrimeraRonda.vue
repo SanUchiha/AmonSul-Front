@@ -33,6 +33,7 @@
             label="¿Qué ronda es?"
             required
           ></v-select>
+          <span v-if="errorRonda" style="color: red">{{ errorRonda }}</span>
           <v-checkbox
             v-model="mismaComunidadCheck"
             label="¿Se permite emparejamientos de la misma comunidad de juego?"
@@ -48,23 +49,28 @@
             label="¿Quieres que tus partidas cuenten para el ELO?"
           ></v-checkbox>
 
-          <v-checkbox
-            v-model="retosCheck"
-            label="¿Tenemos algun reto para esta ronda?"
-          ></v-checkbox>
-
           <v-radio-group
             v-if="isImpares"
             v-model="opcionImpares"
             label="Los jugadores son impares. ¿Cómo quieres gestionarlo?"
           >
-            <v-radio label="Añadir un jugador" value="añadirJugador"></v-radio>
-            <v-radio
-              label="Dejar emparejamiento incompleto"
-              value="incompleto"
-            ></v-radio>
+            <!-- <v-radio label="Añadir un jugador" value="añadirJugador"></v-radio> -->
             <v-radio label="Hacer un bye" value="bye"></v-radio>
           </v-radio-group>
+
+          <!-- <v-combobox
+            v-if="opcionImpares === 'añadirJugador'"
+            v-model="jugadorSelected"
+            :items="jugadores"
+            item-title="nick"
+            item-value="idUsuario"
+            label="Selecciona el jugador a añadir"
+          ></v-combobox> -->
+
+          <v-checkbox
+            v-model="retosCheck"
+            label="¿Tenemos algun reto para esta ronda?"
+          ></v-checkbox>
 
           <div v-if="retosCheck">
             <v-combobox
@@ -123,20 +129,46 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn @click="closeModal">Cancelar</v-btn>
-        <v-btn
-          :disabled="isGenerating"
-          @click="confirmarConfiguracion"
-          color="primary"
-          >Confirmar</v-btn
-        >
+        <v-row justify="center" class="my-4 ga-5">
+          <v-btn
+            :disabled="isGenerating"
+            @click="confirmarConfiguracion"
+            color="primary"
+            variant="tonal"
+            >Generar ronda</v-btn
+          >
+          <v-btn variant="tonal" color="secondary" @click="closeModal" large
+            >Cancelar</v-btn
+          >
+        </v-row>
       </v-card-actions>
-      <div v-if="isGenerating">
-        <ProgressCircular />
-      </div>
     </v-card>
   </v-dialog>
+
+  <!-- Modal de progreso circular -->
+  <v-dialog v-model="isGenerating" hide-overlay persistent>
+    <v-card class="progress-card">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="70"
+      ></v-progress-circular>
+    </v-card>
+  </v-dialog>
+
+  <!-- Modal response eliminar inscripcion -->
+  <ModalSuccess
+    :isVisible="showSuccessModal"
+    message="Ronda generada correctamente."
+    @update:isVisible="showSuccessModal = $event"
+  />
+
+  <!-- Modal response si error -->
+  <ModalError
+    :isVisible="showErrorModal"
+    message="No se ha podido generarla ronda. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    @update:isVisible="showErrorModal = $event"
+  />
 </template>
 
 <script setup lang="ts">
@@ -151,7 +183,11 @@ import {
 } from "@/interfaces/Torneo";
 import { generarRonda } from "@/services/PartidaTorneoService";
 import { ref, defineProps, defineEmits, watch, onMounted, computed } from "vue";
-import ProgressCircular from "../Commons/ProgressCircular.vue";
+import { getInfoTorneoCreado } from "@/services/TorneosService";
+import { getUsuariosFast } from "@/services/UsuariosService";
+import { UsuarioFastDTO } from "@/interfaces/Usuario";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import ModalError from "../Commons/ModalError.vue";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -176,16 +212,19 @@ const opcionImpares = ref<string | null>(null);
 const isImpares = ref<boolean>(false);
 const numeroRonda = ref<number>();
 
-const jugadoresObj = ref<InscripcionTorneoCreadoDTO[] | undefined>(
-  props.torneo?.inscripciones
-);
-const jugadoresNick = ref<JugadorParaEmparejamiento[]>([]);
+const jugadoresObj = ref<InscripcionTorneoCreadoDTO[]>();
+const jugadoresNick = ref<JugadorParaEmparejamiento[]>();
 const jugador1 = ref<JugadorParaEmparejamiento>();
 const jugador2 = ref<JugadorParaEmparejamiento>();
 
-const tiposSiNo = ref<string[]>(["NO", "SI"]);
 const rondas = ref<number[]>();
 const isGenerating = ref<boolean>(false);
+const torneoSelected = ref<TorneoGestionInfoDTO>();
+const jugadores = ref<UsuarioFastDTO[]>();
+
+const errorRonda = ref<string | null>(null);
+const showErrorModal = ref<boolean>(false);
+const showSuccessModal = ref<boolean>(false);
 
 const closeModal = () => {
   internalIsVisible.value = false;
@@ -199,30 +238,49 @@ const isAddEmparejamientoEnabled = computed(() => {
   return jugador1.value && jugador2.value && jugador1.value !== jugador2.value;
 });
 
+watch(numeroRonda, (newValue) => {
+  if (newValue) {
+    errorRonda.value = null;
+  }
+});
+
 onMounted(async () => {
-  if (props.torneo?.inscripciones) {
-    jugadoresObj.value = props.torneo.inscripciones;
+  try {
+    if (!props.torneo?.torneo.idTorneo) {
+      console.error("El idTorneo no está definido");
+      return;
+    }
+    // Obtener información del torneo creado
+    const responseTorneo = await getInfoTorneoCreado(
+      props.torneo?.torneo.idTorneo
+    );
+    torneoSelected.value = responseTorneo.data;
 
-    jugadoresObj.value.forEach(async (element) => {
-      const jugadorObj: JugadorParaEmparejamiento = {
-        idUsuario: element.idUsuario!,
-        nick: element.nick!,
-      };
-      return await jugadoresNick.value.push(jugadorObj);
-    });
+    // Si hay inscripciones, procesar jugadores
+    if (torneoSelected.value?.inscripciones) {
+      jugadoresObj.value = torneoSelected.value.inscripciones;
+      isImpares.value = jugadoresObj.value?.length % 2 !== 0;
+
+      // Usamos `for...of` para manejar promesas de manera secuencial o `map` con `Promise.all`
+      jugadoresNick.value = torneoSelected.value?.inscripciones.map(
+        (element) => ({
+          idUsuario: element.idUsuario!,
+          nick: element.nick!,
+        })
+      );
+    }
+
+    // Procesar rondas si existe el número de partidas
+    if (torneoSelected.value?.torneo?.numeroPartidas) {
+      const totalRondas = torneoSelected.value.torneo.numeroPartidas;
+      rondas.value = Array.from({ length: totalRondas }, (_, i) => i + 1);
+    }
+
+    const responseJugadores = await getUsuariosFast();
+    jugadores.value = responseJugadores.data;
+  } catch (error) {
+    console.error("Error al obtener la información del torneo:", error);
   }
-
-  if (props.torneo?.torneo.numeroPartidas) {
-    const totalRondas = props.torneo.torneo.numeroPartidas;
-    rondas.value = await Array.from({ length: totalRondas }, (_, i) => i + 1);
-  }
-
-  if (jugadoresObj.value && jugadoresObj.value.length % 2 !== 0) {
-    isImpares.value = true;
-  }
-
-  console.log("NICK: ", jugadoresNick.value);
-  console.log("RONDAS: ", rondas.value);
 });
 
 const addEmparejamiento = () => {
@@ -269,15 +327,16 @@ const removeEmparejamiento = (index: number) => {
 };
 
 const confirmarConfiguracion = async () => {
+  if (!numeroRonda.value) {
+    errorRonda.value = "El número de ronda es obligatorio.";
+    return;
+  }
   if (!props.torneo?.torneo.idTorneo) {
     console.error("El idTorneo no está definido");
     return;
   }
 
-  // if (!numeroRonda.value) {
-  //   console.error("El número de ronda no está definido");
-  //   return;
-  // }
+  errorRonda.value = null;
 
   const configuracion: GenerarRonda = {
     mismaComunidadCheck: mismaComunidadCheck.value,
@@ -287,7 +346,7 @@ const confirmarConfiguracion = async () => {
     esEloCheck: esEloCheck.value,
     opcionImpares: opcionImpares.value,
     idTorneo: props.torneo?.torneo.idTorneo,
-    idRonda: 1,
+    idRonda: numeroRonda.value!,
   };
 
   console.log("Configuración final:", configuracion);
@@ -295,9 +354,9 @@ const confirmarConfiguracion = async () => {
   try {
     isGenerating.value = true;
     await generarRonda(configuracion);
+    showSuccessModal.value = true;
   } catch (error) {
-    isGenerating.value = false;
-
+    showErrorModal.value = true;
     console.error(error);
   } finally {
     isGenerating.value = false;
@@ -335,5 +394,14 @@ const confirmarConfiguracion = async () => {
 
 .emparejamiento-text {
   flex-grow: 1;
+}
+
+.progress-card {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
 }
 </style>
