@@ -38,3 +38,24 @@ export interface CreatePartidaAmistosaDTO {
   ejercitoUsuario2: string;
   esElo: boolean;
 }
+
+export interface PartidaTorneoDTO {
+  ejercitoUsuario1: string | null;
+  ejercitoUsuario2: string | null;
+  escenarioPartida: string | null;
+  fechaPartida: string;
+  ganadorPartidaTorneo: number | null;
+  idPartidaTorneo: number;
+  idTorneo: number;
+  idUsuario1: number;
+  idUsuario2: number;
+  liderMuertoUsuario1: boolean | null;
+  liderMuertoUsuario2: boolean | null;
+  nick1: string;
+  nick2: string;
+  numeroRonda: number;
+  partidaValidadaUsuario1: boolean | null;
+  partidaValidadaUsuario2: boolean | null;
+  resultadoUsuario1: number | null;
+  resultadoUsuario2: number | null;
+}

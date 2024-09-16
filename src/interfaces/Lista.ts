@@ -15,3 +15,14 @@ export interface ModificarListaTorneoRequestDTO {
   listaData: string;
   ejercito: string;
 }
+
+export interface ListaTorneoRequestDTO {
+  idTorneo: number;
+  idUsuario: number;
+}
+
+export interface ListaTorneoResponseDTO {
+  idTorneo: number;
+  idUsuario: number;
+  listaData: string;
+}

@@ -19,3 +19,7 @@ export const getTorneosCreadosUsuario = async (idUsuario: string) => {
 export const getInfoTorneoCreado = async (idTorneo: number) => {
   return http.get(`Torneo/Gestion/Info-torneo/${idTorneo}`);
 };
+
+export const getPartidasTorneo = async (idTorneo: number) => {
+  return http.get(`Torneo/Gestion/Partidas/${idTorneo}`);
+};

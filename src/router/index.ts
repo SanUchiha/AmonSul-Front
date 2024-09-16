@@ -1,6 +1,5 @@
 import ContactoView from "@/views/ContactoView.vue";
 import DetalleJugadorView from "@/views/DetalleJugadorView.vue";
-import TorneoLiveView from "@/views/TorneoLiveView.vue";
 import DetalleTorneoView from "@/views/DetalleTorneoView.vue";
 import InicioSesionView from "@/views/InicioSesionView.vue";
 import DashboardView from "@/views/DashboardView.vue";
@@ -16,6 +15,7 @@ import DetalleInscripcionView from "@/views/DetalleInscripcionView.vue";
 import GestionTorneosView from "@/views/GestionTorneosView.vue";
 import DetalleTorneoGestionView from "@/views/DetalleTorneoGestionView.vue";
 import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
+import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -64,7 +64,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/resultados-torneos",
     name: "resultados-torneos",
-    component: TorneoLiveView,
+    component: ResultadosTorneosView,
     meta: { requiresAuth: true },
   },
 
