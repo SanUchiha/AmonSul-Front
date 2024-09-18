@@ -22,7 +22,5 @@ export interface ListaTorneoRequestDTO {
 }
 
 export interface ListaTorneoResponseDTO {
-  idTorneo: number;
-  idUsuario: number;
   listaData: string;
 }
