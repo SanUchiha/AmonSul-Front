@@ -103,7 +103,6 @@ const addJugador = async () => {
       idUsuario: idUsuario,
     };
 
-    console.log(addInscripcion);
     await registrarInscripcion(addInscripcion);
     showSuccessModal.value = true;
   } catch (error) {

@@ -105,14 +105,14 @@
       >
         Añadir Jugador
       </v-btn>
-      <v-btn
+      <!-- <v-btn
         variant="tonal"
         @click="openConfigModal"
         color="primary"
         size="large"
       >
         Generar Ronda
-      </v-btn>
+      </v-btn> -->
     </v-row>
 
     <ModalParametrosPrimeraRonda

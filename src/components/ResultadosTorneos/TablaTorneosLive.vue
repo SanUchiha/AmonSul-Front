@@ -39,12 +39,10 @@ onMounted(async () => {
   const response = await getTorneos();
   listaTorneos.value = response.data;
 
-  console.log(listaTorneos.value);
   isLoading.value = false;
 });
 
 const verTorneo = (idTorneo: number) => {
-  console.log(idTorneo);
   router.push({ name: "detalle-torneo-live", params: { idTorneo } });
 };
 </script>

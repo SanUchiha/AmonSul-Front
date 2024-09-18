@@ -349,8 +349,6 @@ const confirmarConfiguracion = async () => {
     idRonda: numeroRonda.value!,
   };
 
-  console.log("Configuración final:", configuracion);
-
   try {
     isGenerating.value = true;
     await generarRonda(configuracion);

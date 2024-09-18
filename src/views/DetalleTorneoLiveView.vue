@@ -35,6 +35,50 @@
                       <div class="player-details">
                         <div class="player-info">
                           <span
+                            v-if="
+                              partida.resultadoUsuario1 &&
+                              partida.resultadoUsuario2 &&
+                              partida.escenarioPartida &&
+                              (partida.liderMuertoUsuario1 == true ||
+                                partida.liderMuertoUsuario1 == false) &&
+                              (partida.liderMuertoUsuario2 == true ||
+                                partida.liderMuertoUsuario2 == false) &&
+                              !partida.partidaValidadaUsuario1
+                            "
+                          >
+                            <v-btn
+                              v-if="
+                                partida.partidaValidadaUsuario1 === null &&
+                                partida.idUsuario1 == idUsuario
+                              "
+                              class="mt-2"
+                              variant="tonal"
+                              color="primary"
+                              size="small"
+                              @click="
+                                abrirModalValidar(partida.idPartidaTorneo, 1)
+                              "
+                            >
+                              Validar
+                            </v-btn>
+                          </span>
+                          <span
+                            v-else-if="
+                              partida.resultadoUsuario1 &&
+                              partida.resultadoUsuario2 &&
+                              partida.escenarioPartida &&
+                              (partida.liderMuertoUsuario1 == true ||
+                                partida.liderMuertoUsuario1 == false) &&
+                              (partida.liderMuertoUsuario2 == true ||
+                                partida.liderMuertoUsuario2 == false) &&
+                              partida.partidaValidadaUsuario1
+                            "
+                          >
+                            Partida validada
+                          </span>
+                        </div>
+                        <div class="player-info">
+                          <span
                             :class="{
                               highlight: partida.idUsuario1 === idUsuario,
                             }"
@@ -122,11 +166,53 @@
                           </v-btn>
                         </div>
                       </div>
-                      <div class="versus">
-                        <v-icon>mdi-vs</v-icon>
-                      </div>
-                      <!-- <v-divider vertical class="divider"></v-divider> -->
+                      <v-divider vertical class="divider"></v-divider>
                       <div class="player-details">
+                        <div class="player-info">
+                          <span
+                            v-if="
+                              partida.resultadoUsuario1 &&
+                              partida.resultadoUsuario2 &&
+                              partida.escenarioPartida &&
+                              (partida.liderMuertoUsuario1 == true ||
+                                partida.liderMuertoUsuario1 == false) &&
+                              (partida.liderMuertoUsuario2 == true ||
+                                partida.liderMuertoUsuario2 == false) &&
+                              !partida.partidaValidadaUsuario2
+                            "
+                          >
+                            <v-btn
+                              v-if="
+                                partida.partidaValidadaUsuario2 === null &&
+                                partida.idUsuario2 == idUsuario
+                              "
+                              class="mt-2"
+                              variant="tonal"
+                              color="primary"
+                              size="small"
+                              @click="
+                                abrirModalValidar(partida.idPartidaTorneo, 2)
+                              "
+                            >
+                              Validar
+                            </v-btn>
+                          </span>
+                          <span
+                            v-else-if="
+                              partida.resultadoUsuario1 &&
+                              partida.resultadoUsuario2 &&
+                              partida.escenarioPartida &&
+                              (partida.liderMuertoUsuario1 == true ||
+                                partida.liderMuertoUsuario1 == false) &&
+                              (partida.liderMuertoUsuario2 == true ||
+                                partida.liderMuertoUsuario2 == false) &&
+                              partida.liderMuertoUsuario2 &&
+                              partida.partidaValidadaUsuario2
+                            "
+                          >
+                            Partida validada
+                          </span>
+                        </div>
                         <div class="player-info">
                           <span
                             :class="{
@@ -233,7 +319,7 @@
                         <v-list-item-content>
                           <v-list-item-title>
                             <v-icon>mdi-calendar</v-icon>
-                            {{ partida.fechaPartida }}
+                            {{ formatDate(partida.fechaPartida) }}
                             <!-- TODO: format fecha -->
                           </v-list-item-title>
                         </v-list-item-content>
@@ -328,8 +414,17 @@
       v-if="isModalEscenarioVisible"
       :isVisible="isModalEscenarioVisible"
       :idPartidaTorneo="idPartidaSeleccionada"
+      :usuario="usuarioSeleccionado"
       @confirmar="confirmarEscenario"
       @cerrar="cerrarModalEscenario"
+    />
+
+    <ModalValidarPartida
+      v-if="isModalValidarVisible"
+      :isVisible="isModalValidarVisible"
+      :idPartidaTorneo="idPartidaSeleccionada"
+      @confirmar="confirmarValidar"
+      @cerrar="cerrarModalValidar"
     />
   </v-container>
 </template>
@@ -340,6 +435,7 @@ import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEsc
 import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
 import ModalLiderPartida from "@/components/ResultadosTorneos/ModalLiderPartida.vue";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
+import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
 import { useAuth } from "@/composables/useAuth";
 import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
 import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
@@ -373,6 +469,7 @@ const usuarioSeleccionado = ref<1 | 2>();
 const isModalPuntosVisible = ref(false);
 const isModalLiderVisible = ref(false);
 const isModalEscenarioVisible = ref(false);
+const isModalValidarVisible = ref(false);
 
 onMounted(async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
@@ -406,8 +503,6 @@ onMounted(async () => {
   } finally {
     isLoading.value = false;
   }
-
-  console.log(partidas.value);
 });
 
 const getGanador = (partida: PartidaTorneoDTO) => {
@@ -458,6 +553,12 @@ const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
 const abrirModalEscenario = (idPartida: number) => {
   idPartidaSeleccionada.value = idPartida;
   isModalEscenarioVisible.value = true;
+};
+
+const abrirModalValidar = (idPartida: number, usuario: 1 | 2) => {
+  idPartidaSeleccionada.value = idPartida;
+  usuarioSeleccionado.value = usuario;
+  isModalValidarVisible.value = true;
 };
 
 const confirmarPuntos = async (puntos: number) => {
@@ -519,19 +620,45 @@ const confirmarEscenario = async (escenario: string) => {
   }
 };
 
-// Cerrar modal
+const confirmarValidar = async () => {
+  if (idPartidaSeleccionada.value) {
+    const body: UpdatePartidaTorneoDTO = {
+      idPartidaTorneo: idPartidaSeleccionada.value,
+    };
+
+    if (usuarioSeleccionado.value === 1) body.partidaValidadaUsuario1 = true;
+    else body.partidaValidadaUsuario2 = true;
+
+    try {
+      await updatePartidaTorneo(body);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isModalValidarVisible.value = false;
+      window.location.reload();
+    }
+  }
+};
+
 const cerrarModal = () => {
   isModalPuntosVisible.value = false;
 };
 
-// Cerrar modal lider
 const cerrarModalLider = () => {
   isModalLiderVisible.value = false;
 };
 
-// Cerrar modal lider
 const cerrarModalEscenario = () => {
   isModalEscenarioVisible.value = false;
+};
+
+const cerrarModalValidar = () => {
+  isModalValidarVisible.value = false;
+};
+
+const formatDate = (date: string | null | undefined) => {
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString();
 };
 </script>
 
