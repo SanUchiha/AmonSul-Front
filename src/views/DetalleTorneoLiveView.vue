@@ -76,7 +76,7 @@
                             "
                           ></span>
                           <span v-else>
-                            Lider muerto:
+                            ¿Mató al lider?
                             {{
                               partida.liderMuertoUsuario1 === true
                                 ? "Sí"
@@ -162,6 +162,7 @@
                             Puntos
                           </v-btn>
                         </div>
+
                         <div class="player-info">
                           <span
                             v-if="
@@ -169,9 +170,17 @@
                               partida.idUsuario2 == idUsuario
                             "
                           ></span>
-                          <span v-else>{{
-                            partida.liderMuertoUsuario2 ?? "... lider"
-                          }}</span>
+                          <span v-else>
+                            ¿Mató al lider?
+                            {{
+                              partida.liderMuertoUsuario2 === true
+                                ? "Sí"
+                                : partida.liderMuertoUsuario2 === false
+                                ? "No"
+                                : "..."
+                            }}
+                          </span>
+
                           <v-btn
                             v-if="
                               partida.liderMuertoUsuario2 === null &&
@@ -186,6 +195,7 @@
                             Lider
                           </v-btn>
                         </div>
+
                         <div class="player-info">
                           <v-icon>mdi-shield-outline</v-icon>
                           <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
