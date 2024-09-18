@@ -43,14 +43,66 @@
                           </span>
                         </div>
                         <div class="player-info">
-                          <span>{{ partida.resultadoUsuario1 ?? "XXX" }}</span>
-                          <!-- TODO: añadir boton para añadir el resultado -->
+                          <span
+                            v-if="
+                              partida.resultadoUsuario1 === null &&
+                              partida.idUsuario1 == idUsuario
+                            "
+                          ></span>
+                          <span v-else>{{
+                            partida.resultadoUsuario1 ?? "Esperando resultado"
+                          }}</span>
+                          <v-btn
+                            v-if="
+                              partida.resultadoUsuario1 === null &&
+                              partida.idUsuario1 == idUsuario
+                            "
+                            class="mt-2"
+                            variant="tonal"
+                            color="primary"
+                            size="small"
+                            @click="
+                              abrirModalPuntos(partida.idPartidaTorneo, 1)
+                            "
+                          >
+                            Puntos
+                          </v-btn>
+                        </div>
+                        <div class="player-info">
+                          <span
+                            v-if="
+                              partida.liderMuertoUsuario1 === null &&
+                              partida.idUsuario1 == idUsuario
+                            "
+                          ></span>
+                          <span v-else>
+                            Lider muerto:
+                            {{
+                              partida.liderMuertoUsuario1 === true
+                                ? "Sí"
+                                : partida.liderMuertoUsuario1 === false
+                                ? "No"
+                                : "..."
+                            }}
+                          </span>
+
+                          <v-btn
+                            v-if="
+                              partida.liderMuertoUsuario1 === null &&
+                              partida.idUsuario1 == idUsuario
+                            "
+                            class="mt-2"
+                            variant="tonal"
+                            color="primary"
+                            size="small"
+                            @click="abrirModalLider(partida.idPartidaTorneo, 1)"
+                          >
+                            Lider
+                          </v-btn>
                         </div>
                         <div class="player-info">
                           <v-icon>mdi-shield-outline</v-icon>
-                          <span>{{
-                            partida.ejercitoUsuario1 ?? "No especificado"
-                          }}</span>
+                          <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
                         </div>
                         <div class="player-info">
                           <v-btn
@@ -85,13 +137,58 @@
                           </span>
                         </div>
                         <div class="player-info">
-                          <span>{{ partida.resultadoUsuario2 ?? "XXX" }}</span>
+                          <span
+                            v-if="
+                              partida.resultadoUsuario2 === null &&
+                              partida.idUsuario2 == idUsuario
+                            "
+                          ></span>
+                          <span v-else>{{
+                            partida.resultadoUsuario2 ?? "Esperando resultado"
+                          }}</span>
+                          <v-btn
+                            v-if="
+                              partida.resultadoUsuario2 === null &&
+                              partida.idUsuario2 == idUsuario
+                            "
+                            class="mt-2"
+                            variant="tonal"
+                            color="primary"
+                            size="small"
+                            @click="
+                              abrirModalPuntos(partida.idPartidaTorneo, 2)
+                            "
+                          >
+                            Puntos
+                          </v-btn>
+                        </div>
+                        <div class="player-info">
+                          <span
+                            v-if="
+                              partida.liderMuertoUsuario2 === null &&
+                              partida.idUsuario2 == idUsuario
+                            "
+                          ></span>
+                          <span v-else>{{
+                            partida.liderMuertoUsuario2 ?? "... lider"
+                          }}</span>
+                          <v-btn
+                            v-if="
+                              partida.liderMuertoUsuario2 === null &&
+                              partida.idUsuario2 == idUsuario
+                            "
+                            class="mt-2"
+                            variant="tonal"
+                            color="primary"
+                            size="small"
+                            @click="abrirModalLider(partida.idPartidaTorneo, 2)"
+                          >
+                            Lider
+                          </v-btn>
                         </div>
                         <div class="player-info">
                           <v-icon>mdi-shield-outline</v-icon>
-                          <span>{{
-                            partida.ejercitoUsuario2 ?? "No especificado"
-                          }}</span>
+                          <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
                         </div>
                         <div class="player-info">
                           <v-btn
@@ -182,17 +279,39 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <ModalAddPuntosPartida
+      v-if="isModalPuntosVisible"
+      :isVisible="isModalPuntosVisible"
+      :idPartidaTorneo="idPartidaSeleccionada"
+      :usuario="usuarioSeleccionado"
+      @confirmar="confirmarPuntos"
+      @cerrar="cerrarModal"
+    />
+
+    <ModalLiderPartida
+      v-if="isModalLiderVisible"
+      :isVisible="isModalLiderVisible"
+      :idPartidaTorneo="idPartidaSeleccionada"
+      :usuario="usuarioSeleccionado"
+      @confirmar="confirmarLider"
+      @cerrar="cerrarModalLider"
+    />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
+import ModalLiderPartida from "@/components/ResultadosTorneos/ModalLiderPartida.vue";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import { useAuth } from "@/composables/useAuth";
 import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
+import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
 import { getlistaTorneo } from "@/services/ListasService";
+import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
 import { getPartidasTorneo, getTorneo } from "@/services/TorneosService";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -214,6 +333,10 @@ const idUsuario = ref<number>();
 const isModalListaVisible = ref<boolean>(false);
 const listaData = ref<string>("");
 const nickJugador = ref<string>("");
+const idPartidaSeleccionada = ref<number>();
+const usuarioSeleccionado = ref<1 | 2>();
+const isModalPuntosVisible = ref(false);
+const isModalLiderVisible = ref(false);
 
 onMounted(async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
@@ -247,6 +370,8 @@ onMounted(async () => {
   } finally {
     isLoading.value = false;
   }
+
+  console.log(partidas.value);
 });
 
 const getGanador = (partida: PartidaTorneoDTO) => {
@@ -280,6 +405,68 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
       isLoadingImage.value = false;
     }
   }
+};
+
+const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
+  idPartidaSeleccionada.value = idPartida;
+  usuarioSeleccionado.value = usuario;
+  isModalPuntosVisible.value = true;
+};
+
+const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
+  idPartidaSeleccionada.value = idPartida;
+  usuarioSeleccionado.value = usuario;
+  isModalLiderVisible.value = true;
+};
+
+const confirmarPuntos = async (puntos: number) => {
+  if (idPartidaSeleccionada.value && usuarioSeleccionado.value !== null) {
+    const body: UpdatePartidaTorneoDTO = {
+      idPartidaTorneo: idPartidaSeleccionada.value,
+    };
+
+    if (usuarioSeleccionado.value === 1) body.resultadoUsuario1 = puntos;
+    else body.resultadoUsuario2 = puntos;
+
+    try {
+      await updatePartidaTorneo(body);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isModalPuntosVisible.value = false;
+      window.location.reload();
+    }
+  }
+};
+
+const confirmarLider = async (lider: boolean) => {
+  if (idPartidaSeleccionada.value && usuarioSeleccionado.value !== null) {
+    const body: UpdatePartidaTorneoDTO = {
+      idPartidaTorneo: idPartidaSeleccionada.value,
+    };
+
+    if (usuarioSeleccionado.value === 1) body.liderMuertoUsuario1 = lider;
+    else body.liderMuertoUsuario2 = lider;
+
+    try {
+      await updatePartidaTorneo(body);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isModalLiderVisible.value = false;
+      window.location.reload();
+    }
+  }
+};
+
+// Cerrar modal
+const cerrarModal = () => {
+  isModalPuntosVisible.value = false;
+};
+
+// Cerrar modal lider
+const cerrarModalLider = () => {
+  isModalLiderVisible.value = false;
 };
 </script>
 

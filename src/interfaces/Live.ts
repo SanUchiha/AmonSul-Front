@@ -18,3 +18,15 @@ export interface JugadorParaEmparejamiento {
   idUsuario: number;
   nick: string;
 }
+
+export interface UpdatePartidaTorneoDTO {
+  idPartidaTorneo: number;
+  resultadoUsuario1?: number | null;
+  resultadoUsuario2?: number | null;
+  escenarioPartida?: string | null;
+  ganadorPartidaTorneo?: number | null;
+  partidaValidadaUsuario1?: boolean | null;
+  partidaValidadaUsuario2?: boolean | null;
+  liderMuertoUsuario1?: boolean | null;
+  liderMuertoUsuario2?: boolean | null;
+}
