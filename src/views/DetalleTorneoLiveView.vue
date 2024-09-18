@@ -240,10 +240,26 @@
                       </v-list-item>
                       <v-list-item>
                         <v-list-item-content>
-                          <v-list-item-title>
+                          <v-list-item-title v-if="partida.escenarioPartida">
                             <v-icon>mdi-map-marker</v-icon>
-                            {{ partida.escenarioPartida ?? "N/A" }}
-                            <!-- TODO: Añadir escenario -->
+                            {{ partida.escenarioPartida }}
+                          </v-list-item-title>
+                          <v-list-item-title v-else>
+                            <v-btn
+                              v-if="
+                                partida.idUsuario1 == idUsuario ||
+                                partida.idUsuario2 == idUsuario
+                              "
+                              class="mt-2"
+                              variant="tonal"
+                              color="primary"
+                              size="small"
+                              @click="
+                                abrirModalEscenario(partida.idPartidaTorneo)
+                              "
+                            >
+                              Escenario
+                            </v-btn>
                           </v-list-item-title>
                         </v-list-item-content>
                       </v-list-item>
@@ -307,11 +323,20 @@
       @confirmar="confirmarLider"
       @cerrar="cerrarModalLider"
     />
+
+    <ModalAddEscenarioPartida
+      v-if="isModalEscenarioVisible"
+      :isVisible="isModalEscenarioVisible"
+      :idPartidaTorneo="idPartidaSeleccionada"
+      @confirmar="confirmarEscenario"
+      @cerrar="cerrarModalEscenario"
+    />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEscenarioPartida.vue";
 import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
 import ModalLiderPartida from "@/components/ResultadosTorneos/ModalLiderPartida.vue";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
@@ -347,6 +372,7 @@ const idPartidaSeleccionada = ref<number>();
 const usuarioSeleccionado = ref<1 | 2>();
 const isModalPuntosVisible = ref(false);
 const isModalLiderVisible = ref(false);
+const isModalEscenarioVisible = ref(false);
 
 onMounted(async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
@@ -429,6 +455,11 @@ const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
   isModalLiderVisible.value = true;
 };
 
+const abrirModalEscenario = (idPartida: number) => {
+  idPartidaSeleccionada.value = idPartida;
+  isModalEscenarioVisible.value = true;
+};
+
 const confirmarPuntos = async (puntos: number) => {
   if (idPartidaSeleccionada.value && usuarioSeleccionado.value !== null) {
     const body: UpdatePartidaTorneoDTO = {
@@ -469,6 +500,25 @@ const confirmarLider = async (lider: boolean) => {
   }
 };
 
+const confirmarEscenario = async (escenario: string) => {
+  if (idPartidaSeleccionada.value) {
+    const body: UpdatePartidaTorneoDTO = {
+      idPartidaTorneo: idPartidaSeleccionada.value,
+    };
+
+    body.escenarioPartida = escenario;
+
+    try {
+      await updatePartidaTorneo(body);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isModalEscenarioVisible.value = false;
+      window.location.reload();
+    }
+  }
+};
+
 // Cerrar modal
 const cerrarModal = () => {
   isModalPuntosVisible.value = false;
@@ -477,6 +527,11 @@ const cerrarModal = () => {
 // Cerrar modal lider
 const cerrarModalLider = () => {
   isModalLiderVisible.value = false;
+};
+
+// Cerrar modal lider
+const cerrarModalEscenario = () => {
+  isModalEscenarioVisible.value = false;
 };
 </script>
 
