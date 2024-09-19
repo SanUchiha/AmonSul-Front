@@ -148,7 +148,7 @@
                           <v-icon>mdi-shield-outline</v-icon>
                           <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
                         </div>
-                        <div class="player-info">
+                        <!-- <div class="player-info">
                           <v-btn
                             class="mt-2"
                             variant="tonal"
@@ -164,7 +164,7 @@
                           >
                             Lista
                           </v-btn>
-                        </div>
+                        </div> -->
                       </div>
                       <v-divider vertical class="divider"></v-divider>
                       <div class="player-details">
@@ -286,7 +286,7 @@
                           <v-icon>mdi-shield-outline</v-icon>
                           <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
                         </div>
-                        <div class="player-info">
+                        <!-- <div class="player-info">
                           <v-btn
                             class="mt-2"
                             variant="tonal"
@@ -302,7 +302,7 @@
                           >
                             Lista
                           </v-btn>
-                        </div>
+                        </div> -->
                       </div>
                     </div>
                     <v-divider></v-divider>
