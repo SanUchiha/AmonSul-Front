@@ -123,7 +123,7 @@
     />
     <ModalAddJugadorTorneo
       :isVisible="showAddJugadorModal"
-      :torneo="localTorneo"
+      :torneo="torneo"
       @close="closeAddJugadorModal"
       @confirm="handleAddJugadorConfirm"
     />
@@ -186,7 +186,8 @@ const openConfigModal = async () => {
   showConfigModal.value = true;
 };
 
-const openAddJugadorModal = () => {
+const openAddJugadorModal = async () => {
+  await props.torneo;
   showAddJugadorModal.value = true;
 };
 
@@ -195,14 +196,15 @@ const closeConfigModal = () => {
 };
 const closeAddJugadorModal = () => {
   showAddJugadorModal.value = false;
-  showSuccessModal.value = true;
 };
 
 const handleConfigConfirm = () => {
   closeConfigModal();
 };
 const handleAddJugadorConfirm = () => {
-  closeAddJugadorModal();
+  showAddJugadorModal.value = false;
+  showSuccessModal.value = false;
+  window.location.reload();
 };
 
 watch(

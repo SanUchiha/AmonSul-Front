@@ -39,11 +39,11 @@
   </v-dialog>
 
   <!-- Modal response eliminar inscripcion -->
-  <!-- <ModalSuccess
+  <ModalSuccess
     :isVisible="showSuccessModal"
     message="Jugador añadido correctamente."
     @update:isVisible="showSuccessModal = $event"
-  /> -->
+  />
 
   <!-- Modal response si error -->
   <ModalError
@@ -62,10 +62,11 @@ import { UsuarioFastDTO } from "@/interfaces/Usuario";
 import { CrearInscripcionDTO } from "@/interfaces/Inscripcion";
 import { registrarInscripcion } from "@/services/InscripcionesService";
 import ModalError from "../Commons/ModalError.vue";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
 
 const props = defineProps<{
   isVisible: boolean;
-  torneo: TorneoGestionInfoDTO | undefined;
+  torneo: TorneoGestionInfoDTO | null;
 }>();
 const emit = defineEmits(["close", "confirm"]);
 
