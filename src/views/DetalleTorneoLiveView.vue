@@ -144,10 +144,10 @@
                             Lider
                           </v-btn>
                         </div>
-                        <div class="player-info">
+                        <!-- <div class="player-info">
                           <v-icon>mdi-shield-outline</v-icon>
                           <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
-                        </div>
+                        </div> -->
                         <!-- <div class="player-info">
                           <v-btn
                             class="mt-2"
@@ -282,10 +282,10 @@
                           </v-btn>
                         </div>
 
-                        <div class="player-info">
+                        <!-- <div class="player-info">
                           <v-icon>mdi-shield-outline</v-icon>
                           <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
-                        </div>
+                        </div> -->
                         <!-- <div class="player-info">
                           <v-btn
                             class="mt-2"
