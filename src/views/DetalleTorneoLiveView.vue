@@ -7,21 +7,30 @@
           <LoadingGandalf />
         </div>
         <div v-else class="center">
-          <!-- Tabs dinámicas basadas en el número de rondas -->
           <v-card class="mx-auto" max-width="800">
-            <!-- Usamos el índice de la tab seleccionada -->
-            <v-tabs v-model="activeTab" grow>
-              <!-- Mostramos el número de la ronda en la tab -->
-              <v-tab v-for="n in numeroRondas" :key="n"> Ronda {{ n }} </v-tab>
-
-              <v-tab value="Clasificación"> Clasificación </v-tab>
+            <!-- TABS -->
+            <v-tabs v-model="activeTab" grow center-active fixed-tabs>
+              <v-tab
+                v-for="n in numeroRondas"
+                :key="n"
+                :text="`Ronda ${n}`"
+                :value="n"
+              >
+              </v-tab>
+              <v-tab
+                :key="tabClasificacion"
+                :text="`Clasificación`"
+                :value="tabClasificacion"
+              ></v-tab>
             </v-tabs>
 
-            <!-- Mostrar las partidas correspondientes a la ronda seleccionada -->
+            <!-- Contenido de las Tabs -->
             <v-tabs-window v-model="activeTab">
-              <v-tab-item
-                v-for="(partida, index) in partidasPorRonda[activeTab + 1]"
+              <!-- tab dinamicas -->
+              <v-tabs-item
+                v-for="(partida, index) in partidasPorRonda[activeTab!]"
                 :key="partida.idPartidaTorneo"
+                :value="activeTab"
               >
                 <div class="card-container">
                   <v-card class="ma-3 bordered-card" max-width="400">
@@ -32,126 +41,68 @@
                     <v-divider></v-divider>
 
                     <v-card-text>
-                      <div class="player-container">
-                        <div class="player-details">
-                          <div class="player-info">
-                            <span
+                      <!-- Partida completada -->
+                      <div v-if="partida.resultadoUsuario1">
+                        <div class="player-container">
+                          <div class="player-details">
+                            <!-- validar 1 -->
+                            <div
+                              class="player-info"
                               v-if="
-                                partida.resultadoUsuario1 &&
-                                partida.resultadoUsuario2 &&
-                                partida.escenarioPartida &&
-                                (partida.liderMuertoUsuario1 == true ||
-                                  partida.liderMuertoUsuario1 == false) &&
-                                (partida.liderMuertoUsuario2 == true ||
-                                  partida.liderMuertoUsuario2 == false) &&
-                                !partida.partidaValidadaUsuario1
+                                partida.partidaValidadaUsuario1 === null &&
+                                partida.idUsuario1 == idUsuario
                               "
                             >
-                              <v-btn
-                                v-if="
-                                  partida.partidaValidadaUsuario1 === null &&
-                                  partida.idUsuario1 == idUsuario
-                                "
-                                class="mt-2"
-                                variant="tonal"
-                                color="primary"
-                                size="small"
-                                @click="
-                                  abrirModalValidar(partida.idPartidaTorneo, 1)
-                                "
+                              <span>
+                                <v-btn
+                                  class="mt-2"
+                                  variant="tonal"
+                                  color="primary"
+                                  size="small"
+                                  @click="
+                                    abrirModalValidar(
+                                      partida.idPartidaTorneo,
+                                      1
+                                    )
+                                  "
+                                >
+                                  Validar
+                                </v-btn>
+                              </span>
+                            </div>
+                            <!-- nick 1 -->
+                            <div class="player-info">
+                              <span
+                                :class="{
+                                  highlight: partida.idUsuario1 === idUsuario,
+                                }"
                               >
-                                Validar
-                              </v-btn>
-                            </span>
-                            <span
-                              v-else-if="
-                                partida.resultadoUsuario1 &&
-                                partida.resultadoUsuario2 &&
-                                partida.escenarioPartida &&
-                                (partida.liderMuertoUsuario1 == true ||
-                                  partida.liderMuertoUsuario1 == false) &&
-                                (partida.liderMuertoUsuario2 == true ||
-                                  partida.liderMuertoUsuario2 == false) &&
-                                partida.partidaValidadaUsuario1
-                              "
-                            >
-                              Partida validada
-                            </span>
-                          </div>
-                          <div class="player-info">
-                            <span
-                              :class="{
-                                highlight: partida.idUsuario1 === idUsuario,
-                              }"
-                            >
-                              {{ partida.nick1 }}
-                            </span>
-                          </div>
-                          <div class="player-info">
-                            <span
-                              v-if="
-                                partida.resultadoUsuario1 === null &&
-                                partida.idUsuario1 == idUsuario
-                              "
-                            ></span>
-                            <span v-else>{{
-                              partida.resultadoUsuario1 ?? "Esperando resultado"
-                            }}</span>
-                            <v-btn
-                              v-if="
-                                partida.resultadoUsuario1 === null &&
-                                partida.idUsuario1 == idUsuario
-                              "
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              size="small"
-                              @click="
-                                abrirModalPuntos(partida.idPartidaTorneo, 1)
-                              "
-                            >
-                              Puntos
-                            </v-btn>
-                          </div>
-                          <div class="player-info">
-                            <span
-                              v-if="
-                                partida.liderMuertoUsuario1 === null &&
-                                partida.idUsuario1 == idUsuario
-                              "
-                            ></span>
-                            <span v-else>
-                              ¿Mató al lider?
-                              {{
-                                partida.liderMuertoUsuario1 === true
-                                  ? "Sí"
-                                  : partida.liderMuertoUsuario1 === false
-                                  ? "No"
-                                  : "..."
-                              }}
-                            </span>
-
-                            <v-btn
-                              v-if="
-                                partida.liderMuertoUsuario1 === null &&
-                                partida.idUsuario1 == idUsuario
-                              "
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              size="small"
-                              @click="
-                                abrirModalLider(partida.idPartidaTorneo, 1)
-                              "
-                            >
-                              Lider
-                            </v-btn>
-                          </div>
-                          <!-- <div class="player-info">
+                                {{ partida.nick1 }}
+                              </span>
+                            </div>
+                            <!-- resultado 1 -->
+                            <div class="player-info">
+                              <span> {{ partida.resultadoUsuario1 }}</span>
+                            </div>
+                            <!-- lider muerto 1 -->
+                            <div class="player-info">
+                              <span>
+                                ¿Líder?
+                                {{
+                                  partida.liderMuertoUsuario1 === true
+                                    ? "Sí"
+                                    : partida.liderMuertoUsuario1 === false
+                                    ? "No"
+                                    : "..."
+                                }}
+                              </span>
+                            </div>
+                            <!-- lista 1 -->
+                            <!-- <div class="player-info">
                           <v-icon>mdi-shield-outline</v-icon>
                           <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
                         </div> -->
-                          <!-- <div class="player-info">
+                            <!-- <div class="player-info">
                           <v-btn
                             class="mt-2"
                             variant="tonal"
@@ -168,129 +119,69 @@
                             Lista
                           </v-btn>
                         </div> -->
-                        </div>
-                        <v-divider vertical class="divider"></v-divider>
-                        <div class="player-details">
-                          <div class="player-info">
-                            <span
+                          </div>
+
+                          <v-divider vertical class="divider"></v-divider>
+
+                          <div class="player-details">
+                            <!-- validar 2 -->
+                            <div
+                              class="player-info"
                               v-if="
-                                partida.resultadoUsuario1 &&
-                                partida.resultadoUsuario2 &&
-                                partida.escenarioPartida &&
-                                (partida.liderMuertoUsuario1 == true ||
-                                  partida.liderMuertoUsuario1 == false) &&
-                                (partida.liderMuertoUsuario2 == true ||
-                                  partida.liderMuertoUsuario2 == false) &&
-                                !partida.partidaValidadaUsuario2
+                                partida.partidaValidadaUsuario2 === null &&
+                                partida.idUsuario2 == idUsuario
                               "
                             >
-                              <v-btn
-                                v-if="
-                                  partida.partidaValidadaUsuario2 === null &&
-                                  partida.idUsuario2 == idUsuario
-                                "
-                                class="mt-2"
-                                variant="tonal"
-                                color="primary"
-                                size="small"
-                                @click="
-                                  abrirModalValidar(partida.idPartidaTorneo, 2)
-                                "
+                              <span>
+                                <v-btn
+                                  class="mt-2"
+                                  variant="tonal"
+                                  color="primary"
+                                  size="small"
+                                  @click="
+                                    abrirModalValidar(
+                                      partida.idPartidaTorneo,
+                                      2
+                                    )
+                                  "
+                                >
+                                  Validar
+                                </v-btn>
+                              </span>
+                            </div>
+                            <!-- nick 2 -->
+                            <div class="player-info">
+                              <span
+                                :class="{
+                                  highlight: partida.idUsuario2 === idUsuario,
+                                }"
                               >
-                                Validar
-                              </v-btn>
-                            </span>
-                            <span
-                              v-else-if="
-                                partida.resultadoUsuario1 &&
-                                partida.resultadoUsuario2 &&
-                                partida.escenarioPartida &&
-                                (partida.liderMuertoUsuario1 == true ||
-                                  partida.liderMuertoUsuario1 == false) &&
-                                (partida.liderMuertoUsuario2 == true ||
-                                  partida.liderMuertoUsuario2 == false) &&
-                                partida.partidaValidadaUsuario2
-                              "
-                            >
-                              Partida validada
-                            </span>
-                          </div>
-                          <div class="player-info">
-                            <span
-                              :class="{
-                                highlight: partida.idUsuario2 === idUsuario,
-                              }"
-                            >
-                              {{ partida.nick2 }}
-                            </span>
-                          </div>
-                          <div class="player-info">
-                            <span
-                              v-if="
-                                partida.resultadoUsuario2 === null &&
-                                partida.idUsuario2 == idUsuario
-                              "
-                            ></span>
-                            <span v-else>{{
-                              partida.resultadoUsuario2 ?? "Esperando resultado"
-                            }}</span>
-                            <v-btn
-                              v-if="
-                                partida.resultadoUsuario2 === null &&
-                                partida.idUsuario2 == idUsuario
-                              "
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              size="small"
-                              @click="
-                                abrirModalPuntos(partida.idPartidaTorneo, 2)
-                              "
-                            >
-                              Puntos
-                            </v-btn>
-                          </div>
-
-                          <div class="player-info">
-                            <span
-                              v-if="
-                                partida.liderMuertoUsuario2 === null &&
-                                partida.idUsuario2 == idUsuario
-                              "
-                            ></span>
-                            <span v-else>
-                              ¿Mató al lider?
-                              {{
-                                partida.liderMuertoUsuario2 === true
-                                  ? "Sí"
-                                  : partida.liderMuertoUsuario2 === false
-                                  ? "No"
-                                  : "..."
-                              }}
-                            </span>
-
-                            <v-btn
-                              v-if="
-                                partida.liderMuertoUsuario2 === null &&
-                                partida.idUsuario2 == idUsuario
-                              "
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              size="small"
-                              @click="
-                                abrirModalLider(partida.idPartidaTorneo, 2)
-                              "
-                            >
-                              Lider
-                            </v-btn>
-                          </div>
-
-                          <!-- <div class="player-info">
+                                {{ partida.nick2 }}
+                              </span>
+                            </div>
+                            <!-- resultado 2 -->
+                            <div class="player-info">
+                              <span>{{ partida.resultadoUsuario2 }}</span>
+                            </div>
+                            <!-- lider muerto 2 -->
+                            <div class="player-info">
+                              <span>
+                                ¿Líder?
+                                {{
+                                  partida.liderMuertoUsuario2 === true
+                                    ? "Sí"
+                                    : partida.liderMuertoUsuario2 === false
+                                    ? "No"
+                                    : "..."
+                                }}
+                              </span>
+                            </div>
+                            <!-- lista 2 -->
+                            <!-- <div class="player-info">
                           <v-icon>mdi-shield-outline</v-icon>
                           <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
                         </div> -->
-                          <!-- <div class="player-info">
+                            <!-- <div class="player-info">
                           <v-btn
                             class="mt-2"
                             variant="tonal"
@@ -307,67 +198,165 @@
                             Lista
                           </v-btn>
                         </div> -->
+                          </div>
                         </div>
+                        <v-divider></v-divider>
+                        <v-list class="centered-list">
+                          <!-- ganador -->
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                <v-icon>mdi-trophy</v-icon>
+                                {{ getGanador(partida) }}
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                          <!-- fecha -->
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                <v-icon>mdi-calendar</v-icon>
+                                {{ formatDate(partida.fechaPartida) }}
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                          <!-- escenario -->
+                          <v-list-item v-if="partida.escenarioPartida">
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                <v-icon>mdi-map-marker</v-icon>
+                                {{ partida.escenarioPartida }}
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
                       </div>
-                      <v-divider></v-divider>
-                      <v-list class="centered-list">
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <v-icon>mdi-trophy</v-icon>
-                              {{ getGanador(partida) }}
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <v-icon>mdi-calendar</v-icon>
-                              {{ formatDate(partida.fechaPartida) }}
-                              <!-- TODO: format fecha -->
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title v-if="partida.escenarioPartida">
-                              <v-icon>mdi-map-marker</v-icon>
-                              {{ partida.escenarioPartida }}
-                            </v-list-item-title>
-                            <v-list-item-title v-else>
-                              <v-btn
-                                v-if="
-                                  partida.idUsuario1 == idUsuario ||
-                                  partida.idUsuario2 == idUsuario
-                                "
-                                class="mt-2"
-                                variant="tonal"
-                                color="primary"
-                                size="small"
-                                @click="
-                                  abrirModalEscenario(partida.idPartidaTorneo)
-                                "
+                      <!-- Partida sin completar -->
+                      <div v-else>
+                        <div class="player-container">
+                          <div class="player-details">
+                            <!-- nick 1 -->
+                            <div class="player-info">
+                              <span
+                                :class="{
+                                  highlight: partida.idUsuario1 === idUsuario,
+                                }"
                               >
-                                Escenario
-                              </v-btn>
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                      </v-list>
+                                {{ partida.nick1 }}
+                              </span>
+                            </div>
+                            <!-- lista 1 -->
+                            <!-- <div class="player-info">
+                          <v-icon>mdi-shield-outline</v-icon>
+                          <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
+                        </div> -->
+                            <!-- <div class="player-info">
+                          <v-btn
+                            class="mt-2"
+                            variant="tonal"
+                            color="primary"
+                            size="small"
+                            @click="
+                              verLista(
+                                partida.idUsuario1,
+                                partida.idTorneo,
+                                partida.nick1
+                              )
+                            "
+                          >
+                            Lista
+                          </v-btn>
+                        </div> -->
+                          </div>
+
+                          <v-divider vertical class="divider"></v-divider>
+
+                          <div class="player-details">
+                            <!-- nick 2 -->
+                            <div class="player-info">
+                              <span
+                                :class="{
+                                  highlight: partida.idUsuario2 === idUsuario,
+                                }"
+                              >
+                                {{ partida.nick2 }}
+                              </span>
+                            </div>
+                            <!-- lista 2 -->
+                            <!-- <div class="player-info">
+                          <v-icon>mdi-shield-outline</v-icon>
+                          <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
+                        </div> -->
+                            <!-- <div class="player-info">
+                          <v-btn
+                            class="mt-2"
+                            variant="tonal"
+                            color="primary"
+                            size="small"
+                            @click="
+                              verLista(
+                                partida.idUsuario2,
+                                partida.idTorneo,
+                                partida.nick2
+                              )
+                            "
+                          >
+                            Lista
+                          </v-btn>
+                        </div> -->
+                          </div>
+                        </div>
+                        <v-divider></v-divider>
+                        <v-list class="centered-list">
+                          <!-- fecha -->
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                <v-icon>mdi-calendar</v-icon>
+                                {{ formatDate(partida.fechaPartida) }}
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                          <!-- editar partida -->
+                          <v-list-item
+                            v-if="
+                              partida.idUsuario1 == idUsuario ||
+                              partida.idUsuario2 == idUsuario
+                            "
+                          >
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                <v-btn
+                                  variant="tonal"
+                                  color="primary"
+                                  @click="editPartida(partida, idUsuario)"
+                                  large
+                                  >Subir resultados</v-btn
+                                >
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                          <v-list-item v-else>
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                <p>Esperando resultados</p>
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
+                      </div>
                     </v-card-text>
                   </v-card>
                 </div>
-              </v-tab-item>
-              <v-tab-item
-                v-if="
-                  !partidasPorRonda[activeTab + 1] ||
-                  !partidasPorRonda[activeTab + 1].length
-                "
+              </v-tabs-item>
+              <!-- Tab clasificacion -->
+              <v-tabs-window-item
+                :value="tabClasificacion"
+                :key="tabClasificacion"
               >
-                <p>No hay partidas de esta ronda aún.</p>
-              </v-tab-item>
+                Contenido de la tab clasificacion
+              </v-tabs-window-item>
             </v-tabs-window>
-            <v-tabs-window value="clasificacion"> </v-tabs-window>
           </v-card>
         </div>
       </v-col>
@@ -397,33 +386,7 @@
       </v-card>
     </v-dialog>
 
-    <ModalAddPuntosPartida
-      v-if="isModalPuntosVisible"
-      :isVisible="isModalPuntosVisible"
-      :idPartidaTorneo="idPartidaSeleccionada"
-      :usuario="usuarioSeleccionado"
-      @confirmar="confirmarPuntos"
-      @cerrar="cerrarModal"
-    />
-
-    <ModalLiderPartida
-      v-if="isModalLiderVisible"
-      :isVisible="isModalLiderVisible"
-      :idPartidaTorneo="idPartidaSeleccionada"
-      :usuario="usuarioSeleccionado"
-      @confirmar="confirmarLider"
-      @cerrar="cerrarModalLider"
-    />
-
-    <ModalAddEscenarioPartida
-      v-if="isModalEscenarioVisible"
-      :isVisible="isModalEscenarioVisible"
-      :idPartidaTorneo="idPartidaSeleccionada"
-      :usuario="usuarioSeleccionado"
-      @confirmar="confirmarEscenario"
-      @cerrar="cerrarModalEscenario"
-    />
-
+    <!-- Modal validar -->
     <ModalValidarPartida
       v-if="isModalValidarVisible"
       :isVisible="isModalValidarVisible"
@@ -431,14 +394,22 @@
       @confirmar="confirmarValidar"
       @cerrar="cerrarModalValidar"
     />
+
+    <!-- Modal editar -->
+    <ModalEditarPartida
+      v-if="isModalEditarPartidaVisible"
+      :isVisible="isModalEditarPartidaVisible"
+      :partida="partidaSelected"
+      :idUsuario="idUsuarioSelected"
+      @confirmar="confirmarEditarPartida"
+      @cerrar="cerrarModalEditarPartida"
+    />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEscenarioPartida.vue";
-import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
-import ModalLiderPartida from "@/components/ResultadosTorneos/ModalLiderPartida.vue";
+import ModalEditarPartida from "@/components/ResultadosTorneos/ModalEditarPartida.vue";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
 import { useAuth } from "@/composables/useAuth";
@@ -460,7 +431,7 @@ const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoDTO[]>();
 const numeroRondas = ref<number[]>([]);
-const activeTab = ref(0);
+const activeTab = ref(1);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 
 const { getidUsuario } = useAuth();
@@ -470,11 +441,33 @@ const isModalListaVisible = ref<boolean>(false);
 const listaData = ref<string>("");
 const nickJugador = ref<string>("");
 const idPartidaSeleccionada = ref<number>();
+const idUsuarioSelected = ref<number>(0);
+
 const usuarioSeleccionado = ref<1 | 2>();
-const isModalPuntosVisible = ref(false);
-const isModalLiderVisible = ref(false);
-const isModalEscenarioVisible = ref(false);
-const isModalValidarVisible = ref(false);
+const isModalValidarVisible = ref<boolean>(false);
+const isModalEditarPartidaVisible = ref<boolean>(false);
+const partidaSelected = ref<PartidaTorneoDTO>({
+  ejercitoUsuario1: null,
+  ejercitoUsuario2: null,
+  escenarioPartida: null,
+  fechaPartida: "",
+  ganadorPartidaTorneo: null,
+  idPartidaTorneo: 0,
+  idTorneo: 0,
+  idUsuario1: 0,
+  idUsuario2: 0,
+  liderMuertoUsuario1: null,
+  liderMuertoUsuario2: null,
+  nick1: "",
+  nick2: "",
+  numeroRonda: 0,
+  partidaValidadaUsuario1: null,
+  partidaValidadaUsuario2: null,
+  resultadoUsuario1: null,
+  resultadoUsuario2: null,
+});
+
+const tabClasificacion = ref<number>(1);
 
 onMounted(async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
@@ -503,6 +496,8 @@ onMounted(async () => {
         return acc;
       }, {} as Record<number, PartidaTorneoDTO[]>);
     }
+
+    tabClasificacion.value = numeroRondas.value.length + 1;
   } catch (error) {
     console.error(error);
   } finally {
@@ -511,9 +506,9 @@ onMounted(async () => {
 });
 
 const getGanador = (partida: PartidaTorneoDTO) => {
-  if (partida.ganadorPartidaTorneo === 1) {
+  if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
     return partida.nick1;
-  } else if (partida.ganadorPartidaTorneo === 2) {
+  } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
     return partida.nick2;
   } else {
     return "Empate";
@@ -543,86 +538,19 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
   }
 };
 
-const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalPuntosVisible.value = true;
-};
-
-const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalLiderVisible.value = true;
-};
-
-const abrirModalEscenario = (idPartida: number) => {
-  idPartidaSeleccionada.value = idPartida;
-  isModalEscenarioVisible.value = true;
-};
-
 const abrirModalValidar = (idPartida: number, usuario: 1 | 2) => {
   idPartidaSeleccionada.value = idPartida;
   usuarioSeleccionado.value = usuario;
   isModalValidarVisible.value = true;
 };
 
-const confirmarPuntos = async (puntos: number) => {
-  if (idPartidaSeleccionada.value && usuarioSeleccionado.value !== null) {
-    const body: UpdatePartidaTorneoDTO = {
-      idPartidaTorneo: idPartidaSeleccionada.value,
-    };
+const editPartida = (partida: PartidaTorneoDTO, idUsuario: number) => {
+  partidaSelected.value = partida;
 
-    if (usuarioSeleccionado.value === 1) body.resultadoUsuario1 = puntos;
-    else body.resultadoUsuario2 = puntos;
+  if (idUsuario === partida.idUsuario1) idUsuarioSelected.value = 1;
+  else idUsuarioSelected.value = 2;
 
-    try {
-      await updatePartidaTorneo(body);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isModalPuntosVisible.value = false;
-      window.location.reload();
-    }
-  }
-};
-
-const confirmarLider = async (lider: boolean) => {
-  if (idPartidaSeleccionada.value && usuarioSeleccionado.value !== null) {
-    const body: UpdatePartidaTorneoDTO = {
-      idPartidaTorneo: idPartidaSeleccionada.value,
-    };
-
-    if (usuarioSeleccionado.value === 1) body.liderMuertoUsuario1 = lider;
-    else body.liderMuertoUsuario2 = lider;
-
-    try {
-      await updatePartidaTorneo(body);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isModalLiderVisible.value = false;
-      window.location.reload();
-    }
-  }
-};
-
-const confirmarEscenario = async (escenario: string) => {
-  if (idPartidaSeleccionada.value) {
-    const body: UpdatePartidaTorneoDTO = {
-      idPartidaTorneo: idPartidaSeleccionada.value,
-    };
-
-    body.escenarioPartida = escenario;
-
-    try {
-      await updatePartidaTorneo(body);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isModalEscenarioVisible.value = false;
-      window.location.reload();
-    }
-  }
+  isModalEditarPartidaVisible.value = true;
 };
 
 const confirmarValidar = async () => {
@@ -645,20 +573,36 @@ const confirmarValidar = async () => {
   }
 };
 
-const cerrarModal = () => {
-  isModalPuntosVisible.value = false;
-};
+const confirmarEditarPartida = async (partida: PartidaTorneoDTO) => {
+  if (partida) {
+    const body: UpdatePartidaTorneoDTO = {
+      idPartidaTorneo: partida.idPartidaTorneo,
+      resultadoUsuario1: partida.resultadoUsuario1,
+      resultadoUsuario2: partida.resultadoUsuario2,
+      escenarioPartida: partida.escenarioPartida,
+      liderMuertoUsuario1: partida.liderMuertoUsuario1,
+      liderMuertoUsuario2: partida.liderMuertoUsuario2,
+    };
 
-const cerrarModalLider = () => {
-  isModalLiderVisible.value = false;
-};
+    if (partida.partidaValidadaUsuario1) body.partidaValidadaUsuario1 = true;
+    else body.partidaValidadaUsuario2 = true;
 
-const cerrarModalEscenario = () => {
-  isModalEscenarioVisible.value = false;
+    try {
+      await updatePartidaTorneo(body);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isModalEditarPartidaVisible.value = false;
+      window.location.reload();
+    }
+  }
 };
 
 const cerrarModalValidar = () => {
   isModalValidarVisible.value = false;
+};
+const cerrarModalEditarPartida = () => {
+  isModalEditarPartidaVisible.value = false;
 };
 
 const formatDate = (date: string | null | undefined) => {

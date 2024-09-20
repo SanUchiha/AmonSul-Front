@@ -24,9 +24,7 @@
               <span>{{ partida?.ejercitoUsuario1 ?? "No especificado" }}</span>
             </div>
           </div>
-          <div class="versus">
-            <v-icon>mdi-vs</v-icon>
-          </div>
+
           <v-divider vertical class="divider"></v-divider>
 
           <div class="player-details">

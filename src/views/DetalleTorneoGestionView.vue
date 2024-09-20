@@ -17,7 +17,7 @@
               >
               </v-tab>
               <v-tab
-                :key="0"
+                :key="tabClasificacion"
                 :text="`Clasificación`"
                 :value="tabClasificacion"
               ></v-tab>
@@ -90,8 +90,20 @@
                           </div>
                           <!-- resultado 1 -->
                           <div class="player-info">
-                            <span
-                              >{{ partida.resultadoUsuario1 ?? "N/A" }}
+                            <span v-if="partida.resultadoUsuario1"
+                              >{{ partida.resultadoUsuario1 }}
+                              <v-icon
+                                class="cursor-pointer"
+                                color="primary"
+                                @click="
+                                  abrirModalPuntos(partida.idPartidaTorneo, 1)
+                                "
+                              >
+                                mdi-pencil
+                              </v-icon>
+                            </span>
+                            <span v-else>
+                              <v-icon color="red">mdi-close</v-icon>
                               <v-icon
                                 class="cursor-pointer"
                                 color="primary"
@@ -105,8 +117,8 @@
                           </div>
                           <!-- lider 1 -->
                           <div class="player-info">
-                            <span>
-                              ¿Mató al lider?
+                            <span v-if="partida.liderMuertoUsuario1 != null">
+                              ¿Líder?
                               {{
                                 partida.liderMuertoUsuario1 === true
                                   ? "Sí"
@@ -114,6 +126,20 @@
                                   ? "No"
                                   : "N/A"
                               }}
+
+                              <v-icon
+                                class="cursor-pointer"
+                                color="primary"
+                                @click="
+                                  abrirModalLider(partida.idPartidaTorneo, 1)
+                                "
+                              >
+                                mdi-pencil
+                              </v-icon>
+                            </span>
+                            <span v-else>
+                              ¿Líder?
+                              <v-icon color="red">mdi-close</v-icon>
 
                               <v-icon
                                 class="cursor-pointer"
@@ -190,9 +216,8 @@
                           </div>
                           <!-- resulultado 2 -->
                           <div class="player-info">
-                            <span
-                              >{{ partida.resultadoUsuario2 ?? "N/A" }}
-
+                            <span v-if="partida.resultadoUsuario2"
+                              >{{ partida.resultadoUsuario2 }}
                               <v-icon
                                 class="cursor-pointer"
                                 color="primary"
@@ -203,11 +228,23 @@
                                 mdi-pencil
                               </v-icon>
                             </span>
+                            <span v-else>
+                              <v-icon color="red">mdi-close</v-icon>
+                              <v-icon
+                                class="cursor-pointer"
+                                color="primary"
+                                @click="
+                                  abrirModalPuntos(partida.idPartidaTorneo, 1)
+                                "
+                              >
+                                mdi-pencil
+                              </v-icon>
+                            </span>
                           </div>
                           <!-- lider 2 -->
                           <div class="player-info">
-                            <span>
-                              ¿Mató al lider?
+                            <span v-if="partida.liderMuertoUsuario2 != null">
+                              ¿Líder?
                               {{
                                 partida.liderMuertoUsuario2 === true
                                   ? "Sí"
@@ -215,6 +252,20 @@
                                   ? "No"
                                   : "N/A"
                               }}
+
+                              <v-icon
+                                class="cursor-pointer"
+                                color="primary"
+                                @click="
+                                  abrirModalLider(partida.idPartidaTorneo, 2)
+                                "
+                              >
+                                mdi-pencil
+                              </v-icon>
+                            </span>
+                            <span v-else>
+                              ¿Líder?
+                              <v-icon color="red">mdi-close</v-icon>
 
                               <v-icon
                                 class="cursor-pointer"
