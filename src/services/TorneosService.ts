@@ -23,3 +23,10 @@ export const getInfoTorneoCreado = async (idTorneo: number) => {
 export const getPartidasTorneo = async (idTorneo: number) => {
   return http.get(`Torneo/Gestion/Partidas/${idTorneo}`);
 };
+
+export const getPartidasTorneoByRonda = async (
+  idTorneo: number,
+  idRonda: number
+) => {
+  return http.get(`Torneo/Gestion/Partidas/${idTorneo}/${idRonda}`);
+};
