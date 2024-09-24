@@ -1,19 +1,12 @@
 <template>
   <v-dialog v-model="internalIsVisible" max-width="600px">
     <v-card>
-      <v-card-title>Configurar Ronda</v-card-title>
+      <v-card-title>Configurar Ronda {{ props.ronda }}</v-card-title>
 
       <v-divider></v-divider>
 
       <v-card-text>
         <v-form>
-          <v-select
-            v-model="numeroRonda"
-            :items="rondas"
-            label="¿Qué ronda es?"
-            required
-          ></v-select>
-          <span v-if="errorRonda" style="color: red">{{ errorRonda }}</span>
           <v-checkbox
             v-model="mismaComunidadCheck"
             label="¿Se permite emparejamientos de la misma comunidad de juego?"
@@ -47,10 +40,10 @@
             label="Selecciona el jugador a añadir"
           ></v-combobox> -->
 
-          <v-checkbox
+          <!-- <v-checkbox
             v-model="retosCheck"
             label="¿Tenemos algún reto para esta ronda?"
-          ></v-checkbox>
+          ></v-checkbox> -->
 
           <div v-if="retosCheck">
             <v-combobox
@@ -80,9 +73,9 @@
             >
           </div>
 
-          <v-divider class="my-3"></v-divider>
+          <!-- <v-divider class="my-3"></v-divider> -->
 
-          <div
+          <!-- <div
             v-if="emparejamientos.length > 0"
             class="emparejamientos-container"
           >
@@ -104,12 +97,12 @@
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </div>
-          </div>
+          </div> -->
         </v-form>
       </v-card-text>
 
       <v-card-actions>
-        <v-row justify="center" class="my-4 ga-5">
+        <v-row justify="center" class="ga-5">
           <v-btn
             :disabled="isGenerating"
             @click="confirmarConfiguracion"
@@ -153,6 +146,7 @@
 
 <script setup lang="ts">
 import {
+  Clasificacion,
   Emparejamiento,
   GenerarRonda,
   JugadorParaEmparejamiento,
@@ -172,7 +166,11 @@ import ModalError from "../Commons/ModalError.vue";
 const props = defineProps<{
   isVisible: boolean;
   torneo: TorneoGestionInfoDTO | null;
+  clasificacion: Clasificacion[];
+  clasificacionDividida: Clasificacion[];
+  ronda: number;
 }>();
+
 const emit = defineEmits(["close", "confirm"]);
 
 const internalIsVisible = ref(props.isVisible);
@@ -201,7 +199,9 @@ const rondas = ref<number[]>();
 const isGenerating = ref<boolean>(false);
 const torneoSelected = ref<TorneoGestionInfoDTO>();
 const jugadores = ref<UsuarioFastDTO[]>();
-
+const clasificacionDividida = ref<Clasificacion[]>([]);
+const clasificacionZona1 = ref<Clasificacion[]>([]);
+const clasificacionZona2 = ref<Clasificacion[]>([]);
 const errorRonda = ref<string | null>(null);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
@@ -306,7 +306,85 @@ const removeEmparejamiento = (index: number) => {
   emparejamientos.value.splice(index, 1);
 };
 
+const dividirClasificacionEnZonas = () => {
+  clasificacionDividida.value = props.clasificacionDividida;
+  const totalJugadores = clasificacionDividida.value.length;
+  const esImpar = totalJugadores % 2 !== 0;
+
+  const mitad = Math.floor(totalJugadores / 2);
+  const zona1Size = esImpar ? mitad + 1 : mitad;
+
+  clasificacionZona1.value = clasificacionDividida.value.slice(0, zona1Size);
+  clasificacionZona2.value = clasificacionDividida.value.slice(zona1Size);
+};
+
+const generarEmparejamientos = (
+  clasificacion: Clasificacion[]
+): Emparejamiento[] => {
+  const emparejamientos: Emparejamiento[] = [];
+
+  dividirClasificacionEnZonas();
+  if (props.torneo?.torneo.idTorneo == 7 && props.ronda > 2) {
+    // Solo podemo emparejar a los jugadores de la zona1 con los jugadores de la zona1
+    // y los jugadores de la zona2 con los jugadores de la zona2
+    // tiene que ser en formato suizo, el orden es tal y como viene en la lista
+
+    const zona1 = clasificacionZona1.value;
+    const zona2 = clasificacionZona2.value;
+
+    // Emparejar a los jugadores de zona 1
+    const jugadoresZona1 = props.clasificacion.filter((jugador) =>
+      zona1.some((z) => z.idUsuario === jugador.idUsuario)
+    );
+
+    for (let i = 0; i < jugadoresZona1.length; i += 2) {
+      if (i + 1 < jugadoresZona1.length) {
+        const jugador1 = jugadoresZona1[i];
+        const jugador2 = jugadoresZona1[i + 1];
+
+        emparejamientos.push({
+          jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
+          jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
+        });
+      }
+    }
+
+    // Emparejar a los jugadores de zona 2
+    const jugadoresZona2 = props.clasificacion.filter((jugador) =>
+      zona2.some((z) => z.idUsuario === jugador.idUsuario)
+    );
+
+    for (let i = 0; i < jugadoresZona2.length; i += 2) {
+      if (i + 1 < jugadoresZona2.length) {
+        const jugador1 = jugadoresZona2[i];
+        const jugador2 = jugadoresZona2[i + 1];
+
+        emparejamientos.push({
+          jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
+          jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
+        });
+      }
+    }
+  } else {
+    // Emparejar en formato suizo
+    for (let i = 0; i < clasificacion.length; i += 2) {
+      if (i + 1 < clasificacion.length) {
+        const jugador1 = clasificacion[i];
+        const jugador2 = clasificacion[i + 1];
+
+        emparejamientos.push({
+          jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
+          jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
+        });
+      }
+    }
+  }
+
+  return emparejamientos;
+};
+
 const confirmarConfiguracion = async () => {
+  numeroRonda.value = props.ronda;
   if (!numeroRonda.value) {
     errorRonda.value = "El número de ronda es obligatorio.";
     return;
@@ -318,21 +396,28 @@ const confirmarConfiguracion = async () => {
 
   errorRonda.value = null;
 
+  //Emparejamientos
+  const emparejamientosGenerados: Emparejamiento[] = generarEmparejamientos(
+    props.clasificacion
+  );
+
   const configuracion: GenerarRonda = {
     mismaComunidadCheck: mismaComunidadCheck.value,
     luzVsOscCheck: luzVsOscCheck.value,
     retosCheck: retosCheck.value,
-    emparejamientos: emparejamientos.value,
+    emparejamientos: emparejamientosGenerados,
     esEloCheck: esEloCheck.value,
     opcionImpares: opcionImpares.value,
     idTorneo: props.torneo?.torneo.idTorneo,
-    idRonda: numeroRonda.value!,
+    idRonda: numeroRonda.value,
   };
 
   try {
     isGenerating.value = true;
     await generarRonda(configuracion);
     showSuccessModal.value = true;
+
+    console.log(configuracion);
   } catch (error) {
     showErrorModal.value = true;
     console.error(error);

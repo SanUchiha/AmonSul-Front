@@ -354,7 +354,127 @@
                 :value="tabClasificacion"
                 :key="tabClasificacion"
               >
-                Contenido de la tab clasificacion
+                <!-- División en dos zonas a a partir de la ronda 3 -->
+                <div v-if="idTorneo === 7">
+                  <!-- Zona mithil -->
+                  <h3>Zona Mithril</h3>
+                  <v-table
+                    v-if="activeTab == tabClasificacion"
+                    density="compact"
+                  >
+                    <thead>
+                      <tr>
+                        <th class="text-center">Posición</th>
+                        <th class="text-center">Jugador</th>
+                        <th class="text-center">Victorias</th>
+                        <th class="text-center">Puntos a favor</th>
+                        <th class="text-center">Puntos en contra</th>
+                        <th class="text-center">Diferencia de puntos</th>
+                        <th class="tect-center">Líder</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(jugador, index) in clasificacionZona1"
+                        :key="jugador.nick"
+                      >
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ jugador.nick }}</td>
+                        <td>
+                          {{ jugador.victorias }}
+                        </td>
+                        <td>{{ jugador.puntosFavor }}</td>
+                        <td>
+                          {{ jugador.puntosContra }}
+                        </td>
+                        <td>{{ jugador.diferenciaPuntos }}</td>
+                        <td>
+                          {{ jugador.lider }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+
+                  <v-divider class="my-5"></v-divider>
+
+                  <!-- Zona acero élfico -->
+                  <h3>Zona Acero Élfico</h3>
+                  <v-table
+                    v-if="activeTab == tabClasificacion"
+                    density="compact"
+                  >
+                    <thead>
+                      <tr>
+                        <th class="text-center">Posición</th>
+                        <th class="text-center">Jugador</th>
+                        <th class="text-center">Victorias</th>
+                        <th class="text-center">Puntos a favor</th>
+                        <th class="text-center">Puntos en contra</th>
+                        <th class="text-center">Diferencia de puntos</th>
+                        <th class="tect-center">Líder</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(jugador, index) in clasificacionZona2"
+                        :key="jugador.nick"
+                      >
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ jugador.nick }}</td>
+                        <td>
+                          {{ jugador.victorias }}
+                        </td>
+                        <td>{{ jugador.puntosFavor }}</td>
+                        <td>
+                          {{ jugador.puntosContra }}
+                        </td>
+                        <td>{{ jugador.diferenciaPuntos }}</td>
+                        <td>
+                          {{ jugador.lider }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+                <!-- Para todo lo demás -->
+                <div v-else>
+                  <v-table
+                    v-if="activeTab == tabClasificacion"
+                    density="compact"
+                  >
+                    <thead>
+                      <tr>
+                        <th class="text-center">Posición</th>
+                        <th class="text-center">Jugador</th>
+                        <th class="text-center">Victorias</th>
+                        <th class="text-center">Puntos a favor</th>
+                        <th class="text-center">Puntos en contra</th>
+                        <th class="text-center">Diferencia de puntos</th>
+                        <th class="tect-center">Líder</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(jugador, index) in clasificacion"
+                        :key="jugador.nick"
+                      >
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ jugador.nick }}</td>
+                        <td>
+                          {{ jugador.victorias }}
+                        </td>
+                        <td>{{ jugador.puntosFavor }}</td>
+                        <td>
+                          {{ jugador.puntosContra }}
+                        </td>
+                        <td>{{ jugador.diferenciaPuntos }}</td>
+                        <td>
+                          {{ jugador.lider }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
               </v-tabs-window-item>
             </v-tabs-window>
           </v-card>
@@ -414,7 +534,7 @@ import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalLista
 import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
 import { useAuth } from "@/composables/useAuth";
 import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
-import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
+import { Clasificacion, UpdatePartidaTorneoDTO } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
 import { getlistaTorneo } from "@/services/ListasService";
@@ -427,13 +547,11 @@ const route = useRoute();
 const idTorneo = ref<number>(Number(route.params.idTorneo));
 const isLoading = ref<boolean>(false);
 const isLoadingImage = ref<boolean>(false);
-
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoDTO[]>();
 const numeroRondas = ref<number[]>([]);
 const activeTab = ref(1);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
-
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const idUsuario = ref<number>();
@@ -442,7 +560,6 @@ const listaData = ref<string>("");
 const nickJugador = ref<string>("");
 const idPartidaSeleccionada = ref<number>();
 const idUsuarioSelected = ref<number>(0);
-
 const usuarioSeleccionado = ref<1 | 2>();
 const isModalValidarVisible = ref<boolean>(false);
 const isModalEditarPartidaVisible = ref<boolean>(false);
@@ -466,8 +583,13 @@ const partidaSelected = ref<PartidaTorneoDTO>({
   resultadoUsuario1: null,
   resultadoUsuario2: null,
 });
-
 const tabClasificacion = ref<number>(1);
+const clasificacion = ref<Clasificacion[]>([]);
+const jugadoresZona1 = ref<Clasificacion[]>([]);
+const jugadoresZona2 = ref<Clasificacion[]>([]);
+const clasificacionDividida = ref<Clasificacion[]>([]);
+const clasificacionZona1 = ref<Clasificacion[]>([]);
+const clasificacionZona2 = ref<Clasificacion[]>([]);
 
 onMounted(async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
@@ -498,12 +620,231 @@ onMounted(async () => {
     }
 
     tabClasificacion.value = numeroRondas.value.length + 1;
+
+    calcularClasificacion();
+
+    console.log("Clasifiacion", clasificacion.value);
+    console.log("clasificacionZona1", clasificacionZona1.value);
+    console.log("clasificacionZona2", clasificacionZona2.value);
   } catch (error) {
     console.error(error);
   } finally {
     isLoading.value = false;
   }
 });
+
+const calcularClasificacion = () => {
+  const ranking: Record<
+    number,
+    {
+      nick: string;
+      victorias: number;
+      puntosFavor: number;
+      puntosContra: number;
+      diferenciaPuntos: number;
+      lider: number;
+      idUsuario: number;
+    }
+  > = {};
+  const rankingDividido: Record<
+    number,
+    {
+      nick: string;
+      victorias: number;
+      puntosFavor: number;
+      puntosContra: number;
+      diferenciaPuntos: number;
+      lider: number;
+      idUsuario: number;
+    }
+  > = {};
+
+  // Filtramos hasta la ronda 2 para dividir el grupo
+  const partidasFiltradas = partidas.value?.filter(
+    (partida) => partida.numeroRonda <= 2
+  );
+
+  partidasFiltradas?.forEach((partida) => {
+    // Verifica que la partida esté validada por ambos usuarios
+    if (partida.partidaValidadaUsuario1 && partida.partidaValidadaUsuario2) {
+      const puntosUsuario1 = partida.resultadoUsuario1 ?? 0;
+      const puntosUsuario2 = partida.resultadoUsuario2 ?? 0;
+      const liderMuertoUsuario1 = partida.liderMuertoUsuario1 ? 1 : 0;
+      const liderMuertoUsuario2 = partida.liderMuertoUsuario2 ? 1 : 0;
+
+      // Inicializamos los jugadores si no están en el ranking
+      if (!rankingDividido[partida.idUsuario1]) {
+        rankingDividido[partida.idUsuario1] = {
+          nick: partida.nick1,
+          victorias: 0,
+          puntosFavor: 0,
+          puntosContra: 0,
+          diferenciaPuntos: 0,
+          lider: 0,
+          idUsuario: partida.idUsuario1,
+        };
+      }
+      if (!rankingDividido[partida.idUsuario2]) {
+        rankingDividido[partida.idUsuario2] = {
+          nick: partida.nick2,
+          victorias: 0,
+          puntosFavor: 0,
+          puntosContra: 0,
+          diferenciaPuntos: 0,
+          lider: 0,
+          idUsuario: partida.idUsuario2,
+        };
+      }
+
+      // Actualizamos puntos a favor y en contra
+      rankingDividido[partida.idUsuario1].puntosFavor += puntosUsuario1;
+      rankingDividido[partida.idUsuario1].puntosContra += puntosUsuario2;
+      rankingDividido[partida.idUsuario2].puntosFavor += puntosUsuario2;
+      rankingDividido[partida.idUsuario2].puntosContra += puntosUsuario1;
+
+      // Actualizamos la diferencia de puntos
+      rankingDividido[partida.idUsuario1].diferenciaPuntos =
+        rankingDividido[partida.idUsuario1].puntosFavor -
+        rankingDividido[partida.idUsuario1].puntosContra;
+      rankingDividido[partida.idUsuario2].diferenciaPuntos =
+        rankingDividido[partida.idUsuario2].puntosFavor -
+        rankingDividido[partida.idUsuario2].puntosContra;
+
+      // Actualizamos las victorias
+      if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
+        rankingDividido[partida.idUsuario1].victorias += 1;
+      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        rankingDividido[partida.idUsuario2].victorias += 1;
+      }
+
+      // Lider muerto primero
+      if (liderMuertoUsuario1) {
+        rankingDividido[partida.idUsuario1].lider += 1;
+      } else if (liderMuertoUsuario2) {
+        rankingDividido[partida.idUsuario2].lider += 1;
+      }
+    }
+  });
+
+  clasificacionDividida.value = Object.values(rankingDividido).sort((a, b) => {
+    // 1. Ordenar por victorias
+    if (b.victorias !== a.victorias) {
+      return b.victorias - a.victorias;
+    }
+    // 2. Ordenar por diferencia de puntos (puntos a favor - puntos en contra)
+    if (b.diferenciaPuntos !== a.diferenciaPuntos) {
+      return b.diferenciaPuntos - a.diferenciaPuntos;
+    }
+    // 3. Ordenar por puntos a favor
+    if (b.puntosFavor !== a.puntosFavor) {
+      return b.puntosFavor - a.puntosFavor;
+    }
+    // 4. Ordenar por quién ha matado al líder primero
+    return b.lider - a.lider;
+  });
+
+  dividirClasificacionEnZonas();
+
+  // Clasificacion normal
+  partidas.value?.forEach((partida) => {
+    // Verifica que la partida esté validada por ambos usuarios
+    if (partida.partidaValidadaUsuario1 && partida.partidaValidadaUsuario2) {
+      const puntosUsuario1 = partida.resultadoUsuario1 ?? 0;
+      const puntosUsuario2 = partida.resultadoUsuario2 ?? 0;
+      const liderMuertoUsuario1 = partida.liderMuertoUsuario1 ? 1 : 0;
+      const liderMuertoUsuario2 = partida.liderMuertoUsuario2 ? 1 : 0;
+
+      // Inicializamos los jugadores si no están en el ranking
+      if (!ranking[partida.idUsuario1]) {
+        ranking[partida.idUsuario1] = {
+          nick: partida.nick1,
+          victorias: 0,
+          puntosFavor: 0,
+          puntosContra: 0,
+          diferenciaPuntos: 0,
+          lider: 0,
+          idUsuario: partida.idUsuario1,
+        };
+      }
+      if (!ranking[partida.idUsuario2]) {
+        ranking[partida.idUsuario2] = {
+          nick: partida.nick2,
+          victorias: 0,
+          puntosFavor: 0,
+          puntosContra: 0,
+          diferenciaPuntos: 0,
+          lider: 0,
+          idUsuario: partida.idUsuario2,
+        };
+      }
+
+      // Actualizamos puntos a favor y en contra
+      ranking[partida.idUsuario1].puntosFavor += puntosUsuario1;
+      ranking[partida.idUsuario1].puntosContra += puntosUsuario2;
+      ranking[partida.idUsuario2].puntosFavor += puntosUsuario2;
+      ranking[partida.idUsuario2].puntosContra += puntosUsuario1;
+
+      // Actualizamos la diferencia de puntos
+      ranking[partida.idUsuario1].diferenciaPuntos =
+        ranking[partida.idUsuario1].puntosFavor -
+        ranking[partida.idUsuario1].puntosContra;
+      ranking[partida.idUsuario2].diferenciaPuntos =
+        ranking[partida.idUsuario2].puntosFavor -
+        ranking[partida.idUsuario2].puntosContra;
+
+      // Actualizamos las victorias
+      if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
+        ranking[partida.idUsuario1].victorias += 1;
+      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        ranking[partida.idUsuario2].victorias += 1;
+      }
+
+      // Lider muerto primero
+      if (liderMuertoUsuario1) {
+        ranking[partida.idUsuario1].lider += 1;
+      } else if (liderMuertoUsuario2) {
+        ranking[partida.idUsuario2].lider += 1;
+      }
+    }
+  });
+
+  clasificacion.value = Object.values(ranking).sort((a, b) => {
+    // 1. Ordenar por victorias
+    if (b.victorias !== a.victorias) {
+      return b.victorias - a.victorias;
+    }
+    // 2. Ordenar por diferencia de puntos (puntos a favor - puntos en contra)
+    if (b.diferenciaPuntos !== a.diferenciaPuntos) {
+      return b.diferenciaPuntos - a.diferenciaPuntos;
+    }
+    // 3. Ordenar por puntos a favor
+    if (b.puntosFavor !== a.puntosFavor) {
+      return b.puntosFavor - a.puntosFavor;
+    }
+    // 4. Ordenar por quién ha matado al líder primero
+    return b.lider - a.lider;
+  });
+
+  // Clasificacion por zonas
+  clasificacionZona1.value = clasificacion.value.filter((jugador) =>
+    jugadoresZona1.value.some((z) => z.idUsuario === jugador.idUsuario)
+  );
+
+  clasificacionZona2.value = clasificacion.value.filter((jugador) =>
+    jugadoresZona2.value.some((z) => z.idUsuario === jugador.idUsuario)
+  );
+};
+
+const dividirClasificacionEnZonas = () => {
+  const totalJugadores = clasificacionDividida.value.length;
+  const esImpar = totalJugadores % 2 !== 0;
+
+  const mitad = Math.floor(totalJugadores / 2);
+  const zona1Size = esImpar ? mitad + 1 : mitad;
+
+  jugadoresZona1.value = clasificacionDividida.value.slice(0, zona1Size);
+  jugadoresZona2.value = clasificacionDividida.value.slice(zona1Size);
+};
 
 const getGanador = (partida: PartidaTorneoDTO) => {
   if (partida.ganadorPartidaTorneo === partida.idUsuario1) {

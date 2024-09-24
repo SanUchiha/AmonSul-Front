@@ -157,15 +157,11 @@ import ModalAddJugadorTorneo from "./ModalAddJugadorTorneo.vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import { getInfoTorneoCreado } from "@/services/TorneosService";
 
-// Define las propiedades
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
-
-// Crear una copia reactiva de las inscripciones
 const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
-const isLoading = ref(true);
-
-const showConfigModal = ref(false);
-const showAddJugadorModal = ref(false);
+const isLoading = ref<boolean>(true);
+const showConfigModal = ref<boolean>(false);
+const showAddJugadorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const localTorneo = ref<TorneoGestionInfoDTO>();
 

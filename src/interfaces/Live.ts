@@ -30,3 +30,13 @@ export interface UpdatePartidaTorneoDTO {
   liderMuertoUsuario1?: boolean | null;
   liderMuertoUsuario2?: boolean | null;
 }
+
+export interface Clasificacion {
+  nick: string;
+  victorias: number;
+  puntosFavor: number;
+  puntosContra: number;
+  diferenciaPuntos: number;
+  lider: number;
+  idUsuario: number;
+}
