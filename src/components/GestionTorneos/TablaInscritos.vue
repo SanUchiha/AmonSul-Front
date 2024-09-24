@@ -105,14 +105,14 @@
       >
         Añadir Jugador
       </v-btn>
-      <!-- <v-btn
+      <v-btn
         variant="tonal"
         @click="openConfigModal"
         color="primary"
         size="large"
       >
         Generar Ronda
-      </v-btn> -->
+      </v-btn>
     </v-row>
 
     <ModalParametrosPrimeraRonda
@@ -189,7 +189,9 @@ const openAddJugadorModal = async () => {
 
 const closeConfigModal = () => {
   showConfigModal.value = false;
+  window.location.reload();
 };
+
 const closeAddJugadorModal = () => {
   showAddJugadorModal.value = false;
 };
@@ -197,6 +199,7 @@ const closeAddJugadorModal = () => {
 const handleConfigConfirm = () => {
   closeConfigModal();
 };
+
 const handleAddJugadorConfirm = () => {
   showAddJugadorModal.value = false;
   showSuccessModal.value = false;

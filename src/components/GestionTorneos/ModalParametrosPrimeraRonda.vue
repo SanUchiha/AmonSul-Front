@@ -7,13 +7,6 @@
 
       <v-card-text>
         <v-form>
-          <v-select
-            v-model="numeroRonda"
-            :items="rondas"
-            label="¿Qué ronda es?"
-            required
-          ></v-select>
-          <span v-if="errorRonda" style="color: red">{{ errorRonda }}</span>
           <v-checkbox
             v-model="mismaComunidadCheck"
             label="¿Se permite emparejamientos de la misma comunidad de juego?"
@@ -190,7 +183,7 @@ const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
 const opcionImpares = ref<string | null>(null);
 const isImpares = ref<boolean>(false);
-const numeroRonda = ref<number>();
+const numeroRonda = ref<number>(1);
 
 const jugadoresObj = ref<InscripcionTorneoCreadoDTO[]>();
 const jugadoresNick = ref<JugadorParaEmparejamiento[]>();

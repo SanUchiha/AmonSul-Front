@@ -23,9 +23,12 @@
                 :value="tabClasificacion"
               ></v-tab>
             </v-tabs>
-
             <!-- Contenido de las Tabs -->
             <v-tabs-window v-model="activeTab">
+              <div v-if="!partidas.length > 0">
+                <p>Aún no se ha generado ninguna ronda</p>
+              </div>
+
               <!-- tab dinamicas -->
               <v-tabs-item
                 v-for="(partida, index) in partidasPorRonda[activeTab!]"
@@ -356,124 +359,135 @@
               >
                 <!-- División en dos zonas a a partir de la ronda 3 -->
                 <div v-if="idTorneo === 7">
-                  <!-- Zona mithil -->
-                  <h3>Zona Mithril</h3>
-                  <v-table
-                    v-if="activeTab == tabClasificacion"
-                    density="compact"
+                  <div
+                    v-if="
+                      clasificacionZona1.length > 0 &&
+                      clasificacionZona2.length > 0
+                    "
                   >
-                    <thead>
-                      <tr>
-                        <th class="text-center">Posición</th>
-                        <th class="text-center">Jugador</th>
-                        <th class="text-center">Victorias</th>
-                        <th class="text-center">Puntos a favor</th>
-                        <th class="text-center">Puntos en contra</th>
-                        <th class="text-center">Diferencia de puntos</th>
-                        <th class="tect-center">Líder</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="(jugador, index) in clasificacionZona1"
-                        :key="jugador.nick"
-                      >
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ jugador.nick }}</td>
-                        <td>
-                          {{ jugador.victorias }}
-                        </td>
-                        <td>{{ jugador.puntosFavor }}</td>
-                        <td>
-                          {{ jugador.puntosContra }}
-                        </td>
-                        <td>{{ jugador.diferenciaPuntos }}</td>
-                        <td>
-                          {{ jugador.lider }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </v-table>
+                    <!-- Zona mithil -->
+                    <h3>Zona Mithril</h3>
+                    <v-table
+                      v-if="activeTab == tabClasificacion"
+                      density="compact"
+                    >
+                      <thead>
+                        <tr>
+                          <th class="text-center">Posición</th>
+                          <th class="text-center">Jugador</th>
+                          <th class="text-center">Victorias</th>
+                          <th class="text-center">Puntos a favor</th>
+                          <th class="text-center">Puntos en contra</th>
+                          <th class="text-center">Diferencia de puntos</th>
+                          <th class="tect-center">Líder</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="(jugador, index) in clasificacionZona1"
+                          :key="jugador.nick"
+                        >
+                          <td>{{ index + 1 }}</td>
+                          <td>{{ jugador.nick }}</td>
+                          <td>
+                            {{ jugador.victorias }}
+                          </td>
+                          <td>{{ jugador.puntosFavor }}</td>
+                          <td>
+                            {{ jugador.puntosContra }}
+                          </td>
+                          <td>{{ jugador.diferenciaPuntos }}</td>
+                          <td>
+                            {{ jugador.lider }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </v-table>
 
-                  <v-divider class="my-5"></v-divider>
+                    <v-divider class="my-5"></v-divider>
 
-                  <!-- Zona acero élfico -->
-                  <h3>Zona Acero Élfico</h3>
-                  <v-table
-                    v-if="activeTab == tabClasificacion"
-                    density="compact"
-                  >
-                    <thead>
-                      <tr>
-                        <th class="text-center">Posición</th>
-                        <th class="text-center">Jugador</th>
-                        <th class="text-center">Victorias</th>
-                        <th class="text-center">Puntos a favor</th>
-                        <th class="text-center">Puntos en contra</th>
-                        <th class="text-center">Diferencia de puntos</th>
-                        <th class="tect-center">Líder</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="(jugador, index) in clasificacionZona2"
-                        :key="jugador.nick"
-                      >
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ jugador.nick }}</td>
-                        <td>
-                          {{ jugador.victorias }}
-                        </td>
-                        <td>{{ jugador.puntosFavor }}</td>
-                        <td>
-                          {{ jugador.puntosContra }}
-                        </td>
-                        <td>{{ jugador.diferenciaPuntos }}</td>
-                        <td>
-                          {{ jugador.lider }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </v-table>
+                    <!-- Zona acero élfico -->
+                    <h3>Zona Acero Élfico</h3>
+                    <v-table
+                      v-if="activeTab == tabClasificacion"
+                      density="compact"
+                    >
+                      <thead>
+                        <tr>
+                          <th class="text-center">Posición</th>
+                          <th class="text-center">Jugador</th>
+                          <th class="text-center">Victorias</th>
+                          <th class="text-center">Puntos a favor</th>
+                          <th class="text-center">Puntos en contra</th>
+                          <th class="text-center">Diferencia de puntos</th>
+                          <th class="tect-center">Líder</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="(jugador, index) in clasificacionZona2"
+                          :key="jugador.nick"
+                        >
+                          <td>{{ index + 1 }}</td>
+                          <td>{{ jugador.nick }}</td>
+                          <td>
+                            {{ jugador.victorias }}
+                          </td>
+                          <td>{{ jugador.puntosFavor }}</td>
+                          <td>
+                            {{ jugador.puntosContra }}
+                          </td>
+                          <td>{{ jugador.diferenciaPuntos }}</td>
+                          <td>
+                            {{ jugador.lider }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </v-table>
+                  </div>
+                  <div v-else><p>Esperando resultados...</p></div>
                 </div>
                 <!-- Para todo lo demás -->
                 <div v-else>
-                  <v-table
-                    v-if="activeTab == tabClasificacion"
-                    density="compact"
-                  >
-                    <thead>
-                      <tr>
-                        <th class="text-center">Posición</th>
-                        <th class="text-center">Jugador</th>
-                        <th class="text-center">Victorias</th>
-                        <th class="text-center">Puntos a favor</th>
-                        <th class="text-center">Puntos en contra</th>
-                        <th class="text-center">Diferencia de puntos</th>
-                        <th class="tect-center">Líder</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="(jugador, index) in clasificacion"
-                        :key="jugador.nick"
-                      >
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ jugador.nick }}</td>
-                        <td>
-                          {{ jugador.victorias }}
-                        </td>
-                        <td>{{ jugador.puntosFavor }}</td>
-                        <td>
-                          {{ jugador.puntosContra }}
-                        </td>
-                        <td>{{ jugador.diferenciaPuntos }}</td>
-                        <td>
-                          {{ jugador.lider }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </v-table>
+                  <div v-if="clasificacion.length > 0">
+                    <v-table
+                      v-if="activeTab == tabClasificacion"
+                      density="compact"
+                    >
+                      <thead>
+                        <tr>
+                          <th class="text-center">Posición</th>
+                          <th class="text-center">Jugador</th>
+                          <th class="text-center">Victorias</th>
+                          <th class="text-center">Puntos a favor</th>
+                          <th class="text-center">Puntos en contra</th>
+                          <th class="text-center">Diferencia de puntos</th>
+                          <th class="tect-center">Líder</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="(jugador, index) in clasificacion"
+                          :key="jugador.nick"
+                        >
+                          <td>{{ index + 1 }}</td>
+                          <td>{{ jugador.nick }}</td>
+                          <td>
+                            {{ jugador.victorias }}
+                          </td>
+                          <td>{{ jugador.puntosFavor }}</td>
+                          <td>
+                            {{ jugador.puntosContra }}
+                          </td>
+                          <td>{{ jugador.diferenciaPuntos }}</td>
+                          <td>
+                            {{ jugador.lider }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </v-table>
+                  </div>
+                  <div v-else><p>Esperando resultados...</p></div>
                 </div>
               </v-tabs-window-item>
             </v-tabs-window>
@@ -548,7 +562,7 @@ const idTorneo = ref<number>(Number(route.params.idTorneo));
 const isLoading = ref<boolean>(false);
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
-const partidas = ref<PartidaTorneoDTO[]>();
+const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
 const activeTab = ref(1);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
@@ -618,7 +632,6 @@ onMounted(async () => {
         return acc;
       }, {} as Record<number, PartidaTorneoDTO[]>);
     }
-
     tabClasificacion.value = numeroRondas.value.length + 1;
 
     calcularClasificacion();
