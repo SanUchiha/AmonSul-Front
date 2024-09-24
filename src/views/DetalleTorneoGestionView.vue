@@ -249,7 +249,7 @@
                               {{ partida.nick2 }}
                             </span>
                           </div>
-                          <!-- resulultado 2 -->
+                          <!-- resultado 2 -->
                           <div class="player-info">
                             <span v-if="partida.resultadoUsuario2 != null"
                               >{{ partida.resultadoUsuario2 }}
@@ -269,7 +269,7 @@
                                 class="cursor-pointer"
                                 color="primary"
                                 @click="
-                                  abrirModalPuntos(partida.idPartidaTorneo, 1)
+                                  abrirModalPuntos(partida.idPartidaTorneo, 2)
                                 "
                               >
                                 mdi-pencil
