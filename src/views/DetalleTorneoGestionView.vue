@@ -706,19 +706,8 @@ const handleConfigConfirm = () => {
 
 const generarSiguienteRonda = (ronda: number) => {
   try {
-    console.log(clasificacion.value);
-
     rondaAGenerar.value = ronda;
     showConfigModal.value = true;
-
-    // Llama a tu servicio para generar la siguiente ronda
-    // Ejemplo:
-    // await someService.generateNextRound(torneo.value.idTorneo);
-    console.log("Generando siguiente ronda...");
-
-    // Actualiza los datos de la vista después de generar la ronda
-    // Puedes necesitar volver a cargar los datos del torneo o las partidas
-    // await cargarDatosActualizados();
   } catch (error) {
     console.error("Error al generar la siguiente ronda:", error);
   }

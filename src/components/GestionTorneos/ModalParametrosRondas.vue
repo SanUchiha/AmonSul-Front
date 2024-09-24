@@ -390,7 +390,6 @@ const generarEmparejamientosSinRepetir = (
   clasificacion: Clasificacion[],
   rondaAnterior: PartidaTorneoDTO[]
 ): Emparejamiento[] => {
-  console.log("ronda anterior", rondaAnterior);
   const emparejamientos: Emparejamiento[] = [];
 
   const emparejamientosPrevios = new Set<string>();
@@ -450,20 +449,19 @@ const emparejarSinRepetir = (
     const jugador1 = jugadores[i];
 
     if (yaEmparejados.has(jugador1.idUsuario)) {
-      continue; // Si el jugador1 ya fue emparejado, saltar
+      continue;
     }
 
     for (let j = i + 1; j < jugadores.length; j++) {
       const jugador2 = jugadores[j];
 
       if (yaEmparejados.has(jugador2.idUsuario)) {
-        continue; // Si el jugador2 ya fue emparejado, saltar
+        continue;
       }
 
       const emparejamiento = `${jugador1.idUsuario}-${jugador2.idUsuario}`;
       const emparejamientoInverso = `${jugador2.idUsuario}-${jugador1.idUsuario}`;
 
-      // Si no han sido emparejados previamente, crear el emparejamiento
       if (
         !emparejamientosPrevios.has(emparejamiento) &&
         !emparejamientosPrevios.has(emparejamientoInverso)
@@ -475,7 +473,7 @@ const emparejarSinRepetir = (
 
         yaEmparejados.add(jugador1.idUsuario);
         yaEmparejados.add(jugador2.idUsuario);
-        break; // Pasamos al siguiente jugador
+        break;
       }
     }
   }
@@ -494,17 +492,14 @@ const confirmarConfiguracion = async () => {
 
   //Si no se puede repetir el rival
   if (!esRepetirRivalCheck.value) {
-    //Traerse todas las partidas de una ronda
     const response = await getPartidasTorneoByRonda(
       props.torneo.torneo.idTorneo,
       numeroRonda.value - 1
     );
     const rondaAnterior = response.data;
 
-    //Generar los emparejamientos sin que se repita rival
     errorRonda.value = null;
 
-    //Emparejamientos
     const emparejamientosGenerados: Emparejamiento[] =
       generarEmparejamientosSinRepetir(props.clasificacion, rondaAnterior);
 
@@ -521,10 +516,8 @@ const confirmarConfiguracion = async () => {
 
     try {
       isGenerating.value = true;
-      //await generarRonda(configuracion);
+      await generarRonda(configuracion);
       showSuccessModal.value = true;
-
-      console.log(configuracion);
     } catch (error) {
       showErrorModal.value = true;
       console.error(error);
@@ -532,13 +525,11 @@ const confirmarConfiguracion = async () => {
       isGenerating.value = false;
     }
 
-    //emit("confirm", configuracion);
-    //closeModal();
-    console.log("configuracion", configuracion);
+    emit("confirm", configuracion);
+    closeModal();
   } else {
     errorRonda.value = null;
 
-    //Emparejamientos
     const emparejamientosGenerados: Emparejamiento[] = generarEmparejamientos(
       props.clasificacion
     );
@@ -558,8 +549,6 @@ const confirmarConfiguracion = async () => {
       isGenerating.value = true;
       await generarRonda(configuracion);
       showSuccessModal.value = true;
-
-      console.log(configuracion);
     } catch (error) {
       showErrorModal.value = true;
       console.error(error);

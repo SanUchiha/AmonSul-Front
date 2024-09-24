@@ -622,10 +622,6 @@ onMounted(async () => {
     tabClasificacion.value = numeroRondas.value.length + 1;
 
     calcularClasificacion();
-
-    console.log("Clasifiacion", clasificacion.value);
-    console.log("clasificacionZona1", clasificacionZona1.value);
-    console.log("clasificacionZona2", clasificacionZona2.value);
   } catch (error) {
     console.error(error);
   } finally {
