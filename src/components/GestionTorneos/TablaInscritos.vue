@@ -111,7 +111,7 @@
         color="primary"
         size="large"
       >
-        Generar Ronda
+        Generar Ronda 1
       </v-btn>
     </v-row>
 
@@ -164,6 +164,7 @@ const showConfigModal = ref<boolean>(false);
 const showAddJugadorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const localTorneo = ref<TorneoGestionInfoDTO>();
+const hasRonda1 = ref<boolean>(false);
 
 const openConfigModal = async () => {
   isLoading.value = true;

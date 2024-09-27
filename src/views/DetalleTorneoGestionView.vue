@@ -42,7 +42,7 @@
                 class="ma-3 text-green-500"
               >
                 Todas las partidas están validadas
-                <div class="mt-3">
+                <div v-if="!esUltimaRonda" class="mt-3">
                   <!-- boton para genenar el siguiente emparejamiento -->
                   <v-btn
                     class="mt-2"
@@ -52,6 +52,19 @@
                     @click="generarSiguienteRonda(activeTab + 1)"
                   >
                     Generar siguiente ronda
+                  </v-btn>
+                </div>
+                <div v-else class="mt-3">
+                  <!-- boton para cerrar el torneo -->
+                  <v-btn
+                    v-if="hasGanador"
+                    class="mt-2"
+                    variant="tonal"
+                    color="primary"
+                    size="small"
+                    @click="guardarGanador(ganador!)"
+                  >
+                    Guardar Ganador
                   </v-btn>
                 </div>
               </div>
@@ -654,6 +667,9 @@ const showConfigModal = ref<boolean>(false);
 const clasificacionDividida = ref<Clasificacion[]>([]);
 const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
+const esUltimaRonda = ref<boolean>(false);
+const hasGanador = ref<boolean>(false);
+const ganador = ref<number>();
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
@@ -699,12 +715,24 @@ onMounted(async () => {
     tabClasificacion.value = numeroRondas.value.length + 1;
 
     calcularClasificacion();
+
+    const ultimaRonda: number = numeroRondas.value.length;
+    const ganador: number = clasificacionZona1.value[0].idUsuario;
+    if (ganador != null) hasGanador.value = true;
+    console.log("ultima ronda", ultimaRonda);
+    console.log("gandor", ganador);
+
+    //if(partidasPorRonda.value[numeroRondas.value])
   } catch (error) {
     console.error(error);
   } finally {
     isLoading.value = false;
   }
 });
+
+const guardarGanador = (idUsuario: number) => {
+  console.log("guardar gandaor", idUsuario);
+};
 
 const closeConfigModal = () => {
   showConfigModal.value = false;

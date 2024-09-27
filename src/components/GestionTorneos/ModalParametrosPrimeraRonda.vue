@@ -12,15 +12,15 @@
             label="¿Se permite emparejamientos de la misma comunidad de juego?"
           ></v-checkbox>
 
-          <v-checkbox
+          <!-- <v-checkbox
             v-model="luzVsOscCheck"
             label="¿Se permite luz vs oscuridad?"
-          ></v-checkbox>
+          ></v-checkbox> -->
 
-          <v-checkbox
+          <!-- <v-checkbox
             v-model="esEloCheck"
             label="¿Quieres que tus partidas cuenten para el ELO?"
-          ></v-checkbox>
+          ></v-checkbox> -->
 
           <v-radio-group
             v-if="isImpares"

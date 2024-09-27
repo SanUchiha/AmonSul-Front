@@ -7,25 +7,29 @@
 
       <v-card-text>
         <v-form>
-          <v-checkbox
+          <!-- <v-checkbox
             v-model="mismaComunidadCheck"
             label="¿Se permite emparejamientos de la misma comunidad de juego?"
-          ></v-checkbox>
+          ></v-checkbox> -->
 
-          <v-checkbox
+          <!-- <v-checkbox
             v-model="luzVsOscCheck"
             label="¿Se permite luz vs oscuridad?"
-          ></v-checkbox>
+          ></v-checkbox> -->
 
-          <v-checkbox
+          <!-- <v-checkbox
             v-model="esEloCheck"
             label="¿Quieres que tus partidas cuenten para el ELO?"
-          ></v-checkbox>
+          ></v-checkbox> -->
 
-          <v-checkbox
+          <v-radio-group
+            inline
             v-model="esRepetirRivalCheck"
             label="¿Se puede repetir rival?"
-          ></v-checkbox>
+          >
+            <v-radio label="SI" value="true"></v-radio>
+            <v-radio label="NO" value="false"></v-radio>
+          </v-radio-group>
 
           <v-radio-group
             v-if="isImpares"
@@ -195,7 +199,7 @@ const mismaComunidadCheck = ref<boolean>(false);
 const luzVsOscCheck = ref<boolean>(false);
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
-const esRepetirRivalCheck = ref<boolean>(false);
+const esRepetirRivalCheck = ref<boolean>(true);
 const opcionImpares = ref<string | null>(null);
 const isImpares = ref<boolean>(false);
 const numeroRonda = ref<number>();
@@ -307,10 +311,6 @@ const addEmparejamiento = () => {
 
   jugador1.value = undefined;
   jugador2.value = undefined;
-};
-
-const removeEmparejamiento = (index: number) => {
-  emparejamientos.value.splice(index, 1);
 };
 
 const dividirClasificacionEnZonas = () => {
