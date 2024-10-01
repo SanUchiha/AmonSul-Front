@@ -59,3 +59,9 @@ export interface InscripcionTorneoCreadoDTO {
   idLista?: number | null;
   ejercito?: string | null;
 }
+
+export interface Resultado {
+  idUsuario: number;
+  idTorneo?: number;
+  resultado: number;
+}

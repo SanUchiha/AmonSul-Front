@@ -337,9 +337,6 @@ const generarEmparejamientos = (
     const zona1 = clasificacionZona1.value;
     const zona2 = clasificacionZona2.value;
 
-    console.log("zona 1", zona1);
-    console.log("zona 2", zona2);
-
     // Emparejar a los jugadores de zona 1
     const jugadoresZona1 = props.clasificacion.filter((jugador) =>
       zona1.some((z) => z.idUsuario === jugador.idUsuario)

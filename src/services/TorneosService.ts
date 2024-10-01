@@ -1,3 +1,4 @@
+import { Resultado } from "@/interfaces/Torneo";
 import { http } from "./index";
 
 export const getTorneos = async () => {
@@ -29,4 +30,8 @@ export const getPartidasTorneoByRonda = async (
   idRonda: number
 ) => {
   return http.get(`Torneo/Gestion/Partidas/${idTorneo}/${idRonda}`);
+};
+
+export const guardarResultados = async (resultados: Resultado[]) => {
+  return http.post(`Ganador`, resultados);
 };

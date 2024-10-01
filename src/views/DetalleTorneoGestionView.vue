@@ -42,7 +42,7 @@
                 class="ma-3 text-green-500"
               >
                 Todas las partidas están validadas
-                <div v-if="!esUltimaRonda" class="mt-3">
+                <div v-if="ultimaRonda != activeTab" class="mt-3">
                   <!-- boton para genenar el siguiente emparejamiento -->
                   <v-btn
                     class="mt-2"
@@ -62,9 +62,9 @@
                     variant="tonal"
                     color="primary"
                     size="small"
-                    @click="guardarGanador(ganador!)"
+                    @click="resultados()"
                   >
-                    Guardar Ganador
+                    Guardar resultados
                   </v-btn>
                 </div>
               </div>
@@ -612,6 +612,31 @@
       @close="closeConfigModal"
       @confirm="handleConfigConfirm"
     />
+
+    <!-- Modal success guardar resultados -->
+    <ModalSuccess
+      :isVisible="showSuccessModal"
+      message="Resultados guardados correctametne."
+      @update:isVisible="showSuccessModal = $event"
+    />
+
+    <!-- Modal error guardar resultados -->
+    <ModalError
+      :isVisible="showErrorModal"
+      message="No se han podido guardar los resultados. Intentalo de nuevo y si el error persiste contacta con el administrador."
+      @update:isVisible="showErrorModal = $event"
+    />
+
+    <!-- Modal de progreso circular -->
+    <v-dialog v-model="isGenerating" hide-overlay persistent>
+      <v-card class="progress-card">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="70"
+        ></v-progress-circular>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -619,10 +644,13 @@
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import router from "@/router";
-import { getInfoTorneoCreado } from "@/services/TorneosService";
+import {
+  getInfoTorneoCreado,
+  guardarResultados,
+} from "@/services/TorneosService";
 import TablaInscritos from "@/components/GestionTorneos/TablaInscritos.vue";
 import CardGestionTorneo from "@/components/GestionTorneos/CardGestionTorneo.vue";
-import { TorneoGestionInfoDTO } from "@/interfaces/Torneo";
+import { Resultado, TorneoGestionInfoDTO } from "@/interfaces/Torneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEscenarioPartida.vue";
 import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
@@ -637,6 +665,8 @@ import { getlistaTorneo } from "@/services/ListasService";
 import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
 import { getPartidasTorneo, getTorneo } from "@/services/TorneosService";
 import ModalParametrosRondas from "@/components/GestionTorneos/ModalParametrosRondas.vue";
+import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
+import ModalError from "@/components/Commons/ModalError.vue";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -667,9 +697,11 @@ const showConfigModal = ref<boolean>(false);
 const clasificacionDividida = ref<Clasificacion[]>([]);
 const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
-const esUltimaRonda = ref<boolean>(false);
+const ultimaRonda = ref<number>();
 const hasGanador = ref<boolean>(false);
-const ganador = ref<number>();
+const showErrorModal = ref<boolean>(false);
+const showSuccessModal = ref<boolean>(false);
+const isGenerating = ref<boolean>(false);
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
@@ -716,10 +748,9 @@ onMounted(async () => {
 
     calcularClasificacion();
 
-    const ultimaRonda: number = numeroRondas.value.length;
+    ultimaRonda.value = numeroRondas.value.length;
     const ganador: number = clasificacionZona1.value[0].idUsuario;
     if (ganador != null) hasGanador.value = true;
-    console.log("Ganador", ganador);
   } catch (error) {
     console.error(error);
   } finally {
@@ -727,8 +758,64 @@ onMounted(async () => {
   }
 });
 
-const guardarGanador = (idUsuario: number) => {
-  console.log("guardar gandaor", idUsuario);
+const resultados = async () => {
+  //TODO  domadores
+  if (torneo.value?.idTorneo == 7) {
+    try {
+      isGenerating.value = true;
+      const resultados1: Resultado[] = clasificacionZona1.value.map(
+        (clasificacion, index) => {
+          return {
+            idUsuario: clasificacion.idUsuario,
+            idTorneo: torneo.value?.idTorneo,
+            resultado: index + 1,
+          };
+        }
+      );
+
+      await guardarResultados(resultados1);
+
+      const resultados2: Resultado[] = clasificacionZona2.value.map(
+        (clasificacion, index) => {
+          return {
+            idUsuario: clasificacion.idUsuario,
+            idTorneo: torneo.value?.idTorneo,
+            resultado: index + 1,
+          };
+        }
+      );
+
+      await guardarResultados(resultados2);
+
+      showSuccessModal.value = true;
+    } catch (error) {
+      showErrorModal.value = true;
+      console.error(error);
+    } finally {
+      isGenerating.value = false;
+    }
+  } else {
+    try {
+      isGenerating.value = true;
+      const resultados: Resultado[] = clasificacion.value.map(
+        (clasi, index) => {
+          return {
+            idUsuario: clasi.idUsuario,
+            idTorneo: torneo.value?.idTorneo,
+            resultado: index + 1,
+          };
+        }
+      );
+
+      await guardarResultados(resultados);
+      showSuccessModal.value = true;
+    } catch (error) {
+      showErrorModal.value = true;
+      console.error(error);
+    } finally {
+      isGenerating.value = false;
+    }
+  }
 };
 
 const closeConfigModal = () => {
@@ -1219,5 +1306,14 @@ const formatDate = (date: string | null | undefined) => {
 
 .text-red-500 {
   color: red;
+}
+
+.progress-card {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
 }
 </style>
