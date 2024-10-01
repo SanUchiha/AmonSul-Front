@@ -27,8 +27,8 @@
             v-model="esRepetirRivalCheck"
             label="¿Se puede repetir rival?"
           >
-            <v-radio label="SI" value="true"></v-radio>
-            <v-radio label="NO" value="false"></v-radio>
+            <v-radio label="SI" value="SI"></v-radio>
+            <v-radio label="NO" value="NO"></v-radio>
           </v-radio-group>
 
           <v-radio-group
@@ -199,7 +199,7 @@ const mismaComunidadCheck = ref<boolean>(false);
 const luzVsOscCheck = ref<boolean>(false);
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
-const esRepetirRivalCheck = ref<boolean>(true);
+const esRepetirRivalCheck = ref<string>("SI");
 const opcionImpares = ref<string | null>(null);
 const isImpares = ref<boolean>(false);
 const numeroRonda = ref<number>();
@@ -315,11 +315,13 @@ const addEmparejamiento = () => {
 
 const dividirClasificacionEnZonas = () => {
   clasificacionDividida.value = props.clasificacionDividida;
-  const totalJugadores = clasificacionDividida.value.length;
-  const esImpar = totalJugadores % 2 !== 0;
+  const totalJugadores: number = clasificacionDividida.value.length;
+  const esImpar: boolean = totalJugadores % 2 !== 0;
 
-  const mitad = Math.floor(totalJugadores / 2);
-  const zona1Size = esImpar ? mitad + 1 : mitad;
+  const mitad: number = Math.floor(totalJugadores / 2);
+
+  var zona1Size: number = esImpar ? mitad + 1 : mitad;
+  if (zona1Size % 2 !== 0) zona1Size = zona1Size + 1;
 
   clasificacionZona1.value = clasificacionDividida.value.slice(0, zona1Size);
   clasificacionZona2.value = clasificacionDividida.value.slice(zona1Size);
@@ -334,6 +336,9 @@ const generarEmparejamientos = (
     dividirClasificacionEnZonas();
     const zona1 = clasificacionZona1.value;
     const zona2 = clasificacionZona2.value;
+
+    console.log("zona 1", zona1);
+    console.log("zona 2", zona2);
 
     // Emparejar a los jugadores de zona 1
     const jugadoresZona1 = props.clasificacion.filter((jugador) =>
@@ -491,7 +496,7 @@ const confirmarConfiguracion = async () => {
   }
 
   //Si no se puede repetir el rival
-  if (!esRepetirRivalCheck.value) {
+  if (esRepetirRivalCheck.value == "NO") {
     const response = await getPartidasTorneoByRonda(
       props.torneo.torneo.idTorneo,
       numeroRonda.value - 1

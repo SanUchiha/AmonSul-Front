@@ -408,8 +408,8 @@
                       clasificacionZona2.length > 0
                     "
                   >
-                    <!-- Zona mithil -->
-                    <h3>Zona Mithril</h3>
+                    <!-- Valinor -->
+                    <h3>Válinor</h3>
                     <v-table
                       v-if="activeTab == tabClasificacion"
                       density="compact"
@@ -449,8 +449,8 @@
 
                     <v-divider class="my-5"></v-divider>
 
-                    <!-- Zona acero élfico -->
-                    <h3>Zona Acero Élfico</h3>
+                    <!-- Arda -->
+                    <h3>Arda</h3>
                     <v-table
                       v-if="activeTab == tabClasificacion"
                       density="compact"
@@ -719,10 +719,7 @@ onMounted(async () => {
     const ultimaRonda: number = numeroRondas.value.length;
     const ganador: number = clasificacionZona1.value[0].idUsuario;
     if (ganador != null) hasGanador.value = true;
-    console.log("ultima ronda", ultimaRonda);
-    console.log("gandor", ganador);
-
-    //if(partidasPorRonda.value[numeroRondas.value])
+    console.log("Ganador", ganador);
   } catch (error) {
     console.error(error);
   } finally {
@@ -959,7 +956,8 @@ const dividirClasificacionEnZonas = () => {
   const esImpar = totalJugadores % 2 !== 0;
 
   const mitad = Math.floor(totalJugadores / 2);
-  const zona1Size = esImpar ? mitad + 1 : mitad;
+  let zona1Size = esImpar ? mitad + 1 : mitad;
+  if (zona1Size % 2 !== 0) zona1Size = zona1Size + 1;
 
   jugadoresZona1.value = clasificacionDividida.value.slice(0, zona1Size);
   jugadoresZona2.value = clasificacionDividida.value.slice(zona1Size);

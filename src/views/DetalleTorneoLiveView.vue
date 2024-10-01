@@ -365,8 +365,8 @@
                       clasificacionZona2.length > 0
                     "
                   >
-                    <!-- Zona mithil -->
-                    <h3>Zona Mithril</h3>
+                    <!-- Valinor -->
+                    <h3>Válinor</h3>
                     <v-table
                       v-if="activeTab == tabClasificacion"
                       density="compact"
@@ -406,8 +406,8 @@
 
                     <v-divider class="my-5"></v-divider>
 
-                    <!-- Zona acero élfico -->
-                    <h3>Zona Acero Élfico</h3>
+                    <!-- Arda -->
+                    <h3>Arda</h3>
                     <v-table
                       v-if="activeTab == tabClasificacion"
                       density="compact"
