@@ -37,13 +37,6 @@
               </v-list-item-title>
             </v-list-item>
 
-            <!-- Estado Inscripción -->
-            <v-list-item>
-              <v-list-item-title class="list-item-title">
-                INSCRIPCIÓN: {{ inscripcionData?.estadoInscripcion }}
-              </v-list-item-title>
-            </v-list-item>
-
             <!-- Botón para eliminar la inscripcion-->
             <v-list-item>
               <v-list-item-content>

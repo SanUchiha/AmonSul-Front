@@ -48,28 +48,6 @@
             </v-list-item-content>
           </v-list-item>
 
-          <!-- Estado Inscripción -->
-          <v-list-item>
-            <v-list-item-content>
-              <v-list-item-title class="list-item-title">
-                INSCRIPCIÓN
-              </v-list-item-title>
-              <v-select
-                v-model="localInscripcion.estadoInscripcion"
-                :items="estadoInscripcionOptions"
-                label="Estado"
-                dense
-                hide-details
-                v-on:change="
-                  logChange(
-                    'estadoInscripcion',
-                    localInscripcion.estadoInscripcion!
-                  )
-                "
-              ></v-select>
-            </v-list-item-content>
-          </v-list-item>
-
           <!-- Botón para ver la lista -->
           <div v-if="inscripcion?.listaData">
             <v-list-item>
@@ -132,13 +110,6 @@
     @update:isVisible="showSuccessModalLista = $event"
   />
 
-  <!-- Modal response estado inscripcion -->
-  <ModalSuccess
-    :isVisible="showSuccessModalInscripcion"
-    message="Estado de la inscripción actualizado."
-    @update:isVisible="showSuccessModalInscripcion = $event"
-  />
-
   <!-- Modal response eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessModalEliminar"
@@ -161,7 +132,6 @@
 import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
 import {
   cancelarInscripcion,
-  updateEstadoInscripcion,
   updateEstadoLista,
   updateEstadoPago,
 } from "@/services/InscripcionesService";
@@ -190,7 +160,6 @@ const showLista = ref(false);
 const localInscripcion = ref({ ...props.inscripcion });
 const isLoading = ref(false);
 
-const estadoInscripcionOptions = ["EN PROCESO", "COMPLETADA"] as const;
 const estadoListaOptions = [
   "NO ENTREGADA",
   "ENTREGADA",
@@ -208,26 +177,13 @@ const showErrorModal = ref<boolean>(false);
 
 // Registrar el cambio y actualizar en la base de datos
 const logChange = async (
-  field: "estadoInscripcion" | "estadoLista" | "esPago",
+  field: "estadoLista" | "esPago",
   value: string | boolean
 ) => {
   isLoading.value = true;
   try {
-    //inscripcion
-    if (field === "estadoInscripcion") {
-      let estado: string;
-      if (value == "EN PROCESO") estado = "EN PROCESO";
-      else estado = "COMPLETADA";
-      await updateEstadoInscripcion({
-        idInscripcion: localInscripcion.value.idInscripcion!,
-        estadoInscripcion: estado,
-      });
-      showSuccessModalInscripcion.value = true;
-      isLoading.value = false;
-      emit("update-inscripcion", { field, value: estado });
-
-      //lista
-    } else if (field === "estadoLista") {
+    //lista
+    if (field === "estadoLista") {
       let estado: string;
       if (value == "NO ENTREGADA") estado = "NO ENTREGADA";
       else if (value == "ENTREGADA") estado = "ENTREGADA";
@@ -262,15 +218,6 @@ const logChange = async (
     isLoading.value = false;
   }
 };
-
-watch(
-  () => localInscripcion.value.estadoInscripcion,
-  (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-      logChange("estadoInscripcion", newValue!);
-    }
-  }
-);
 
 watch(
   () => localInscripcion.value.estadoLista,

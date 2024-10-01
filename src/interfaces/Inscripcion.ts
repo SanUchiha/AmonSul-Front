@@ -9,17 +9,11 @@ export interface InscripcionUsuarioDTO {
   idUsuario: number;
   nick: string;
   email: string;
-  estadoInscripcion: string;
   fechaInscripcion: string;
   estadoLista: string;
   fechaEntregaLista: string;
   esPago: boolean;
   nombreTorneo: string;
-}
-
-export interface UpdateEstadoInscripcionDTO {
-  idInscripcion: number;
-  estadoInscripcion: string;
 }
 
 export interface UpdateEstadoListaDTO {

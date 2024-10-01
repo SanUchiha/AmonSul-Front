@@ -41,16 +41,6 @@
           <!-- nick -->
           <td>{{ item.nick }}</td>
 
-          <!-- estado inscripcion -->
-          <td>
-            <v-chip
-              :color="formattedEstadoInscripcion(item.estadoInscripcion).color"
-              dark
-            >
-              {{ formattedEstadoInscripcion(item.estadoInscripcion).text }}
-            </v-chip>
-          </td>
-
           <!-- fecha de la inscripcion -->
           <td>
             <v-chip
@@ -164,7 +154,6 @@ const showConfigModal = ref<boolean>(false);
 const showAddJugadorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const localTorneo = ref<TorneoGestionInfoDTO>();
-const hasRonda1 = ref<boolean>(false);
 
 const openConfigModal = async () => {
   isLoading.value = true;
@@ -235,7 +224,6 @@ const selectedInscripcion = ref<InscripcionTorneoCreadoDTO | null>(null);
 
 const headers = computed(() => [
   { title: "Nick", key: "nick" },
-  { title: "Estado Inscripción", key: "estadoInscripcion" },
   { title: "Fecha Inscripción", key: "fechaInscripcion" },
   { title: "Estado Lista", key: "estadoLista" },
   { title: "Fecha Entrega", key: "fechaEntrega" },
@@ -254,15 +242,6 @@ const chipColor = (
   return new Date(inscriptionDate) < new Date(referenceDate)
     ? "blue"
     : "yellow";
-};
-
-const formattedEstadoInscripcion = (estado: string) => {
-  if (estado === "EN PROCESO") {
-    return { text: "EN PROCESO", color: "red" };
-  } else if (estado === "COMPLETADA") {
-    return { text: "COMPLETADA", color: "blue" };
-  }
-  return { text: "Desconocido", color: "gray" };
 };
 
 const formattedEstadoPago = (estado: string) => {

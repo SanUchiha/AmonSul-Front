@@ -1,6 +1,5 @@
 import {
   CrearInscripcionDTO,
-  UpdateEstadoInscripcionDTO,
   UpdateEstadoListaDTO,
   UpdateEstadoPagoDTO,
 } from "@/interfaces/Inscripcion";
@@ -30,12 +29,6 @@ export const getInscripcionesUser = async (idUsuario: string) => {
 
 export const getInscripcionesTorneo = async (idTorneo: number) => {
   return http.get(`Inscripcion/byTorneo/${idTorneo}`);
-};
-
-export const updateEstadoInscripcion = async (
-  nuevaEstado: UpdateEstadoInscripcionDTO
-) => {
-  return http.put(`Inscripcion/Estado-Inscripcion`, nuevaEstado);
 };
 
 export const updateEstadoLista = async (nuevaEstado: UpdateEstadoListaDTO) => {

@@ -51,7 +51,6 @@ export interface InscripcionTorneoCreadoDTO {
   idInscripcion: number;
   idUsuario?: number | null;
   nick?: string | null;
-  estadoInscripcion?: string | null;
   fechaInscripcion?: string | null;
   listaData?: string | null;
   estadoLista?: string | null;
