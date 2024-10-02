@@ -58,7 +58,7 @@ import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 
 const usuariosStore = useUsuariosStore();
 
-const tab = ref<string>("Mensual");
+const tab = ref<string>("Global");
 
 const { getUser } = useAuth();
 const error = ref<string | null>(null);
