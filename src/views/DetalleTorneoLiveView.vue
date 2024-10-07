@@ -25,7 +25,7 @@
             </v-tabs>
             <!-- Contenido de las Tabs -->
             <v-tabs-window v-model="activeTab">
-              <div v-if="!partidas.length > 0">
+              <div v-if="partidas.length === 0">
                 <p>Aún no se ha generado ninguna ronda</p>
               </div>
 
@@ -101,27 +101,29 @@
                               </span>
                             </div>
                             <!-- lista 1 -->
-                            <!-- <div class="player-info">
-                          <v-icon>mdi-shield-outline</v-icon>
-                          <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
-                        </div> -->
-                            <!-- <div class="player-info">
-                          <v-btn
-                            class="mt-2"
-                            variant="tonal"
-                            color="primary"
-                            size="small"
-                            @click="
-                              verLista(
-                                partida.idUsuario1,
-                                partida.idTorneo,
-                                partida.nick1
-                              )
-                            "
-                          >
-                            Lista
-                          </v-btn>
-                        </div> -->
+                            <div class="player-info">
+                              <v-icon>mdi-shield-outline</v-icon>
+                              <span>{{
+                                partida.ejercitoUsuario1 ?? "N/A"
+                              }}</span>
+                            </div>
+                            <div class="player-info">
+                              <v-btn
+                                class="mt-2"
+                                variant="tonal"
+                                color="primary"
+                                size="small"
+                                @click="
+                                  verLista(
+                                    partida.idUsuario1,
+                                    partida.idTorneo,
+                                    partida.nick1
+                                  )
+                                "
+                              >
+                                Lista
+                              </v-btn>
+                            </div>
                           </div>
 
                           <v-divider vertical class="divider"></v-divider>
@@ -180,27 +182,29 @@
                               </span>
                             </div>
                             <!-- lista 2 -->
-                            <!-- <div class="player-info">
-                          <v-icon>mdi-shield-outline</v-icon>
-                          <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
-                        </div> -->
-                            <!-- <div class="player-info">
-                          <v-btn
-                            class="mt-2"
-                            variant="tonal"
-                            color="primary"
-                            size="small"
-                            @click="
-                              verLista(
-                                partida.idUsuario2,
-                                partida.idTorneo,
-                                partida.nick2
-                              )
-                            "
-                          >
-                            Lista
-                          </v-btn>
-                        </div> -->
+                            <div class="player-info">
+                              <v-icon>mdi-shield-outline</v-icon>
+                              <span>{{
+                                partida.ejercitoUsuario2 ?? "N/A"
+                              }}</span>
+                            </div>
+                            <div class="player-info">
+                              <v-btn
+                                class="mt-2"
+                                variant="tonal"
+                                color="primary"
+                                size="small"
+                                @click="
+                                  verLista(
+                                    partida.idUsuario2,
+                                    partida.idTorneo,
+                                    partida.nick2
+                                  )
+                                "
+                              >
+                                Lista
+                              </v-btn>
+                            </div>
                           </div>
                         </div>
                         <v-divider></v-divider>
@@ -249,27 +253,29 @@
                               </span>
                             </div>
                             <!-- lista 1 -->
-                            <!-- <div class="player-info">
-                          <v-icon>mdi-shield-outline</v-icon>
-                          <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
-                        </div> -->
-                            <!-- <div class="player-info">
-                          <v-btn
-                            class="mt-2"
-                            variant="tonal"
-                            color="primary"
-                            size="small"
-                            @click="
-                              verLista(
-                                partida.idUsuario1,
-                                partida.idTorneo,
-                                partida.nick1
-                              )
-                            "
-                          >
-                            Lista
-                          </v-btn>
-                        </div> -->
+                            <div class="player-info">
+                              <v-icon>mdi-shield-outline</v-icon>
+                              <span>{{
+                                partida.ejercitoUsuario1 ?? "N/A"
+                              }}</span>
+                            </div>
+                            <div class="player-info">
+                              <v-btn
+                                class="mt-2"
+                                variant="tonal"
+                                color="primary"
+                                size="small"
+                                @click="
+                                  verLista(
+                                    partida.idUsuario1,
+                                    partida.idTorneo,
+                                    partida.nick1
+                                  )
+                                "
+                              >
+                                Lista
+                              </v-btn>
+                            </div>
                           </div>
 
                           <v-divider vertical class="divider"></v-divider>
@@ -286,27 +292,29 @@
                               </span>
                             </div>
                             <!-- lista 2 -->
-                            <!-- <div class="player-info">
-                          <v-icon>mdi-shield-outline</v-icon>
-                          <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
-                        </div> -->
-                            <!-- <div class="player-info">
-                          <v-btn
-                            class="mt-2"
-                            variant="tonal"
-                            color="primary"
-                            size="small"
-                            @click="
-                              verLista(
-                                partida.idUsuario2,
-                                partida.idTorneo,
-                                partida.nick2
-                              )
-                            "
-                          >
-                            Lista
-                          </v-btn>
-                        </div> -->
+                            <div class="player-info">
+                              <v-icon>mdi-shield-outline</v-icon>
+                              <span>{{
+                                partida.ejercitoUsuario2 ?? "N/A"
+                              }}</span>
+                            </div>
+                            <div class="player-info">
+                              <v-btn
+                                class="mt-2"
+                                variant="tonal"
+                                color="primary"
+                                size="small"
+                                @click="
+                                  verLista(
+                                    partida.idUsuario2,
+                                    partida.idTorneo,
+                                    partida.nick2
+                                  )
+                                "
+                              >
+                                Lista
+                              </v-btn>
+                            </div>
                           </div>
                         </div>
                         <v-divider></v-divider>
