@@ -7,10 +7,13 @@
 
       <v-card-text>
         <v-form>
-          <v-checkbox
-            v-model="mismaComunidadCheck"
+          <v-radio-group
+            v-model="mismaComunidadCheckString"
             label="¿Se permite emparejamientos de la misma comunidad de juego?"
-          ></v-checkbox>
+          >
+            <v-radio label="SI" value="true"></v-radio>
+            <v-radio label="NO" value="false"></v-radio>
+          </v-radio-group>
 
           <!-- <v-checkbox
             v-model="luzVsOscCheck"
@@ -178,6 +181,7 @@ watch(
 );
 
 const mismaComunidadCheck = ref<boolean>(false);
+const mismaComunidadCheckString = ref<string>("SI");
 const luzVsOscCheck = ref<boolean>(false);
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
@@ -310,6 +314,9 @@ const confirmarConfiguracion = async () => {
   }
 
   errorRonda.value = null;
+  if (mismaComunidadCheckString.value === "SI")
+    mismaComunidadCheck.value = true;
+  else mismaComunidadCheck.value = false;
 
   const configuracion: GenerarRonda = {
     mismaComunidadCheck: mismaComunidadCheck.value,
@@ -324,6 +331,7 @@ const confirmarConfiguracion = async () => {
 
   try {
     isGenerating.value = true;
+
     await generarRonda(configuracion);
     showSuccessModal.value = true;
   } catch (error) {
