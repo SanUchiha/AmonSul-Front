@@ -45,7 +45,14 @@
 
                     <v-card-text>
                       <!-- Partida completada -->
-                      <div v-if="partida.resultadoUsuario1">
+                      <div
+                        v-if="
+                          partida.resultadoUsuario1 ||
+                          partida.resultadoUsuario2 ||
+                          partida.liderMuertoUsuario1 ||
+                          partida.liderMuertoUsuario2
+                        "
+                      >
                         <div class="player-container">
                           <div class="player-details">
                             <!-- validar 1 -->
