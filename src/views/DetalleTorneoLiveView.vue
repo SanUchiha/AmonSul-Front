@@ -47,10 +47,10 @@
                       <!-- Partida completada -->
                       <div
                         v-if="
-                          partida.resultadoUsuario1 ||
-                          partida.resultadoUsuario2 ||
-                          partida.liderMuertoUsuario1 ||
-                          partida.liderMuertoUsuario2
+                          partida.resultadoUsuario1 !== null ||
+                          partida.resultadoUsuario2 !== null ||
+                          partida.liderMuertoUsuario1 !== null ||
+                          partida.liderMuertoUsuario2 !== null
                         "
                       >
                         <div class="player-container">
