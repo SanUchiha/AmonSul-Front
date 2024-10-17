@@ -103,6 +103,10 @@
       >
         Generar Ronda 1
       </v-btn>
+
+      <v-btn variant="tonal" @click="openSorteo" color="primary" size="large">
+        Sorteo
+      </v-btn>
     </v-row>
 
     <ModalParametrosPrimeraRonda
@@ -116,6 +120,11 @@
       :torneo="torneo"
       @close="closeAddJugadorModal"
       @confirm="handleAddJugadorConfirm"
+    />
+    <ModalSorteo
+      :isVisible="showSorteoModal"
+      :participantes="nicks"
+      @close="closeSorteoModal"
     />
   </v-card>
 
@@ -146,14 +155,17 @@ import ModalParametrosPrimeraRonda from "./ModalParametrosPrimeraRonda.vue";
 import ModalAddJugadorTorneo from "./ModalAddJugadorTorneo.vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import { getInfoTorneoCreado } from "@/services/TorneosService";
+import ModalSorteo from "./ModalSorteo.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 const isLoading = ref<boolean>(true);
 const showConfigModal = ref<boolean>(false);
+const showSorteoModal = ref<boolean>(false);
 const showAddJugadorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const localTorneo = ref<TorneoGestionInfoDTO>();
+const nicks = ref<string[]>();
 
 const openConfigModal = async () => {
   isLoading.value = true;
@@ -170,6 +182,24 @@ const openConfigModal = async () => {
     isLoading.value = false;
   }
   showConfigModal.value = true;
+};
+
+const openSorteo = async () => {
+  isLoading.value = true;
+  try {
+    nicks.value = localInscripciones.value
+      .map((x) => x.nick)
+      .filter((nick): nick is string => nick !== null && nick !== undefined);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isLoading.value = false;
+  }
+  showSorteoModal.value = true;
+};
+
+const closeSorteoModal = () => {
+  showSorteoModal.value = false;
 };
 
 const openAddJugadorModal = async () => {
