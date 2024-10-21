@@ -140,27 +140,9 @@
                           <div class="player-info">
                             <span v-if="partida.resultadoUsuario1 != null"
                               >{{ partida.resultadoUsuario1 }}
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalPuntos(partida.idPartidaTorneo, 1)
-                                "
-                              >
-                                mdi-pencil
-                              </v-icon>
                             </span>
                             <span v-else>
                               <v-icon color="red">mdi-close</v-icon>
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalPuntos(partida.idPartidaTorneo, 1)
-                                "
-                              >
-                                mdi-pencil
-                              </v-icon>
                             </span>
                           </div>
                           <!-- lider 1 -->
@@ -174,30 +156,10 @@
                                   ? "No"
                                   : "N/A"
                               }}
-
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalLider(partida.idPartidaTorneo, 1)
-                                "
-                              >
-                                mdi-pencil
-                              </v-icon>
                             </span>
                             <span v-else>
                               ¿Líder?
                               <v-icon color="red">mdi-close</v-icon>
-
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalLider(partida.idPartidaTorneo, 1)
-                                "
-                              >
-                                mdi-pencil
-                              </v-icon>
                             </span>
                           </div>
                           <!-- ejercito 1 -->
@@ -266,27 +228,9 @@
                           <div class="player-info">
                             <span v-if="partida.resultadoUsuario2 != null"
                               >{{ partida.resultadoUsuario2 }}
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalPuntos(partida.idPartidaTorneo, 2)
-                                "
-                              >
-                                mdi-pencil
-                              </v-icon>
                             </span>
                             <span v-else>
                               <v-icon color="red">mdi-close</v-icon>
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalPuntos(partida.idPartidaTorneo, 2)
-                                "
-                              >
-                                mdi-pencil
-                              </v-icon>
                             </span>
                           </div>
                           <!-- lider 2 -->
@@ -300,30 +244,10 @@
                                   ? "No"
                                   : "N/A"
                               }}
-
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalLider(partida.idPartidaTorneo, 2)
-                                "
-                              >
-                                mdi-pencil
-                              </v-icon>
                             </span>
                             <span v-else>
                               ¿Líder?
                               <v-icon color="red">mdi-close</v-icon>
-
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalLider(partida.idPartidaTorneo, 2)
-                                "
-                              >
-                                mdi-pencil
-                              </v-icon>
                             </span>
                           </div>
                           <!-- ejercito 2 -->
@@ -377,15 +301,41 @@
                             <v-list-item-title>
                               <v-icon>mdi-map-marker</v-icon>
                               {{ partida.escenarioPartida }}
-                              <v-icon
-                                class="cursor-pointer"
-                                color="primary"
-                                @click="
-                                  abrirModalEscenario(partida.idPartidaTorneo)
-                                "
+                            </v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                        <!-- Modificar partida -->
+                        <v-list-item>
+                          <v-list-item-content>
+                            <v-list-item-title>
+                              <div
+                                class="d-flex flex-wrap justify-space-between"
                               >
-                                mdi-pencil
-                              </v-icon>
+                                <v-btn
+                                  class="mt-2"
+                                  variant="tonal"
+                                  color="secondary"
+                                  @click="modificarPartida(partida)"
+                                >
+                                  Modificar Resultado
+                                </v-btn>
+                                <v-btn
+                                  class="mt-2"
+                                  variant="tonal"
+                                  color="secondary"
+                                  @click="modificarPairing(partida)"
+                                >
+                                  Modificar Pairing
+                                </v-btn>
+                                <v-btn
+                                  class="mt-2"
+                                  variant="tonal"
+                                  color="error"
+                                  @click="eliminarPartida(partida)"
+                                >
+                                  Eliminar partida
+                                </v-btn>
+                              </div>
                             </v-list-item-title>
                           </v-list-item-content>
                         </v-list-item>
@@ -613,10 +563,26 @@
       @confirm="handleConfigConfirm"
     />
 
+    <!-- Modal modificar partida -->
+    <ModalEditarPartidaGestion
+      :isVisible="showModificarPartidaTorneoModal"
+      :partida="partidaActual"
+      @cerrar="closeModificarPartidaTorneoModal"
+      @confirm="handleModificarPartidaTorneoConfirm"
+    />
+
+    <!-- Modal modificar partida -->
+    <ModalEditarPairing
+      :isVisible="showModificarPairingModal"
+      :partida="partidaActual"
+      @cerrar="closeModificarPairingModal"
+      @confirm="handleModificarPairingTorneoConfirm"
+    />
+
     <!-- Modal success guardar resultados -->
     <ModalSuccess
       :isVisible="showSuccessModal"
-      message="Resultados guardados correctametne."
+      message="Resultados guardados correctamente."
       @update:isVisible="showSuccessModal = $event"
     />
 
@@ -641,7 +607,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import router from "@/router";
 import {
@@ -667,6 +633,8 @@ import { getPartidasTorneo, getTorneo } from "@/services/TorneosService";
 import ModalParametrosRondas from "@/components/GestionTorneos/ModalParametrosRondas.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
+import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPartidaGestion.vue";
+import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.vue";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -702,6 +670,28 @@ const hasGanador = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const isGenerating = ref<boolean>(false);
+const showModificarPartidaTorneoModal = ref<boolean>(false);
+const showModificarPairingModal = ref<boolean>(false);
+const partidaActual = ref<PartidaTorneoDTO>({
+  ejercitoUsuario1: null,
+  ejercitoUsuario2: null,
+  escenarioPartida: null,
+  fechaPartida: "",
+  ganadorPartidaTorneo: null,
+  idPartidaTorneo: 0,
+  idTorneo: 0,
+  idUsuario1: 0,
+  idUsuario2: 0,
+  liderMuertoUsuario1: null,
+  liderMuertoUsuario2: null,
+  nick1: "",
+  nick2: "",
+  numeroRonda: 0,
+  partidaValidadaUsuario1: null,
+  partidaValidadaUsuario2: null,
+  resultadoUsuario1: null,
+  resultadoUsuario2: null,
+});
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
@@ -827,6 +817,71 @@ const handleConfigConfirm = () => {
   closeConfigModal();
 };
 
+const closeModificarPartidaTorneoModal = () => {
+  showModificarPartidaTorneoModal.value = false;
+};
+
+const handleModificarPartidaTorneoConfirm = async (
+  partidaEditada: PartidaTorneoDTO
+) => {
+  isGenerating.value = true;
+  console.log("partida editada", partidaEditada);
+
+  if (partidaEditada !== null) {
+    try {
+      await updatePartidaTorneo(partidaEditada);
+      showSuccessModal.value = true;
+    } catch (error) {
+      console.error(error);
+      showErrorModal.value = true;
+    } finally {
+      isGenerating.value = false;
+      closeModificarPartidaTorneoModal();
+    }
+  }
+};
+
+// Watch para detectar cuando se cierra el modal de éxito
+watch(
+  () => showSuccessModal.value,
+  (newValue, oldValue) => {
+    if (oldValue && !newValue) {
+      recargarPagina();
+    }
+  }
+);
+
+const modificarPartida = (partidaRecibida: PartidaTorneoDTO) => {
+  partidaActual.value = partidaRecibida;
+  showModificarPartidaTorneoModal.value = true;
+  console.log(partidaActual.value);
+};
+
+const recargarPagina = () => {
+  window.location.reload();
+};
+
+const closeModificarPairingModal = () => {
+  showModificarPairingModal.value = false;
+  //window.location.reload();
+};
+
+const handleModificarPairingTorneoConfirm = () => {
+  closeModificarPairingModal();
+};
+
+const modificarPairing = (partidaRecibida: PartidaTorneoDTO) => {
+  partidaActual.value = partidaRecibida;
+  showModificarPairingModal.value = true;
+  console.log(partidaActual.value);
+};
+
+const eliminarPartida = (partidaRecibida: PartidaTorneoDTO) => {
+  partidaActual.value = partidaRecibida;
+  showModificarPartidaTorneoModal.value = true;
+  console.log(partidaActual.value);
+};
+
 const generarSiguienteRonda = (ronda: number) => {
   try {
     rondaAGenerar.value = ronda;
@@ -915,8 +970,11 @@ const calcularClasificacion = () => {
 
       // Actualizamos las victorias
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        rankingDividido[partida.idUsuario1].victorias += 1;
+        rankingDividido[partida.idUsuario1].victorias += 3;
       } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        rankingDividido[partida.idUsuario2].victorias += 3;
+      } else {
+        rankingDividido[partida.idUsuario1].victorias += 1;
         rankingDividido[partida.idUsuario2].victorias += 1;
       }
 
@@ -997,8 +1055,11 @@ const calcularClasificacion = () => {
 
       // Actualizamos las victorias
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        ranking[partida.idUsuario1].victorias += 1;
+        ranking[partida.idUsuario1].victorias += 3;
       } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        ranking[partida.idUsuario2].victorias += 3;
+      } else {
+        ranking[partida.idUsuario1].victorias += 1;
         ranking[partida.idUsuario2].victorias += 1;
       }
 

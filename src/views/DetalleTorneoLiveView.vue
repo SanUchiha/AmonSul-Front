@@ -736,8 +736,11 @@ const calcularClasificacion = () => {
 
       // Actualizamos las victorias
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        rankingDividido[partida.idUsuario1].victorias += 1;
+        rankingDividido[partida.idUsuario1].victorias += 3;
       } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        rankingDividido[partida.idUsuario2].victorias += 3;
+      } else {
+        rankingDividido[partida.idUsuario1].victorias += 1;
         rankingDividido[partida.idUsuario2].victorias += 1;
       }
 
@@ -818,8 +821,11 @@ const calcularClasificacion = () => {
 
       // Actualizamos las victorias
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        ranking[partida.idUsuario1].victorias += 1;
+        ranking[partida.idUsuario1].victorias += 3;
       } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        ranking[partida.idUsuario2].victorias += 3;
+      } else {
+        ranking[partida.idUsuario1].victorias += 1;
         ranking[partida.idUsuario2].victorias += 1;
       }
 
