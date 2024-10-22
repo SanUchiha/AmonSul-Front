@@ -31,6 +31,15 @@ export interface UpdatePartidaTorneoDTO {
   liderMuertoUsuario2?: boolean | null;
 }
 
+export interface UpdatePairingTorneoDTO {
+  idPartidaTorneo: number;
+  idTorneo: number;
+  idUsuario1: number | { idUsuario: number };
+  idUsuario2: number | { idUsuario: number };
+  nick1: string;
+  nick2: string;
+}
+
 export interface Clasificacion {
   nick: string;
   victorias: number;
@@ -39,4 +48,10 @@ export interface Clasificacion {
   diferenciaPuntos: number;
   lider: number;
   idUsuario: number;
+}
+
+export interface RequestUpdatePairingTorneoDTO {
+  idPartidaTorneo: number;
+  idUsuario1?: number;
+  idUsuario2?: number;
 }

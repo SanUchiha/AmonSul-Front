@@ -579,6 +579,14 @@
       @confirm="handleModificarPairingTorneoConfirm"
     />
 
+    <!-- Modal modificar partida -->
+    <ModalEliminarPartidaTorneo
+      :isVisible="showEliminarPartidaModal"
+      :partida="partidaActual"
+      @cerrar="closeEliminarPartidaModal"
+      @confirm="handleEliminarPartidaConfirm"
+    />
+
     <!-- Modal success guardar resultados -->
     <ModalSuccess
       :isVisible="showSuccessModal"
@@ -635,6 +643,7 @@ import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPartidaGestion.vue";
 import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.vue";
+import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -672,6 +681,8 @@ const showSuccessModal = ref<boolean>(false);
 const isGenerating = ref<boolean>(false);
 const showModificarPartidaTorneoModal = ref<boolean>(false);
 const showModificarPairingModal = ref<boolean>(false);
+const showEliminarPartidaModal = ref<boolean>(false);
+
 const partidaActual = ref<PartidaTorneoDTO>({
   ejercitoUsuario1: null,
   ejercitoUsuario2: null,
@@ -863,23 +874,44 @@ const recargarPagina = () => {
 
 const closeModificarPairingModal = () => {
   showModificarPairingModal.value = false;
-  //window.location.reload();
+};
+
+const closeEliminarPartidaModal = () => {
+  showEliminarPartidaModal.value = false;
 };
 
 const handleModificarPairingTorneoConfirm = () => {
-  closeModificarPairingModal();
+  try {
+    showSuccessModal.value = true;
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isGenerating.value = false;
+    closeModificarPairingModal();
+  }
+};
+
+const handleEliminarPartidaConfirm = () => {
+  try {
+    showSuccessModal.value = true;
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isGenerating.value = false;
+    closeEliminarPartidaModal();
+  }
 };
 
 const modificarPairing = (partidaRecibida: PartidaTorneoDTO) => {
   partidaActual.value = partidaRecibida;
   showModificarPairingModal.value = true;
-  console.log(partidaActual.value);
 };
 
 const eliminarPartida = (partidaRecibida: PartidaTorneoDTO) => {
   partidaActual.value = partidaRecibida;
-  showModificarPartidaTorneoModal.value = true;
-  console.log(partidaActual.value);
+  showEliminarPartidaModal.value = true;
 };
 
 const generarSiguienteRonda = (ronda: number) => {

@@ -1,153 +1,193 @@
 <template>
-  <v-dialog v-model="isModalEditarPairingVisible" max-width="400">
+  <v-dialog v-model="isModalPairingVisible" max-width="400">
     <v-card>
-      <v-card-title> Editar pairing </v-card-title>
+      <v-card-title> Editar emparejamiento </v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="isFormValid">
-          <!-- Puntos del jugador 1 -->
-          <v-text-field
-            :label="`Puntos de ${props.partida.nick1}`"
-            v-model="partidaEditada.resultadoUsuario1"
-            type="number"
-            :rules="[rules.required, rules.isNumber]"
-          ></v-text-field>
-
-          <!-- Puntos del jugador 2 -->
-          <v-text-field
-            :label="`Puntos de ${props.partida.nick2}`"
-            v-model="partidaEditada.resultadoUsuario2"
-            type="number"
-            :rules="[rules.required, rules.isNumber]"
-          ></v-text-field>
-
-          <!-- Selección de escenario -->
+          <!-- Nick del jugador 1 -->
           <v-combobox
-            v-model="escenario"
-            :items="listaEscenarios"
-            @click="loadEscenarios"
-            label="Escenario"
+            label="Selecciona el nuevo jugador 1"
+            v-model="pairingEditado.idUsuario1"
+            :items="jugadores"
+            item-title="nick"
+            item-value="idUsuario"
+            :rules="[rules.required]"
           ></v-combobox>
 
-          <!-- Líder del jugador 1 -->
-          <v-radio-group
-            v-model="partidaEditada.liderMuertoUsuario1"
-            :label="`¿${props.partida.nick1} ha matado al líder?`"
-            :rules="[rules.isBool]"
-          >
-            <v-radio label="Sí" :value="true"></v-radio>
-            <v-radio label="No" :value="false"></v-radio>
-          </v-radio-group>
-
-          <!-- Líder del jugador 2 -->
-          <v-radio-group
-            v-model="partidaEditada.liderMuertoUsuario2"
-            :label="`¿${props.partida.nick2} ha matado al líder?`"
-            :rules="[rules.isBool]"
-          >
-            <v-radio label="Sí" :value="true"></v-radio>
-            <v-radio label="No" :value="false"></v-radio>
-          </v-radio-group>
+          <!-- Nombre del jugador 2 -->
+          <v-combobox
+            label="Selecciona el nuevo jugador 2"
+            v-model="pairingEditado.idUsuario2"
+            :items="jugadores"
+            item-title="nick"
+            item-value="idUsuario"
+            :rules="[rules.required]"
+          ></v-combobox>
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-btn
-          small
-          variant="tonal"
-          color="primary"
-          @click="confirmarEditarPartida"
-          :disabled="!isFormValid"
-        >
-          Confirmar
-        </v-btn>
-        <v-btn small variant="tonal" color="secondary" @click="cerrarModal">
-          Cancelar
-        </v-btn>
+        <v-row justify="center" class="my-4 ga-5">
+          <v-btn
+            variant="tonal"
+            color="primary"
+            @click="() => changeJugador()"
+            large
+          >
+            Modificar emparejamiento
+          </v-btn>
+
+          <v-btn small variant="tonal" color="secondary" @click="cerrarModal">
+            Cancelar
+          </v-btn>
+        </v-row>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Modal de progreso circular -->
+  <v-dialog v-model="isGenerating" hide-overlay persistent>
+    <v-card class="progress-card">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="70"
+      ></v-progress-circular>
+    </v-card>
+  </v-dialog>
+
+  <!-- Modal response eliminar inscripcion -->
+  <ModalSuccess
+    :isVisible="showSuccessModal"
+    message="Pairing modificado correctamente."
+    @update:isVisible="showSuccessModal = $event"
+  />
+
+  <!-- Modal response si error -->
+  <ModalError
+    :isVisible="showErrorModal"
+    message="No se ha podido modificar el pairing. Contacta con el administrador."
+    @update:isVisible="showErrorModal = $event"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, watch, defineProps } from "vue";
-import { PartidaTorneoDTO } from "@/interfaces/Partidas";
-import { appsettings } from "@/settings/appsettings";
-import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
+import { ref, defineEmits, watch, defineProps, onMounted } from "vue";
+import { UsuarioFastDTO } from "@/interfaces/Usuario";
+import { getUsuariosFast } from "@/services/UsuariosService";
+import {
+  RequestUpdatePairingTorneoDTO,
+  UpdatePairingTorneoDTO,
+} from "@/interfaces/Live";
+import { updatePairingTorneo } from "@/services/PartidaTorneoService";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import ModalError from "../Commons/ModalError.vue";
 
-// Definir las props
 const props = defineProps<{
   isVisible: boolean;
-  partida: PartidaTorneoDTO;
+  partida: UpdatePairingTorneoDTO;
 }>();
 
-// Emitir eventos
-const emit = defineEmits(["confirmar", "cerrar"]);
+const emit = defineEmits(["confirm", "cerrar"]);
 
-// Variables reactivas
-const isModalEditarPairingVisible = ref<boolean>(props.isVisible);
-const partidaEditada = ref<UpdatePartidaTorneoDTO>({
+const isModalPairingVisible = ref<boolean>(props.isVisible);
+const pairingEditado = ref<UpdatePairingTorneoDTO>({
+  nick1: props.partida.nick1,
+  nick2: props.partida.nick2,
   idPartidaTorneo: props.partida.idPartidaTorneo,
-  resultadoUsuario1: props.partida.resultadoUsuario1,
-  resultadoUsuario2: props.partida.resultadoUsuario2,
-  escenarioPartida: props.partida.escenarioPartida,
-  ganadorPartidaTorneo: props.partida.ganadorPartidaTorneo,
-  partidaValidadaUsuario1: props.partida.partidaValidadaUsuario1,
-  partidaValidadaUsuario2: props.partida.partidaValidadaUsuario2,
-  liderMuertoUsuario1: props.partida.liderMuertoUsuario1,
-  liderMuertoUsuario2: props.partida.liderMuertoUsuario2,
+  idTorneo: props.partida.idTorneo,
+  idUsuario1: props.partida.idUsuario1,
+  idUsuario2: props.partida.idUsuario2,
 });
 const isFormValid = ref<boolean>(false);
-
-const escenario = ref<string>();
-const listaEscenarios = ref<string[]>([]);
-const isLoading = ref<boolean>(false);
+const jugadores = ref<UsuarioFastDTO[]>();
+const isGenerating = ref<boolean>(false);
+const showErrorModal = ref<boolean>(false);
+const showSuccessModal = ref<boolean>(false);
 
 // Función para cerrar el modal
 const cerrarModal = () => {
   emit("cerrar");
 };
 
-// Función para confirmar la edición
-const confirmarEditarPartida = () => {
-  // if (props.partida. === 1)
-  //   partidaEditada.value.partidaValidadaUsuario1 = true;
-  // else partidaEditada.value.partidaValidadaUsuario2 = true;
-
-  // emit("confirmar", partidaEditada.value);
-  // cerrarModal();
-  console.log("Partida editada confirmada");
-};
-
 // Monitorea cambios en la visibilidad del modal
 watch(
   () => props.isVisible,
   (newVal) => {
-    isModalEditarPairingVisible.value = newVal;
+    isModalPairingVisible.value = newVal;
   }
 );
 
-// Monitorea cambios en los datos de la partida
 watch(
   () => props.partida,
   (newPartida) => {
-    partidaEditada.value = { ...newPartida };
+    pairingEditado.value.idUsuario1 = newPartida.idUsuario1;
+    pairingEditado.value.idUsuario2 = newPartida.idUsuario2;
   },
   { immediate: true }
 );
 
-// Cargar escenarios
-const loadEscenarios = async () => {
-  isLoading.value = true;
-
-  listaEscenarios.value = await appsettings.escenarios;
-
-  isLoading.value = false;
-};
-
 // Reglas de validación
 const rules = {
-  required: (value: any) => !!value || "Este campo es obligatorio",
-  isNumber: (value: number) => !isNaN(value) || "Debe ser un número",
-  isBool: (value: boolean) =>
-    value == true || value == false || "Este campo es obligatorio",
+  required: (value: any) =>
+    (value !== null && value !== undefined && value !== "") ||
+    "Este campo es obligatorio",
 };
+
+const changeJugador = async () => {
+  try {
+    isGenerating.value = true;
+
+    let idUsuario1 = pairingEditado.value.idUsuario1;
+    let idUsuario2 = pairingEditado.value.idUsuario2;
+
+    if (typeof idUsuario1 === "object") {
+      idUsuario1 = idUsuario1.idUsuario;
+    }
+
+    if (typeof idUsuario2 === "object") {
+      idUsuario2 = idUsuario2.idUsuario;
+    }
+
+    const body: RequestUpdatePairingTorneoDTO = {
+      idPartidaTorneo: props.partida.idPartidaTorneo,
+      idUsuario1: idUsuario1 as number,
+      idUsuario2: idUsuario2 as number,
+    };
+
+    await updatePairingTorneo(body);
+    showSuccessModal.value = true;
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isGenerating.value = false;
+    emit("confirm");
+    cerrarModal();
+  }
+};
+
+onMounted(async () => {
+  try {
+    const responseJugadores = await getUsuariosFast();
+
+    // Mapeamos el array de jugadores para obtener solo el idUsuario y el nick
+    jugadores.value = responseJugadores.data.map((jugador: UsuarioFastDTO) => ({
+      idUsuario: jugador.idUsuario,
+      nick: jugador.nick,
+    }));
+  } catch (error) {
+    console.error("Error al obtener la información del torneo:", error);
+  }
+});
 </script>
+
+<style>
+.progress-card {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+</style>

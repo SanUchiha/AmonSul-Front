@@ -1,4 +1,8 @@
-import { GenerarRonda, UpdatePartidaTorneoDTO } from "@/interfaces/Live";
+import {
+  GenerarRonda,
+  RequestUpdatePairingTorneoDTO,
+  UpdatePartidaTorneoDTO,
+} from "@/interfaces/Live";
 import { http } from "./index";
 
 export const generarRonda = async (nuevaRonda: GenerarRonda) => {
@@ -7,4 +11,14 @@ export const generarRonda = async (nuevaRonda: GenerarRonda) => {
 
 export const updatePartidaTorneo = async (partida: UpdatePartidaTorneoDTO) => {
   return http.put(`Torneo/Editar-Partida`, partida);
+};
+
+export const updatePairingTorneo = async (
+  pairing: RequestUpdatePairingTorneoDTO
+) => {
+  return http.put(`Torneo/Editar-Pairing`, pairing);
+};
+
+export const deletePartidaTorneo = async (idPartida: number) => {
+  return http.delete(`Torneo/Eliminar-Partida/${idPartida}`);
 };

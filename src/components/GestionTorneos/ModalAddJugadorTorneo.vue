@@ -126,6 +126,7 @@ onMounted(async () => {
   }
 });
 </script>
+
 <style scoped>
 .progress-card {
   width: 200px;
