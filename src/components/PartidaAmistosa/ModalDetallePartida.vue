@@ -79,14 +79,6 @@
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-
-          <v-list-item>
-            <v-list-item-content>
-              <v-list-item-title>
-                ELO: {{ partida?.esElo ? "Sí" : "No" }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
         </v-list>
       </v-card-text>
     </v-card>
@@ -94,12 +86,15 @@
 </template>
 
 <script setup lang="ts">
-import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
+import {
+  ViewPartidaAmistosaDTO,
+  ViewPartidaTorneoDTO,
+} from "@/interfaces/Partidas";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
 
 const props = defineProps<{
-  partida: ViewPartidaAmistosaDTO;
+  partida: ViewPartidaAmistosaDTO | ViewPartidaTorneoDTO;
 }>();
 const emit = defineEmits<{ (event: "close"): void }>();
 

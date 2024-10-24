@@ -59,3 +59,22 @@ export interface PartidaTorneoDTO {
   resultadoUsuario1: number | null;
   resultadoUsuario2: number | null;
 }
+
+export interface ViewPartidaTorneoDTO {
+  idPartidaTorneo: number;
+  idUsuario1: number;
+  nickUsuario1?: string;
+  idUsuario2: number;
+  nickUsuario2?: string;
+  resultadoUsuario1: number;
+  resultadoUsuario2: number;
+  fechaPartida: string;
+  escenarioPartida?: string;
+  puntosPartida: number;
+  ganadorPartidaTorneo: number;
+  ganadorPartidaNick?: string;
+  esTorneo: boolean;
+  ejercitoUsuario1?: string;
+  ejercitoUsuario2?: string;
+  nombreTorneo?: string;
+}

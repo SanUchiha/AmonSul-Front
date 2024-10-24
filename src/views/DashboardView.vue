@@ -12,19 +12,20 @@
         </div>
         <div v-else>
           <!-- tabs
-           1. info usuario / 2. partidas / 3. torneos jugador -->
+           1. info usuario / 2. partidas amistosas / 3. partidas torneos / 4. torneos jugador -->
 
           <v-tabs v-model="tab" color="primary" grow>
-            <v-tab value="one">
+            <v-tab value="1">
               <v-icon icon="mdi-star-face"></v-icon>
             </v-tab>
-            <v-tab value="two">
-              <v-icon icon="mdi-gamepad-variant-outline"></v-icon>
-            </v-tab>
-            <v-tab value="three">
-              <v-icon icon="mdi-trophy-variant-outline"></v-icon>
+            <v-tab value="2"> P. Amistosas </v-tab>
+            <v-tab value="3"> P. Torneo </v-tab>
+            <v-tab value="4">
+              <v-icon icon="mdi-calendar-account-outline"></v-icon>
             </v-tab>
           </v-tabs>
+
+          <v-spacer class="my-3"></v-spacer>
 
           <v-tabs-window v-model="tab">
             <!-- Tab 1.
@@ -32,7 +33,7 @@
            Jugador card
            ultima partida jugada
            ultimo torneo jugado -->
-            <v-tabs-window-item value="one">
+            <v-tabs-window-item value="1">
               <v-row justify="center">
                 <v-col cols="12" md="12">
                   <v-row dense>
@@ -45,28 +46,6 @@
                       <JugadorCard :usuario="usuarioData" />
                     </v-col>
                   </v-row>
-                  <v-row dense>
-                    <v-col cols="12" md="12" class="text-center">
-                      <v-card :class="cardClass">
-                        <v-card-title>Última partida</v-card-title>
-                        <v-card-text v-if="ultimaPartida">{{
-                          messageUltimaPartida
-                        }}</v-card-text>
-                        <v-card-text v-else
-                          >No tiene aún partida registrada</v-card-text
-                        >
-                      </v-card>
-                    </v-col>
-                  </v-row>
-
-                  <v-row dense>
-                    <v-col cols="12" md="12" class="text-center">
-                      <v-card>
-                        <v-card-title>Último torneo</v-card-title>
-                        <v-card-text>No ha jugado aún torneos.</v-card-text>
-                      </v-card>
-                    </v-col>
-                  </v-row>
                 </v-col>
               </v-row>
             </v-tabs-window-item>
@@ -74,7 +53,8 @@
             <!-- tab 2. (partidas)
            partidas pendientes de validar
            Lista de partidas -->
-            <v-tabs-window-item value="two">
+            <v-tabs-window-item value="2">
+              <!-- Registrar partidas -->
               <v-btn
                 class="dashboard_button mt-2"
                 variant="tonal"
@@ -87,6 +67,7 @@
 
               <v-divider class="my-3"></v-divider>
 
+              <!-- partidas pendientes -->
               <div v-if="pendingMatches.length > 0 && !isLoadingPending">
                 <PendingMatchCard
                   v-for="match in pendingMatches"
@@ -102,6 +83,7 @@
 
               <v-divider class="my-3"></v-divider>
 
+              <!-- partidas validades -->
               <div v-if="!isLoadingValidadas && validMatches.length > 0">
                 <ValidadasMatchCard
                   v-for="match in validMatches"
@@ -117,10 +99,29 @@
               </div>
               <v-divider class="my-3"></v-divider>
             </v-tabs-window-item>
-            <!-- tab 3.
+
+            <!-- tab 3 (partidas torneos) -->
+            <v-tabs-window-item value="3">
+              <div v-if="tournamentMatches.length > 0">
+                <div
+                  v-for="match in tournamentMatches"
+                  :key="match.idPartidaTorneo"
+                >
+                  <CardTournamentMatch
+                    :match="match"
+                    :idUsuario="parseInt(idUsuarioLogger!)"
+                  />
+                </div>
+              </div>
+              <div v-else>
+                <h3>No tienes partidas de torneo</h3>
+              </div>
+              <v-divider class="my-3"></v-divider>
+            </v-tabs-window-item>
+            <!-- tab 4
            Inscription a los tornoes (mis torneos)
            Lista de partidas -->
-            <v-tabs-window-item value="three">
+            <v-tabs-window-item value="4">
               <TablaInscripcionesTorneo
                 :isLoading="isLoading"
                 :listaTorneos="usuarioData.inscripcionesTorneo"
@@ -140,7 +141,10 @@ import {
   getPartidasPendientesValidar,
   getPartidasValidadas,
 } from "@/services/PartidasAmistosasService";
-import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
+import {
+  ViewPartidaAmistosaDTO,
+  ViewPartidaTorneoDTO,
+} from "@/interfaces/Partidas";
 import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { useAuth } from "@/composables/useAuth";
@@ -152,6 +156,8 @@ import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import ModalProteccionDatos from "@/components/Usuarios/ModalProteccionDatos.vue";
+import { getTournamentMatches } from "@/services/PartidaTorneoService";
+import CardTournamentMatch from "@/components/PartidasTorneo/CardTournamentMatch.vue";
 
 const tab = ref<string>("one");
 const usuariosStore = useUsuariosStore();
@@ -168,36 +174,11 @@ const usuarioData: ComputedRef<UsuarioDataDTO> = computed(
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
+const tournamentMatches = ref<ViewPartidaTorneoDTO[]>([]);
 
 const isLoadingPending = ref<boolean>(false);
 const isLoadingValidadas = ref<boolean>(false);
-
-const ultimaPartida = ref<ViewPartidaAmistosaDTO | null>(null);
-
-const messageUltimaPartida = computed(() => {
-  if (!ultimaPartida.value) return null;
-
-  const nickRival =
-    ultimaPartida.value.nickUsuario1 === usuarioData.value.nick
-      ? ultimaPartida.value.nickUsuario2
-      : ultimaPartida.value.nickUsuario1;
-
-  if (ultimaPartida.value.ganadorPartidaNick == null) {
-    return `Empate contra ${nickRival}`;
-  }
-
-  return ultimaPartida.value.ganadorPartidaNick === nickRival
-    ? `Derrota contra ${nickRival}`
-    : `Victoria contra ${nickRival}`;
-});
-
-const cardClass = computed(() => {
-  if (!ultimaPartida.value) return "";
-  if (ultimaPartida.value.ganadorPartidaNick == null) return "empate-card";
-  return ultimaPartida.value.ganadorPartidaNick === usuarioData.value.nick
-    ? "victoria-card"
-    : "derrota-card";
-});
+const isLoadingTournamentMatches = ref<boolean>(false);
 
 const showProteccionDatosModal = ref<boolean>(false);
 
@@ -207,13 +188,25 @@ const cargarPartidasValidadas = async () => {
     const responseValidadas = await getPartidasValidadas(emailUsuario.value);
 
     validMatches.value = responseValidadas.data;
-
-    ultimaPartida.value =
-      responseValidadas.data[responseValidadas.data.length - 1];
   } catch (error) {
     console.error("Error al obtener las partidas validadas:", error);
   } finally {
     isLoadingValidadas.value = false;
+  }
+};
+
+const cargarPartidasTorneos = async () => {
+  try {
+    isLoadingTournamentMatches.value = true;
+    const response = await getTournamentMatches(
+      parseInt(idUsuarioLogger.value!)
+    );
+
+    tournamentMatches.value = response.data;
+  } catch (error) {
+    console.error("Error al obtener las partidas de torneo:", error);
+  } finally {
+    isLoadingTournamentMatches.value = false;
   }
 };
 
@@ -243,16 +236,15 @@ const initializeComponent = async () => {
       if (!usuariosStore.usuarioData.proteccionDatos) {
         showProteccionDatosModal.value = true;
       }
-
       validMatches.value = usuarioData.value?.partidasValidadas ?? [];
-
-      ultimaPartida.value = validMatches.value[validMatches.value.length - 1];
-
       pendingMatches.value = usuarioData.value?.partidasPendientes ?? [];
+      tournamentMatches.value = usuarioData.value.PartidasTorneo ?? [];
 
       if (route.params.tab) {
         tab.value = route.params.tab as string;
       }
+
+      cargarPartidasTorneos();
     } catch (error) {
       console.error(error);
       router.push({ name: "error" });

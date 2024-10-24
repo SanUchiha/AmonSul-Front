@@ -7,17 +7,16 @@
         </div>
         <div v-else>
           <!-- tabs
-           1. info usuario / 2. partidas / 3. torneos jugador -->
+           1. info usuario / 2. partidas amistosas / 3. partidas torneos / 4. torneos jugador -->
 
           <v-tabs v-model="tab" color="primary" grow>
-            <v-tab value="one">
+            <v-tab value="1">
               <v-icon icon="mdi-star-face"></v-icon>
             </v-tab>
-            <v-tab value="two">
-              <v-icon icon="mdi-gamepad-variant-outline"></v-icon>
-            </v-tab>
-            <v-tab value="three">
-              <v-icon icon="mdi-trophy-variant-outline"></v-icon>
+            <v-tab value="2"> P. Amistosas </v-tab>
+            <v-tab value="3"> P. Torneo </v-tab>
+            <v-tab value="4">
+              <v-icon icon="mdi-calendar-account-outline"></v-icon>
             </v-tab>
           </v-tabs>
 
@@ -25,7 +24,7 @@
             <!-- Tab 1.
              spark
            Jugador card -->
-            <v-tabs-window-item value="one">
+            <v-tabs-window-item value="1">
               <v-row justify="center">
                 <v-col cols="12" md="12">
                   <v-row dense>
@@ -44,7 +43,7 @@
 
             <!-- tab 2. (partidas)
            Lista de partidas -->
-            <v-tabs-window-item value="two">
+            <v-tabs-window-item value="2">
               <v-divider class="my-3"></v-divider>
 
               <div v-if="!isLoading && validMatches.length > 0">
@@ -62,10 +61,30 @@
               </div>
               <v-divider class="my-3"></v-divider>
             </v-tabs-window-item>
-            <!-- tab 3.
+
+            <!-- tab 3 (partidas torneos) -->
+            <v-tabs-window-item value="3">
+              <div v-if="tournamentMatches.length > 0">
+                <div
+                  v-for="match in tournamentMatches"
+                  :key="match.idPartidaTorneo"
+                >
+                  <CardTournamentMatch
+                    :match="match"
+                    :idUsuario="usuarioData.idUsuario"
+                  />
+                </div>
+              </div>
+              <div v-else>
+                <h3>No tiene partidas de torneo</h3>
+              </div>
+              <v-divider class="my-3"></v-divider>
+            </v-tabs-window-item>
+
+            <!-- tab 4.
            Inscription a los tornoes (mis torneos)
            Lista de partidas -->
-            <v-tabs-window-item value="three">
+            <v-tabs-window-item value="4">
               <TablaInscripcionesTorneo
                 :isLoading="isLoading"
                 :listaTorneos="usuarioData.inscripcionesTorneo"
@@ -97,17 +116,24 @@ import { useRoute, useRouter } from "vue-router";
 import JugadorCard from "@/components/Usuarios/JugadorCard.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import { getPartidasValidadas } from "@/services/PartidasAmistosasService";
-import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
+import {
+  ViewPartidaAmistosaDTO,
+  ViewPartidaTorneoDTO,
+} from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
+import CardTournamentMatch from "@/components/PartidasTorneo/CardTournamentMatch.vue";
+import { getTournamentMatches } from "@/services/PartidaTorneoService";
 
 const tab = ref<string>("one");
 const usuariosStore = useUsuariosStore();
 
 const isLoading = ref(true);
+const isLoadingTournamentMatches = ref<boolean>(false);
+
 const router = useRouter();
 const route = useRoute();
 const usuarioData: ComputedRef<UsuarioDataDTO> = computed(
@@ -116,6 +142,7 @@ const usuarioData: ComputedRef<UsuarioDataDTO> = computed(
 
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
+const tournamentMatches = ref<ViewPartidaTorneoDTO[]>([]);
 
 const ultimaPartida = ref<ViewPartidaAmistosaDTO | null>(null);
 
@@ -135,6 +162,24 @@ const cargarPartidasValidadas = async () => {
   }
 };
 
+const cargarPartidasTorneos = async () => {
+  try {
+    isLoadingTournamentMatches.value = true;
+    const response = await getTournamentMatches(usuarioData.value.idUsuario);
+
+    tournamentMatches.value = response.data;
+    tournamentMatches.value = tournamentMatches.value.sort((a, b) => {
+      return (
+        new Date(b.fechaPartida).getTime() - new Date(a.fechaPartida).getTime()
+      );
+    });
+  } catch (error) {
+    console.error("Error al obtener las partidas de torneo:", error);
+  } finally {
+    isLoadingTournamentMatches.value = false;
+  }
+};
+
 const initializeComponent = async () => {
   isLoading.value = true;
   try {
@@ -143,8 +188,21 @@ const initializeComponent = async () => {
 
     // Verifica la estructura de usuarioResponse
     if (usuarioData.value.idUsuario) {
-      validMatches.value = usuarioData.value.partidasValidadas;
-      pendingMatches.value = usuarioData.value.partidasPendientes;
+      validMatches.value = usuarioData.value.partidasValidadas.sort((a, b) => {
+        return (
+          new Date(b.fechaPartida).getTime() -
+          new Date(a.fechaPartida).getTime()
+        );
+      });
+      pendingMatches.value = usuarioData.value.partidasPendientes.sort(
+        (a, b) => {
+          return (
+            new Date(b.fechaPartida).getTime() -
+            new Date(a.fechaPartida).getTime()
+          );
+        }
+      );
+      cargarPartidasTorneos();
     }
   } catch (error) {
     console.error(error);

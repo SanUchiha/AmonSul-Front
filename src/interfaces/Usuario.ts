@@ -1,7 +1,7 @@
 import { EloDTO } from "./Elo";
 import { FaccionDTO } from "./Faccion";
 import { InscripcionUsuarioDTO } from "./Inscripcion";
-import { ViewPartidaAmistosaDTO } from "./Partidas";
+import { ViewPartidaAmistosaDTO, ViewPartidaTorneoDTO } from "./Partidas";
 
 export interface NewUserDTO {
   NombreUsuario: string;
@@ -96,6 +96,13 @@ export interface UsuarioDataDTO {
   partidasEmpatadas: number;
   partidasPerdidas: number;
   proteccionDatos: boolean | null;
+  PartidasTorneo: ViewPartidaTorneoDTO[];
+  ClasificacionTorneos: ClasificacionTorneosDTO[];
+}
+
+export interface ClasificacionTorneosDTO {
+  nombreTorneo: string;
+  resultado: number;
 }
 
 export interface UsuarioCambioPassDTO {

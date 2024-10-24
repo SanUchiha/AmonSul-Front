@@ -54,6 +54,8 @@ export const useUsuariosStore = defineStore("usuarios", {
       partidasEmpatadas: 0,
       partidasPerdidas: 0,
       proteccionDatos: null,
+      PartidasTorneo: [],
+      ClasificacionTorneos: [],
     },
   }),
   actions: {

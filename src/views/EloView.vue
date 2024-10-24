@@ -97,7 +97,7 @@ onMounted(async () => {
 
     // Procesar la clasificación ELO
     eloClasificacion.value = responseClasificacionElo.data.sort(
-      (a, b) => b.elo - a.elo
+      (a: { elo: number }, b: { elo: number }) => b.elo - a.elo
     );
     eloClasificacion.value = eloClasificacion.value.map((item, index) => ({
       ...item,
@@ -109,7 +109,7 @@ onMounted(async () => {
 
     // Procesar la clasificación ELO mensual
     eloClasificacionMensual.value = responseClasificacionEloMensual.data.sort(
-      (a, b) => b.elo - a.elo
+      (a: { elo: number }, b: { elo: number }) => b.elo - a.elo
     );
     eloClasificacionMensual.value = eloClasificacionMensual.value.map(
       (item, index) => ({
@@ -122,6 +122,8 @@ onMounted(async () => {
     if (!usuarios.value.length) {
       await usuariosStore.requestUsuarios();
     }
+
+    console.log("eloclis", eloClasificacion.value);
   } catch (err) {
     console.error("Error al obtener datos del usuario:", error.value);
   } finally {

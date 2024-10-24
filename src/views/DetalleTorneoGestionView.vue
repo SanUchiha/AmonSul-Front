@@ -836,7 +836,6 @@ const handleModificarPartidaTorneoConfirm = async (
   partidaEditada: PartidaTorneoDTO
 ) => {
   isGenerating.value = true;
-  console.log("partida editada", partidaEditada);
 
   if (partidaEditada !== null) {
     try {
@@ -865,7 +864,6 @@ watch(
 const modificarPartida = (partidaRecibida: PartidaTorneoDTO) => {
   partidaActual.value = partidaRecibida;
   showModificarPartidaTorneoModal.value = true;
-  console.log(partidaActual.value);
 };
 
 const recargarPagina = () => {
