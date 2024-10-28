@@ -1,4 +1,4 @@
-export interface army {
+export interface ArmyDTO {
   name: string;
   band: string;
 }

@@ -1,4 +1,4 @@
-import { army } from "./Army";
+import { ArmyDTO } from "./Army";
 
 export interface CrearListaTorneoRequestDTO {
   idInscripcion: number;
@@ -6,12 +6,12 @@ export interface CrearListaTorneoRequestDTO {
   idTorneo: number;
   idOrganizador: number;
   listaData: string;
-  ejercito: army;
+  ejercito: ArmyDTO;
 }
 
 export interface RequesListaDTO {
   listaData: string;
-  ejercito: army;
+  ejercito: ArmyDTO;
 }
 
 export interface ModificarListaTorneoRequestDTO {
@@ -21,7 +21,7 @@ export interface ModificarListaTorneoRequestDTO {
   idTorneo: number;
   idOrganizador: number;
   listaData: string;
-  ejercito: army;
+  ejercito: ArmyDTO;
 }
 
 export interface ListaTorneoRequestDTO {

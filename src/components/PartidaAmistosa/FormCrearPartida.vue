@@ -160,6 +160,7 @@ import { appsettings } from "@/settings/appsettings";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useUsuariosStore } from "@/store/usuarios";
+import { ArmyDTO } from "@/interfaces/Army";
 
 const usuariosStore = useUsuariosStore();
 
@@ -171,12 +172,12 @@ const loadingEjercitos = ref(false);
 const loadingEscenarios = ref(false);
 const listaUsuarios = ref<UsuarioNickDTO[]>([]);
 const listadoNicks = ref<string[]>([]);
-const listadoEjercitos = ref<string[]>([]);
+const listadoEjercitos = ref<ArmyDTO[]>([]);
 const listaEscenarios = ref<string[]>([]);
 const nickDosSelected = ref<string>("");
 const escenarioSelected = ref<string>("");
-const ejercitoPropio = ref<string>("");
-const ejercitoRival = ref<string>("");
+const ejercitoPropio = ref<ArmyDTO>();
+const ejercitoRival = ref<ArmyDTO>();
 const puntosJugadorUno = ref<number | null>(null);
 const puntosJugadorDos = ref<number | null>(null);
 const checkEsMatchedPlay = ref<boolean>(false);
@@ -221,7 +222,7 @@ const loadEjercitos = async () => {
   isLoading.value = true;
   loadingEjercitos.value = true;
 
-  listadoEjercitos.value = await appsettings.ejercitos;
+  listadoEjercitos.value = appsettings.armies;
 
   isLoading.value = false;
   loadingEjercitos.value = false;
@@ -231,7 +232,7 @@ const loadEscenarios = async () => {
   isLoading.value = true;
   loadingEscenarios.value = true;
 
-  listaEscenarios.value = await appsettings.escenarios;
+  listaEscenarios.value = appsettings.escenarios;
 
   isLoading.value = false;
   loadingEscenarios.value = false;
@@ -282,10 +283,12 @@ const handlerNuevaPartida = async () => {
       esMatchedPlayPartida: checkEsMatchedPlay.value ?? false,
       escenarioPartida: escenarioSelected.value,
       esTorneo: esTorneo.value ?? false,
-      ejercitoUsuario1: ejercitoPropio.value,
-      ejercitoUsuario2: ejercitoRival.value,
+      ejercitoUsuario1: ejercitoPropio.value!,
+      ejercitoUsuario2: ejercitoRival.value!,
       esElo: esElo.value ?? false,
     };
+
+    console.log(nuevaPartida);
 
     try {
       await registrarPartida(nuevaPartida);

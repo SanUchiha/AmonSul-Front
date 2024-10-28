@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { army } from "@/interfaces/Army";
+import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
 import { getlista } from "@/services/ListasService";
 import { appsettings } from "@/settings/appsettings";
@@ -89,8 +89,8 @@ const isLoading = ref(false);
 
 const imageBase64 = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const ejercitoSelected = ref<army>();
-const listadoEjercitos = ref<army[]>([]);
+const ejercitoSelected = ref<ArmyDTO>();
+const listadoEjercitos = ref<ArmyDTO[]>([]);
 const loadingEjercitos = ref(false);
 const isSendButtonDisabled = computed(() => {
   return (

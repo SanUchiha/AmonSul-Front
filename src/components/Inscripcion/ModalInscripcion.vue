@@ -127,7 +127,7 @@ import {
   modificarListaTorneo,
   subirListaTorneo,
 } from "@/services/ListasService";
-import { army } from "@/interfaces/Army";
+import { ArmyDTO } from "@/interfaces/Army";
 
 const props = defineProps<{
   idInscripcion: number | null;
@@ -153,7 +153,7 @@ const currentInscripcionId = ref<number | null>(null);
 const showVerListaModal = ref<boolean>(false);
 const hasLista = ref<boolean>(false);
 const listaText = ref<string>("");
-const ejercito = ref<army>();
+const ejercito = ref<ArmyDTO>();
 const showSuccessModalLista = ref<boolean>(false);
 const showErrorModalLista = ref<boolean>(false);
 const idLista = ref<number | null>();

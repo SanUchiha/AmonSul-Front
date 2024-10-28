@@ -1,3 +1,5 @@
+import { ArmyDTO } from "./Army";
+
 export interface ViewPartidaAmistosaDTO {
   idPartidaAmistosa: number;
   idUsuario1: number;
@@ -34,8 +36,8 @@ export interface CreatePartidaAmistosaDTO {
   esMatchedPlayPartida: boolean;
   escenarioPartida: string;
   esTorneo: boolean;
-  ejercitoUsuario1: string;
-  ejercitoUsuario2: string;
+  ejercitoUsuario1: ArmyDTO;
+  ejercitoUsuario2: ArmyDTO;
   esElo: boolean;
 }
 
