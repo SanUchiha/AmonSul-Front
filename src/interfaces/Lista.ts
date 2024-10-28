@@ -1,19 +1,27 @@
+import { army } from "./Army";
+
 export interface CrearListaTorneoRequestDTO {
   idInscripcion: number;
+  idUsuario: number;
+  idTorneo: number;
+  idOrganizador: number;
   listaData: string;
-  ejercito: string;
+  ejercito: army;
 }
 
-export interface ObjetoListaDTO {
+export interface RequesListaDTO {
   listaData: string;
-  ejercito: string;
+  ejercito: army;
 }
 
 export interface ModificarListaTorneoRequestDTO {
   idInscripcion: number;
   idLista: number;
+  idUsuario: number;
+  idTorneo: number;
+  idOrganizador: number;
   listaData: string;
-  ejercito: string;
+  ejercito: army;
 }
 
 export interface ListaTorneoRequestDTO {

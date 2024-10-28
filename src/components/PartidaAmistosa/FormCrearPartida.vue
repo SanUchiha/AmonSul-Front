@@ -29,6 +29,7 @@
                 v-model="ejercitoRival"
                 :items="listadoEjercitos"
                 label="¿Que llevaba tu rival?"
+                item-title="name"
                 @click="loadEjercitos"
                 :rules="[rules.required]"
                 required
@@ -43,6 +44,7 @@
               <v-combobox
                 v-model="ejercitoPropio"
                 :items="listadoEjercitos"
+                item-title="name"
                 label="¿Que llevabas tú?"
                 @click="loadEjercitos"
                 :rules="[rules.required]"

@@ -121,15 +121,19 @@ import ModalLista from "./ModalLista.vue";
 import {
   CrearListaTorneoRequestDTO,
   ModificarListaTorneoRequestDTO,
-  ObjetoListaDTO,
+  RequesListaDTO,
 } from "@/interfaces/Lista";
 import {
   modificarListaTorneo,
   subirListaTorneo,
 } from "@/services/ListasService";
+import { army } from "@/interfaces/Army";
 
 const props = defineProps<{
   idInscripcion: number | null;
+  idUsuario: number | null;
+  idTorneo: number | null;
+  idOrganizador: number | null;
 }>();
 
 const emit = defineEmits<{
@@ -149,7 +153,7 @@ const currentInscripcionId = ref<number | null>(null);
 const showVerListaModal = ref<boolean>(false);
 const hasLista = ref<boolean>(false);
 const listaText = ref<string>("");
-const ejercito = ref<string>("");
+const ejercito = ref<army>();
 const showSuccessModalLista = ref<boolean>(false);
 const showErrorModalLista = ref<boolean>(false);
 const idLista = ref<number | null>();
@@ -165,19 +169,22 @@ const verLista = async () => {
   showVerListaModal.value = true;
 };
 
-const handleEnviarLista = async (newLista: ObjetoListaDTO) => {
+const handleEnviarLista = async (newLista: RequesListaDTO) => {
   listaText.value = newLista.listaData;
   ejercito.value = newLista.ejercito;
   await enviarLista(newLista);
 };
 
-const enviarLista = async (newLista: ObjetoListaDTO) => {
+const enviarLista = async (newLista: RequesListaDTO) => {
   if (currentInscripcionId.value !== null) {
     isRegistering.value = true;
     const requestLista: CrearListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       listaData: listaText.value,
       ejercito: newLista.ejercito,
+      idUsuario: props.idUsuario!,
+      idTorneo: props.idTorneo!,
+      idOrganizador: props.idOrganizador!,
     };
 
     try {
@@ -197,13 +204,13 @@ const enviarLista = async (newLista: ObjetoListaDTO) => {
   }
 };
 
-const handleModificarLista = async (newLista: ObjetoListaDTO) => {
+const handleModificarLista = async (newLista: RequesListaDTO) => {
   ejercito.value = newLista.ejercito;
   listaText.value = newLista.listaData;
   await modificarLista(newLista);
 };
 
-const modificarLista = async (newLista: ObjetoListaDTO) => {
+const modificarLista = async (newLista: RequesListaDTO) => {
   isRegistering.value = true;
   if (currentInscripcionId.value !== null && idLista.value != null) {
     const requestLista: ModificarListaTorneoRequestDTO = {
@@ -211,6 +218,9 @@ const modificarLista = async (newLista: ObjetoListaDTO) => {
       listaData: listaText.value,
       idLista: idLista.value,
       ejercito: newLista.ejercito,
+      idUsuario: props.idUsuario!,
+      idTorneo: props.idTorneo!,
+      idOrganizador: props.idOrganizador!,
     };
     try {
       await modificarListaTorneo(requestLista);

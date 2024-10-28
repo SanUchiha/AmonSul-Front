@@ -61,6 +61,9 @@
   <ModalInscripcion
     v-if="showModalInscripcion"
     :idInscripcion="currentInscripcionId"
+    :idUsuario="parseInt(idUsuarioLogger!)"
+    :idTorneo="currentTorneoId"
+    :idOrganizador="currentTorneoId"
     @eliminar-inscripcion="eliminarInscripcion"
     @close="closeModal"
   />
@@ -105,6 +108,7 @@ const isRegistering = ref<boolean>(false);
 
 const currentInscripcionId = ref<number | null>(null);
 const currentTorneoId = ref<number | null>(null);
+const currentIdOrganizador = ref<number | null>(null);
 const listaTorneos = ref<InscripcionUsuarioDTO[]>([]);
 
 const showSuccessModal = ref<boolean>(false);
@@ -121,6 +125,10 @@ const verDetalleInscripcion = (idInscripcion: number) => {
     listaTorneos.value.find(
       (i) => i.idInscripcion == currentInscripcionId.value
     )?.idTorneo ?? null;
+  currentIdOrganizador.value =
+    listaTorneos.value.find(
+      (i) => i.idInscripcion == currentInscripcionId.value
+    )?.idOrganizador ?? null;
 
   showModalInscripcion.value = true;
 };

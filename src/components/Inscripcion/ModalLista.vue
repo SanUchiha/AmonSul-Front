@@ -7,6 +7,7 @@
         <v-combobox
           v-model="ejercitoSelected"
           :items="listadoEjercitos"
+          item-title="name"
           label="¿Cuál es tu ejército principal?"
           @click="loadEjercitos"
           :rules="[rules.required]"
@@ -71,7 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import { ObjetoListaDTO } from "@/interfaces/Lista";
+import { army } from "@/interfaces/Army";
+import { RequesListaDTO } from "@/interfaces/Lista";
 import { getlista } from "@/services/ListasService";
 import { appsettings } from "@/settings/appsettings";
 import { defineProps, defineEmits, ref, watch, onMounted, computed } from "vue";
@@ -87,8 +89,8 @@ const isLoading = ref(false);
 
 const imageBase64 = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const ejercitoSelected = ref<string>("");
-const listadoEjercitos = ref<string[]>([]);
+const ejercitoSelected = ref<army>();
+const listadoEjercitos = ref<army[]>([]);
 const loadingEjercitos = ref(false);
 const isSendButtonDisabled = computed(() => {
   return (
@@ -105,7 +107,7 @@ const loadEjercitos = async () => {
   isLoading.value = true;
   loadingEjercitos.value = true;
 
-  listadoEjercitos.value = await appsettings.ejercitos;
+  listadoEjercitos.value = await appsettings.armies;
 
   isLoading.value = false;
   loadingEjercitos.value = false;
@@ -115,8 +117,35 @@ const onImageSelected = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
     const reader = new FileReader();
-    reader.onloadend = () => {
-      imageBase64.value = reader.result as string;
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxWidth = 500; // Cambia esto al ancho máximo deseado
+        const maxHeight = 500; // Cambia esto a la altura máxima deseada
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          } else {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          // Convertir el canvas a base64
+          imageBase64.value = canvas.toDataURL("image/jpeg", 0.5); // Ajusta la calidad de 0 a 1
+        }
+      };
+      img.src = e.target?.result as string;
     };
     reader.readAsDataURL(file);
   }
@@ -155,9 +184,9 @@ const close = () => {
 };
 
 const enviarLista = () => {
-  const newLista: ObjetoListaDTO = {
+  const newLista: RequesListaDTO = {
     listaData: imageBase64.value!,
-    ejercito: ejercitoSelected.value,
+    ejercito: ejercitoSelected.value!,
   };
   if (props.hasLista) emit("modificarLista", newLista);
   else emit("enviarLista", newLista);
