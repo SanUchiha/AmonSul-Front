@@ -9,21 +9,19 @@
         <v-form>
           <v-radio-group
             v-model="mismaComunidadCheckString"
-            label="¿Se permite emparejamientos de la misma comunidad de juego?"
+            label="¿Se permiten emparejamientos de la misma comunidad de juego?"
           >
             <v-radio label="SI" value="true"></v-radio>
             <v-radio label="NO" value="false"></v-radio>
           </v-radio-group>
 
-          <!-- <v-checkbox
-            v-model="luzVsOscCheck"
+          <v-radio-group
+            v-model="goodVsEvilCheckString"
             label="¿Se permite luz vs oscuridad?"
-          ></v-checkbox> -->
-
-          <!-- <v-checkbox
-            v-model="esEloCheck"
-            label="¿Quieres que tus partidas cuenten para el ELO?"
-          ></v-checkbox> -->
+          >
+            <v-radio label="SI" value="true"></v-radio>
+            <v-radio label="NO" value="false"></v-radio>
+          </v-radio-group>
 
           <v-radio-group
             v-if="isImpares"
@@ -182,7 +180,8 @@ watch(
 
 const mismaComunidadCheck = ref<boolean>(false);
 const mismaComunidadCheckString = ref<string>("SI");
-const luzVsOscCheck = ref<boolean>(false);
+const goodVsEvilCheck = ref<boolean>(false);
+const goodVsEvilCheckString = ref<string>("SI");
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
 const opcionImpares = ref<string | null>(null);
@@ -318,9 +317,12 @@ const confirmarConfiguracion = async () => {
     mismaComunidadCheck.value = true;
   else mismaComunidadCheck.value = false;
 
+  if (goodVsEvilCheckString.value === "SI") goodVsEvilCheck.value = true;
+  else goodVsEvilCheck.value = false;
+
   const configuracion: GenerarRonda = {
     mismaComunidadCheck: mismaComunidadCheck.value,
-    luzVsOscCheck: luzVsOscCheck.value,
+    luzVsOscCheck: goodVsEvilCheck.value,
     retosCheck: retosCheck.value,
     emparejamientos: emparejamientos.value,
     esEloCheck: esEloCheck.value,
