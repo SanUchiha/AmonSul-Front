@@ -14,7 +14,7 @@
         <v-list-item link to="/torneos" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-calendar-text</v-icon>
-            <v-list-item-title>Calendario Torneos</v-list-item-title>
+            <v-list-item-title>Calendario</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/jugadores" v-if="isAuthenticated">
@@ -31,20 +31,20 @@
         </v-list-item>
         <v-list-item link to="/gestion-torneos" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
-            <v-icon>mdi mdi-cogs</v-icon>
+            <v-icon>mdi-tune-vertical-variant</v-icon>
             <v-list-item-title>Gestión Torneos</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link to="/resultados-torneos" v-if="isAuthenticated">
+          <v-list-item-content class="d-flex ga-2">
+            <v-icon>mdi-chart-bar</v-icon>
+            <v-list-item-title>Resultados</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/perfil-usuario" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-cog</v-icon>
             <v-list-item-title>Perfil</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link to="/resultados-torneos" v-if="isAuthenticated">
-          <v-list-item-content class="d-flex ga-2">
-            <v-icon>mdi-cog</v-icon>
-            <v-list-item-title>Resultados Torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
