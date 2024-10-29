@@ -162,9 +162,10 @@ const handleVerLista = async (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
   idLista.value = inscripcionData.value?.idLista;
 
-  if (inscripcionData.value?.listaData) hasLista.value = true;
+  if (inscripcionData.value?.bando) hasLista.value = true;
   await verLista();
 };
+
 const verLista = async () => {
   showVerListaModal.value = true;
 };

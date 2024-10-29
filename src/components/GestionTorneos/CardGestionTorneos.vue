@@ -10,7 +10,6 @@
               variant="outlined"
               size="large"
               class="login-form__button"
-              :disabled="isDisabled"
               @click="handlerCrearTorneo"
             >
               Crear torneo
@@ -37,10 +36,10 @@ import { ref } from "vue";
 const modalCreacionTorneos = ref<boolean>(false);
 
 const isLoading = ref(false);
-const isDisabled = ref(true);
 
 const handlerCrearTorneo = () => {
   modalCreacionTorneos.value = true;
+  alert("No esta disponible está funcionalidad.");
 };
 </script>
 

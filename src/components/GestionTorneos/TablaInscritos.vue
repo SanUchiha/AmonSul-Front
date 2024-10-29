@@ -1,4 +1,6 @@
 <template>
+  <!-- Tabla inscritos -->
+
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
       Inscritos
@@ -6,7 +8,7 @@
       <v-text-field
         v-model="search"
         density="compact"
-        label="Search"
+        label="Buscar"
         prepend-inner-icon="mdi-magnify"
         variant="solo-filled"
         flat

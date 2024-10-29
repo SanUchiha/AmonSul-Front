@@ -8,17 +8,18 @@
       <v-text-field
         v-model="search"
         density="compact"
-        label="Search"
+        label="Buscar"
         prepend-inner-icon="mdi-magnify"
         variant="solo-filled"
         flat
         hide-details
         single-line
+        class="search-field"
       ></v-text-field>
     </v-card-title>
 
     <v-divider></v-divider>
-    <v-divider></v-divider>
+
     <v-data-table
       v-model:search="search"
       :items="items"
@@ -28,17 +29,22 @@
       item-key="idTorneo"
     >
       <template v-slot:item="{ item }">
-        <tr>
+        <tr class="table-row">
           <td>{{ item.nombreTorneo }}</td>
-          <td>
-            <v-btn @click="viewDetails(item.idTorneo)" icon="mdi-eye"> </v-btn>
+          <td class="action-buttons">
             <v-btn
-              :disabled="isDisabled"
+              @click="viewDetails(item.idTorneo)"
+              icon="mdi-eye"
+              color="primary"
+              elevation="2"
+            >
+            </v-btn>
+            <v-btn
               @click="deleteTournament(item.idTorneo)"
               color="error"
               icon="mdi-close"
-            >
-            </v-btn>
+              elevation="2"
+            ></v-btn>
           </td>
         </tr>
       </template>
@@ -66,7 +72,6 @@ const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const search = ref<string>("");
 const items = ref<TorneoPropioDTO[]>([]);
 const isLoading = ref<boolean>(true);
-const isDisabled = ref(true);
 
 const router = useRouter();
 
@@ -80,6 +85,7 @@ const deleteTournament = async (idTorneo: number) => {
   try {
     //await deleteTorneo(idTorneo);
     items.value = items.value.filter((item) => item.idTorneo !== idTorneo);
+    alert("No está disponible está funcionalidad.");
   } catch (error) {
     console.error("Error deleting tournament:", error);
   }
@@ -88,14 +94,12 @@ const deleteTournament = async (idTorneo: number) => {
 onMounted(async () => {
   try {
     isLoading.value = true;
-
-    items.value = [];
-
-    const responseTorneosCreados = await getTorneosCreadosUsuario(
-      idUsuarioLogger.value!
-    );
-
-    items.value = responseTorneosCreados.data;
+    if (idUsuarioLogger.value != null) {
+      const responseTorneosCreados = await getTorneosCreadosUsuario(
+        idUsuarioLogger.value
+      );
+      items.value = responseTorneosCreados.data;
+    }
   } catch (error) {
     console.error("Error recuperando torneos creados por el usuario:", error);
   } finally {
@@ -105,12 +109,35 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.custom-table {
-  text-align: left;
-  background-color: rgb(55, 59, 59);
+.title-bar {
+  background-color: #2e3b55;
+  color: white;
+  padding: 8px;
+  font-size: 18px;
+  font-weight: bold;
 }
 
-.clickable-row {
-  cursor: pointer;
+.search-field {
+  max-width: 200px;
+  background-color: #f0f0f0;
+}
+
+.custom-table {
+  text-align: left;
+  background-color: #373b3b;
+}
+
+.table-row:hover {
+  background-color: #525e75;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.action-buttons v-btn {
+  border-radius: 50%;
 }
 </style>

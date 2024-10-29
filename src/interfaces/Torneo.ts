@@ -49,10 +49,11 @@ export interface TorneoCreadoDTO {
 
 export interface InscripcionTorneoCreadoDTO {
   idInscripcion: number;
-  idUsuario?: number | null;
+  idUsuario: number;
+  idTorneo: number;
   nick?: string | null;
   fechaInscripcion?: string | null;
-  listaData?: string | null;
+  bando?: "evil" | "good" | null;
   estadoLista?: string | null;
   fechaEntrega?: string | null;
   esPago?: string | null;

@@ -288,8 +288,6 @@ const handlerNuevaPartida = async () => {
       esElo: esElo.value ?? false,
     };
 
-    console.log(nuevaPartida);
-
     try {
       await registrarPartida(nuevaPartida);
       showSuccessModal.value = true;

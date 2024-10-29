@@ -23,6 +23,8 @@
         <strong>Listas legales: :</strong>
         {{ listasLegales }}/{{ totalInscripciones }}
       </p>
+      <p><strong>Listas de luz:</strong> {{ listasLuz }}</p>
+      <p><strong>Listas de oscuridad:</strong> {{ listasOscuridad }}</p>
     </v-card-text>
   </v-card>
 </template>
@@ -40,6 +42,16 @@ const plazasRestantes = computed(() => {
   return (
     props.torneo.torneo.limiteParticipantes! - props.torneo.inscripciones.length
   );
+});
+
+const listasLuz = computed(() => {
+  if (!props.torneo) return 0;
+  return props.torneo.inscripciones.filter((i) => i.bando === "good").length;
+});
+
+const listasOscuridad = computed(() => {
+  if (!props.torneo) return 0;
+  return props.torneo.inscripciones.filter((i) => i.bando === "evil").length;
 });
 
 const totalInscripciones = computed(() => {

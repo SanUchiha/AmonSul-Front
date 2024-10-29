@@ -122,8 +122,6 @@ onMounted(async () => {
     if (!usuarios.value.length) {
       await usuariosStore.requestUsuarios();
     }
-
-    console.log("eloclis", eloClasificacion.value);
   } catch (err) {
     console.error("Error al obtener datos del usuario:", error.value);
   } finally {

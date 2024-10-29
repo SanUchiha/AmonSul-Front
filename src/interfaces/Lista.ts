@@ -4,7 +4,7 @@ export interface CrearListaTorneoRequestDTO {
   idInscripcion: number;
   idUsuario: number;
   idTorneo: number;
-  idOrganizador: number;
+  idOrganizador?: number;
   listaData: string;
   ejercito: ArmyDTO;
 }
@@ -15,11 +15,11 @@ export interface RequesListaDTO {
 }
 
 export interface ModificarListaTorneoRequestDTO {
-  idInscripcion: number;
+  idInscripcion?: number;
   idLista: number;
-  idUsuario: number;
-  idTorneo: number;
-  idOrganizador: number;
+  idUsuario?: number;
+  idTorneo?: number;
+  idOrganizador?: number;
   listaData: string;
   ejercito: ArmyDTO;
 }
