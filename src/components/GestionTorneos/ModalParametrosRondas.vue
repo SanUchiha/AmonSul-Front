@@ -23,6 +23,14 @@
           ></v-checkbox> -->
 
           <v-radio-group
+            v-model="goodVsEvilCheckString"
+            label="¿Se permite luz vs oscuridad?"
+          >
+            <v-radio label="SI" value="true"></v-radio>
+            <v-radio label="NO" value="false"></v-radio>
+          </v-radio-group>
+
+          <v-radio-group
             inline
             v-model="esRepetirRivalCheck"
             label="¿Se puede repetir rival?"
@@ -196,7 +204,8 @@ watch(
 );
 
 const mismaComunidadCheck = ref<boolean>(false);
-const luzVsOscCheck = ref<boolean>(false);
+const goodVsEvilCheck = ref<boolean>(false);
+const goodVsEvilCheckString = ref<string>("SI");
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
 const esRepetirRivalCheck = ref<string>("SI");
@@ -492,74 +501,160 @@ const confirmarConfiguracion = async () => {
     return;
   }
 
-  //Si no se puede repetir el rival
-  if (esRepetirRivalCheck.value == "NO") {
-    const response = await getPartidasTorneoByRonda(
-      props.torneo.torneo.idTorneo,
-      numeroRonda.value - 1
-    );
-    const rondaAnterior = response.data;
+  if (goodVsEvilCheckString.value === "SI") goodVsEvilCheck.value = true;
+  else goodVsEvilCheck.value = false;
 
-    errorRonda.value = null;
+  // TODO: good vs evil
 
-    const emparejamientosGenerados: Emparejamiento[] =
-      generarEmparejamientosSinRepetir(props.clasificacion, rondaAnterior);
+  // Guerra civil
+  if (!goodVsEvilCheck.value) {
+    // TODO
 
-    const configuracion: GenerarRonda = {
-      mismaComunidadCheck: mismaComunidadCheck.value,
-      luzVsOscCheck: luzVsOscCheck.value,
-      retosCheck: retosCheck.value,
-      emparejamientos: emparejamientosGenerados,
-      esEloCheck: esEloCheck.value,
-      opcionImpares: opcionImpares.value,
-      idTorneo: props.torneo?.torneo.idTorneo,
-      idRonda: numeroRonda.value,
-    };
+    //Si no se puede repetir el rival
+    if (esRepetirRivalCheck.value == "NO") {
+      const response = await getPartidasTorneoByRonda(
+        props.torneo.torneo.idTorneo,
+        numeroRonda.value - 1
+      );
+      const rondaAnterior = response.data;
 
-    try {
-      isGenerating.value = true;
-      await generarRonda(configuracion);
-      showSuccessModal.value = true;
-    } catch (error) {
-      showErrorModal.value = true;
-      console.error(error);
-    } finally {
-      isGenerating.value = false;
+      errorRonda.value = null;
+
+      const emparejamientosGenerados: Emparejamiento[] =
+        generarEmparejamientosSinRepetir(props.clasificacion, rondaAnterior);
+
+      const configuracion: GenerarRonda = {
+        mismaComunidadCheck: mismaComunidadCheck.value,
+        luzVsOscCheck: goodVsEvilCheck.value,
+        retosCheck: retosCheck.value,
+        emparejamientos: emparejamientosGenerados,
+        esEloCheck: esEloCheck.value,
+        opcionImpares: opcionImpares.value,
+        idTorneo: props.torneo?.torneo.idTorneo,
+        idRonda: numeroRonda.value,
+      };
+
+      try {
+        isGenerating.value = true;
+        await generarRonda(configuracion);
+        showSuccessModal.value = true;
+      } catch (error) {
+        showErrorModal.value = true;
+        console.error(error);
+      } finally {
+        isGenerating.value = false;
+      }
+
+      emit("confirm", configuracion);
+      closeModal();
     }
+    //Si se puede repetir rival
+    else {
+      errorRonda.value = null;
 
-    emit("confirm", configuracion);
-    closeModal();
+      const emparejamientosGenerados: Emparejamiento[] = generarEmparejamientos(
+        props.clasificacion
+      );
+
+      const configuracion: GenerarRonda = {
+        mismaComunidadCheck: mismaComunidadCheck.value,
+        luzVsOscCheck: goodVsEvilCheck.value,
+        retosCheck: retosCheck.value,
+        emparejamientos: emparejamientosGenerados,
+        esEloCheck: esEloCheck.value,
+        opcionImpares: opcionImpares.value,
+        idTorneo: props.torneo?.torneo.idTorneo,
+        idRonda: numeroRonda.value,
+      };
+
+      try {
+        isGenerating.value = true;
+        await generarRonda(configuracion);
+        showSuccessModal.value = true;
+      } catch (error) {
+        showErrorModal.value = true;
+        console.error(error);
+      } finally {
+        isGenerating.value = false;
+      }
+
+      emit("confirm", configuracion);
+      closeModal();
+    }
   } else {
-    errorRonda.value = null;
+    // TODO: luz vs oscuridad
 
-    const emparejamientosGenerados: Emparejamiento[] = generarEmparejamientos(
-      props.clasificacion
-    );
+    //Si no se puede repetir el rival
+    if (esRepetirRivalCheck.value == "NO") {
+      const response = await getPartidasTorneoByRonda(
+        props.torneo.torneo.idTorneo,
+        numeroRonda.value - 1
+      );
+      const rondaAnterior = response.data;
 
-    const configuracion: GenerarRonda = {
-      mismaComunidadCheck: mismaComunidadCheck.value,
-      luzVsOscCheck: luzVsOscCheck.value,
-      retosCheck: retosCheck.value,
-      emparejamientos: emparejamientosGenerados,
-      esEloCheck: esEloCheck.value,
-      opcionImpares: opcionImpares.value,
-      idTorneo: props.torneo?.torneo.idTorneo,
-      idRonda: numeroRonda.value,
-    };
+      errorRonda.value = null;
 
-    try {
-      isGenerating.value = true;
-      await generarRonda(configuracion);
-      showSuccessModal.value = true;
-    } catch (error) {
-      showErrorModal.value = true;
-      console.error(error);
-    } finally {
-      isGenerating.value = false;
+      const emparejamientosGenerados: Emparejamiento[] =
+        generarEmparejamientosSinRepetir(props.clasificacion, rondaAnterior);
+
+      const configuracion: GenerarRonda = {
+        mismaComunidadCheck: mismaComunidadCheck.value,
+        luzVsOscCheck: goodVsEvilCheck.value,
+        retosCheck: retosCheck.value,
+        emparejamientos: emparejamientosGenerados,
+        esEloCheck: esEloCheck.value,
+        opcionImpares: opcionImpares.value,
+        idTorneo: props.torneo?.torneo.idTorneo,
+        idRonda: numeroRonda.value,
+      };
+
+      try {
+        isGenerating.value = true;
+        await generarRonda(configuracion);
+        showSuccessModal.value = true;
+      } catch (error) {
+        showErrorModal.value = true;
+        console.error(error);
+      } finally {
+        isGenerating.value = false;
+      }
+
+      emit("confirm", configuracion);
+      closeModal();
     }
+    //Si se puede repetir rival
+    else {
+      errorRonda.value = null;
 
-    emit("confirm", configuracion);
-    closeModal();
+      const emparejamientosGenerados: Emparejamiento[] = generarEmparejamientos(
+        props.clasificacion
+      );
+
+      const configuracion: GenerarRonda = {
+        mismaComunidadCheck: mismaComunidadCheck.value,
+        luzVsOscCheck: goodVsEvilCheck.value,
+        retosCheck: retosCheck.value,
+        emparejamientos: emparejamientosGenerados,
+        esEloCheck: esEloCheck.value,
+        opcionImpares: opcionImpares.value,
+        idTorneo: props.torneo?.torneo.idTorneo,
+        idRonda: numeroRonda.value,
+      };
+
+      try {
+        isGenerating.value = true;
+        await generarRonda(configuracion);
+        showSuccessModal.value = true;
+      } catch (error) {
+        showErrorModal.value = true;
+        console.error(error);
+      } finally {
+        isGenerating.value = false;
+      }
+
+      emit("confirm", configuracion);
+      closeModal();
+    }
   }
 };
 </script>
