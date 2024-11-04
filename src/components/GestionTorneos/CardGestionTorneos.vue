@@ -28,18 +28,68 @@
       </v-card>
     </v-col>
   </v-row>
+
+  <!-- Modal generar siguiente ronda -->
+  <ModalCrearTorneo
+    :isVisible="showModalCreateTournament"
+    :idUsuario="parseInt(idUsuarioLogger!)"
+    @close="closeConfigModal"
+    @confirm="handleConfigConfirm"
+  />
+
+  <!-- Modal success guardar resultados -->
+  <ModalSuccess
+    :isVisible="showSuccessModal"
+    message="Torneo creado correctamente."
+    @update:isVisible="showSuccessModal = $event"
+  />
+
+  <!-- Modal error guardar resultados -->
+  <ModalError
+    :isVisible="showErrorModal"
+    message="No se crear el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    @update:isVisible="showErrorModal = $event"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import ModalCrearTorneo from "./ModalCrearTorneo.vue";
+import { useAuth } from "@/composables/useAuth";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import ModalError from "../Commons/ModalError.vue";
 
-const modalCreacionTorneos = ref<boolean>(false);
+const { getidUsuario } = useAuth();
+const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 
+const showModalCreateTournament = ref<boolean>(false);
+const showErrorModal = ref<boolean>(false);
+const showSuccessModal = ref<boolean>(false);
 const isLoading = ref(false);
 
 const handlerCrearTorneo = () => {
-  modalCreacionTorneos.value = true;
-  alert("No esta disponible está funcionalidad.");
+  showModalCreateTournament.value = true;
+};
+const closeConfigModal = () => {
+  showModalCreateTournament.value = false;
+};
+
+const handleConfigConfirm = () => {
+  closeConfigModal();
+};
+
+// Watch para detectar cuando se cierra el modal de éxito
+watch(
+  () => showSuccessModal.value,
+  (newValue, oldValue) => {
+    if (oldValue && !newValue) {
+      recargarPagina();
+    }
+  }
+);
+
+const recargarPagina = () => {
+  window.location.reload();
 };
 </script>
 
