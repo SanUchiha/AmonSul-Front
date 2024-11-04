@@ -1,4 +1,4 @@
-import { Resultado } from "@/interfaces/Torneo";
+import { CrearTorneoDTO, Resultado } from "@/interfaces/Torneo";
 import { http } from "./index";
 
 export const getTorneos = async () => {
@@ -34,4 +34,8 @@ export const getPartidasTorneoByRonda = async (
 
 export const guardarResultados = async (resultados: Resultado[]) => {
   return http.post(`Ganador`, resultados);
+};
+
+export const crearTorneo = async (torneoData: CrearTorneoDTO) => {
+  return http.post(`Torneo`, torneoData);
 };

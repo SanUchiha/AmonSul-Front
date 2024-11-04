@@ -85,7 +85,7 @@ export interface CrearTorneoDTO {
   esMatchedPlayTorneo: boolean;
   fechaEntregaListas: string; // formato de fecha "YYYY-MM-DD"
   fechaFinInscripcion: string; // formato de fecha "YYYY-MM-DD"
-  basesTorneo?: string; // puede ser una URL o texto descriptivo
+  basesTorneo?: string;
   cartelTorneo?: string; //  base64
   metodosPago?: string;
   horaInicioTorneo: string; // formato de hora "HH:mm:ss"
