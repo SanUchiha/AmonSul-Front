@@ -17,7 +17,7 @@
 
           <v-radio-group
             v-model="goodVsEvilCheckString"
-            label="¿Se permite luz vs oscuridad?"
+            label="¿Prevalece luz vs oscuridad?"
           >
             <v-radio label="SI" value="true"></v-radio>
             <v-radio label="NO" value="false"></v-radio>
@@ -313,11 +313,11 @@ const confirmarConfiguracion = async () => {
   }
 
   errorRonda.value = null;
-  if (mismaComunidadCheckString.value === "SI")
+  if (mismaComunidadCheckString.value === "true")
     mismaComunidadCheck.value = true;
   else mismaComunidadCheck.value = false;
 
-  if (goodVsEvilCheckString.value === "SI") goodVsEvilCheck.value = true;
+  if (goodVsEvilCheckString.value === "true") goodVsEvilCheck.value = true;
   else goodVsEvilCheck.value = false;
 
   const configuracion: GenerarRonda = {
