@@ -383,7 +383,12 @@ const confirmarConfiguracion = async () => {
   }
 
   const basesTorneoBase64 = byteArrayBases.value
-    ? btoa(String.fromCharCode(...byteArrayBases.value))
+    ? btoa(
+        new Uint8Array(byteArrayBases.value).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ""
+        )
+      )
     : null;
 
   const nuevoTorneo: CrearTorneoDTO = {
