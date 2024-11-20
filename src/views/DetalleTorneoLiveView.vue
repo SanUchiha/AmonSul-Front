@@ -390,7 +390,7 @@
                         <tr>
                           <th class="text-center">Posición</th>
                           <th class="text-center">Jugador</th>
-                          <th class="text-center">Victorias</th>
+                          <th class="text-center">Puntos</th>
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
@@ -431,7 +431,7 @@
                         <tr>
                           <th class="text-center">Posición</th>
                           <th class="text-center">Jugador</th>
-                          <th class="text-center">Victorias</th>
+                          <th class="text-center">Puntos</th>
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
@@ -473,17 +473,21 @@
                         <tr>
                           <th class="text-center">Posición</th>
                           <th class="text-center">Jugador</th>
-                          <th class="text-center">Victorias</th>
-                          <th class="text-center">Puntos a favor</th>
-                          <th class="text-center">Puntos en contra</th>
-                          <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">Líder</th>
+                          <th class="text-center">P</th>
+                          <th class="text-center">PV</th>
+                          <th class="text-center">PD</th>
+                          <th class="text-center">+-</th>
+                          <th class="tect-center">L</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr
                           v-for="(jugador, index) in clasificacion"
                           :key="jugador.nick"
+                          :class="{
+                            'good-bando': jugador.bando === 'good',
+                            'evil-bando': jugador.bando === 'evil',
+                          }"
                         >
                           <td>{{ index + 1 }}</td>
                           <td>{{ jugador.nick }}</td>
@@ -569,6 +573,7 @@ import { Torneo } from "@/interfaces/Torneo";
 import { getlistaTorneo } from "@/services/ListasService";
 import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
 import { getPartidasTorneo, getTorneo } from "@/services/TorneosService";
+import { appsettings } from "@/settings/appsettings";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -657,7 +662,7 @@ onMounted(async () => {
   }
 });
 
-const calcularClasificacion = () => {
+const calcularClasificacion = async () => {
   const ranking: Record<
     number,
     {
@@ -863,6 +868,38 @@ const calcularClasificacion = () => {
   clasificacionZona2.value = clasificacion.value.filter((jugador) =>
     jugadoresZona2.value.some((z) => z.idUsuario === jugador.idUsuario)
   );
+
+  type JugadorConEjercito = {
+    nick: string;
+    ejercito: string | null;
+  };
+
+  const jugadoresConEjercitos = partidas.value.reduce<JugadorConEjercito[]>(
+    (acc, partida) => {
+      acc.push({ nick: partida.nick1, ejercito: partida.ejercitoUsuario1 });
+      acc.push({ nick: partida.nick2, ejercito: partida.ejercitoUsuario2 });
+      return acc;
+    },
+    []
+  );
+
+  const listaEjercitos = appsettings.armies;
+
+  const ejercitosJugadoresConBando = jugadoresConEjercitos.map((jugador) => {
+    const ejercito = listaEjercitos.find((e) => e.name === jugador.ejercito);
+    return {
+      nick: jugador.nick,
+      ejercito: jugador.ejercito,
+      bando: ejercito ? ejercito.band : "desconocido",
+    };
+  });
+
+  clasificacion.value = clasificacion.value.map((j) => {
+    const bando = ejercitosJugadoresConBando.find(
+      (e) => e.nick === j.nick
+    )?.bando;
+    return { ...j, bando }; // Devuelve el objeto original más el atributo bando
+  });
 };
 
 const dividirClasificacionEnZonas = () => {
@@ -1051,5 +1088,13 @@ const formatDate = (date: string | null | undefined) => {
 .underlined-title {
   text-decoration: underline; /* Subrayar el título MESA X */
   font-weight: bold;
+}
+
+.good-bando {
+  background-color: #57a86a; /* Verde claro */
+}
+
+.evil-bando {
+  background-color: #ce4b56; /* Rojo claro */
 }
 </style>

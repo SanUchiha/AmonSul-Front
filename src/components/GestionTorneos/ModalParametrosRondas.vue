@@ -23,17 +23,18 @@
           ></v-checkbox> -->
 
           <v-radio-group
+            inline
             v-model="goodVsEvilCheckString"
-            label="¿Se permite luz vs oscuridad?"
+            label="¿Prevalece luz vs oscuridad?"
           >
-            <v-radio label="SI" value="true"></v-radio>
-            <v-radio label="NO" value="false"></v-radio>
+            <v-radio label="SI" value="SI"></v-radio>
+            <v-radio label="NO" value="NO"></v-radio>
           </v-radio-group>
 
           <v-radio-group
             inline
             v-model="esRepetirRivalCheck"
-            label="¿Se puede repetir rival?"
+            label="¿Se puede repetir rival de la ronda anterior?"
           >
             <v-radio label="SI" value="SI"></v-radio>
             <v-radio label="NO" value="NO"></v-radio>
@@ -205,7 +206,7 @@ watch(
 
 const mismaComunidadCheck = ref<boolean>(false);
 const goodVsEvilCheck = ref<boolean>(false);
-const goodVsEvilCheckString = ref<string>("SI");
+const goodVsEvilCheckString = ref<string>("NO");
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
 const esRepetirRivalCheck = ref<string>("SI");
@@ -397,6 +398,94 @@ const generarEmparejamientos = (
   return emparejamientos;
 };
 
+const generarEmparejamientosLuzVsOscuridad = (
+  clasificacion: Clasificacion[]
+): Emparejamiento[] => {
+  const emparejamientos: Emparejamiento[] = [];
+
+  // Si es por zonas Hardcode domadores
+  if (props.torneo?.torneo.idTorneo == 7 && props.ronda > 2) {
+    dividirClasificacionEnZonas();
+    const zona1 = clasificacionZona1.value;
+    const zona2 = clasificacionZona2.value;
+
+    // Emparejar a los jugadores de zona 1
+    const jugadoresZona1 = props.clasificacion.filter((jugador) =>
+      zona1.some((z) => z.idUsuario === jugador.idUsuario)
+    );
+
+    for (let i = 0; i < jugadoresZona1.length; i += 2) {
+      if (i + 1 < jugadoresZona1.length) {
+        const jugador1 = jugadoresZona1[i];
+        const jugador2 = jugadoresZona1[i + 1];
+
+        emparejamientos.push({
+          jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
+          jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
+        });
+      }
+    }
+
+    // Emparejar a los jugadores de zona 2
+    const jugadoresZona2 = props.clasificacion.filter((jugador) =>
+      zona2.some((z) => z.idUsuario === jugador.idUsuario)
+    );
+
+    for (let i = 0; i < jugadoresZona2.length; i += 2) {
+      if (i + 1 < jugadoresZona2.length) {
+        const jugador1 = jugadoresZona2[i];
+        const jugador2 = jugadoresZona2[i + 1];
+
+        emparejamientos.push({
+          jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
+          jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
+        });
+      }
+    }
+  } else {
+    // Emparejar en formato suizo luz vs osc
+    var clasificacionLuz: Clasificacion[] = [];
+    var clasificacionOsc: Clasificacion[] = [];
+
+    clasificacion.forEach((element) => {
+      if (element.bando == "evil") clasificacionOsc.push(element);
+      else clasificacionLuz.push(element);
+    });
+
+    do {
+      const jugador1 = clasificacionLuz[0];
+      const jugador2 = clasificacionOsc[0];
+      emparejamientos.push({
+        jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
+        jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
+      });
+
+      clasificacionLuz.shift();
+      clasificacionOsc.shift();
+
+      clasificacion = clasificacion.filter(
+        (element) =>
+          element.idUsuario !== jugador1.idUsuario &&
+          element.idUsuario !== jugador2.idUsuario
+      );
+    } while (clasificacionLuz.length > 0 && clasificacionOsc.length > 0);
+
+    do {
+      const jugador1 = clasificacion[0];
+      const jugador2 = clasificacion[1];
+      emparejamientos.push({
+        jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
+        jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
+      });
+
+      clasificacion.shift();
+      clasificacion.shift();
+    } while (clasificacion.length > 1);
+  }
+
+  return emparejamientos;
+};
+
 const generarEmparejamientosSinRepetir = (
   clasificacion: Clasificacion[],
   rondaAnterior: PartidaTorneoDTO[]
@@ -450,6 +539,116 @@ const generarEmparejamientosSinRepetir = (
   return emparejamientos;
 };
 
+const generarEmparejamientosSinRepetirLuzVsOsc = (
+  clasificacion: Clasificacion[],
+  rondaAnterior: PartidaTorneoDTO[]
+): Emparejamiento[] => {
+  let emparejamientos: Emparejamiento[] = [];
+
+  // Emparejar en formato suizo luz vs osc
+  var clasificacionLuz: Clasificacion[] = [];
+  var clasificacionOsc: Clasificacion[] = [];
+
+  clasificacion.forEach((element) => {
+    if (element.bando == "evil") clasificacionOsc.push(element);
+    else clasificacionLuz.push(element);
+  });
+
+  const emparejamientosPrevios = new Set<string>();
+
+  rondaAnterior.forEach((partida) => {
+    const emparejamiento1 = `${partida.idUsuario1}-${partida.idUsuario2}`;
+    const emparejamiento2 = `${partida.idUsuario2}-${partida.idUsuario1}`;
+    emparejamientosPrevios.add(emparejamiento1);
+    emparejamientosPrevios.add(emparejamiento2);
+  });
+
+  const yaEmparejados = new Set<number>();
+
+  // Hardcode para domadores2
+  if (props.torneo?.torneo.idTorneo == 7 && props.ronda > 2) {
+    dividirClasificacionEnZonas();
+    const zona1 = clasificacionZona1.value;
+    const zona2 = clasificacionZona2.value;
+
+    const jugadoresZona1 = props.clasificacion.filter((jugador) =>
+      zona1.some((z) => z.idUsuario === jugador.idUsuario)
+    );
+    emparejarSinRepetir(
+      jugadoresZona1,
+      emparejamientos,
+      emparejamientosPrevios,
+      yaEmparejados
+    );
+
+    const jugadoresZona2 = props.clasificacion.filter((jugador) =>
+      zona2.some((z) => z.idUsuario === jugador.idUsuario)
+    );
+    emparejarSinRepetir(
+      jugadoresZona2,
+      emparejamientos,
+      emparejamientosPrevios,
+      yaEmparejados
+    );
+  }
+  // Para todos los demas torneos
+  else {
+    do {
+      const jugador1 = clasificacionLuz[0];
+      const jugador2 = clasificacionOsc[0];
+      emparejamientos.push({
+        jugador1: {
+          idUsuario: jugador1.idUsuario,
+          nick: jugador1.nick,
+          bando: jugador1.bando,
+        },
+        jugador2: {
+          idUsuario: jugador2.idUsuario,
+          nick: jugador2.nick,
+          bando: jugador2.bando,
+        },
+      });
+
+      clasificacionLuz.shift();
+      clasificacionOsc.shift();
+
+      clasificacion = clasificacion.filter(
+        (element) =>
+          element.idUsuario !== jugador1.idUsuario &&
+          element.idUsuario !== jugador2.idUsuario
+      );
+    } while (clasificacionLuz.length > 0 && clasificacionOsc.length > 0);
+
+    do {
+      const jugador1 = clasificacion[0];
+      const jugador2 = clasificacion[1];
+      emparejamientos.push({
+        jugador1: {
+          idUsuario: jugador1.idUsuario,
+          nick: jugador1.nick,
+          bando: jugador1.bando,
+        },
+        jugador2: {
+          idUsuario: jugador2.idUsuario,
+          nick: jugador2.nick,
+          bando: jugador2.bando,
+        },
+      });
+
+      clasificacion.shift();
+      clasificacion.shift();
+    } while (clasificacion.length > 1);
+
+    emparejamientos = emparejarSinRepetirLuzVsOscuridad(
+      emparejamientos,
+      emparejamientosPrevios,
+      yaEmparejados
+    );
+  }
+
+  return emparejamientos;
+};
+
 const emparejarSinRepetir = (
   jugadores: Clasificacion[],
   emparejamientos: Emparejamiento[],
@@ -490,6 +689,62 @@ const emparejarSinRepetir = (
   }
 };
 
+const emparejarSinRepetirLuzVsOscuridad = (
+  emparejamientos: Emparejamiento[],
+  emparejamientosPrevios: Set<string>,
+  yaEmparejados: Set<number>
+) => {
+  const nuevosEmparejamientos: Emparejamiento[] = [];
+
+  emparejamientos.forEach((emparejamiento) => {
+    const jugador1Id = emparejamiento.jugador1.idUsuario;
+    const jugador2Id = emparejamiento.jugador2.idUsuario;
+
+    // Generar el identificador único de este emparejamiento
+    const emparejamientoId = `${jugador1Id}-${jugador2Id}`;
+    const emparejamientoReversoId = `${jugador2Id}-${jugador1Id}`;
+
+    // Verificar si este emparejamiento ya ocurrió o si los jugadores están emparejados
+    if (
+      emparejamientosPrevios.has(emparejamientoId) ||
+      emparejamientosPrevios.has(emparejamientoReversoId) ||
+      yaEmparejados.has(jugador1Id) ||
+      yaEmparejados.has(jugador2Id)
+    ) {
+      // Intentar encontrar un nuevo jugador del bando contrario
+      const nuevoJugador = emparejamientos.find((nuevo) => {
+        const nuevoJugadorId = nuevo.jugador2.idUsuario;
+        return (
+          nuevo.jugador2.bando !== emparejamiento.jugador1.bando &&
+          !yaEmparejados.has(nuevoJugadorId) &&
+          nuevoJugadorId !== jugador1Id &&
+          !emparejamientosPrevios.has(`${jugador1Id}-${nuevoJugadorId}`) &&
+          !emparejamientosPrevios.has(`${nuevoJugadorId}-${jugador1Id}`)
+        );
+      });
+
+      if (nuevoJugador) {
+        // Emparejar con el nuevo jugador
+        nuevosEmparejamientos.push({
+          jugador1: emparejamiento.jugador1,
+          jugador2: nuevoJugador.jugador2,
+        });
+
+        // Marcar jugadores como emparejados
+        yaEmparejados.add(jugador1Id);
+        yaEmparejados.add(nuevoJugador.jugador2.idUsuario);
+      }
+    } else {
+      // Emparejamiento válido, agregarlo
+      nuevosEmparejamientos.push(emparejamiento);
+      yaEmparejados.add(jugador1Id);
+      yaEmparejados.add(jugador2Id);
+    }
+  });
+
+  return nuevosEmparejamientos;
+};
+
 const confirmarConfiguracion = async () => {
   numeroRonda.value = props.ronda;
   if (!numeroRonda.value) {
@@ -504,12 +759,8 @@ const confirmarConfiguracion = async () => {
   if (goodVsEvilCheckString.value === "SI") goodVsEvilCheck.value = true;
   else goodVsEvilCheck.value = false;
 
-  // TODO: good vs evil
-
   // Guerra civil
   if (!goodVsEvilCheck.value) {
-    // TODO
-
     //Si no se puede repetir el rival
     if (esRepetirRivalCheck.value == "NO") {
       const response = await getPartidasTorneoByRonda(
@@ -581,9 +832,9 @@ const confirmarConfiguracion = async () => {
       emit("confirm", configuracion);
       closeModal();
     }
-  } else {
-    // TODO: luz vs oscuridad
-
+  }
+  // luz vs oscuridad
+  else {
     //Si no se puede repetir el rival
     if (esRepetirRivalCheck.value == "NO") {
       const response = await getPartidasTorneoByRonda(
@@ -595,7 +846,10 @@ const confirmarConfiguracion = async () => {
       errorRonda.value = null;
 
       const emparejamientosGenerados: Emparejamiento[] =
-        generarEmparejamientosSinRepetir(props.clasificacion, rondaAnterior);
+        generarEmparejamientosSinRepetirLuzVsOsc(
+          props.clasificacion,
+          rondaAnterior
+        );
 
       const configuracion: GenerarRonda = {
         mismaComunidadCheck: mismaComunidadCheck.value,
@@ -626,9 +880,8 @@ const confirmarConfiguracion = async () => {
     else {
       errorRonda.value = null;
 
-      const emparejamientosGenerados: Emparejamiento[] = generarEmparejamientos(
-        props.clasificacion
-      );
+      const emparejamientosGenerados: Emparejamiento[] =
+        generarEmparejamientosLuzVsOscuridad(props.clasificacion);
 
       const configuracion: GenerarRonda = {
         mismaComunidadCheck: mismaComunidadCheck.value,

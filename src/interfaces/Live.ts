@@ -17,6 +17,7 @@ export interface Emparejamiento {
 export interface JugadorParaEmparejamiento {
   idUsuario: number;
   nick: string;
+  bando?: string;
 }
 
 export interface UpdatePartidaTorneoDTO {
@@ -48,6 +49,7 @@ export interface Clasificacion {
   diferenciaPuntos: number;
   lider: number;
   idUsuario: number;
+  bando?: string;
 }
 
 export interface RequestUpdatePairingTorneoDTO {

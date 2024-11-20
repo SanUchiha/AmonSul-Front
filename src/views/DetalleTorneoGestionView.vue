@@ -368,7 +368,7 @@
                         <tr>
                           <th class="text-center">Posición</th>
                           <th class="text-center">Jugador</th>
-                          <th class="text-center">Victorias</th>
+                          <th class="text-center">Puntos</th>
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
@@ -409,7 +409,7 @@
                         <tr>
                           <th class="text-center">Posición</th>
                           <th class="text-center">Jugador</th>
-                          <th class="text-center">Victorias</th>
+                          <th class="text-center">Puntos</th>
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
@@ -451,7 +451,7 @@
                         <tr>
                           <th class="text-center">Posición</th>
                           <th class="text-center">Jugador</th>
-                          <th class="text-center">Victorias</th>
+                          <th class="text-center">Puntos</th>
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
@@ -462,6 +462,10 @@
                         <tr
                           v-for="(jugador, index) in clasificacion"
                           :key="jugador.nick"
+                          :class="{
+                            'good-bando': jugador.bando === 'good',
+                            'evil-bando': jugador.bando === 'evil',
+                          }"
                         >
                           <td>{{ index + 1 }}</td>
                           <td>{{ jugador.nick }}</td>
@@ -644,10 +648,11 @@ import ModalError from "@/components/Commons/ModalError.vue";
 import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPartidaGestion.vue";
 import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.vue";
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
+import { appsettings } from "@/settings/appsettings";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
-const partidas = ref<PartidaTorneoDTO[]>();
+const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
 const activeTab = ref<number>(2);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
@@ -1127,6 +1132,38 @@ const calcularClasificacion = () => {
   clasificacionZona2.value = clasificacion.value.filter((jugador) =>
     jugadoresZona2.value.some((z) => z.idUsuario === jugador.idUsuario)
   );
+
+  type JugadorConEjercito = {
+    nick: string;
+    ejercito: string | null;
+  };
+
+  const jugadoresConEjercitos = partidas.value.reduce<JugadorConEjercito[]>(
+    (acc, partida) => {
+      acc.push({ nick: partida.nick1, ejercito: partida.ejercitoUsuario1 });
+      acc.push({ nick: partida.nick2, ejercito: partida.ejercitoUsuario2 });
+      return acc;
+    },
+    []
+  );
+
+  const listaEjercitos = appsettings.armies;
+
+  const ejercitosJugadoresConBando = jugadoresConEjercitos.map((jugador) => {
+    const ejercito = listaEjercitos.find((e) => e.name === jugador.ejercito);
+    return {
+      nick: jugador.nick,
+      ejercito: jugador.ejercito,
+      bando: ejercito ? ejercito.band : "desconocido",
+    };
+  });
+
+  clasificacion.value = clasificacion.value.map((j) => {
+    const bando = ejercitosJugadoresConBando.find(
+      (e) => e.nick === j.nick
+    )?.bando;
+    return { ...j, bando }; // Devuelve el objeto original más el atributo bando
+  });
 };
 
 const dividirClasificacionEnZonas = () => {
@@ -1406,5 +1443,13 @@ const formatDate = (date: string | null | undefined) => {
   justify-content: center;
   align-items: center;
   margin: auto;
+}
+
+.good-bando {
+  background-color: #57a86a; /* Verde claro */
+}
+
+.evil-bando {
+  background-color: #ce4b56; /* Rojo claro */
 }
 </style>

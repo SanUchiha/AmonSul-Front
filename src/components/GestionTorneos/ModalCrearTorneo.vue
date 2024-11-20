@@ -347,7 +347,6 @@ const onFileChange = (event: Event) => {
         byteArrayBases.value = new Uint8Array(arrayBuffer);
       }
     };
-    console.log(byteArrayBases.value);
 
     reader.readAsArrayBuffer(file);
   }
@@ -416,7 +415,6 @@ const confirmarConfiguracion = async () => {
   };
   try {
     isGenerating.value = true;
-    console.log("nuevo torneo", nuevoTorneo);
     await crearTorneo(nuevoTorneo);
 
     showSuccessModal.value = true;
