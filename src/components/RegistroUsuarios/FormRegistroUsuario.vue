@@ -136,14 +136,23 @@
       </v-col>
     </v-row>
 
-    <ErrorNick
-      :isVisible="dialogNick"
-      @update:isVisible="dialogNick = $event"
+    <!-- Modal error guardar resultados -->
+    <ModalError
+      :isVisible="showErrorModal"
+      message="Al menos un dato no es correcto. Revisa todos los campos."
+      @update:isVisible="showErrorModal = $event"
     />
+
     <ErrorEmail
       :isVisible="dialogEmail"
-      @update:isVisible="dialogEmail = $event"
+      @update:isVisible="handleOkClick = $event"
     />
+
+    <ErrorNick
+      :isVisible="dialogNick"
+      @update:isVisible="handleOkClick = $event"
+    />
+
     <ResponseNuevoUsuario
       :isVisible="dialogOk"
       @update:isVisible="handleOkClick = $event"
@@ -191,14 +200,15 @@
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { NewUserDTO } from "@/interfaces/Usuario";
-import { AxiosError } from "axios";
-import ErrorNick from "../RegistroUsuarios/ErrorNick.vue";
-import ErrorEmail from "../RegistroUsuarios/ErrorEmail.vue";
+import axios, { AxiosError } from "axios";
 import ResponseNuevoUsuario from "../RegistroUsuarios/ResponseNuevoUsuario.vue";
 import { getFacciones, registrarFaccion } from "@/services/FaccionesService";
 import ModalMessageError from "../Commons/ModalMessageError.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import { FaccionDTO } from "@/interfaces/Faccion";
+import ModalError from "../Commons/ModalError.vue";
+import ErrorEmail from "./ErrorEmail.vue";
+import ErrorNick from "./ErrorNick.vue";
 
 const usuariosStore = useUsuariosStore();
 
@@ -212,18 +222,20 @@ const nick = ref("");
 const ciudad = ref("");
 const fechaNacimiento = ref("");
 const router = useRouter();
-const dialogNick = ref(false);
-const dialogEmail = ref(false);
+const dialogNick = ref<boolean>(false);
+const dialogEmail = ref<boolean>(false);
 const dialogOk = ref(false);
 const dialogDuplicado = ref(false);
 const dialogAddFaccion = ref(false);
-const loading = ref(false);
+const loading = ref<boolean>(false);
 const telefono = ref("");
 const listaFacciones = ref<FaccionDTO[]>([]);
 const nombreFacciones = ref<string[]>([]);
 const faccionSelected = ref<string>("");
 const nuevaFaccion = ref<string>("");
 const idFaccionSelected = ref<number>();
+
+const showErrorModal = ref<boolean>(false);
 
 const formatFecha = (fechaString: string) => {
   const fecha = new Date(fechaString);
@@ -270,7 +282,7 @@ const loadFacciones = async () => {
     const response = await getFacciones();
     listaFacciones.value = response.data;
     nombreFacciones.value = listaFacciones.value
-      .map((f: { nombreFaccion: any }) => f.nombreFaccion)
+      .map((f: { nombreFaccion: string }) => f.nombreFaccion)
       .sort();
   } catch (error) {
     console.error("Error al obtener las facciones:", error);
@@ -290,8 +302,7 @@ const addFaccion = async () => {
     //Controlar que no duplique
     if (
       listaFacciones.value.find(
-        (f) =>
-          f.nombreFaccion.toUpperCase() === nuevaFaccion.value.toUpperCase()
+        (f) => f.nombreFaccion.toUpperCase() == nuevaFaccion.value.toUpperCase()
       )
     )
       dialogDuplicado.value = true;
@@ -338,13 +349,11 @@ const handlerNewUser = async () => {
   dialogOk.value = false;
   loading.value = true;
 
-  if (faccionSelected.value.length > 1) {
-    for (let index = 0; index < listaFacciones.value.length; index++) {
-      const element = listaFacciones.value[index];
-      if (faccionSelected.value === element.nombreFaccion) {
-        idFaccionSelected.value = element.idFaccion;
-      }
-    }
+  const selectedFaccion = listaFacciones.value.find(
+    (f) => f.nombreFaccion === faccionSelected.value
+  );
+  if (selectedFaccion) {
+    idFaccionSelected.value = selectedFaccion.idFaccion;
   }
 
   const newUserDTO: NewUserDTO = {
@@ -356,23 +365,23 @@ const handlerNewUser = async () => {
     Rol: "JUGADOR",
     Nick: nick.value,
     Ciudad: ciudad.value,
-    idFaccion: idFaccionSelected.value!,
+    idFaccion: idFaccionSelected.value,
     FechaNacimiento: formatFecha(fechaNacimiento.value),
     Telefono: telefono.value,
   };
   try {
     await usuariosStore.postUser(newUserDTO);
     dialogOk.value = true;
-  } catch (error: any) {
-    if (error.isAxiosError) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response) {
-        const responseData: any = axiosError.response.data;
-        if (responseData.detail === "El correo electrónico ya está en uso.")
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (axiosError.response?.data?.message) {
+        const message = axiosError.response.data.message;
+        if (message === "El correo electrónico ya está en uso.") {
           dialogEmail.value = true;
-        else dialogNick.value = true;
-      } else if (axiosError.request) {
-        router.push({ name: "error" });
+        } else if (message === "El nick ya está en uso.") {
+          dialogNick.value = true;
+        }
       } else {
         router.push({ name: "error" });
       }
@@ -386,6 +395,8 @@ const handlerNewUser = async () => {
 
 const handleOkClick = () => {
   dialogOk.value = false;
+  dialogEmail.value = false;
+  dialogNick.value = false;
 };
 </script>
 
