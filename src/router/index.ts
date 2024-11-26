@@ -16,6 +16,8 @@ import GestionTorneosView from "@/views/GestionTorneosView.vue";
 import DetalleTorneoGestionView from "@/views/DetalleTorneoGestionView.vue";
 import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
 import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
+import MisPartidasView from "@/views/MisPartidasView.vue";
+import MisTorneosView from "@/views/MisTorneosView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -88,6 +90,19 @@ const routes: Array<RouteRecordRaw> = [
     path: "/dashboard",
     name: "dashboard",
     component: DashboardView,
+    meta: { requiresAuth: true },
+  },
+
+  {
+    path: "/mis-Partidas",
+    name: "mis-Partidas",
+    component: MisPartidasView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/mis-torneos",
+    name: "mis-torneos",
+    component: MisTorneosView,
     meta: { requiresAuth: true },
   },
   {
