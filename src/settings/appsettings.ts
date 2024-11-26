@@ -101,6 +101,7 @@ export const appsettings = {
     { name: "Serpent Horde", band: "evil" },
     { name: "Sharkey's Rogues", band: "evil" },
     { name: "The Black Riders", band: "evil" },
+    { name: "The Easterlings", band: "evil" },
     { name: "The Trolls", band: "evil" },
     { name: "Uglúk’s Scouts", band: "evil" },
     { name: "Variags of Khand", band: "evil" },
