@@ -17,7 +17,7 @@
               @click="handlerOk"
               class="mx-auto"
             >
-              Di amigo y entra
+              Melon
             </v-btn>
           </template>
         </v-card>
@@ -51,7 +51,7 @@ watch(
 const handlerOk = () => {
   emits("update:isVisible", false);
   internalVisible.value = false;
-  router.push({ name: "dashboard" });
+  router.push({ name: "mis-Partidas" });
 };
 
 const handleEscapeKey = (event: KeyboardEvent) => {
