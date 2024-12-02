@@ -1,8 +1,5 @@
 <template>
-  <div v-if="isLoading" class="center">
-    <LoadingGandalf />
-  </div>
-  <v-card v-else class="jugador-card">
+  <v-card class="jugador-card">
     <v-card-title class="title">
       <div class="title">
         <h3 @click="goToDetalle">
@@ -73,7 +70,6 @@
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { computed, defineProps } from "vue";
 import { useRouter } from "vue-router";
-import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const props = defineProps<{ usuario: UsuarioDataDTO }>();
 const router = useRouter();
