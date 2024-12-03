@@ -38,7 +38,6 @@ onMounted(async () => {
     try {
       isLoading.value = true;
       const response = await getInscripcionesUser(idUsuarioLogger.value);
-      console.log(response.data);
       inscripciones.value = response.data;
     } catch (error) {
       console.error(

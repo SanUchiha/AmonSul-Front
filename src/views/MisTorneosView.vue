@@ -30,13 +30,11 @@
 
       <v-divider class="my-3"></v-divider>
 
-      <v-divider class="my-3"></v-divider>
-
       <!-- partidas validades -->
       <div v-if="!isLoadingMatches && matches.length > 0">
         <ValidadasMatchCard
           v-for="match in matches"
-          :key="match.idPartidaAmistosa"
+          :key="match.idPartidaTorneo"
           :idUsuario="parseInt(idUsuarioLogger!)"
           :match="match"
           class="mb-4"
@@ -59,7 +57,7 @@ import CardInscripcionesUsuarioTorneo from "@/components/PartidasTorneo/CardInsc
 import CardTitleMisTorneos from "@/components/PartidasTorneo/CardTitleMisTorneos.vue";
 import { useAuth } from "@/composables/useAuth";
 import { FaccionDTO } from "@/interfaces/Faccion";
-import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
+import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
@@ -71,7 +69,7 @@ const { getidUsuario, getUser } = useAuth();
 const router = useRouter();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const emailOwner = ref<string | null>(getUser.value);
-const matches = ref<ViewPartidaAmistosaDTO[]>([]);
+const matches = ref<ViewPartidaTorneoDTO[]>([]);
 const isLoadingMatches = ref<boolean>(false);
 const faccionDTO = ref<FaccionDTO>({
   idFaccion: 0,
@@ -121,7 +119,7 @@ const initializeComponent = async () => {
   }
 };
 
-const loadResume = async (matches: ViewPartidaAmistosaDTO[]) => {
+const loadResume = async (matches: ViewPartidaTorneoDTO[]) => {
   usuarioData.value.numeroPartidasJugadas = matches.length;
 
   let contadorGanadas = 0;
@@ -129,11 +127,11 @@ const loadResume = async (matches: ViewPartidaAmistosaDTO[]) => {
   let contadorPerdidas = 0;
 
   matches.forEach((element) => {
-    if (element.ganadorPartida == parseInt(idUsuarioLogger.value!))
+    if (element.ganadorPartidaTorneo == parseInt(idUsuarioLogger.value!))
       contadorGanadas++;
     else if (
-      element.ganadorPartida != parseInt(idUsuarioLogger.value!) &&
-      element.ganadorPartida != null
+      element.ganadorPartidaTorneo != parseInt(idUsuarioLogger.value!) &&
+      element.ganadorPartidaTorneo != null
     )
       contadorPerdidas++;
     else contadorEmpatadas++;

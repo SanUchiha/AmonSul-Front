@@ -164,7 +164,6 @@ const emit = defineEmits(["partidaValidada"]);
 
 onMounted(async () => {
   isLoading.value = true;
-  console.log("entra");
 
   try {
     nickJugadorUno.value = props.match.nickUsuario1;
