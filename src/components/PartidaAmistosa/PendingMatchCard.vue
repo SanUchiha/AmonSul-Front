@@ -37,7 +37,7 @@
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions class="d-flex align-center justify-center mt-4">
-        <v-row>
+        <v-row justify="center" class="my-4 ga-5">
           <v-col class="text-center">
             <div v-if="!IsValidadaOwner">
               <v-btn
@@ -45,7 +45,6 @@
                 variant="outlined"
                 color="green darken-1"
                 @click="validarPartida"
-                class="mx-auto"
               >
                 <v-icon left>mdi-check</v-icon>
                 Validar
@@ -56,7 +55,6 @@
                 variant="outlined"
                 color="red darken-1"
                 @click="cancelPartida"
-                class="mx-auto mt-2"
               >
                 <v-icon left>mdi-close</v-icon>
                 Cancelar
@@ -138,7 +136,7 @@ import { useUsuariosStore } from "@/store/usuarios";
 import ModalDetallePartida from "./ModalDetallePartida.vue";
 
 const usuariosStore = useUsuariosStore();
-const isLoading = ref(true);
+const isLoading = ref(false);
 const { getUser } = useAuth();
 const nickJugadorUno = ref<string | unknown>("");
 const nickJugadorDos = ref<string | unknown>("");
@@ -166,20 +164,12 @@ const emit = defineEmits(["partidaValidada"]);
 
 onMounted(async () => {
   isLoading.value = true;
+  console.log("entra");
 
   try {
-    if (!usuario.value.idUsuario) {
-      await usuariosStore.requestUsuario(emailUsuario.value);
-    }
-    const [nick1, nick2, fecha] = await Promise.all([
-      usuariosStore.requestNickById(props.match.idUsuario1),
-      usuariosStore.requestNickById(props.match.idUsuario2),
-      formatFechaSpa(props.match.fechaPartida),
-    ]);
-
-    nickJugadorUno.value = nick1;
-    nickJugadorDos.value = nick2;
-    fechaFormateada.value = fecha;
+    nickJugadorUno.value = props.match.nickUsuario1;
+    nickJugadorDos.value = props.match.nickUsuario2;
+    fechaFormateada.value = await formatFechaSpa(props.match.fechaPartida);
 
     controlValidacionesPartidas();
   } catch (err) {
@@ -261,6 +251,28 @@ const controlValidacionesPartidas = () => {
   ) {
     IsValidadaRival.value = true;
   }
+};
+
+watch(
+  () => showSuccessValidarModal.value,
+  (newValue, oldValue) => {
+    if (oldValue && !newValue) {
+      recargarPagina();
+    }
+  }
+);
+
+watch(
+  () => showSuccessCancelarModal.value,
+  (newValue, oldValue) => {
+    if (oldValue && !newValue) {
+      recargarPagina();
+    }
+  }
+);
+
+const recargarPagina = () => {
+  window.location.reload();
 };
 </script>
 

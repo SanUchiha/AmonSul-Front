@@ -278,7 +278,7 @@ watch(
   () => showSuccessModal.value,
   (newValue) => {
     if (!newValue) {
-      router.push({ name: "dashboard", params: { tab: "three" } });
+      router.push({ name: "mis-torneos", params: { tab: "three" } });
     }
   }
 );

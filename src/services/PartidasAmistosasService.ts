@@ -4,6 +4,10 @@ import {
 } from "@/interfaces/Partidas";
 import { http } from "./index";
 
+export const getPartidasAmistosasByIdUser = async (idUser: number) => {
+  return http.get(`PartidaAmistosa/Partidas/${idUser}`);
+};
+
 export const getById = async (idPartida: string) => {
   return http.get(`PartidaAmistosa/Partida/${idPartida}`);
 };

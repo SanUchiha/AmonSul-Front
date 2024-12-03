@@ -2,7 +2,6 @@ import ContactoView from "@/views/ContactoView.vue";
 import DetalleJugadorView from "@/views/DetalleJugadorView.vue";
 import DetalleTorneoView from "@/views/DetalleTorneoView.vue";
 import InicioSesionView from "@/views/InicioSesionView.vue";
-import DashboardView from "@/views/DashboardView.vue";
 import JugadoresView from "@/views/JugadoresView.vue";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
 import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
@@ -16,6 +15,8 @@ import GestionTorneosView from "@/views/GestionTorneosView.vue";
 import DetalleTorneoGestionView from "@/views/DetalleTorneoGestionView.vue";
 import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
 import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
+import MisPartidasView from "@/views/MisPartidasView.vue";
+import MisTorneosView from "@/views/MisTorneosView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -85,9 +86,15 @@ const routes: Array<RouteRecordRaw> = [
     component: RegistroUsuarioView,
   },
   {
-    path: "/dashboard",
-    name: "dashboard",
-    component: DashboardView,
+    path: "/mis-partidas",
+    name: "mis-partidas",
+    component: MisPartidasView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/mis-torneos",
+    name: "mis-torneos",
+    component: MisTorneosView,
     meta: { requiresAuth: true },
   },
   {

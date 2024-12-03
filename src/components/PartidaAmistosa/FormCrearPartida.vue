@@ -103,21 +103,20 @@
               ></v-text-field>
               <v-row justify="center" class="my-4">
                 <v-btn
-                  variant="outlined"
+                  class="mr-4"
+                  variant="tonal"
                   color="blue darken-1"
                   @click="validateForm"
-                  class="mr-4"
                 >
                   Registrar
                 </v-btn>
                 <v-btn
-                  variant="outlined"
-                  color="blue darken-1"
-                  to="dashboard"
-                  :disabled="isLoading"
                   class="mr-4"
+                  variant="tonal"
+                  color="blue darken-1"
+                  :disabled="isLoading"
                 >
-                  Volver
+                  Cancelar
                 </v-btn>
               </v-row>
               <v-row justify="center" v-if="isLoading" class="mt-3">
@@ -303,7 +302,7 @@ watch(
   [showSuccessModal, showErrorModal],
   ([newShowSuccessModal, newShowErrorModal]) => {
     if (!newShowSuccessModal && !newShowErrorModal) {
-      router.push("dashboard");
+      router.push("mis-partidas");
     }
   }
 );

@@ -796,8 +796,8 @@ const confirmarConfiguracion = async () => {
         isGenerating.value = false;
       }
 
-      emit("confirm", configuracion);
-      closeModal();
+      //emit("confirm", configuracion);
+      //closeModal();
     }
     //Si se puede repetir rival
     else {
