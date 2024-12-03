@@ -32,7 +32,7 @@
 
       <!-- partidas validades -->
       <div v-if="!isLoadingMatches && matches.length > 0">
-        <ValidadasMatchCard
+        <CardPartidaTorneo
           v-for="match in matches"
           :key="match.idPartidaTorneo"
           :idUsuario="parseInt(idUsuarioLogger!)"
@@ -51,8 +51,8 @@
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
+import CardPartidaTorneo from "@/components/PartidaAmistosa/CardPartidaTorneo.vue";
 import CardResumenPartidas from "@/components/PartidaAmistosa/CardResumenPartidas.vue";
-import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import CardInscripcionesUsuarioTorneo from "@/components/PartidasTorneo/CardInscripcionesUsuarioTorneo.vue";
 import CardTitleMisTorneos from "@/components/PartidasTorneo/CardTitleMisTorneos.vue";
 import { useAuth } from "@/composables/useAuth";

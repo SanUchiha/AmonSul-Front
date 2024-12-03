@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { defineProps, ref, onMounted, computed } from "vue";
-import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
+import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
 import ModalDetallePartida from "@/components/PartidaAmistosa/ModalDetallePartida.vue";
@@ -41,7 +41,7 @@ const resultado = ref<string>("");
 const fechaPartidaFormateada = ref<string>("");
 
 const props = defineProps<{
-  match: ViewPartidaAmistosaDTO;
+  match: ViewPartidaTorneoDTO;
   idUsuario: number;
 }>();
 
@@ -65,7 +65,7 @@ const initializeComponent = async () => {
 const setResultado = () => {
   if (props.match.ganadorPartidaNick == null) {
     resultado.value = "Empate";
-  } else if (props.match.ganadorPartida == props.idUsuario) {
+  } else if (props.match.ganadorPartidaTorneo == props.idUsuario) {
     resultado.value = "Victoria";
   } else {
     resultado.value = "Derrota";
