@@ -1,5 +1,7 @@
 <template>
   <v-container class="text-center">
+    <!-- Modal aviso -->
+    <ModalAviso />
     <div v-if="isLoading">
       <LoadingGandalf />
     </div>
@@ -65,6 +67,7 @@
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import ModalAviso from "@/components/Commons/ModalAviso.vue";
 import CardResumenPartidas from "@/components/PartidaAmistosa/CardResumenPartidas.vue";
 import CardTitleMisPartidas from "@/components/PartidaAmistosa/CardTitleMisPartidas.vue";
 import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
@@ -110,6 +113,7 @@ const usuarioData = ref<UsuarioDataDTO>({
   PartidasTorneo: [],
   ClasificacionTorneos: [],
 });
+const showModalAviso = ref<boolean>(true);
 
 const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
@@ -166,7 +170,6 @@ const loadResume = async (matches: ViewPartidaAmistosaDTO[]) => {
   usuarioData.value.partidasPerdidas = contadorPerdidas;
 };
 
-///TODO: Modal
 const handleFormCreateMatch = () => {
   router.push({ name: "registrar-partida" });
 };
