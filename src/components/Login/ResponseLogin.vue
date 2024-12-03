@@ -17,7 +17,7 @@
               @click="handlerOk"
               class="mx-auto"
             >
-              Melon
+              Mellon
             </v-btn>
           </template>
         </v-card>
