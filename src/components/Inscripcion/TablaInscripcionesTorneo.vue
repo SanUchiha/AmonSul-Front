@@ -23,8 +23,8 @@
     <v-table :loading="isLoading">
       <thead>
         <tr>
-          <th class="text-center">Nombre torneo</th>
-          <th class="text-center">Inscripción</th>
+          <th class="text-center">Torneo</th>
+          <th class="text-center"></th>
         </tr>
       </thead>
       <tbody>

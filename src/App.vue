@@ -5,12 +5,6 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <v-list>
-        <v-list-item link to="/dashboard" v-if="isAuthenticated">
-          <v-list-item-content class="d-flex ga-2">
-            <v-icon>mdi-view-dashboard</v-icon>
-            <v-list-item-title>Dashboard</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
         <v-list-item link to="/mis-partidas" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-view-dashboard</v-icon>

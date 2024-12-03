@@ -51,7 +51,7 @@ watch(
 const handlerOk = () => {
   emits("update:isVisible", false);
   internalVisible.value = false;
-  router.push({ name: "mis-Partidas" });
+  router.push({ name: "mis-partidas" });
 };
 
 const handleEscapeKey = (event: KeyboardEvent) => {

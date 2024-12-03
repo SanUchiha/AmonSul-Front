@@ -2,7 +2,6 @@ import ContactoView from "@/views/ContactoView.vue";
 import DetalleJugadorView from "@/views/DetalleJugadorView.vue";
 import DetalleTorneoView from "@/views/DetalleTorneoView.vue";
 import InicioSesionView from "@/views/InicioSesionView.vue";
-import DashboardView from "@/views/DashboardView.vue";
 import JugadoresView from "@/views/JugadoresView.vue";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
 import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
@@ -87,15 +86,8 @@ const routes: Array<RouteRecordRaw> = [
     component: RegistroUsuarioView,
   },
   {
-    path: "/dashboard",
-    name: "dashboard",
-    component: DashboardView,
-    meta: { requiresAuth: true },
-  },
-
-  {
-    path: "/mis-Partidas",
-    name: "mis-Partidas",
+    path: "/mis-partidas",
+    name: "mis-partidas",
     component: MisPartidasView,
     meta: { requiresAuth: true },
   },

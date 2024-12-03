@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading" class="center">
-    <!-- <LoadingGandalf /> -->
+    <ProgressCircular />
   </div>
   <div v-else-if="value.length > 1" class="center">
     <v-card class="mx-auto text-center">
@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
 import { getEloUsuario } from "@/services/EloService";
+import ProgressCircular from "../Commons/ProgressCircular.vue";
 
 const props = defineProps<{ email: string }>();
 
@@ -55,7 +56,7 @@ const width = ref<number>(2);
 const radius = ref<number>(10);
 const padding = ref<number>(8);
 const lineCap = ref<string>("round");
-const gradient = ref<string>(gradients.value[5]);
+const gradient = ref<string[]>(gradients.value[5]);
 const gradientDirection = ref<string>("top");
 const fill = ref<boolean>(false);
 const type = ref<string>("trend");

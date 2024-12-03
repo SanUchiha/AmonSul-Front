@@ -4,6 +4,10 @@
       <LoadingGandalf />
     </div>
     <div v-else>
+      <!-- Titulo -->
+      <CardTitleMisPartidas />
+      <v-spacer class="my-4"></v-spacer>
+
       <!-- Resumen partidas -->
       <v-row justify="center">
         <v-col cols="12" md="12">
@@ -60,7 +64,9 @@
 </template>
 
 <script setup lang="ts">
+import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import CardResumenPartidas from "@/components/PartidaAmistosa/CardResumenPartidas.vue";
+import CardTitleMisPartidas from "@/components/PartidaAmistosa/CardTitleMisPartidas.vue";
 import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import { useAuth } from "@/composables/useAuth";
