@@ -7,13 +7,13 @@
       <v-list>
         <v-list-item link to="/mis-partidas" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
-            <v-icon>mdi-view-dashboard</v-icon>
+            <v-icon>mdi-dice-multiple</v-icon>
             <v-list-item-title>Mis partidas</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/mis-torneos" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
-            <v-icon>mdi-view-dashboard</v-icon>
+            <v-icon>mdi-sword-cross</v-icon>
             <v-list-item-title>Mis torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
