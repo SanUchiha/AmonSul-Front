@@ -12,8 +12,9 @@
           </v-card-text>
           <template v-slot:actions>
             <v-btn
+              ref="mellonButton"
               color="blue darken-1"
-              variant="outlined"
+              variant="tonal"
               @click="handlerOk"
               class="mx-auto"
             >
@@ -27,7 +28,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineProps, defineEmits, onUnmounted } from "vue";
+import {
+  ref,
+  watch,
+  defineProps,
+  defineEmits,
+  onMounted,
+  onUnmounted,
+} from "vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps({
@@ -39,12 +47,22 @@ const props = defineProps({
 
 const emits = defineEmits(["update:isVisible"]);
 const internalVisible = ref(props.isVisible);
+const mellonButton = ref<HTMLButtonElement | null>(null);
 const router = useRouter();
 
 watch(
   () => props.isVisible,
   (newVal) => {
     internalVisible.value = newVal;
+
+    // Enfocar el botón cuando se hace visible el modal
+    if (newVal) {
+      setTimeout(() => {
+        if (mellonButton.value?.el) {
+          mellonButton.value.$el.focus();
+        }
+      }, 0);
+    }
   }
 );
 
@@ -54,14 +72,25 @@ const handlerOk = () => {
   router.push({ name: "mis-partidas" });
 };
 
-const handleEscapeKey = (event: KeyboardEvent) => {
-  if (event.key === "Escape") {
-    internalVisible.value = false;
-    emits("update:isVisible", false);
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === "Enter") {
+    handlerOk(); // Ejecutar el handler del botón "Mellon"
   }
 };
+
+onMounted(() => {
+  window.addEventListener("keydown", handleKeyDown); // Escuchar el evento de teclado
+  if (internalVisible.value) {
+    setTimeout(() => {
+      if (mellonButton.value?.$el) {
+        mellonButton.value.$el.focus();
+      }
+    }, 0); // Enfocar el botón al cargar
+  }
+});
+
 onUnmounted(() => {
-  window.removeEventListener("keydown", handleEscapeKey);
+  window.removeEventListener("keydown", handleKeyDown); // Limpiar el evento al desmontar
 });
 </script>
 

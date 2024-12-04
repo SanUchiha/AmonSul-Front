@@ -22,6 +22,7 @@
                 type="password"
                 required
                 class="my-4"
+                @keydown.enter="handleLogin"
               ></v-text-field>
 
               <v-row justify="center" class="my-4 ga-5">
