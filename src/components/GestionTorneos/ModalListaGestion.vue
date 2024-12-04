@@ -128,7 +128,7 @@ const onImageSelected = async (event: Event) => {
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
           // Convertir el canvas a base64
-          imageBase64.value = canvas.toDataURL("image/jpeg", 0.5); // Ajusta la calidad de 0 a 1
+          imageBase64.value = canvas.toDataURL("image/jpeg", 0.7); // Ajusta la calidad de 0 a 1
         }
       };
       img.src = e.target?.result as string;
