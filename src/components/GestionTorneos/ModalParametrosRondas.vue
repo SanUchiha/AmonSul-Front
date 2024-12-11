@@ -619,25 +619,27 @@ const generarEmparejamientosSinRepetirLuzVsOsc = (
       );
     } while (clasificacionLuz.length > 0 && clasificacionOsc.length > 0);
 
-    do {
-      const jugador1 = clasificacion[0];
-      const jugador2 = clasificacion[1];
-      emparejamientos.push({
-        jugador1: {
-          idUsuario: jugador1.idUsuario,
-          nick: jugador1.nick,
-          bando: jugador1.bando,
-        },
-        jugador2: {
-          idUsuario: jugador2.idUsuario,
-          nick: jugador2.nick,
-          bando: jugador2.bando,
-        },
-      });
+    if (clasificacion.length > 1) {
+      do {
+        const jugador1 = clasificacion[0];
+        const jugador2 = clasificacion[1];
+        emparejamientos.push({
+          jugador1: {
+            idUsuario: jugador1.idUsuario,
+            nick: jugador1.nick,
+            bando: jugador1.bando,
+          },
+          jugador2: {
+            idUsuario: jugador2.idUsuario,
+            nick: jugador2.nick,
+            bando: jugador2.bando,
+          },
+        });
 
-      clasificacion.shift();
-      clasificacion.shift();
-    } while (clasificacion.length > 1);
+        clasificacion.shift();
+        clasificacion.shift();
+      } while (clasificacion.length > 1);
+    }
 
     emparejamientos = emparejarSinRepetirLuzVsOscuridad(
       emparejamientos,
@@ -836,11 +838,13 @@ const confirmarConfiguracion = async () => {
   // luz vs oscuridad
   else {
     //Si no se puede repetir el rival
+
     if (esRepetirRivalCheck.value == "NO") {
       const response = await getPartidasTorneoByRonda(
         props.torneo.torneo.idTorneo,
         numeroRonda.value - 1
       );
+
       const rondaAnterior = response.data;
 
       errorRonda.value = null;
