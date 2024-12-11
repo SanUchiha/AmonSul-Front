@@ -470,17 +470,19 @@ const generarEmparejamientosLuzVsOscuridad = (
       );
     } while (clasificacionLuz.length > 0 && clasificacionOsc.length > 0);
 
-    do {
-      const jugador1 = clasificacion[0];
-      const jugador2 = clasificacion[1];
-      emparejamientos.push({
-        jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
-        jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
-      });
+    if (clasificacion.length > 1) {
+      do {
+        const jugador1 = clasificacion[0];
+        const jugador2 = clasificacion[1];
+        emparejamientos.push({
+          jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
+          jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
+        });
 
-      clasificacion.shift();
-      clasificacion.shift();
-    } while (clasificacion.length > 1);
+        clasificacion.shift();
+        clasificacion.shift();
+      } while (clasificacion.length > 1);
+    }
   }
 
   return emparejamientos;
