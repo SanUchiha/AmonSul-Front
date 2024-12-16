@@ -91,3 +91,27 @@ export interface CrearTorneoDTO {
   horaInicioTorneo: string; // formato de hora "HH:mm:ss"
   horaFinTorneo: string; // formato de hora "HH:mm:ss"
 }
+
+export interface ModificarTorneoDTO {
+  nombreTorneo: string;
+  descripcionTorneo?: string;
+  limiteParticipantes: number;
+  fechaInicioTorneo: string; // formato de fecha "YYYY-MM-DD"
+  fechaFinTorneo: string; // formato de fecha "YYYY-MM-DD"
+  precioTorneo: number;
+  numeroPartidas: number;
+  puntosTorneo: number;
+  estadoTorneo: number;
+  lugarTorneo: string;
+  tipoTorneo: string;
+  esLiga: boolean;
+  idRangoTorneo: number;
+  esMatchedPlayTorneo: boolean;
+  fechaEntregaListas: string; // formato de fecha "YYYY-MM-DD"
+  fechaFinInscripcion: string; // formato de fecha "YYYY-MM-DD"
+  basesTorneo?: string;
+  cartelTorneo?: string; //  base64
+  metodosPago?: string;
+  horaInicioTorneo: string; // formato de hora "HH:mm:ss"
+  horaFinTorneo: string; // formato de hora "HH:mm:ss"
+}
