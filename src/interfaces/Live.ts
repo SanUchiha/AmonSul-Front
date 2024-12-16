@@ -41,6 +41,13 @@ export interface UpdatePairingTorneoDTO {
   nick2: string;
 }
 
+export interface AddPairingTorneoDTO {
+  idTorneo: number;
+  idRonda: number;
+  idUsuario1?: number | { idUsuario: number };
+  idUsuario2?: number | { idUsuario: number };
+}
+
 export interface Clasificacion {
   nick: string;
   victorias: number;
@@ -56,4 +63,11 @@ export interface RequestUpdatePairingTorneoDTO {
   idPartidaTorneo: number;
   idUsuario1?: number;
   idUsuario2?: number;
+}
+
+export interface RequestAddPairingTorneoDTO {
+  idTorneo: number;
+  idUsuario1?: number;
+  idUsuario2?: number;
+  idRonda: number;
 }

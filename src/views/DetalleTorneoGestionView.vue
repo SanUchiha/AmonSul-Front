@@ -42,17 +42,49 @@
                 class="ma-3 text-green-500"
               >
                 Todas las partidas están validadas
+                <div>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        <div class="flex-column align-items-center">
+                          <v-btn
+                            class="mt-2"
+                            variant="tonal"
+                            color="secondary"
+                            @click="agregarPairing(activeTab)"
+                          >
+                            Añadir partida
+                          </v-btn>
+                        </div>
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </div>
                 <div v-if="ultimaRonda != activeTab" class="mt-3">
-                  <!-- boton para genenar el siguiente emparejamiento -->
-                  <v-btn
-                    class="mt-2"
-                    variant="tonal"
-                    color="primary"
-                    size="small"
-                    @click="generarSiguienteRonda(activeTab + 1)"
+                  <div
+                    v-if="partidasPorRonda[activeTab + 1] != undefined"
+                    class="mt-3"
                   >
-                    Generar siguiente ronda
-                  </v-btn>
+                    La ronda {{ activeTab + 1 }} ya se ha generado
+                  </div>
+                  <div v-else>
+                    <v-list-item>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          <div class="flex-column align-items-center">
+                            <v-btn
+                              class="mt-2"
+                              variant="tonal"
+                              color="primary"
+                              @click="generarSiguienteRonda(activeTab + 1)"
+                            >
+                              Generar siguiente ronda
+                            </v-btn>
+                          </div>
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </div>
                 </div>
                 <div v-else class="mt-3">
                   <!-- boton para cerrar el torneo -->
@@ -77,10 +109,46 @@
                   "
                 >
                   Esperando ronda...
+                  <div>
+                    <v-list-item>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          <div class="flex-column align-items-center">
+                            <v-btn
+                              class="mt-2"
+                              variant="tonal"
+                              color="secondary"
+                              @click="agregarPairing(activeTab)"
+                            >
+                              Añadir partida
+                            </v-btn>
+                          </div>
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </div>
                 </div>
                 <div v-else>
                   <div v-if="partidasPorRonda[activeTab]" class="text-red-500">
                     Faltan partidas por validar
+                    <div>
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title>
+                            <div class="flex-column align-items-center">
+                              <v-btn
+                                class="mt-2"
+                                variant="tonal"
+                                color="secondary"
+                                @click="agregarPairing(activeTab)"
+                              >
+                                Añadir partida
+                              </v-btn>
+                            </div>
+                          </v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -308,9 +376,7 @@
                         <v-list-item>
                           <v-list-item-content>
                             <v-list-item-title>
-                              <div
-                                class="d-flex flex-wrap justify-space-between"
-                              >
+                              <div class="flex-column align-items-center">
                                 <v-btn
                                   class="mt-2"
                                   variant="tonal"
@@ -319,6 +385,10 @@
                                 >
                                   Modificar Resultado
                                 </v-btn>
+                              </div>
+                            </v-list-item-title>
+                            <v-list-item-title>
+                              <div class="flex-column align-items-center">
                                 <v-btn
                                   class="mt-2"
                                   variant="tonal"
@@ -327,6 +397,10 @@
                                 >
                                   Modificar Pairing
                                 </v-btn>
+                              </div>
+                            </v-list-item-title>
+                            <v-list-item-title>
+                              <div class="flex-column align-items-center">
                                 <v-btn
                                   class="mt-2"
                                   variant="tonal"
@@ -575,12 +649,19 @@
       @confirm="handleModificarPartidaTorneoConfirm"
     />
 
-    <!-- Modal modificar partida -->
+    <!-- Modal cambiar pairing -->
     <ModalEditarPairing
       :isVisible="showModificarPairingModal"
       :partida="partidaActual"
       @cerrar="closeModificarPairingModal"
       @confirm="handleModificarPairingTorneoConfirm"
+    />
+    <!-- Modal cambiar pairing -->
+    <ModalAgregarPairing
+      :isVisible="showAgregarPairingModal"
+      :idTorneo="idTorneo"
+      :idRonda="idRondaSelected"
+      @cerrar="closeAgregarPairingModal"
     />
 
     <!-- Modal modificar partida -->
@@ -649,6 +730,7 @@ import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPa
 import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.vue";
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
+import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -686,8 +768,8 @@ const showSuccessModal = ref<boolean>(false);
 const isGenerating = ref<boolean>(false);
 const showModificarPartidaTorneoModal = ref<boolean>(false);
 const showModificarPairingModal = ref<boolean>(false);
+const showAgregarPairingModal = ref<boolean>(false);
 const showEliminarPartidaModal = ref<boolean>(false);
-
 const partidaActual = ref<PartidaTorneoDTO>({
   ejercitoUsuario1: null,
   ejercitoUsuario2: null,
@@ -708,6 +790,7 @@ const partidaActual = ref<PartidaTorneoDTO>({
   resultadoUsuario1: null,
   resultadoUsuario2: null,
 });
+const idRondaSelected = ref<number>(0);
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
@@ -879,6 +962,10 @@ const closeModificarPairingModal = () => {
   showModificarPairingModal.value = false;
 };
 
+const closeAgregarPairingModal = () => {
+  showAgregarPairingModal.value = false;
+};
+
 const closeEliminarPartidaModal = () => {
   showEliminarPartidaModal.value = false;
 };
@@ -910,6 +997,11 @@ const handleEliminarPartidaConfirm = () => {
 const modificarPairing = (partidaRecibida: PartidaTorneoDTO) => {
   partidaActual.value = partidaRecibida;
   showModificarPairingModal.value = true;
+};
+
+const agregarPairing = (idRonda: number) => {
+  idRondaSelected.value = idRonda;
+  showAgregarPairingModal.value = true;
 };
 
 const eliminarPartida = (partidaRecibida: PartidaTorneoDTO) => {

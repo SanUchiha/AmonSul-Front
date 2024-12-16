@@ -8,19 +8,21 @@
       <v-card-text>
         <v-form>
           <v-radio-group
+            inline
             v-model="mismaComunidadCheckString"
             label="¿Se permiten emparejamientos de la misma comunidad de juego?"
           >
-            <v-radio label="SI" value="true"></v-radio>
-            <v-radio label="NO" value="false"></v-radio>
+            <v-radio label="SI" value="SI"></v-radio>
+            <v-radio label="NO" value="NO"></v-radio>
           </v-radio-group>
 
           <v-radio-group
+            inline
             v-model="goodVsEvilCheckString"
             label="¿Prevalece luz vs oscuridad?"
           >
-            <v-radio label="SI" value="true"></v-radio>
-            <v-radio label="NO" value="false"></v-radio>
+            <v-radio label="SI" value="SI"></v-radio>
+            <v-radio label="NO" value="NO"></v-radio>
           </v-radio-group>
 
           <v-radio-group
@@ -313,11 +315,11 @@ const confirmarConfiguracion = async () => {
   }
 
   errorRonda.value = null;
-  if (mismaComunidadCheckString.value === "true")
+  if (mismaComunidadCheckString.value === "SI")
     mismaComunidadCheck.value = true;
   else mismaComunidadCheck.value = false;
 
-  if (goodVsEvilCheckString.value === "true") goodVsEvilCheck.value = true;
+  if (goodVsEvilCheckString.value === "SI") goodVsEvilCheck.value = true;
   else goodVsEvilCheck.value = false;
 
   const configuracion: GenerarRonda = {

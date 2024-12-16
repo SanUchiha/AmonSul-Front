@@ -7,21 +7,6 @@
 
       <v-card-text>
         <v-form>
-          <!-- <v-checkbox
-            v-model="mismaComunidadCheck"
-            label="¿Se permite emparejamientos de la misma comunidad de juego?"
-          ></v-checkbox> -->
-
-          <!-- <v-checkbox
-            v-model="luzVsOscCheck"
-            label="¿Se permite luz vs oscuridad?"
-          ></v-checkbox> -->
-
-          <!-- <v-checkbox
-            v-model="esEloCheck"
-            label="¿Quieres que tus partidas cuenten para el ELO?"
-          ></v-checkbox> -->
-
           <v-radio-group
             inline
             v-model="goodVsEvilCheckString"

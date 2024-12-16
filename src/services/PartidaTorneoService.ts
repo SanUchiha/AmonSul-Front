@@ -1,5 +1,6 @@
 import {
   GenerarRonda,
+  RequestAddPairingTorneoDTO,
   RequestUpdatePairingTorneoDTO,
   UpdatePartidaTorneoDTO,
 } from "@/interfaces/Live";
@@ -17,6 +18,10 @@ export const updatePairingTorneo = async (
   pairing: RequestUpdatePairingTorneoDTO
 ) => {
   return http.put(`Torneo/Editar-Pairing`, pairing);
+};
+
+export const addPairingTorneo = async (pairing: RequestAddPairingTorneoDTO) => {
+  return http.post(`Torneo/Agregar-Pairing`, pairing);
 };
 
 export const deletePartidaTorneo = async (idPartida: number) => {
