@@ -98,6 +98,7 @@ export interface UsuarioDataDTO {
   proteccionDatos: boolean | null;
   PartidasTorneo: ViewPartidaTorneoDTO[];
   ClasificacionTorneos: ClasificacionTorneosDTO[];
+  rankingElo: number;
 }
 
 export interface ClasificacionTorneosDTO {

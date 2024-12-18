@@ -21,12 +21,12 @@
   </div>
   <div v-if="hasAcciones">
     <v-table :loading="isLoading">
-      <thead>
+      <!-- <thead>
         <tr>
           <th class="text-center">Torneo</th>
           <th class="text-center"></th>
         </tr>
-      </thead>
+      </thead> -->
       <tbody>
         <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
           <td>{{ torneo.nombreTorneo }}</td>

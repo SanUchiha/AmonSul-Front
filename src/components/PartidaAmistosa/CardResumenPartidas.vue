@@ -40,25 +40,34 @@
       <div class="stats-container">
         <v-row>
           <v-col class="stat-item">
-            <v-icon color="orange">mdi-percent</v-icon>
+            <v-icon color="green">mdi-trophy</v-icon>
             <p>Victorias: {{ porcentajeVictorias }}%</p>
           </v-col>
+
+          <div v-if="usuario.rankingElo">
+            <v-col class="stat-item">
+              <v-icon color="blue">mdi-chess-queen</v-icon>
+              <p>Ranking Elo: {{ usuario.rankingElo }}</p>
+            </v-col>
+          </div>
         </v-row>
       </div>
       <v-divider></v-divider>
       <div class="stats-container">
         <v-row>
           <v-col class="stat-item">
-            <v-icon color="orange">mdi-percent</v-icon>
-            <p>Ejercito mas usado: proximamente</p>
+            <v-icon color="purple">mdi-sword-cross</v-icon>
+            <p>Ejército más usado: próximamente</p>
           </v-col>
+
           <v-col class="stat-item">
-            <v-icon color="orange">mdi-percent</v-icon>
-            <p>Ejercito con mejor resultado: proximamente</p>
+            <v-icon color="green">mdi-star-check</v-icon>
+            <p>Ejército con mejor resultado: próximamente</p>
           </v-col>
+
           <v-col class="stat-item">
-            <v-icon color="orange">mdi-percent</v-icon>
-            <p>Ejercito con peor resultado: proximamente</p>
+            <v-icon color="red">mdi-alert-circle</v-icon>
+            <p>Ejército con peor resultado: próximamente</p>
           </v-col>
         </v-row>
       </div>

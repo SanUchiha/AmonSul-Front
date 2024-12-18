@@ -59,6 +59,7 @@ import { useAuth } from "@/composables/useAuth";
 import { FaccionDTO } from "@/interfaces/Faccion";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
+import { getRankingEloByIdUser } from "@/services/EloService";
 import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import { ref, onMounted } from "vue";
@@ -93,6 +94,7 @@ const usuarioData = ref<UsuarioDataDTO>({
   proteccionDatos: null,
   PartidasTorneo: [],
   ClasificacionTorneos: [],
+  rankingElo: 0,
 });
 
 const initializeComponent = async () => {
@@ -109,6 +111,9 @@ const initializeComponent = async () => {
       usuarioData.value.email = emailOwner.value;
 
       loadResume(matches.value);
+
+      loadRankingElo(parseInt(idUsuarioLogger.value));
+      console.log(usuarioData.value);
     } catch (error) {
       console.error(error);
       router.push({ name: "error" });
@@ -150,6 +155,15 @@ const loadComunidad = async (idUser: number) => {
     usuarioData.value.faccion.nombreFaccion = response.data;
   } catch (error) {
     console.error("Error al obtener las comunidades: ", error);
+  }
+};
+
+const loadRankingElo = async (idUser: number) => {
+  try {
+    const response = await getRankingEloByIdUser(idUser);
+    usuarioData.value.rankingElo = response.data;
+  } catch (error) {
+    console.error("Error al obtener el ranking del jugador: ", error);
   }
 };
 </script>

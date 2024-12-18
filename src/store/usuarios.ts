@@ -56,6 +56,7 @@ export const useUsuariosStore = defineStore("usuarios", {
       proteccionDatos: null,
       PartidasTorneo: [],
       ClasificacionTorneos: [],
+      rankingElo: 0,
     },
   }),
   actions: {

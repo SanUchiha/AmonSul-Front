@@ -11,3 +11,7 @@ export const getClasifiacionElo = async () => {
 export const getClasifiacionEloMensual = async () => {
   return http.get("Elo/Mensual/");
 };
+
+export const getRankingEloByIdUser = async (idUser: number) => {
+  return http.get(`Elo/Ranking/${idUser}`);
+};
