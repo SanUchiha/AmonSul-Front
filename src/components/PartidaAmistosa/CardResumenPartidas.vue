@@ -43,13 +43,10 @@
             <v-icon color="green">mdi-trophy</v-icon>
             <p>Victorias: {{ porcentajeVictorias }}%</p>
           </v-col>
-
-          <div v-if="usuario.rankingElo">
-            <v-col class="stat-item">
-              <v-icon color="blue">mdi-chess-queen</v-icon>
-              <p>Ranking Elo: {{ usuario.rankingElo }}</p>
-            </v-col>
-          </div>
+          <v-col v-if="usuario.rankingElo" class="stat-item">
+            <v-icon color="blue">mdi-chess-queen</v-icon>
+            <p>Ranking Elo: {{ usuario.rankingElo }}</p>
+          </v-col>
         </v-row>
       </div>
       <v-divider></v-divider>

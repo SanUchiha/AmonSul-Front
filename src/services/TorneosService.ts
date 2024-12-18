@@ -9,6 +9,10 @@ export const getTorneos = async () => {
   return http.get(`Torneo`);
 };
 
+export const isSaveTournament = async (idTorneo: number) => {
+  return http.get(`Torneo/Gestion/issave/${idTorneo}`);
+};
+
 export const getTorneo = async (idTorneo: number) => {
   return http.get(`Torneo/id/${idTorneo}`);
 };

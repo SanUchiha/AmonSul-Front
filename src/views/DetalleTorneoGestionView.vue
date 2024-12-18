@@ -89,11 +89,10 @@
                 <div v-else class="mt-3">
                   <!-- boton para cerrar el torneo -->
                   <v-btn
-                    v-if="hasGanador"
+                    v-if="hasGanador && !wasSave"
                     class="mt-2"
                     variant="tonal"
                     color="primary"
-                    size="small"
                     @click="resultados()"
                   >
                     Guardar resultados
@@ -722,7 +721,11 @@ import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
 import { getlistaTorneo } from "@/services/ListasService";
 import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
-import { getPartidasTorneo, getTorneo } from "@/services/TorneosService";
+import {
+  getPartidasTorneo,
+  getTorneo,
+  isSaveTournament,
+} from "@/services/TorneosService";
 import ModalParametrosRondas from "@/components/GestionTorneos/ModalParametrosRondas.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
@@ -791,6 +794,7 @@ const partidaActual = ref<PartidaTorneoDTO>({
   resultadoUsuario2: null,
 });
 const idRondaSelected = ref<number>(0);
+const wasSave = ref<boolean>(false);
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
@@ -840,6 +844,9 @@ onMounted(async () => {
     ultimaRonda.value = numeroRondas.value.length;
     const ganador: number = clasificacionZona1.value[0].idUsuario;
     if (ganador != null) hasGanador.value = true;
+
+    const isSave = await isSaveTournament(idTorneo.value);
+    wasSave.value = isSave.data;
   } catch (error) {
     console.error(error);
   } finally {
