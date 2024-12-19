@@ -146,7 +146,7 @@ import ModalDetallePartida from "./ModalDetallePartida.vue";
 
 const usuariosStore = useUsuariosStore();
 const isLoading = ref(false);
-const { getUser } = useAuth();
+const { getUser, getidUsuario } = useAuth();
 const nickJugadorUno = ref<string | unknown>("");
 const nickJugadorDos = ref<string | unknown>("");
 const validarPartidaDTO = ref<ValidarPartidaDTO>();
@@ -154,6 +154,7 @@ const fechaFormateada = ref<string>("");
 const IsValidadaRival = ref<boolean>(false);
 const IsValidadaOwner = ref<boolean>(false);
 const emailUsuario = ref<string>(getUser.value ?? "null");
+const idUsuarioOwner = ref<string>(getidUsuario.value ?? "null");
 const usuario: ComputedRef<UsuarioViewDTO> = computed(
   () => usuariosStore.usuario
 );
@@ -232,11 +233,30 @@ watch(showSuccessValidarModal, (newValue) => {
 });
 
 const controlValidacionesPartidas = () => {
-  if (props.match.partidaValidadaUsuario1) {
+  if (
+    parseInt(idUsuarioOwner.value) == props.match.idUsuario1 &&
+    props.match.partidaValidadaUsuario1
+  ) {
     IsValidadaOwner.value = true;
   }
 
-  if (props.match.partidaValidadaUsuario2) {
+  if (
+    parseInt(idUsuarioOwner.value) == props.match.idUsuario2 &&
+    props.match.partidaValidadaUsuario2
+  ) {
+    IsValidadaOwner.value = true;
+  }
+  if (
+    parseInt(idUsuarioOwner.value) != props.match.idUsuario1 &&
+    props.match.partidaValidadaUsuario1
+  ) {
+    IsValidadaRival.value = true;
+  }
+
+  if (
+    parseInt(idUsuarioOwner.value) != props.match.idUsuario2 &&
+    props.match.partidaValidadaUsuario2
+  ) {
     IsValidadaRival.value = true;
   }
 };
