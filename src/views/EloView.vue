@@ -6,7 +6,7 @@
     <div v-else>
       <v-tabs v-model="tab" color="primary" grow>
         <v-tab value="Global"> Global </v-tab>
-        <v-tab value="Mensual"> Mensual </v-tab>
+        <!-- <v-tab value="Mensual"> Mensual </v-tab> -->
         <v-tab value="Equipos"> Equipos </v-tab>
       </v-tabs>
 
@@ -15,14 +15,6 @@
         <v-tabs-window-item value="Global" v-if="tab === 'Global'">
           <SparklineElo :email="correo" class="separated" />
           <TablaClasificacionElo class="separated" :items="eloClasificacion" />
-        </v-tabs-window-item>
-
-        <!-- TAB 2. -->
-        <v-tabs-window-item value="Mensual" v-if="tab === 'Mensual'">
-          <TablaClasificacionElo
-            class="separated"
-            :items="eloClasificacionMensual"
-          />
         </v-tabs-window-item>
 
         <!-- TAB 3. -->
@@ -44,10 +36,7 @@ import TablaClasificacionElo from "@/components/Elo/TablaClasificacionElo.vue";
 import TablaClasificacionEloEquipos from "@/components/Elo/TablaClasificacionEloEquipos.vue";
 import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
 import { FaccionDTO } from "@/interfaces/Faccion";
-import {
-  getClasifiacionElo,
-  getClasifiacionEloMensual,
-} from "@/services/EloService";
+import { getClasifiacionElo } from "@/services/EloService";
 import { getFacciones } from "@/services/FaccionesService";
 import { onMounted, ref, computed, ComputedRef } from "vue";
 import { useAuth } from "@/composables/useAuth";
@@ -66,7 +55,6 @@ const router = useRouter();
 const correo = ref<string>(``);
 const isLoading = ref<boolean>(true);
 const eloClasificacion = ref<UsuarioEloTablaClasificacion[]>([]);
-const eloClasificacionMensual = ref<UsuarioEloTablaClasificacion[]>([]);
 const facciones = ref<FaccionDTO[]>([]);
 const usuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(
   () => usuariosStore.usuarios
@@ -76,7 +64,7 @@ onMounted(async () => {
   isLoading.value = true;
   try {
     // Obtener el usuario
-    const email: any = await getUser.value;
+    const email: string | null = getUser.value;
     if (!email) {
       error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
       router.push({ name: "error" });
@@ -85,14 +73,9 @@ onMounted(async () => {
     correo.value = email;
 
     // Hacer peticiones en paralelo
-    const [
-      responseClasificacionElo,
-      faccionesResponse,
-      responseClasificacionEloMensual,
-    ] = await Promise.all([
+    const [responseClasificacionElo, faccionesResponse] = await Promise.all([
       getClasifiacionElo(),
       getFacciones(),
-      getClasifiacionEloMensual(),
     ]);
 
     // Procesar la clasificación ELO
@@ -106,17 +89,6 @@ onMounted(async () => {
 
     // Procesar las facciones
     facciones.value = faccionesResponse.data;
-
-    // Procesar la clasificación ELO mensual
-    eloClasificacionMensual.value = responseClasificacionEloMensual.data.sort(
-      (a: { elo: number }, b: { elo: number }) => b.elo - a.elo
-    );
-    eloClasificacionMensual.value = eloClasificacionMensual.value.map(
-      (item, index) => ({
-        ...item,
-        clasificacion: index + 1,
-      })
-    );
 
     // Obtener los usuarios si no se han cargado
     if (!usuarios.value.length) {
@@ -132,6 +104,6 @@ onMounted(async () => {
 
 <style scoped>
 .separated {
-  margin-bottom: 20px; /* Ajusta el valor según tus necesidades */
+  margin-bottom: 20px;
 }
 </style>

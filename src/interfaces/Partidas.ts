@@ -39,6 +39,7 @@ export interface CreatePartidaAmistosaDTO {
   ejercitoUsuario1: ArmyDTO;
   ejercitoUsuario2: ArmyDTO;
   esElo: boolean;
+  partidaValidadaUsuario1: boolean;
 }
 
 export interface PartidaTorneoDTO {

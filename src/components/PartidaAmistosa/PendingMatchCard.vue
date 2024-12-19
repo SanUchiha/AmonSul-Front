@@ -42,7 +42,7 @@
             <div v-if="!IsValidadaOwner">
               <v-btn
                 :disabled="isLoading"
-                variant="outlined"
+                variant="tonal"
                 color="green darken-1"
                 @click="validarPartida"
               >
@@ -52,7 +52,7 @@
 
               <v-btn
                 :disabled="isLoading"
-                variant="outlined"
+                variant="tonal"
                 color="red darken-1"
                 @click="cancelPartida"
               >
@@ -60,11 +60,20 @@
                 Cancelar
               </v-btn>
             </div>
-            <div v-else class="validada">Validada</div>
+            <div v-else class="validada">
+              <v-btn
+                :disabled="isLoading"
+                variant="tonal"
+                color="red darken-1"
+                @click="cancelPartida"
+              >
+                Cancelar partida
+              </v-btn>
+            </div>
           </v-col>
           <v-col class="text-center">
             <div v-if="!IsValidadaRival">
-              <span class="no-validada">NO validada por el rival</span>
+              <span class="no-validada">Esperando la validación del rival</span>
             </div>
             <div v-else class="validada">Validada por el rival</div>
           </v-col>
@@ -223,31 +232,11 @@ watch(showSuccessValidarModal, (newValue) => {
 });
 
 const controlValidacionesPartidas = () => {
-  if (
-    usuario.value?.idUsuario == props.match.idUsuario1 &&
-    props.match.partidaValidadaUsuario1
-  ) {
+  if (props.match.partidaValidadaUsuario1) {
     IsValidadaOwner.value = true;
   }
 
-  if (
-    usuario.value?.idUsuario == props.match.idUsuario2 &&
-    props.match.partidaValidadaUsuario2
-  ) {
-    IsValidadaOwner.value = true;
-  }
-
-  if (
-    usuario.value?.idUsuario != props.match.idUsuario1 &&
-    props.match.partidaValidadaUsuario1
-  ) {
-    IsValidadaRival.value = true;
-  }
-
-  if (
-    usuario.value?.idUsuario != props.match.idUsuario2 &&
-    props.match.partidaValidadaUsuario2
-  ) {
+  if (props.match.partidaValidadaUsuario2) {
     IsValidadaRival.value = true;
   }
 };

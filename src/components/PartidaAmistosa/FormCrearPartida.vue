@@ -89,11 +89,6 @@
                 color="primary"
                 class="progress-linear-margin"
               ></v-progress-linear>
-              <v-switch
-                v-model="esElo"
-                color="primary"
-                label="¿Quieres que cuente para el ELO?"
-              ></v-switch>
               <v-text-field
                 v-model="puntosPartida"
                 label="¿A cuantos puntos has jugado?"
@@ -284,7 +279,8 @@ const handlerNuevaPartida = async () => {
       esTorneo: esTorneo.value ?? false,
       ejercitoUsuario1: ejercitoPropio.value!,
       ejercitoUsuario2: ejercitoRival.value!,
-      esElo: esElo.value ?? false,
+      esElo: false,
+      partidaValidadaUsuario1: true,
     };
 
     try {
