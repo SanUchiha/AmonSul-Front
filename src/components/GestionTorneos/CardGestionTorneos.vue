@@ -7,7 +7,7 @@
           <v-row justify="center" class="my-4 ga-5">
             <v-btn
               color="blue darken-1"
-              variant="outlined"
+              variant="tonal"
               size="large"
               class="login-form__button"
               @click="handlerCrearTorneo"

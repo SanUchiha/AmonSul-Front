@@ -110,6 +110,7 @@
                   variant="tonal"
                   color="blue darken-1"
                   :disabled="isLoading"
+                  @click="cancelar"
                 >
                   Cancelar
                 </v-btn>
@@ -176,10 +177,9 @@ const puntosJugadorUno = ref<number | null>(null);
 const puntosJugadorDos = ref<number | null>(null);
 const checkEsMatchedPlay = ref<boolean>(false);
 const esTorneo = ref<boolean>(false);
-const esElo = ref<boolean>(false);
 const puntosPartida = ref<number | null>(null);
-const emailOwner = ref<string>(await getUser.value!);
-const idUsuario = ref<string>(await getidUsuario.value!);
+const emailOwner = ref<string>(getUser.value!);
+const idUsuario = ref<string>(getidUsuario.value!);
 
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
@@ -254,6 +254,10 @@ const validateForm = () => {
   } else {
     alert("Por favor, completa todos los campos requeridos correctamente.");
   }
+};
+
+const cancelar = () => {
+  router.push("mis-partidas");
 };
 
 const handlerNuevaPartida = async () => {
