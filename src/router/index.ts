@@ -17,6 +17,7 @@ import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
 import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
 import MisPartidasView from "@/views/MisPartidasView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
+import LigasView from "@/views/LigasView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -113,6 +114,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/torneos",
     name: "torneos",
     component: TorneosView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/ligas",
+    name: "ligas",
+    component: LigasView,
     meta: { requiresAuth: true },
   },
   {

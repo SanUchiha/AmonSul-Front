@@ -47,6 +47,12 @@
             <v-list-item-title>Resultados</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item link to="/ligas" v-if="isAuthenticated">
+          <v-list-item-content class="d-flex ga-2">
+            <v-icon>mdi-chart-bar</v-icon>
+            <v-list-item-title>Ligas</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item link to="/perfil-usuario" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-cog</v-icon>
