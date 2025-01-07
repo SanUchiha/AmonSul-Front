@@ -113,7 +113,6 @@ const initializeComponent = async () => {
       loadResume(matches.value);
 
       loadRankingElo(parseInt(idUsuarioLogger.value));
-      console.log(usuarioData.value);
     } catch (error) {
       console.error(error);
       router.push({ name: "error" });

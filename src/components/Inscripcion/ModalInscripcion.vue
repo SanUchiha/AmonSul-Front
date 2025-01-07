@@ -30,6 +30,38 @@
               </v-btn>
             </v-list-item>
 
+            <v-list-item v-if="inscripcionData?.listaData != null">
+              <v-list-item-content v-if="inscripcionData?.listaData">
+                <v-btn color="orange" variant="tonal" @click="toggleLista">
+                  Mostrar Lista
+                </v-btn>
+              </v-list-item-content>
+              <v-list-item-content v-else>
+                <v-btn color="orange" variant="tonal" @click="toggleLista">
+                  Ocultar Lista
+                </v-btn>
+              </v-list-item-content>
+            </v-list-item>
+
+            <!-- Contenido de la lista -->
+            <v-expand-transition>
+              <v-list-item v-if="showLista">
+                <v-list-item-content>
+                  <h3>{{ inscripcionData?.ejercito }}</h3>
+                  <v-spacer class="my-3"></v-spacer>
+                  <template v-if="listaBase64">
+                    <img
+                      :src="listaBase64"
+                      alt="Lista"
+                      style="max-width: 100%; height: auto"
+                    />
+                  </template>
+                  <template v-else>
+                    <p>No hay lista disponible</p>
+                  </template>
+                </v-list-item-content>
+              </v-list-item>
+            </v-expand-transition>
             <!-- Estado Pago -->
             <v-list-item>
               <v-list-item-title class="list-item-title">
@@ -111,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, defineEmits, onMounted } from "vue";
+import { defineProps, ref, defineEmits, onMounted, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
@@ -120,10 +152,12 @@ import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
 import ModalLista from "./ModalLista.vue";
 import {
   CrearListaTorneoRequestDTO,
+  ListaTorneoRequestDTO,
   ModificarListaTorneoRequestDTO,
   RequesListaDTO,
 } from "@/interfaces/Lista";
 import {
+  getlistaTorneo,
   modificarListaTorneo,
   subirListaTorneo,
 } from "@/services/ListasService";
@@ -157,6 +191,21 @@ const ejercito = ref<ArmyDTO>();
 const showSuccessModalLista = ref<boolean>(false);
 const showErrorModalLista = ref<boolean>(false);
 const idLista = ref<number | null>();
+const showLista = ref<boolean>(false);
+const listaBase64 = ref<string | null>();
+
+watch(
+  () => showSuccessModalLista.value,
+  (newValue, oldValue) => {
+    if (oldValue && !newValue) {
+      recargarPagina();
+    }
+  }
+);
+
+const recargarPagina = () => {
+  window.location.reload();
+};
 
 const handleVerLista = async (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
@@ -164,6 +213,32 @@ const handleVerLista = async (idInscripcion: number) => {
 
   if (inscripcionData.value?.bando) hasLista.value = true;
   await verLista();
+};
+
+const toggleLista = async () => {
+  if (!props.idTorneo || !props.idUsuario) {
+    console.error("Faltan datos necesarios: idTorneo o idUsuario.");
+    return;
+  }
+
+  showLista.value = !showLista.value;
+  isLoading.value = true;
+
+  const requestLista: ListaTorneoRequestDTO = {
+    idTorneo: props.idTorneo,
+    idUsuario: props.idUsuario,
+  };
+  try {
+    const response = await getlistaTorneo(requestLista);
+    listaBase64.value = response.data;
+
+    if (response.data != null && inscripcionData.value)
+      inscripcionData.value.listaData = response.data;
+  } catch (error) {
+    console.error("Error al recuperar la lista.");
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const verLista = async () => {

@@ -20,5 +20,7 @@ export const getlista = async (idInscripcion: number) => {
 };
 
 export const getlistaTorneo = async (request: ListaTorneoRequestDTO) => {
-  return http.post(`Lista/Lista-Torneo`, request);
+  return http.get(
+    `Lista/Lista-Torneo/${request.idTorneo}/${request.idUsuario}`
+  );
 };

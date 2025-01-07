@@ -479,7 +479,7 @@ const confirmarConfiguracion = async () => {
 };
 
 onMounted(async () => {
-  console.log(props.torneo);
+  //
 });
 </script>
 <style scoped>

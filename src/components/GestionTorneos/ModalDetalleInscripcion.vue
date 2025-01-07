@@ -51,12 +51,12 @@
           <!-- Botón para ver la lista -->
           <v-list-item>
             <v-list-item-content v-if="!showLista">
-              <v-btn color="primary" @click="toggleLista">
+              <v-btn color="orange" variant="tonal" @click="toggleLista">
                 Mostrar Lista
               </v-btn>
             </v-list-item-content>
             <v-list-item-content v-else>
-              <v-btn color="primary" @click="toggleLista">
+              <v-btn color="orange" variant="tonal" @click="toggleLista">
                 Ocultar Lista
               </v-btn>
             </v-list-item-content>
@@ -94,6 +94,7 @@
             <v-list-item-content>
               <v-btn
                 color="red"
+                variant="tonal"
                 @click="eliminarInscripcion(inscripcion?.idInscripcion!)"
               >
                 Eliminar inscripción

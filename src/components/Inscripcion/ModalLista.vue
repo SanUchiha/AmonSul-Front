@@ -85,13 +85,14 @@ const props = defineProps<{
 }>();
 
 const internalIsVisible = ref(props.isVisible);
-const isLoading = ref(false);
+const isLoading = ref<boolean>(false);
+const hasLista = ref<boolean>(false);
 
 const imageBase64 = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const ejercitoSelected = ref<ArmyDTO>();
 const listadoEjercitos = ref<ArmyDTO[]>([]);
-const loadingEjercitos = ref(false);
+const loadingEjercitos = ref<boolean>(false);
 const isSendButtonDisabled = computed(() => {
   return (
     !ejercitoSelected.value ||
@@ -188,22 +189,22 @@ const enviarLista = () => {
     listaData: imageBase64.value!,
     ejercito: ejercitoSelected.value!,
   };
-  if (props.hasLista) emit("modificarLista", newLista);
+  if (!hasLista.value) emit("modificarLista", newLista);
   else emit("enviarLista", newLista);
 };
 
 onMounted(async () => {
-  if (props.hasLista) {
-    isLoading.value = true;
-    try {
-      const response = await getlista(props.idInscripcion);
-      imageBase64.value = response.data.listaData;
-      ejercitoSelected.value = response.data.ejercito;
-    } catch {
-      console.error("No se ha podido cargar la lista");
-    } finally {
-      isLoading.value = false;
-    }
+  isLoading.value = true;
+  try {
+    const response = await getlista(props.idInscripcion);
+
+    imageBase64.value = response.data.listaData;
+    ejercitoSelected.value = response.data.ejercito;
+    if (imageBase64.value == null) hasLista.value = true;
+  } catch {
+    console.error("No se ha podido cargar la lista");
+  } finally {
+    isLoading.value = false;
   }
 });
 </script>

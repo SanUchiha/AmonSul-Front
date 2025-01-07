@@ -59,6 +59,7 @@ export interface InscripcionTorneoCreadoDTO {
   esPago?: string | null;
   idLista?: number | null;
   ejercito?: string | null;
+  listaData?: string | null;
 }
 
 export interface Resultado {
