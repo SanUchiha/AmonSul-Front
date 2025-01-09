@@ -8,11 +8,7 @@
       </v-col>
     </v-row>
 
-    <ModalLiga
-      :liga="selectedLiga"
-      :showModalLiga="showModalLiga"
-      @update:showModalLiga="showModalLiga = $event"
-    />
+    <ModalLiga v-if="showModalLiga" :liga="selectedLiga" @close="closeModal" />
   </v-container>
 </template>
 
@@ -35,7 +31,6 @@ const loadLigas = async () => {
   try {
     const response = await getLigas();
     ligas.value = response.data;
-    console.log(response.data);
   } catch (error) {
     console.error("Error al cargar ligas:", error);
   } finally {
@@ -46,8 +41,11 @@ const loadLigas = async () => {
 // Función para abrir el modal con los detalles de la liga seleccionada
 const openDialog = (liga: LigaDTO) => {
   selectedLiga.value = liga;
-  console.log(selectedLiga.value);
   showModalLiga.value = true;
+};
+
+const closeModal = () => {
+  showModalLiga.value = false;
 };
 
 // Cargar ligas cuando el componente esté montado

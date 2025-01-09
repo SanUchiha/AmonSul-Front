@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" max-width="600px">
+  <v-dialog v-model="show" max-width="800px">
     <v-card class="elevation-2 rounded">
       <v-card-title>
         <span class="headline">{{ props.liga?.nombreLiga }}</span>
@@ -7,35 +7,67 @@
 
       <!-- Aquí puedes agregar más detalles de la liga -->
       <v-card-text>
-        <div class="my-2">Número de torneos: {{ numeroTorneos }}</div>
+        <!-- Mostrar el número de torneos -->
+        <v-divider class="my-3"></v-divider>
+
+        <div class="my-2 text-h6 font-weight-bold">
+          <v-icon color="primary" class="mr-2">mdi-trophy</v-icon>
+          Número de torneos: {{ numeroTorneos }}
+        </div>
+        <v-divider class="my-3"></v-divider>
+        <!-- Listado de torneos -->
         <!-- Listado de torneos -->
         <v-list dense>
-          <v-list-item-group v-if="torneos.length > 0">
-            <v-list-item v-for="torneo in torneos" :key="torneo.idTorneo">
-              <v-list-item-content>
-                <v-list-item-title>{{ torneo.torneoNombre }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-item-group>
-          <v-list-item v-else>
-            <v-list-item-content>
-              <v-list-item-title
-                >No hay torneos asociados a esta liga.</v-list-item-title
-              >
-            </v-list-item-content>
-          </v-list-item>
+          <template v-if="torneos.length > 0">
+            <v-list-item-group>
+              <v-list-item v-for="torneo in torneos" :key="torneo.idTorneo">
+                <v-list-item-content>
+                  <v-list-item-title>
+                    <v-icon small color="secondary" class="mr-2"
+                      >mdi-sword-cross</v-icon
+                    >
+                    {{ torneo.torneoNombre }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </template>
+          <v-alert
+            v-else
+            type="info"
+            dense
+            border="left"
+            color="blue lighten-4"
+            icon="mdi-information-outline"
+            class="my-3"
+          >
+            No hay torneos asociados a esta liga.
+          </v-alert>
         </v-list>
       </v-card-text>
+      <v-divider class="my-3"></v-divider>
 
       <v-expand-transition>
         <v-list-item v-if="showClasificacion">
           <v-list-item-content>
-            <v-card class="elevation-1">
-              <v-card-title class="headline"
-                >Clasificación General</v-card-title
-              >
+            <v-card flat>
+              <v-card-title class="d-flex align-center pe-2">
+                Clasificación general
+                <v-spacer></v-spacer>
+                <v-text-field
+                  v-model="search"
+                  density="compact"
+                  label="Buscar"
+                  prepend-inner-icon="mdi-magnify"
+                  variant="solo-filled"
+                  flat
+                  hide-details
+                  single-line
+                />
+              </v-card-title>
               <v-card-text>
                 <v-data-table
+                  v-model:search="search"
                   :items="clasificacion"
                   :headers="headers"
                   item-key="idUsuario"
@@ -70,26 +102,38 @@
         </v-list-item>
       </v-expand-transition>
 
-      <v-card-actions>
+      <v-card-actions class="d-flex justify-space-between">
+        <!-- Botón para ver clasificación -->
         <v-btn
           v-if="!showClasificacion"
           color="primary"
           variant="tonal"
+          size="large"
           text
           @click="verClasificacion"
-          >ver clasificación</v-btn
         >
+          <v-icon class="mr-2">mdi-eye</v-icon>
+          Ver clasificación
+        </v-btn>
+
+        <!-- Botón para ocultar clasificación -->
         <v-btn
           v-else
           color="primary"
           variant="tonal"
+          size="large"
           text
           @click="ocultarClasificacion"
-          >ocultar clasificación</v-btn
         >
-        <v-btn color="primary" variant="tonal" text @click="closeDialog"
-          >Cerrar</v-btn
-        >
+          <v-icon class="mr-2">mdi-eye-off</v-icon>
+          Ocultar clasificación
+        </v-btn>
+
+        <!-- Botón para cerrar -->
+        <v-btn color="primary" variant="tonal" size="large" text @click="close">
+          <v-icon class="mr-2">mdi-close</v-icon>
+          Cerrar
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -113,8 +157,7 @@ const headers = [
   { title: "Torneos Ganados", key: "torneosGanados" },
   { title: "Puntos por Torneo", key: "puntosPorTorneos" }, // Nueva columna
 ];
-
-const localDialog = ref(props.showModalLiga);
+const show = ref<boolean>(true);
 const torneos = ref<LigaTorneosDTO[]>([]);
 const loading = ref<boolean>(false);
 const numeroTorneos = ref<number>(0);
@@ -122,14 +165,20 @@ const ganadores = ref<GanadorDTO[]>([]);
 const topGanadores = ref<GanadorDTO[]>([]);
 const showClasificacion = ref<boolean>(false);
 const puntosPorResultado = [25, 20, 18, 15, 10, 8, 6, 4, 2, 1];
+const search = ref<string>("");
 
-const emit = defineEmits<{
-  (e: "update:showModalLiga", value: boolean): void;
-}>();
+const emit = defineEmits<{ (event: "close"): void }>();
 
-const closeDialog = () => {
-  emit("update:showModalLiga", false);
+const close = () => {
+  show.value = false;
+  emit("close");
 };
+
+watch(show, (newValue) => {
+  if (!newValue) {
+    emit("close");
+  }
+});
 
 const clasificacion = computed(() => {
   const jugadoresMap = new Map<
@@ -177,14 +226,7 @@ const clasificacion = computed(() => {
 const verClasificacion = async () => {
   await loadGanadores();
   mergeGanadoresXTorneo();
-  hacerClasificacion();
   showClasificacion.value = true;
-
-  console.log("clasifiacion final", clasificacion.value);
-};
-
-const hacerClasificacion = async () => {
-  showClasificacion.value = false;
 };
 
 const ocultarClasificacion = async () => {
@@ -194,7 +236,6 @@ const ocultarClasificacion = async () => {
 const mergeGanadoresXTorneo = () => {
   if (!torneos.value.length || !ganadores.value.length) return;
   const idTorneosLiga = torneos.value.map((torneo) => torneo.idTorneo);
-  console.log("ids", idTorneosLiga);
 
   const ganadoresPorTorneo = ganadores.value.reduce((acc, ganador) => {
     if (!acc[ganador.idTorneo]) {
@@ -208,9 +249,11 @@ const mergeGanadoresXTorneo = () => {
     (ganadoresTorneo) => ganadoresTorneo.slice(0, 10)
   );
 
-  topGanadores.value = top10PorTorneo;
+  const soloGanadoresTorneosLiga = top10PorTorneo.filter((ganador) =>
+    idTorneosLiga.includes(ganador.idTorneo)
+  );
 
-  console.log("Ganadores top 10 por torneo:", topGanadores.value);
+  topGanadores.value = soloGanadoresTorneosLiga;
 };
 
 const loadGanadores = async () => {
@@ -218,7 +261,6 @@ const loadGanadores = async () => {
   try {
     const response = await getGanadores();
     ganadores.value = response.data;
-    console.log("ganadores", ganadores.value);
   } catch (error) {
     console.error("Error al cargar torneos para la liga:", error);
   } finally {
@@ -249,13 +291,5 @@ watch(
     }
   },
   { immediate: true } // Llama a loadTorneos inmediatamente si props.liga tiene valor inicial
-);
-
-// Sincroniza localDialog con props.showModalLiga
-watch(
-  () => props.showModalLiga,
-  (newVal) => {
-    localDialog.value = newVal;
-  }
 );
 </script>
