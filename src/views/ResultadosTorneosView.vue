@@ -1,9 +1,9 @@
 <template>
-  <TablaTorneosLive />
+  <CardTorneoLive />
 </template>
 
 <script setup lang="ts">
-import TablaTorneosLive from "@/components/ResultadosTorneos/TablaTorneosLive.vue";
+import CardTorneoLive from "@/components/ResultadosTorneos/CardTorneoLive.vue";
 </script>
 
 <style scoped></style>
