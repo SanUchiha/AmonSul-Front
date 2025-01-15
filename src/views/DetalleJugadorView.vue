@@ -98,7 +98,7 @@
         <v-col cols="auto">
           <v-btn
             color="orange"
-            variant="outlined"
+            variant="tonal"
             class="login-form__button mt-4"
             @click="goBack"
           >

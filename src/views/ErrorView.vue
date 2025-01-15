@@ -14,7 +14,7 @@
           </v-card-text>
 
           <v-card-actions class="d-flex justify-center">
-            <v-btn variant="outlined" to="/inicio-sesion">Volver</v-btn>
+            <v-btn variant="tonal" to="/inicio-sesion">Volver</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>

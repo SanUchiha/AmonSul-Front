@@ -112,7 +112,7 @@
                   Registrar
                 </v-btn>
                 <v-btn
-                  variant="outlined"
+                  variant="tonal"
                   color="blue darken-1"
                   to="inicio-sesion"
                   :disabled="loading"

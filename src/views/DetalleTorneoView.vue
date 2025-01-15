@@ -68,7 +68,7 @@
 
                   <v-card-actions>
                     <v-btn
-                      variant="outlined"
+                      variant="tonal"
                       color="orange lighten-2"
                       @click="goBack"
                       >Volver</v-btn
