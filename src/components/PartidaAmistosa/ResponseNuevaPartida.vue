@@ -8,7 +8,7 @@
             Partida creada con éxito
           </v-card-title>
           <template v-slot:actions>
-            <v-btn variant="outlined" color="blue darken-1" @click="handlerOk"
+            <v-btn variant="tonal" color="blue darken-1" @click="handlerOk"
               >Ok</v-btn
             >
           </template>

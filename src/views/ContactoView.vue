@@ -33,7 +33,7 @@
                 <v-col cols="12" class="text-center">
                   <v-btn
                     color="blue darken-1"
-                    variant="outlined"
+                    variant="tonal"
                     size="large"
                     class="login-form__button"
                     type="submit"

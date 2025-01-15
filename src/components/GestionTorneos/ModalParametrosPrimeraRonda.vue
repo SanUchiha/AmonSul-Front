@@ -69,7 +69,7 @@
             </v-btn> -->
             <v-btn
               :disabled="!isAddEmparejamientoEnabled"
-              variant="outlined"
+              variant="tonal"
               color="blue"
               @click="addEmparejamiento"
               >Agregar Emparejamiento</v-btn

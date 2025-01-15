@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="d-flex align-center justify-center fill-height">
-    <v-card class="text-center pa-4 card-background" max-width="90vw" outlined>
+    <v-card class="text-center pa-4 card-background" max-width="90vw" tonal>
       <v-card-text>
         {{ displayText }}
       </v-card-text>

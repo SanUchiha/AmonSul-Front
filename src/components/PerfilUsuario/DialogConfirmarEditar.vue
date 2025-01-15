@@ -15,10 +15,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="outlined" color="blue darken-1" @click="cerrarDialogo"
+        <v-btn variant="tonal" color="blue darken-1" @click="cerrarDialogo"
           >Cancelar</v-btn
         >
-        <v-btn variant="outlined" color="blue darken-1" @click="guardarCambios"
+        <v-btn variant="tonal" color="blue darken-1" @click="guardarCambios"
           >Guardar</v-btn
         >
       </v-card-actions>

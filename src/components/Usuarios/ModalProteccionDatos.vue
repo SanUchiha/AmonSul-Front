@@ -19,10 +19,10 @@
         <p>Solo tendrás que aceptarlas una vez.</p>
       </v-card-text>
       <v-card-actions class="justify-center">
-        <v-btn variant="outlined" color="primary" @click="aceptarPolitica">
+        <v-btn variant="tonal" color="primary" @click="aceptarPolitica">
           Aceptar
         </v-btn>
-        <v-btn variant="outlined" color="secondary" @click="cancelarPolitica">
+        <v-btn variant="tonal" color="secondary" @click="cancelarPolitica">
           Cancelar
         </v-btn>
       </v-card-actions>

@@ -25,9 +25,7 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" variant="outlined" @click="close"
-          >OK</v-btn
-        >
+        <v-btn color="blue darken-1" variant="tonal" @click="close">OK</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

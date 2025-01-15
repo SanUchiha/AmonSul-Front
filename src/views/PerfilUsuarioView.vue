@@ -94,7 +94,7 @@
 
                 <v-col cols="12" class="d-flex justify-space-between">
                   <v-btn
-                    variant="outlined"
+                    variant="tonal"
                     color="blue darken-1"
                     @click="handleCambiarPassword"
                     class="login-form__remember-password"

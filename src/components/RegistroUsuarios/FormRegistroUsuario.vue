@@ -86,7 +86,7 @@
               >
                 <template #append-item>
                   <v-btn
-                    variant="outlined"
+                    variant="tonal"
                     color="blue darken-1"
                     @click="openDialogNuevaFaccion"
                   >
@@ -104,7 +104,7 @@
               ></v-text-field>
               <v-row justify="center" class="my-4">
                 <v-btn
-                  variant="outlined"
+                  variant="tonal"
                   color="blue darken-1"
                   @click="validateForm"
                   class="mr-4"
@@ -181,13 +181,13 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-            variant="outlined"
+            variant="tonal"
             color="blue darken-1"
             @click="dialogAddFaccion = false"
           >
             Cancelar
           </v-btn>
-          <v-btn variant="outlined" color="blue darken-1" @click="addFaccion">
+          <v-btn variant="tonal" color="blue darken-1" @click="addFaccion">
             Añadir
           </v-btn>
         </v-card-actions>

@@ -56,7 +56,7 @@
 
                   <v-card-actions>
                     <v-btn
-                      variant="outlined"
+                      variant="tonal"
                       color="blue lighten-2"
                       @click="descargarBases"
                       block

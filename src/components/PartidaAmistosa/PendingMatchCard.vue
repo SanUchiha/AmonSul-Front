@@ -24,7 +24,7 @@
 
             <div>
               <v-btn
-                variant="outlined"
+                variant="tonal"
                 color="blue darken-1"
                 @click="goToDetallePartida"
                 class="mx-auto"
