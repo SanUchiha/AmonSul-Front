@@ -1,3 +1,5 @@
+import { GenerarRonda } from "./Live";
+
 export interface Torneo {
   idTorneo: number; // Identificador único del torneo (PK)
   idUsuario: number; // ID del usuario administrador del torneo (FK)
@@ -62,7 +64,12 @@ export interface InscripcionTorneoCreadoDTO {
   listaData?: string | null;
 }
 
-export interface Resultado {
+export interface GuardarResultadosDTO {
+  ganadoresDTO: ResultadoJugador[];
+  generarRondaDTO: GenerarRonda;
+}
+
+export interface ResultadoJugador {
   idUsuario: number;
   idTorneo?: number;
   resultado: number;

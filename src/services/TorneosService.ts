@@ -1,7 +1,7 @@
 import {
   CrearTorneoDTO,
+  GuardarResultadosDTO,
   ModificarTorneoDTO,
-  Resultado,
 } from "@/interfaces/Torneo";
 import { http } from "./index";
 
@@ -40,8 +40,10 @@ export const getPartidasTorneoByRonda = async (
   return http.get(`Torneo/Gestion/Partidas/${idTorneo}/${idRonda}`);
 };
 
-export const guardarResultados = async (resultados: Resultado[]) => {
-  return http.post(`Ganador`, resultados);
+export const guardarResultados = async (
+  guardarResultados: GuardarResultadosDTO
+) => {
+  return http.post(`Ganador`, guardarResultados);
 };
 
 export const crearTorneo = async (torneoData: CrearTorneoDTO) => {

@@ -1,7 +1,7 @@
 <template>
   <v-container class="text-center">
     <!-- Modal aviso -->
-    <ModalAviso />
+    <!-- <ModalAviso /> -->
     <div v-if="isLoading">
       <LoadingGandalf />
     </div>

@@ -93,7 +93,7 @@
                     class="mt-2"
                     variant="tonal"
                     color="primary"
-                    @click="resultados()"
+                    @click="resultados(activeTab)"
                   >
                     Guardar resultados
                   </v-btn>
@@ -708,7 +708,11 @@ import {
 } from "@/services/TorneosService";
 import TablaInscritos from "@/components/GestionTorneos/TablaInscritos.vue";
 import CardGestionTorneo from "@/components/GestionTorneos/CardGestionTorneo.vue";
-import { Resultado, TorneoGestionInfoDTO } from "@/interfaces/Torneo";
+import {
+  GuardarResultadosDTO,
+  ResultadoJugador,
+  TorneoGestionInfoDTO,
+} from "@/interfaces/Torneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEscenarioPartida.vue";
 import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
@@ -716,7 +720,11 @@ import ModalLiderPartida from "@/components/ResultadosTorneos/ModalLiderPartida.
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
 import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
-import { Clasificacion, UpdatePartidaTorneoDTO } from "@/interfaces/Live";
+import {
+  Clasificacion,
+  GenerarRonda,
+  UpdatePartidaTorneoDTO,
+} from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
 import { getlistaTorneo } from "@/services/ListasService";
@@ -854,63 +862,82 @@ onMounted(async () => {
   }
 });
 
-const resultados = async () => {
-  //TODO  domadores
-  if (torneo.value?.idTorneo == 7) {
-    try {
-      isGenerating.value = true;
-      const resultados1: Resultado[] = clasificacionZona1.value.map(
-        (clasificacion, index) => {
-          return {
-            idUsuario: clasificacion.idUsuario,
-            idTorneo: torneo.value?.idTorneo,
-            resultado: index + 1,
-          };
-        }
-      );
+const resultados = async (ronda: number) => {
+  // //TODO  domadores
+  // if (torneo.value?.idTorneo == 7) {
+  //   try {
+  //     isGenerating.value = true;
+  //     const resultados1: Resultado[] = clasificacionZona1.value.map(
+  //       (clasificacion, index) => {
+  //         return {
+  //           idUsuario: clasificacion.idUsuario,
+  //           idTorneo: torneo.value?.idTorneo,
+  //           resultado: index + 1,
+  //         };
+  //       }
+  //     );
 
-      await guardarResultados(resultados1);
+  //     await guardarResultados(resultados1);
 
-      const resultados2: Resultado[] = clasificacionZona2.value.map(
-        (clasificacion, index) => {
-          return {
-            idUsuario: clasificacion.idUsuario,
-            idTorneo: torneo.value?.idTorneo,
-            resultado: index + 1,
-          };
-        }
-      );
+  //     const resultados2: Resultado[] = clasificacionZona2.value.map(
+  //       (clasificacion, index) => {
+  //         return {
+  //           idUsuario: clasificacion.idUsuario,
+  //           idTorneo: torneo.value?.idTorneo,
+  //           resultado: index + 1,
+  //         };
+  //       }
+  //     );
 
-      await guardarResultados(resultados2);
+  //     await guardarResultados(resultados2);
 
-      showSuccessModal.value = true;
-    } catch (error) {
-      showErrorModal.value = true;
-      console.error(error);
-    } finally {
-      isGenerating.value = false;
-    }
-  } else {
-    try {
-      isGenerating.value = true;
-      const resultados: Resultado[] = clasificacion.value.map(
-        (clasi, index) => {
-          return {
-            idUsuario: clasi.idUsuario,
-            idTorneo: torneo.value?.idTorneo,
-            resultado: index + 1,
-          };
-        }
-      );
+  //     showSuccessModal.value = true;
+  //   } catch (error) {
+  //     showErrorModal.value = true;
+  //     console.error(error);
+  //   } finally {
+  //     isGenerating.value = false;
+  //   }
 
-      await guardarResultados(resultados);
-      showSuccessModal.value = true;
-    } catch (error) {
-      showErrorModal.value = true;
-      console.error(error);
-    } finally {
-      isGenerating.value = false;
-    }
+  try {
+    isGenerating.value = true;
+    const ganadores: ResultadoJugador[] = clasificacion.value.map(
+      (clasi, index) => {
+        return {
+          idUsuario: clasi.idUsuario,
+          idTorneo: torneo.value?.idTorneo,
+          resultado: index + 1,
+        };
+      }
+    );
+    const idTorneo: number | undefined = torneo.value?.idTorneo;
+
+    console.log(idTorneo);
+
+    if (idTorneo == undefined) return;
+
+    const partidasUltimasRonda: GenerarRonda = {
+      emparejamientos: [],
+      luzVsOscCheck: false,
+      mismaComunidadCheck: false,
+      retosCheck: false,
+      esEloCheck: false,
+      opcionImpares: null,
+      idTorneo: idTorneo,
+      idRonda: ronda,
+    };
+
+    const guardarResultadosDTO: GuardarResultadosDTO = {
+      ganadoresDTO: ganadores,
+      generarRondaDTO: partidasUltimasRonda,
+    };
+    await guardarResultados(guardarResultadosDTO);
+    showSuccessModal.value = true;
+  } catch (error) {
+    showErrorModal.value = true;
+    console.error(error);
+  } finally {
+    isGenerating.value = false;
   }
 };
 
