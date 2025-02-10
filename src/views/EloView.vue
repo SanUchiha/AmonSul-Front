@@ -5,14 +5,14 @@
     </div>
     <div v-else>
       <v-tabs v-model="tab" color="primary" grow>
-        <v-tab value="Global"> Global </v-tab>
+        <v-tab value="Individual"> Individual </v-tab>
         <!-- <v-tab value="Mensual"> Mensual </v-tab> -->
         <v-tab value="Equipos"> Equipos </v-tab>
       </v-tabs>
 
       <v-tabs-window v-model="tab">
         <!-- TAB 1. -->
-        <v-tabs-window-item value="Global" v-if="tab === 'Global'">
+        <v-tabs-window-item value="Individual" v-if="tab === 'Individual'">
           <SparklineElo :email="correo" class="separated" />
           <TablaClasificacionElo class="separated" :items="eloClasificacion" />
         </v-tabs-window-item>
@@ -47,7 +47,7 @@ import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 
 const usuariosStore = useUsuariosStore();
 
-const tab = ref<string>("Global");
+const tab = ref<string>("Individual");
 
 const { getUser } = useAuth();
 const error = ref<string | null>(null);
