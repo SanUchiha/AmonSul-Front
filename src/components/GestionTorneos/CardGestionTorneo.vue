@@ -47,8 +47,6 @@
               >
                 Modificar torneo
               </v-btn>
-
-              {{ showModificarTorneoModal }}
             </div>
 
             <div class="text-wrap text-sm">
@@ -60,8 +58,6 @@
               >
                 Modificar bases
               </v-btn>
-
-              {{ showModificarBasesTorneoModal }}
             </div>
           </div>
         </v-list-item-title>
