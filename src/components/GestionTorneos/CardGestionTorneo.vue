@@ -39,8 +39,29 @@
               Modificar torneo
             </v-btn> -->
             <div class="text-wrap text-sm">
-              Para modificar algún parámetro del torneo ponte en contacto con el
-              administrador
+              <v-btn
+                class="mt-2"
+                variant="tonal"
+                color="secondary"
+                @click="modificarTorneo()"
+              >
+                Modificar torneo
+              </v-btn>
+
+              {{ showModificarTorneoModal }}
+            </div>
+
+            <div class="text-wrap text-sm">
+              <v-btn
+                class="mt-2"
+                variant="tonal"
+                color="secondary"
+                @click="modificarBasesTorneo()"
+              >
+                Modificar bases
+              </v-btn>
+
+              {{ showModificarBasesTorneoModal }}
             </div>
           </div>
         </v-list-item-title>
@@ -52,6 +73,14 @@
   <ModalModificarTorneo
     :isVisible="showModificarTorneoModal"
     :torneo="torneoMod"
+    @close="cerrarModalModificarTorneo()"
+  />
+
+  <!-- modal para modificar el torneo -->
+  <ModalModificarBasesTorneo
+    :isVisible="showModificarBasesTorneoModal"
+    :torneo="torneoMod"
+    @close="cerrarModalModificarBasesTorneo()"
   />
   <!-- modal torneo modificado con exito -->
   <ModalSuccess
@@ -72,11 +101,14 @@ import { Torneo, TorneoGestionInfoDTO } from "@/interfaces/Torneo";
 import { computed, defineProps, ref } from "vue";
 import ModalModificarTorneo from "./ModalModificarTorneo.vue";
 import { getTorneo } from "@/services/TorneosService";
+import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const showModificarTorneoModal = ref<boolean>(false);
+const showModificarBasesTorneoModal = ref<boolean>(false);
+
 const idTorneo = ref<number>(0);
 const isLoading = ref<boolean>(false);
 const torneoMod = ref<Torneo>();
@@ -152,6 +184,35 @@ const modificarTorneo = async () => {
     isLoading.value = false;
     showErrorModal.value = false;
   }
+};
+
+const modificarBasesTorneo = async () => {
+  if (
+    props.torneo?.torneo.idTorneo != undefined &&
+    props.torneo?.torneo.idTorneo != 0 &&
+    props.torneo?.torneo.idTorneo != null
+  )
+    idTorneo.value = props.torneo?.torneo.idTorneo;
+
+  try {
+    const responseTorneo = await getTorneo(idTorneo.value);
+    torneoMod.value = responseTorneo.data;
+    showModificarBasesTorneoModal.value = true;
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isLoading.value = false;
+    showErrorModal.value = false;
+  }
+};
+
+const cerrarModalModificarTorneo = async () => {
+  showModificarTorneoModal.value = false;
+};
+
+const cerrarModalModificarBasesTorneo = async () => {
+  showModificarBasesTorneoModal.value = false;
 };
 </script>
 <style scoped>

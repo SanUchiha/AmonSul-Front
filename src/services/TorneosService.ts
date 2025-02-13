@@ -1,6 +1,7 @@
 import {
   CrearTorneoDTO,
   GuardarResultadosDTO,
+  ModificarBasesTorneoDTO,
   ModificarTorneoDTO,
 } from "@/interfaces/Torneo";
 import { http } from "./index";
@@ -51,5 +52,11 @@ export const crearTorneo = async (torneoData: CrearTorneoDTO) => {
 };
 
 export const modificarTorneo = async (torneoData: ModificarTorneoDTO) => {
-  return http.put(`Torneo`, torneoData);
+  return http.patch(`Torneo/Gestion/editar`, torneoData);
+};
+
+export const ModificarBasesTorneoAsync = async (
+  torneoData: ModificarBasesTorneoDTO
+) => {
+  return http.patch(`Torneo/Gestion/subir-bases`, torneoData);
 };

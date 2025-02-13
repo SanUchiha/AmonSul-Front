@@ -164,7 +164,7 @@
             @click="confirmarConfiguracion"
             color="primary"
             variant="tonal"
-            >Crear</v-btn
+            >Modificar</v-btn
           >
           <v-btn variant="tonal" color="secondary" @click="closeModal" large
             >Cancelar</v-btn
@@ -188,14 +188,14 @@
   <!-- Modal response eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Torneo creado correctamente."
+    message="Torneo modificado correctamente."
     @update:isVisible="showSuccessModal = $event"
   />
 
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido crear el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    message="No se ha podido modificar el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
 </template>
@@ -267,8 +267,6 @@ const imageBase64 = ref<string | null>(null);
 const byteArrayBases = ref<Uint8Array | null>(null);
 
 const isGenerating = ref<boolean>(false);
-const isLoading = ref<boolean>(false);
-
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 
@@ -295,7 +293,6 @@ watch(
   { immediate: true }
 );
 
-// Sincronizar visibilidad del modal
 watch(
   () => props.isVisible,
   (newValue) => {
@@ -441,26 +438,27 @@ const confirmarConfiguracion = async () => {
     : null;
 
   const nuevoTorneo: ModificarTorneoDTO = {
-    nombreTorneo: nombreTorneo.value!,
-    limiteParticipantes: limiteParticipantes.value!,
-    fechaInicioTorneo: fechaInicio.value!,
-    fechaFinTorneo: fechaFin.value!,
-    precioTorneo: precioTorneo.value!,
-    numeroPartidas: numeroPartidas.value!,
-    puntosTorneo: puntosTorneo.value!,
+    nombreTorneo: nombreTorneo.value,
+    limiteParticipantes: limiteParticipantes.value,
+    fechaInicioTorneo: fechaInicio.value,
+    fechaFinTorneo: fechaFin.value,
+    precioTorneo: precioTorneo.value,
+    numeroPartidas: numeroPartidas.value,
+    puntosTorneo: puntosTorneo.value,
     estadoTorneo: estadoTorneo.value,
-    lugarTorneo: lugarTorneo.value!,
+    lugarTorneo: lugarTorneo.value,
     tipoTorneo: tipoTorneo.value,
     esLiga: esLiga.value,
     idRangoTorneo: idRangoTorneo.value,
     esMatchedPlayTorneo: esMatchedPlayTorneo.value,
-    fechaEntregaListas: fechaListas.value!,
-    fechaFinInscripcion: fechaInscripcion.value!,
+    fechaEntregaListas: fechaListas.value,
+    fechaFinInscripcion: fechaInscripcion.value,
     horaInicioTorneo: horaInicioTorneo.value + ":00",
     horaFinTorneo: horaFinTorneo.value + ":00",
     cartelTorneo: imageBase64.value!,
     basesTorneo: basesTorneoBase64!,
     descripcionTorneo: descripcionTorneo.value,
+    idTorneo: props.torneo?.idTorneo,
   };
   try {
     isGenerating.value = true;
@@ -477,10 +475,6 @@ const confirmarConfiguracion = async () => {
   emit("confirm");
   closeModal();
 };
-
-onMounted(async () => {
-  //
-});
 </script>
 <style scoped>
 .remove-btn {

@@ -207,7 +207,6 @@ import ModalError from "../Commons/ModalError.vue";
 import { CrearTorneoDTO } from "@/interfaces/Torneo";
 import DatePicker from "../Commons/DatePicker.vue";
 import { crearTorneo } from "@/services/TorneosService";
-import TimePicker from "../Commons/TimePicker.vue";
 
 const props = defineProps<{
   isVisible: boolean;
