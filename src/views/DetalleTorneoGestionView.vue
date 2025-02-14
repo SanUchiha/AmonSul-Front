@@ -674,7 +674,7 @@
     <!-- Modal success guardar resultados -->
     <ModalSuccess
       :isVisible="showSuccessModal"
-      message="Resultados guardados correctamente."
+      message="Acción realizada correctamente."
       @update:isVisible="showSuccessModal = $event"
     />
 
