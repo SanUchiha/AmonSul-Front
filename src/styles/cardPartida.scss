@@ -1,0 +1,78 @@
+  
+  /* Iconos de ubicación */
+  .location-icon {
+    color: #e92020; /* Deep Orange 400 */
+    font-size: 22px;
+  }
+
+  .match-card {
+    background: linear-gradient(to right, #111, #222);
+    box-shadow: 5px 5px 5px var(--border-color, #121212);
+    border-radius: 5px;
+    color: #fff;
+    text-transform: uppercase;
+    font-family: 'Ringbearer', sans-serif;
+  }
+
+  /* Encabezados de mesas */
+  .match-card .v-card-title {
+    font-weight: bold;
+    color: #ffcc00;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-size: 18px;
+    text-transform: uppercase;
+  }
+
+  .match-card .v-card-subtitle {
+    color: #fff;
+  }
+
+  .match-card .score {
+    color: #fff;
+    text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    display: inline-block;
+  }
+
+  .match-card .player {
+    font-weight: bold;
+    font-size: 16px;
+    color: #fff;
+  }
+
+  /* Colores de fondo para las card en funcion del resultado */
+  .victoria-card {
+    background-color: #145c17;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .derrota-card {
+    background-color: #751710;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .empate-card {
+    background-color: #e6c400;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .partida-en-juego {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-size: 1.2em;
+    font-weight: bold;
+    animation: pulse 2s infinite alternate; /* Animación */
+  }
+  
+  @keyframes pulse {
+    from {
+      opacity: 0.2;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+

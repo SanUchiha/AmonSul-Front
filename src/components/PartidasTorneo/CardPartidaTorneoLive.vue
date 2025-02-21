@@ -6,23 +6,24 @@
         </v-card-title>
 
         <v-divider></v-divider>
-        
-        <v-card-text class="text-center match-content">
-          <v-row align="center" justify="center" class="match-score" no-gutters>
-            <v-col cols="5" class="player-name text-left">
+        <v-card-title class="text-wrap">
+          <v-row align="center" justify="center" no-gutters>
+            <v-col cols="5" @click.prevent="verProfileUser(match.idUsuario1)" class="player text-left">
               <span class="ml-2 text-wrap" :class="{highlight: match.idUsuario1 === idUsuario,}">{{ match.nick1 }}</span><br>
             </v-col>
-
+  
             <v-col cols="2" class="score text-center marcador">
               <p>vs</p>
               <p>{{ match.resultadoUsuario1 }}-{{ match.resultadoUsuario2 }}</p>
             </v-col>
-
-            <v-col cols="5" class="player-name text-right">
+  
+            <v-col cols="5" @click.prevent="verProfileUser(match.idUsuario2)" class="player text-right">
               <span class="ml-2 text-wrap" :class="{highlight: match.idUsuario2 === idUsuario,}">{{ match.nick2 }}</span><br>
             </v-col>
           </v-row>
+        </v-card-title>
 
+        <v-card-text class="match-content">
           <v-row align="center" justify="center" class="army-buttons">
             <v-col cols="6" class="text-left">
               <v-btn block class="army-btn" @click="verLista(match.idUsuario1, match.idTorneo, match.nick1)" style="font-size: 10px;" variant="tonal">
@@ -33,6 +34,13 @@
               <v-btn block class="army-btn" @click="verLista(match.idUsuario2, match.idTorneo, match.nick2)" style="font-size: 10px;" variant="tonal">
                 <span class="text-wrap">{{ match.ejercitoUsuario2 }}</span>
               </v-btn>
+            </v-col>
+          </v-row>
+          
+          <v-row class="mt-3 match-scenario">
+            <v-col cols="12" class="text-center">
+              <v-icon left class="location-icon">mdi-map-marker</v-icon> Escenario:
+              <strong>{{ match.escenarioPartida || "No disponible" }}</strong>
             </v-col>
           </v-row>
 
@@ -83,11 +91,9 @@
               </v-chip>
             </v-col>
           </v-row>
-
-          <v-row class="mt-3 match-scenario">
-            <v-col cols="12" class="text-center">
-              <v-icon left class="location-icon">mdi-map-marker</v-icon> Escenario:
-              <strong>{{ match.escenarioPartida || "No disponible" }}</strong>
+          <v-row v-else class="text-center">
+            <v-col cols="12" class="text-center" >
+              <span class="partida-en-juego"><v-icon>mdi-sword-cross</v-icon> Partida en juego...</span>
             </v-col>
           </v-row>
 
@@ -342,46 +348,23 @@
     isModalEditarPartidaVisible.value = false;
   };
 
+  const verProfileUser = (idUser: number) => {
+    if (navigator.vibrate) {
+      navigator.vibrate(500);
+      router.push({ name: "detalle-jugador", params: { idUsuario:idUser } });
+    } else {
+      console.warn("La vibración no es compatible en este navegador.");
+    }
+  };
+
   onMounted(initializeComponent);
   </script>
-  <style>
+
+<style scoped>
     .highlight {
       color: rgb(224, 175, 13);
       font-weight: bold;
     }
-
-
-  .match-card {
-    background: linear-gradient(to right, #111, #222);
-    border: 1px solid #ffcc00;
-    border-radius: 10px;
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
-    text-transform: uppercase;
-  }
-
-  .match-card .title {
-    font-weight: bold;
-    color: #ffcc00;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  }
-
-  .match-card .score {
-    color: #fff;
-    text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
-    border-radius: 5px;
-    display: inline-block;
-  }
-
-  .match-card .player {
-    font-weight: bold;
-    color: #fff;
-  }
-
-  .match-card .details {     
-    color: #aaa;
-  }
-
 
 </style>
  

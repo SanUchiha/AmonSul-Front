@@ -27,7 +27,7 @@
                   <v-card-text>
                     <v-row>
                       <v-col cols="12">
-                        <p class="text-subtitle-1"><v-icon left color="blue">mdi-text</v-icon> <strong>Descripción:</strong> {{ torneo.descripcionTorneo }}</p>
+                        <p class="text-subtitle-1"><v-icon left color="blue">mdi-text</v-icon> <strong>Descripción</strong><br/> {{ torneo.descripcionTorneo }}</p>
                       </v-col>
                       <v-col cols="6" offset="3" class="text-center">
                         <p><v-icon color="cyan">mdi-trophy</v-icon> <strong>Puntos:</strong> {{ torneo.puntosTorneo }}</p>
@@ -39,7 +39,7 @@
                       </v-col>
                       <v-col cols="12" sm="6">
                         <p><v-icon left color="green">mdi-cash</v-icon> <strong>Precio:</strong> {{ torneo.precioTorneo }}€</p>
-                        <p><v-icon left color="teal">mdi-account-group</v-icon> <strong>Participantes:</strong> {{ torneo.limiteParticipantes || "Sin límite" }}</p>
+                        <p><v-icon left color="teal">mdi-account-group</v-icon> <strong>Participantes:</strong> {{ participantes.length }}/{{ torneo.limiteParticipantes || "Sin límite" }}</p>
                         <p><v-icon left color="pink">mdi-dice-multiple</v-icon> <strong>Partidas:</strong> {{ torneo.numeroPartidas }}</p>
                       </v-col>
                     </v-row>
@@ -48,23 +48,28 @@
                   <v-divider class="mb-3"></v-divider>
 
                   <v-card-actions class="d-flex justify-space-between">
-                    <v-btn variant="tonal" color="blue" :disabled="!torneo.tieneBases" @click="descargarBases">
-                      <v-icon left>mdi-file-download</v-icon> Descargar Bases
-                    </v-btn>
-                    
-                    <span v-if="!isInscripcionCerrada">
-                      <span v-if="estaApuntado" class="text-green text-subtitle-1">
-                        <v-btn variant="tonal" color="red" @click="showModalResponse">
-                          <v-icon left>mdi-check-circle</v-icon> Borrar inscripción
-                        </v-btn>   
-                      </span>
-                      <span v-else>
-                        <v-btn variant="tonal" color="green" @click="showModalResponse">
-                          <v-icon left>mdi-check-circle</v-icon> Apuntarse
-                        </v-btn>                        
-                      </span>
-                    </span>
-                    <span v-else class="text-red text-subtitle-1">Plazo de inscripción cerrado</span>
+                    <v-row>
+                      <v-col cols="12" sm="6">
+                        <v-btn variant="tonal" color="blue" :disabled="!torneo.tieneBases" @click="descargarBases" block>
+                          <v-icon left>mdi-file-download</v-icon> Descargar Bases
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="12" sm="6">
+                        <span v-if="!isInscripcionCerrada">
+                          <span v-if="estaApuntado" class="text-green text-subtitle-1">
+                            <v-btn variant="tonal" color="red" @click="showModalResponse" block>
+                              <v-icon left>mdi-check-circle</v-icon> Borrar inscripción
+                            </v-btn>   
+                          </span>
+                          <span v-else>
+                            <v-btn variant="tonal" color="green" @click="showModalResponse" block>
+                              <v-icon left>mdi-check-circle</v-icon> Apuntarse
+                            </v-btn>                        
+                          </span>
+                        </span>
+                        <span v-else class="text-red text-subtitle-1">Plazo de inscripción cerrado</span>
+                      </v-col>
+                    </v-row>
                   </v-card-actions>
                 </v-card>
               </v-col>
@@ -178,7 +183,7 @@ const eliminarInscripcion = async (idInscripcion: number) => {
     if (response.request?.status === 200) {
       showSuccessModal.value = true;
       const responseInscriptionesUser = await getInscripcionesUser(
-        idUsuario.value.toString()
+        idUsuario.value!
       );
     } else {
       showErrorModal.value = true;
@@ -282,6 +287,7 @@ const showModalResponse = async () => {
     }
   }
   else{
+    //TODO necesito la inscripcion del torneo a borrar
     eliminarInscripcion(idInscripcion);
   }
 };
