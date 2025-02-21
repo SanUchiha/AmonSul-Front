@@ -32,13 +32,15 @@
 
       <!-- partidas validades -->
       <div v-if="!isLoadingMatches && matches.length > 0">
-        <CardPartidaTorneo
-          v-for="match in matches"
-          :key="match.idPartidaTorneo"
-          :idUsuario="parseInt(idUsuarioLogger!)"
-          :match="match"
-          class="mb-4"
-        />
+        <v-row align="center" justify="center">
+          <CardPartidaTorneo
+            v-for="match in matches"
+            :key="match.idPartidaTorneo"
+            :idUsuario="parseInt(idUsuarioLogger!)"
+            :match="match"
+            class="mb-4"
+          />
+        </v-row>
       </div>
       <div v-else>
         <h3>No tienes partidas en torneos</h3>
@@ -51,7 +53,7 @@
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
-import CardPartidaTorneo from "@/components/PartidaAmistosa/CardPartidaTorneo.vue";
+import CardPartidaTorneo from "@/components/PartidasTorneo/CardPartidaTorneo.vue";
 import CardResumenPartidas from "@/components/PartidaAmistosa/CardResumenPartidas.vue";
 import CardInscripcionesUsuarioTorneo from "@/components/PartidasTorneo/CardInscripcionesUsuarioTorneo.vue";
 import CardTitleMisTorneos from "@/components/PartidasTorneo/CardTitleMisTorneos.vue";

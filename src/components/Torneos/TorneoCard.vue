@@ -1,29 +1,29 @@
 <template>
-  <v-card class="torneo-card mx-auto my-3" max-width="300px">
+  <v-card class="torneo-card mx-auto my-3">
     <v-img :src="torneo.cartelTorneo" height="200px" contain></v-img>
 
     <v-divider class="my-3"></v-divider>
 
     <v-card-title class="torneo-titulo">{{ torneo.nombreTorneo }}</v-card-title>
 
-    <v-card-subtitle>
+    <v-card-subtitle class="text-left">
       <v-icon left>mdi-map-marker</v-icon>
-      Lugar: {{ torneo.lugarTorneo }}
+      Lugar: <span class="subheading text-wrap">{{ torneo.lugarTorneo }}</span>
     </v-card-subtitle>
 
-    <v-card-subtitle>
+    <v-card-subtitle class="text-left">
       <v-icon left>mdi-calendar-month</v-icon>
-      Fecha: {{ fechaTorneo }}
+      Fecha: <span class="subheading">{{ fechaTorneo }}</span>
     </v-card-subtitle>
 
-    <v-card-subtitle>
+    <v-card-subtitle class="text-left">
       <v-icon left>mdi-star</v-icon>
-      Puntos: {{ torneo.puntosTorneo }}
+      Puntos: <span class="subheading">{{ torneo.puntosTorneo }}</span>
     </v-card-subtitle>
 
-    <v-card-subtitle>
+    <v-card-subtitle class="text-left">
       <v-icon left>mdi-format-list-bulleted</v-icon>
-      Rondas: {{ torneo.numeroPartidas }}
+      Rondas: <span class="subheading">{{ torneo.numeroPartidas }}</span>
     </v-card-subtitle>
 
     <v-spacer class="my-3"></v-spacer>
@@ -37,6 +37,16 @@
       >
         Ver Detalle
       </v-btn>
+      <v-if torneo.estadoTorneo="TERMINADO">
+        <v-btn
+          variant="tonal"
+          color="blue lighten-2"
+          @click="goToResultadoTorneo"
+          block
+        >
+          Ver Clasificación
+        </v-btn>
+      </v-if>
     </v-card-actions>
   </v-card>
 </template>
@@ -58,6 +68,10 @@ onMounted(async () => {
 const goToDetalle = () => {
   router.push(`/detalle-torneo/${props.torneo.idTorneo}`);
 };
+const goToResultadoTorneo = () => {
+  router.push(`/detalle-torneo-live/${props.torneo.idTorneo}`);
+};
+
 </script>
 
 <style scoped>

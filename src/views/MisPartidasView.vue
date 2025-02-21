@@ -47,15 +47,18 @@
 
       <v-divider class="my-3"></v-divider>
 
-      <!-- partidas validades -->
+      <!-- partidas validadas -->
+      <!-- TODO Hacer un infinite scroll-->
       <div v-if="!isLoadingValidadas && validMatches.length > 0">
-        <ValidadasMatchCard
-          v-for="match in validMatches"
-          :key="match.idPartidaAmistosa"
-          :idUsuario="parseInt(idUsuarioLogger!)"
-          :match="match"
-          class="mb-4"
-        />
+        <v-row align="center" justify="center">
+          <ValidadasMatchCard
+            v-for="match in validMatches"
+            :key="match.idPartidaAmistosa"
+            :idUsuario="parseInt(idUsuarioLogger!)"
+            :match="match"
+            class="mb-4"
+          />
+        </v-row>
       </div>
       <div v-else>
         <h3>No tienes partidas validadas</h3>

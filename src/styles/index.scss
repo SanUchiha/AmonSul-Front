@@ -4,3 +4,95 @@
   font-weight: 400;
   src: url('~@/assets/fonts/IntroDemoBlackCaps.otf');
 }
+/* Fondo general */
+body {
+  background-color: #263238; /* Blue Grey 900 */
+  color: #F5F5F5; /* Grey 100 */
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Contenedores de tarjetas (mesas de juego) */
+.v-sheet {
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Encabezados de mesas */
+.v-card-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #FFC107; /* Amber 500 */
+  text-transform: uppercase;
+}
+
+/* Texto dentro de las tarjetas */
+.card-text {
+  color: #F5F5F5; /* Grey 100 */
+  font-size: 14px;
+}
+
+/* Iconos de ubicación */
+.location-icon {
+  color: #e92020; /* Deep Orange 400 */
+  font-size: 22px;
+}
+
+/* Pestañas activas */
+.v-tab {
+  color: #F5F5F5; /* Texto claro */
+}
+
+.v-tab--selected {
+  color: white !important; /* Indigo 400 */
+  background-color: #292929;
+  font-weight: bold;
+}
+
+/* Extra extra pequeño (xxs): móviles */
+@media (max-width: 399px) {
+  .marcador {
+    font-size: 13px;
+  }
+}
+/* Extra pequeño (xs): móviles */
+@media (min-width: 400px) and (max-width: 499px) {
+  .marcador {
+    font-size: 20px;
+  }
+}
+
+/* Extra pequeño (xs): móviles */
+@media (min-width: 500px) and (max-width: 599px) {
+  .marcador {
+    font-size: 20px;
+  }
+}
+
+/* Pequeño (sm): tablets en vertical */
+@media (min-width: 600px) and (max-width: 959px) {
+  .marcador {
+    font-size: 24px;
+  }
+}
+
+/* Mediano (md): tablets en horizontal o laptops pequeñas */
+@media (min-width: 960px) and (max-width: 1263px) {
+  .marcador {
+    font-size: 18px;
+  }
+}
+
+/* Grande (lg): pantallas grandes o monitores */
+@media (min-width: 1264px) and (max-width: 1903px) {
+  .marcador {
+    font-size: 20px;
+  }
+}
+
+/* Extra grande (xl): pantallas 4K o mayores */
+@media (min-width: 1904px) {
+  .marcador {
+    font-size: 22px;
+  }
+}
+

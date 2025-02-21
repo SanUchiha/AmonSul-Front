@@ -24,6 +24,7 @@ export interface Torneo {
   horaInicioTorneo: string; // Hora de inicio del torneo (HH:mm)
   horaFinTorneo: string; // Hora de fin del torneo (HH:mm)
   limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
+  tieneBases: boolean;
 }
 
 export interface TorneoPropioDTO {

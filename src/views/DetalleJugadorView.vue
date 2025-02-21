@@ -65,15 +65,16 @@
             <!-- tab 3 (partidas torneos) -->
             <v-tabs-window-item value="3">
               <div v-if="tournamentMatches.length > 0">
-                <div
+                <v-row align="center" justify="center">
+                <CardPartidaTorneo
                   v-for="match in tournamentMatches"
                   :key="match.idPartidaTorneo"
-                >
-                  <CardTournamentMatch
-                    :match="match"
-                    :idUsuario="usuarioData.idUsuario"
-                  />
-                </div>
+                  :idUsuario="usuarioData.idUsuario"
+                  :match="match"
+                  class="mb-4"
+                />
+              </v-row>
+
               </div>
               <div v-else>
                 <h3>No tiene partidas de torneo</h3>
@@ -125,7 +126,7 @@ import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcione
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
-import CardTournamentMatch from "@/components/PartidasTorneo/CardTournamentMatch.vue";
+import CardPartidaTorneo from "@/components/PartidasTorneo/CardPartidaTorneo.vue";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
 
 const tab = ref<string>("one");
