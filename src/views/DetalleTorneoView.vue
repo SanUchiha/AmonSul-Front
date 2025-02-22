@@ -145,7 +145,7 @@ const idTorneo = ref<number>();
 const estaApuntado = ref<boolean>(false);
 const isTorneoCompletado = ref<boolean>(false);
 const torneosApuntado = ref<InscripcionUsuarioDTO[]>();
-const idInscripcion = ref<number>();
+const idInscripcion = ref<number>(0);
 
 const tab = ref(0);
 const search = ref<string>("");
@@ -220,7 +220,10 @@ onMounted(async () => {
     // Verificar si el usuario ya está apuntado
     if (torneosApuntado.value != null) {
       torneosApuntado.value.forEach((element) => {
-        if (element.idTorneo === idTorneo.value) estaApuntado.value = true;
+        if (element.idTorneo === idTorneo.value) {
+          idInscripcion.value=element.idInscripcion;
+          estaApuntado.value = true;
+        }
       });
 
       // Verificar si el torneo está completo
@@ -267,10 +270,12 @@ const descargarBases = async () => {
 };
 
 const showModalResponse = async () => {
+  console.log("idInscripcion.value", idInscripcion.value)
   if (
     idUsuario.value != null &&
     idTorneo.value != null &&
-    !isInscripcionCerrada.value
+    !isInscripcionCerrada.value &&
+    idInscripcion.value == 0
   ) {
     const inscripcion: CrearInscripcionDTO = {
       idUsuario: parseInt(idUsuario.value),
@@ -288,7 +293,7 @@ const showModalResponse = async () => {
   }
   else{
     //TODO necesito la inscripcion del torneo a borrar
-    eliminarInscripcion(idInscripcion);
+    eliminarInscripcion(idInscripcion.value);
   }
 };
 </script>

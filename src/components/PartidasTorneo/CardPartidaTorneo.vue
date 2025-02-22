@@ -39,7 +39,7 @@
       <v-card-text :class="['text-center match-content', cardColorClass]">
         <v-row align="center">
           <v-col cols="4" class="text-center">
-            <v-chip :color="resultado === 'Victoria' ? '#4CAF50' : resultado === 'Derrota'? '#F44336' : 'orange'" class="text-h6">
+            <v-chip :color="resultado === 'Victoria' ? '#4CAF50' : resultado === 'Derrota'? '#F44336' : '#fff09d'" class="text-h6">
               {{ resultado }}
             </v-chip>
           </v-col>
