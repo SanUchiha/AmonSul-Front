@@ -1,52 +1,51 @@
 <template>
-  <v-card class="torneo-card mx-auto my-3">
-    <v-img :src="torneo.cartelTorneo" height="200px" contain></v-img>
+  <v-card class="pa-3">
+    <v-img :src="torneo.cartelTorneo" height="250px" class="rounded-lg" />
 
     <v-divider class="my-3"></v-divider>
 
-    <v-card-title class="torneo-titulo">{{ torneo.nombreTorneo }}</v-card-title>
-
-    <v-card-subtitle class="text-left">
-      <v-icon left>mdi-map-marker</v-icon>
-      Lugar: <span class="subheading text-wrap">{{ torneo.lugarTorneo }}</span>
+    <v-card-title class="text-h5 text-center font-weight-bold mt-3">
+      {{ torneo.nombreTorneo }}
+    </v-card-title>
+    <v-card-subtitle class="text-center mb-3">
+      <v-icon left>mdi-map-marker</v-icon> {{ torneo.lugarTorneo }}
     </v-card-subtitle>
 
-    <v-card-subtitle class="text-left">
-      <v-icon left>mdi-calendar-month</v-icon>
-      Fecha: <span class="subheading">{{ fechaTorneo }}</span>
-    </v-card-subtitle>
+    <v-divider class="my-3"></v-divider>
 
-    <v-card-subtitle class="text-left">
-      <v-icon left>mdi-star</v-icon>
-      Puntos: <span class="subheading">{{ torneo.puntosTorneo }}</span>
-    </v-card-subtitle>
+    <v-card-text>
+      <v-row>
+        <v-col cols="10" offset="1" class="text-left">
+          <p><v-icon left color="green">mdi-calendar</v-icon> <strong>Fecha:</strong> {{ fechaTorneo }} a las {{ torneo.horaInicioTorneo }}</p>  
+          <p><v-icon color="cyan">mdi-trophy</v-icon> <strong>Puntos:</strong> {{ torneo.puntosTorneo }}</p>
+          <p><v-icon color="cyan">mdi-format-list-bulleted</v-icon> <strong>Rondas:</strong> {{ torneo.numeroPartidas }}</p>
+        </v-col>
+      </v-row>
+    </v-card-text>
 
-    <v-card-subtitle class="text-left">
-      <v-icon left>mdi-format-list-bulleted</v-icon>
-      Rondas: <span class="subheading">{{ torneo.numeroPartidas }}</span>
-    </v-card-subtitle>
+    <v-divider class="mb-3"></v-divider>
 
-    <v-spacer class="my-3"></v-spacer>
-
-    <v-card-actions>
-      <v-btn
-        variant="tonal"
-        color="orange lighten-2"
-        @click="goToDetalle"
-        block
-      >
-        Ver Detalle
-      </v-btn>
-      <v-if torneo.estadoTorneo="TERMINADO">
-        <v-btn
-          variant="tonal"
-          color="blue lighten-2"
-          @click="goToResultadoTorneo"
-          block
-        >
-          Ver Clasificación
-        </v-btn>
-      </v-if>
+    <v-card-actions class="d-flex justify-space-between">
+      <v-row>
+        <v-col cols="12" sm="6">
+          <v-btn
+            variant="tonal"
+            color="orange lighten-2"
+            @click="goToDetalle"
+          >
+            Ver Detalle
+          </v-btn>
+        </v-col>
+        <v-col v-if=(verClasificacion) cols="12" sm="6">
+          <v-btn
+            variant="tonal"
+            color="blue lighten-2"
+            @click="goToResultadoTorneo"
+          >
+            Ver Clasificación
+          </v-btn>
+        </v-col>
+      </v-row>
     </v-card-actions>
   </v-card>
 </template>
@@ -57,7 +56,7 @@ import { formatFechaSpa } from "@/utils/Fecha";
 import { defineProps, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
-const props = defineProps<{ torneo: Torneo }>();
+const props = defineProps<{ torneo: Torneo; verClasificacion: boolean }>();
 const router = useRouter();
 const fechaTorneo = ref<string>("");
 
