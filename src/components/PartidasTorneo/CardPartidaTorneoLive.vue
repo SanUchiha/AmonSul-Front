@@ -228,6 +228,7 @@
         props.match.fechaPartida
       );
     } catch (err) {
+      console.error(error);
       error.value = (err as Error).message;
       router.push({ name: "error" });
     } finally {

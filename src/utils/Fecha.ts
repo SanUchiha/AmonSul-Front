@@ -1,7 +1,10 @@
 export const formatFechaSpa = async (fecha: string): Promise<string> => {
-  const [year, month, day] = fecha.split("-");
-  const formattedDate = `${day}/${month}/${year}`;
-  return formattedDate;
+  if (fecha !== null){
+    const [year, month, day] = fecha.split("-");
+    const formattedDate = `${day}/${month}/${year}`;
+    return formattedDate;
+  }
+  return "";
 };
 
 export const formatFechaDB = async (fecha: string): Promise<string> => {
