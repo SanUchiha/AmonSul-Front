@@ -8,13 +8,13 @@
       </v-tabs>
 
       <v-card-text>
-        <v-tabs-window v-model="tab">
+        <v-window v-model="tab">
           <!-- Información del Torneo -->
-          <v-tabs-window-item value="one">
+          <v-window-item value="one">
             <v-row justify="center">
               <v-col cols="12" md="10">
                 <v-card v-if="torneo" class="pa-3">
-                  <v-img :src="torneo.cartelTorneo" height="250px" class="rounded-lg" />
+                  <v-img :src="torneo.cartelTorneo || require('@/assets/images/ImagenTorneo.jpg')" height="250px" class="rounded-lg" />
                   <v-card-title class="text-h5 text-center font-weight-bold mt-3">
                     {{ torneo.nombreTorneo }}
                   </v-card-title>
@@ -29,9 +29,15 @@
                       <v-col cols="12">
                         <p class="text-subtitle-1"><v-icon left color="blue">mdi-text</v-icon> <strong>Descripción</strong><br/> {{ torneo.descripcionTorneo }}</p>
                       </v-col>
-                      <v-col cols="6" offset="3" class="text-center">
-                        <p><v-icon color="cyan">mdi-trophy</v-icon> <strong>Puntos:</strong> {{ torneo.puntosTorneo }}</p>
+
+                      <v-divider></v-divider>
+
+                      <v-col cols="10" offset="1" class="text-center">
+                        <p class="text-h6"><v-icon color="cyan">mdi-trophy</v-icon> <strong>Puntos:</strong> {{ torneo.puntosTorneo }}</p>
                       </v-col>
+
+                      <v-divider class="mb-3"></v-divider>
+
                       <v-col cols="12" sm="6">
                         <p><v-icon left color="green">mdi-calendar</v-icon> <strong>Fecha:</strong> {{ formatDate(torneo.fechaInicioTorneo) }} a las {{ torneo.horaInicioTorneo }}</p>
                         <p><v-icon left color="red">mdi-calendar-clock</v-icon> <strong>Inscripción hasta:</strong> {{ formatDate(torneo.fechaFinInscripcion) }}</p>
@@ -74,7 +80,7 @@
                 </v-card>
               </v-col>
             </v-row>
-          </v-tabs-window-item>
+          </v-window-item>
 
           <!-- Modal Success -->
     <ModalSuccess
@@ -91,7 +97,7 @@
     />
     
           <!-- Participantes -->
-          <v-tabs-window-item value="two">
+          <v-window-item value="two">
             <v-card flat>
               <v-card-title class="d-flex align-center">
                 <p><v-icon left>mdi-account-group</v-icon> Participantes</p>
@@ -107,8 +113,8 @@
                 </template>
               </v-data-table>
             </v-card>
-          </v-tabs-window-item>
-        </v-tabs-window>
+          </v-window-item>
+        </v-window>
       </v-card-text>
     </v-card>
   </v-container>

@@ -9,7 +9,7 @@
           <!-- tabs
            1. info usuario / 2. partidas amistosas / 3. partidas torneos / 4. torneos jugador -->
 
-          <v-tabs v-model="tab" color="primary" grow>
+          <v-tabs v-model="tab" color="primary" grow show-arrows next-icon="mdi-arrow-right-bold-box-outline" prev-icon="mdi-arrow-left-bold-box-outline">
             <v-tab value="1">
               <v-icon icon="mdi-star-face"></v-icon>
             </v-tab>
@@ -20,11 +20,11 @@
             </v-tab>
           </v-tabs>
 
-          <v-tabs-window v-model="tab">
+          <v-window v-model="tab">
             <!-- Tab 1.
              spark
            Jugador card -->
-            <v-tabs-window-item value="1">
+            <v-window-item value="1">
               <v-row justify="center">
                 <v-col cols="12" md="12">
                   <v-row dense>
@@ -39,11 +39,11 @@
                   </v-row>
                 </v-col>
               </v-row>
-            </v-tabs-window-item>
+            </v-window-item>
 
             <!-- tab 2. (partidas)
            Lista de partidas -->
-            <v-tabs-window-item value="2">
+            <v-window-item value="2">
               <v-divider class="my-3"></v-divider>
 
               <div v-if="!isLoading && validMatches.length > 0">
@@ -60,10 +60,10 @@
                 <h3>No tienes partidas validadas</h3>
               </div>
               <v-divider class="my-3"></v-divider>
-            </v-tabs-window-item>
+            </v-window-item>
 
             <!-- tab 3 (partidas torneos) -->
-            <v-tabs-window-item value="3">
+            <v-window-item value="3">
               <div v-if="tournamentMatches.length > 0">
                 <v-row align="center" justify="center">
                 <CardPartidaTorneo
@@ -80,19 +80,19 @@
                 <h3>No tiene partidas de torneo</h3>
               </div>
               <v-divider class="my-3"></v-divider>
-            </v-tabs-window-item>
+            </v-window-item>
 
             <!-- tab 4.
            Inscription a los tornoes (mis torneos)
            Lista de partidas -->
-            <v-tabs-window-item value="4">
+            <v-window-item value="4">
               <TablaInscripcionesTorneo
                 :isLoading="isLoading"
                 :listaTorneos="usuarioData.inscripcionesTorneo"
                 :idUsuario="usuarioData.idUsuario"
               />
-            </v-tabs-window-item>
-          </v-tabs-window>
+            </v-window-item>
+          </v-window>
         </div>
       </v-col>
       <v-row align="center" justify="center">

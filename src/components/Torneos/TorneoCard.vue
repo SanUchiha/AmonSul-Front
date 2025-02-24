@@ -1,10 +1,10 @@
 <template>
   <v-card class="pa-3">
-    <v-img :src="torneo.cartelTorneo" height="250px" class="rounded-lg" />
+    <v-img :src="torneo.cartelTorneo || require('@/assets/images/ImagenTorneo.jpg')" height="250px" class="rounded-lg" />
 
     <v-divider class="my-3"></v-divider>
 
-    <v-card-title class="text-h5 text-center font-weight-bold mt-3">
+    <v-card-title class="ringbearer text-h6 text-center text-wrapper font-weight-bold mt-3">
       {{ torneo.nombreTorneo }}
     </v-card-title>
     <v-card-subtitle class="text-center mb-3">

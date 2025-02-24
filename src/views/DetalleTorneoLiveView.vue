@@ -22,13 +22,13 @@
           ></v-tab>
         </v-tabs>
         <!-- Contenido de las Tabs -->
-        <v-tabs-window v-model="activeTab">
+        <v-window v-model="activeTab">
           <div v-if="partidas.length === 0">
             <p>Aún no se ha generado ninguna ronda</p>
           </div>
 
           <!-- tab dinamicas -->
-          <v-tabs-item>
+          <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
                 <v-row>
                   <v-col cols="12" sm="12" md="6" lg="6" xl="4" class="pb-0"
                     v-for="(partida, index) in partidasPorRonda[activeTab!]"
@@ -64,12 +64,12 @@
                     </div>
                   </v-col>                       
                 </v-row>
-          </v-tabs-item>
+          </v-window-item>
 
 
 
           <!-- Tab clasificacion -->
-          <v-tabs-window-item
+          <v-window-item
             :value="tabClasificacion"
             :key="tabClasificacion"
           >
@@ -209,8 +209,8 @@
               </div>
               <div v-else><p>Esperando resultados...</p></div>
             </div>
-          </v-tabs-window-item>
-        </v-tabs-window>
+          </v-window-item>
+        </v-window>
     </div>
 
 

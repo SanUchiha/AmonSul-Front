@@ -10,8 +10,8 @@
             <v-tab value="proximos"> Próximos </v-tab>
             <v-tab value="pasados"> Pasados </v-tab>
           </v-tabs>
-          <v-tabs-window v-model="tab">
-            <v-tabs-window-item value="proximos">
+          <v-window v-model="tab" >
+            <v-window-item value="proximos" >
               <div v-if="torneosFuturos.length < 1">
                 No hay torneos próximos...
               </div>
@@ -29,8 +29,8 @@
                   />
                 </v-col>
               </v-row>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="pasados">
+            </v-window-item>
+            <v-window-item value="pasados">
               <div v-if="torneosPasados.length < 1">
                 No hay torneos pasados...
               </div>
@@ -85,8 +85,8 @@
               <div v-if="filteredTorneos.length === 0" class="text-center mt-4">
                 <p>No se encontraron torneos que coincidan con la búsqueda.</p>
               </div>
-            </v-tabs-window-item>
-          </v-tabs-window>
+            </v-window-item>
+          </v-window>
         </div>
       </v-col>
     </v-row>

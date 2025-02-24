@@ -9,7 +9,9 @@
         <v-card-title class="text-wrap">
           <v-row align="center" justify="center" no-gutters>
             <v-col cols="5" @click.prevent="verProfileUser(match.idUsuario1)" class="player text-left">
-              <span class="ml-2 text-wrap" :class="{highlight: match.idUsuario1 === idUsuario,}">{{ match.nick1 }}</span><br>
+              <v-chip variant="text" >   
+                <span class="ml-2 text-wrap" :class="{highlight: match.idUsuario1 === idUsuario,}">{{ match.nick1 }}</span>
+              </v-chip>
             </v-col>
   
             <v-col cols="2" class="score text-center marcador">
@@ -18,7 +20,9 @@
             </v-col>
   
             <v-col cols="5" @click.prevent="verProfileUser(match.idUsuario2)" class="player text-right">
-              <span class="ml-2 text-wrap" :class="{highlight: match.idUsuario2 === idUsuario,}">{{ match.nick2 }}</span><br>
+              <v-chip variant="text" >   
+                <span class="ml-2 text-wrap" :class="{highlight: match.idUsuario2 === idUsuario,}">{{ match.nick2 }}</span>
+              </v-chip>
             </v-col>
           </v-row>
         </v-card-title>
@@ -75,7 +79,7 @@
           <v-row align="center" v-if="completa" class="match-outcome">
             <v-col cols="5" class="text-center" >
               <v-chip :color="getColorGanador(match, match.idUsuario1)" class="outcome-chip">
-                <p v-if="match.nick1 === getGanador(match)">Vencedor</p>
+                <p v-if="match.nick1 === getGanador(match)">Victoria</p>
                 <p v-else-if="match.nick2 === getGanador(match)">Derrota</p>
                 <p v-else>Empate</p>
               </v-chip>
@@ -85,7 +89,7 @@
 
             <v-col cols="5" class="text-center">
               <v-chip :color="getColorGanador(match, match.idUsuario2)" class="outcome-chip">
-                <p v-if="match.nick2 === getGanador(match)">Vencedor</p>
+                <p v-if="match.nick2 === getGanador(match)">Victoria</p>
                 <p v-else-if="match.nick1 === getGanador(match)">Derrota</p>
                 <p v-else>Empate</p>
               </v-chip>
