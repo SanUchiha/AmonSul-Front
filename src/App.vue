@@ -53,6 +53,12 @@
             <v-list-item-title>Ligas</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item link to="/about-us" v-if="isAuthenticated">
+          <v-list-item-content class="d-flex ga-2">
+            <v-icon>mdi-information</v-icon>
+            <v-list-item-title>Sobre nosotros</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item link to="/perfil-usuario" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-cog</v-icon>

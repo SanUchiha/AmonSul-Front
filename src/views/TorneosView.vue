@@ -129,7 +129,7 @@ onMounted(async () => {
   torneosPasados.value = listaTorneos.value.filter(
     (torneo) => new Date(torneo.fechaInicioTorneo).getTime() <= now
   ).toSorted((a,b)=>{
-    return a.fechaInicioTorneo.localeCompare(b.fechaInicioTorneo);
+    return b.fechaInicioTorneo.localeCompare(a.fechaInicioTorneo);
   });
 
   isLoading.value = false;
