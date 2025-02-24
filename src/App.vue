@@ -4,13 +4,17 @@
       <v-btn icon @click.stop="drawer = false" class="close-drawer-btn">
         <v-icon>mdi-close</v-icon>
       </v-btn>
+      <v-list-item>
+        <NameAmonSulSVG class="name" />
+      </v-list-item>
+      <v-divider></v-divider>
       <v-list class="ringbearer">
         <v-list-item link to="/mis-partidas" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-list-item-icon>
               <img src="@/assets/icons/misPartidas.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Mis partidas</v-list-item-title>
+            <v-list-item-title class="mt-1">Mis partidas</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/mis-torneos" v-if="isAuthenticated">
@@ -18,7 +22,7 @@
             <v-list-item-icon>
               <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Mis torneos</v-list-item-title>
+            <v-list-item-title class="mt-1">Mis torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/torneos" v-if="isAuthenticated">
@@ -26,7 +30,7 @@
             <v-list-item-icon>
               <img src="@/assets/icons/calendario.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Calendario</v-list-item-title>
+            <v-list-item-title class="mt-1">Calendario</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/jugadores" v-if="isAuthenticated">
@@ -34,7 +38,7 @@
             <v-list-item-icon>
               <img src="@/assets/icons/usuarios.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Usuarios</v-list-item-title>
+            <v-list-item-title class="mt-1">Usuarios</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/elo" v-if="isAuthenticated">
@@ -42,7 +46,7 @@
             <v-list-item-icon>
               <img src="@/assets/icons/clasificacion.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Clasificaciones</v-list-item-title>
+            <v-list-item-title class="mt-1">Clasificaciones</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/gestion-torneos" v-if="isAuthenticated">
@@ -50,13 +54,13 @@
             <v-list-item-icon>
               <img src="@/assets/icons/gestionTorneos.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Gestión Torneos</v-list-item-title>
+            <v-list-item-title class="mt-1">Gestión Torneos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/resultados-torneos" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-icon>mdi-chart-bar</v-icon>
-            <v-list-item-title>Resultados</v-list-item-title>
+            <v-list-item-title class="mt-1">Resultados</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/ligas" v-if="isAuthenticated">
@@ -64,7 +68,7 @@
             <v-list-item-icon>
               <img src="@/assets/icons/ligas.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Ligas</v-list-item-title>
+            <v-list-item-title class="mt-1">Ligas</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/about-us" v-if="isAuthenticated">
@@ -72,7 +76,7 @@
             <v-list-item-icon>
               <img src="@/assets/icons/sobreNosotros.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Sobre nosotros</v-list-item-title>
+            <v-list-item-title class="mt-1">Sobre nosotros</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link to="/perfil-usuario" v-if="isAuthenticated">
@@ -80,7 +84,7 @@
             <v-list-item-icon>
               <img src="@/assets/icons/perfil.png" alt="Icono personalizado" width="30" height="30">
             </v-list-item-icon>
-            <v-list-item-title>Perfil</v-list-item-title>
+            <v-list-item-title class="mt-1">Perfil</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
