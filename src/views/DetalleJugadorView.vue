@@ -9,7 +9,8 @@
           <!-- tabs
            1. info usuario / 2. partidas amistosas / 3. partidas torneos / 4. torneos jugador -->
 
-          <v-tabs v-model="tab" color="primary" grow show-arrows next-icon="mdi-arrow-right-bold-box-outline" prev-icon="mdi-arrow-left-bold-box-outline">
+          <!--<v-tabs v-model="tab" color="primary" grow show-arrows next-icon="mdi-arrow-right-bold-box-outline" prev-icon="mdi-arrow-left-bold-box-outline">-->
+          <v-tabs v-model="tab" color="primary" grow>
             <v-tab value="1">
               <v-icon icon="mdi-star-face"></v-icon>
             </v-tab>

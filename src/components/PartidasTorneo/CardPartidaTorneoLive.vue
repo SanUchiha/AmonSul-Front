@@ -1,17 +1,15 @@
 <template>
     <v-hover v-slot:default="{ props }">
       <v-card v-bind="props" class="match-card mt-3">
-        <v-card-title class="text-center text-wrap match-title">
+        <v-card-title class="text-center text-h5 text-wrap" style="font-family: 'Roboto', sans-serif; color: #ffcc00;">
           {{ mesa }}
         </v-card-title>
 
         <v-divider></v-divider>
-        <v-card-title class="text-wrap">
+        <v-card-title class="text-wrap match-title">
           <v-row align="center" justify="center" no-gutters>
             <v-col cols="5" @click.prevent="verProfileUser(match.idUsuario1)" class="player text-left">
-              <v-chip variant="text" >   
-                <span class="ml-2 text-wrap" :class="{highlight: match.idUsuario1 === idUsuario,}">{{ match.nick1 }}</span>
-              </v-chip>
+              <span class="text-wrap" :class="{highlight: match.idUsuario1 === idUsuario,}">{{ match.nick1 }}</span>
             </v-col>
   
             <v-col cols="2" class="score text-center marcador">
@@ -20,9 +18,7 @@
             </v-col>
   
             <v-col cols="5" @click.prevent="verProfileUser(match.idUsuario2)" class="player text-right">
-              <v-chip variant="text" >   
-                <span class="ml-2 text-wrap" :class="{highlight: match.idUsuario2 === idUsuario,}">{{ match.nick2 }}</span>
-              </v-chip>
+              <span class="text-wrap" :class="{highlight: match.idUsuario2 === idUsuario,}">{{ match.nick2 }}</span>
             </v-col>
           </v-row>
         </v-card-title>
