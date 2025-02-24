@@ -15,7 +15,7 @@
         </v-col>
         <v-col v-for="feature in features" :key="feature.title" cols="12" md="4">
           <v-card class="text-center pa-4" elevation="3">
-            <v-icon size="48" color="primary">{{ feature.icon }}</v-icon>
+            <img :src="feature.icon" alt="Icono personalizado" width="100" height="100">
             <h3 class="text-h6 mt-3">{{ feature.title }}</h3>
             <p class="text-body-2">{{ feature.description }}</p>
           </v-card>
@@ -29,7 +29,7 @@
         </v-col>
         <v-col cols="12">
           <v-timeline align="start" dense>
-            <v-timeline-item v-for="item in roadmap" :key="item.title" :color="item.color" small>
+            <v-timeline-item v-for="item in roadmap" :key="item.title" :icon-color="item.color" small>
               <template v-slot:opposite>
                 <span class="text-caption font-weight-bold">{{ item.date }}</span>
               </template>
@@ -45,13 +45,17 @@
   </template>
   
   <script>
+  import ELO from '@/assets/icons/ELO.png';
+  import clasificacion from '@/assets/icons/clasificacion.png';
+  import gestionTorneos from '@/assets/icons/gestionTorneos.png';
+
   export default {
     data() {
       return {
         features: [
-          { icon: 'mdi-trophy', title: 'Torneos organizados', description: 'Crea y gestiona torneos fácilmente.' },
-          { icon: 'mdi-account-group', title: 'Sistema de ELO', description: 'Ranking competitivo actualizado en tiempo real.' },
-          { icon: 'mdi-map-marker', title: 'Ubicaciones interactivas', description: 'Visualiza torneos en un mapa.' },
+          { icon: gestionTorneos, title: 'Torneos organizados', description: 'Crea y gestiona torneos fácilmente.' },
+          { icon: ELO, title: 'Sistema de ELO', description: 'Ranking competitivo actualizado en tiempo real.' },
+          { icon: clasificacion, title: 'Clasificación', description: 'Clasificación de jugadores individual y por equipos.' },
         ],
         roadmap: [
           { date: 'Q2 2025', title: 'Torneos por equipos', description: 'Creación y gestión de torneos a parejas y por equipos.', color: 'primary' },
