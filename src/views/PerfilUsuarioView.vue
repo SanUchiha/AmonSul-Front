@@ -1,4 +1,27 @@
 <template>
+  <v-container class="profile-container">
+    <v-row>
+      <!-- Columna Izquierda (Perfil) -->
+      <v-col cols="12" md="4">
+        <CardPerfilUsuario :user=user :selectedFaccionName=selectedFaccionName></CardPerfilUsuario>
+      </v-col>
+      
+      <!-- Columna Derecha (Estadísticas, Rango/Nivel, Logros) -->
+      <v-col cols="12" md="8">
+        <!-- Sección de Estadísticas -->
+        <CardEstadisticas></CardEstadisticas>
+
+        <!-- Sección de Rango/Nivel -->
+        <CardRangoUsuario></CardRangoUsuario>
+        
+        <!-- Sección de Logros -->
+        <LogrosUsuario></LogrosUsuario>
+      </v-col>
+    </v-row>
+  </v-container>
+
+
+
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="6">
@@ -165,6 +188,10 @@ import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import ModalCambiarPass from "@/components/Perfil/ModalCambiarPass.vue";
+import CardPerfilUsuario from "@/components/Perfil/CardPerfilUsuario.vue";
+import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
+import CardRangoUsuario from "@/components/Perfil/CardRangoUsuario.vue";
+import LogrosUsuario from "@/components/Perfil/LogrosUsuario.vue";
 
 const usuariosStore = useUsuariosStore();
 
@@ -266,15 +293,26 @@ const closeModal = () => {
 </script>
 
 <style scoped>
-.d-flex {
-  display: flex;
-}
+  .profile-container {
+    max-width: 1000px;
+    margin: auto;
+    background: #242427;
+    padding: 20px;
+    border-radius: 12px;
+  }
 
-.justify-space-between {
-  justify-content: space-between;
-}
-
-.text-center {
-  text-align: center;
-}
-</style>
+  .section-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #212121;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .stat-bar {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  </style>
+  
