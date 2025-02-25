@@ -293,14 +293,6 @@ const closeModal = () => {
 </script>
 
 <style scoped>
-  .profile-container {
-    max-width: 1000px;
-    margin: auto;
-    background: #242427;
-    padding: 20px;
-    border-radius: 12px;
-  }
-
   .section-card {
     margin-bottom: 20px;
     padding: 20px;

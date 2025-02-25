@@ -16,6 +16,7 @@
           <v-row dense>
             <v-col cols="12" md="12" class="text-center">
               <CardResumenPartidas :usuario="usuarioData" />
+              <CardEstadisticas></CardEstadisticas>
             </v-col>
           </v-row>
         </v-col>
@@ -77,6 +78,7 @@ import CardResumenPartidas from "@/components/PartidaAmistosa/CardResumenPartida
 import CardTitleMisPartidas from "@/components/PartidaAmistosa/CardTitleMisPartidas.vue";
 import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
+import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
 import { useAuth } from "@/composables/useAuth";
 import { FaccionDTO } from "@/interfaces/Faccion";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
@@ -191,4 +193,13 @@ const loadComunidad = async (idUser: number) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+  .section-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #212121;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  }
+  </style>

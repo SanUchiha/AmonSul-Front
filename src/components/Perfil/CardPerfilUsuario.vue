@@ -5,6 +5,7 @@
         </v-avatar>
         <h2 class="player-name text-wrap">{{ user.nombreUsuario }} {{ user.primerApellido }} {{ user.segundoApellido }} <v-icon size="x-small">mdi-pen</v-icon></h2>
         <h2 class="player-name text-wrap">{{ user.nick }}</h2>
+        <v-divider class="mb-3"></v-divider>
         <p class="profile-info"><strong>Clan:</strong> {{selectedFaccionName }}</p>
         <p class="profile-info"><strong>Población:</strong> {{ user.ciudad }}</p>
         <p class="profile-info"><strong>Email:</strong> {{ user.email }}</p>
