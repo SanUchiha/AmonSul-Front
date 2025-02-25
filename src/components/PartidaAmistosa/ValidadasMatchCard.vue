@@ -1,5 +1,4 @@
 <template>
-<v-col cols="12" sm="12" md="6" lg="4" class="text-right">
   <v-card :class="['match-card', cardColorClass]" :style="{ '--border-color': resultado === 'Victoria' ? '#145c1750' : resultado === 'Derrota'? '#75171050' : '#e6c40050'}">
            
       <v-divider></v-divider>
@@ -59,7 +58,6 @@
       </v-card-text>
 
     </v-card>
-  </v-col>
   <v-spacer class="my-3"></v-spacer>
 
   <div v-if="error" class="error">{{ error }}</div>

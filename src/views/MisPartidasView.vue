@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <!-- Titulo -->
-      <CardTitleMisPartidas />
+      <CardTitleMisPartidas message="Mis Partidas" textsize="text-h4" />
       <v-spacer class="my-4"></v-spacer>
 
       <!-- Resumen partidas -->
@@ -30,35 +30,37 @@
         >Registrar partida</v-btn
       >
 
-      <v-divider class="my-3"></v-divider>
 
       <!-- partidas pendientes -->
       <div v-if="pendingMatches.length > 0 && !isLoadingPending">
-        <PendingMatchCard
-          v-for="match in pendingMatches"
-          :key="match.idPartidaAmistosa"
-          :match="match"
-          class="mb-4"
-        />
-      </div>
-      <div v-else>
-        <h3>No tienes partidas pendientes de validar</h3>
+        <v-sheet border >
+
+          <v-col cols="12"><CardTitleMisPartidas message="Partidas pendientes de validar" textsize="text-h5"></CardTitleMisPartidas></v-col>
+          <v-col cols="12" sm="8" offset-sm="2" md="6" offset-md="3" v-for="match in pendingMatches" :key="match.idPartidaAmistosa">
+            <PendingMatchCard
+              :match="match"
+              class="mb-4"
+            />
+          </v-col>
+        </v-sheet>
       </div>
 
-      <v-divider class="my-3"></v-divider>
 
       <!-- partidas validadas -->
       <!-- TODO Hacer un infinite scroll-->
       <div v-if="!isLoadingValidadas && validMatches.length > 0">
-        <v-row align="center" justify="center">
-          <ValidadasMatchCard
-            v-for="match in validMatches"
-            :key="match.idPartidaAmistosa"
-            :idUsuario="parseInt(idUsuarioLogger!)"
-            :match="match"
-            class="mb-4"
-          />
-        </v-row>
+        <v-sheet border >
+          <v-row>
+            <v-col cols="12"><CardTitleMisPartidas message="Partidas validadas" textsize="text-h5"></CardTitleMisPartidas></v-col>
+            <v-col cols="12" sm="6" md="6" lg="4" xl="4" class="pb-0" v-for="match in validMatches" :key="match.idPartidaAmistosa">
+            <ValidadasMatchCard
+              :idUsuario="parseInt(idUsuarioLogger!)"
+              :match="match"
+              class="mb-4"
+            />
+            </v-col>
+          </v-row>
+        </v-sheet>
       </div>
       <div v-else>
         <h3>No tienes partidas validadas</h3>

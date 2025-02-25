@@ -1,12 +1,21 @@
 <template>
   <v-card class="jugador-card">
     <v-card-title class="title">
-      <h2>Mis Partidas</h2>
+      <span :class=props.textsize>{{ props.message }}</span>
     </v-card-title>
   </v-card>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import {
+  defineProps
+} from "vue";
+
+const props = defineProps<{
+  message: string;
+  textsize: string;
+}>();
+</script>
 
 <style scoped>
 .jugador-card {

@@ -55,7 +55,7 @@
         features: [
           { icon: gestionTorneos, title: 'Torneos organizados', description: 'Crea y gestiona torneos fácilmente.' },
           { icon: ELO, title: 'Sistema de ELO', description: 'Ranking competitivo actualizado en tiempo real.' },
-          { icon: clasificacion, title: 'Clasificación', description: 'Clasificación de jugadores individual y por equipos.' },
+          { icon: clasificacion, title: 'Ranking', description: 'Clasificación de jugadores individual y por equipos.' },
         ],
         roadmap: [
           { date: 'Q2 2025', title: 'Torneos por equipos', description: 'Creación y gestión de torneos a parejas y por equipos.', color: 'primary' },
