@@ -24,28 +24,28 @@ const props = defineProps<{
 }>();
 
 </script>
-<style>
-  .profile-section {
+<style scoped>
+.profile-section {
     padding: 20px;
     text-align: center;
     background: #212121;
     color: white;
     border-radius: 12px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-  }
-  .avatar {
+}
+.avatar {
     margin-bottom: 10px;
     border: 3px solid #f5e1a4;
-  }
-    .player-name {
+}
+.player-name {
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 10px;
     color: #f5e1a4;
-  }
-  
-  .profile-info {
+}
+
+.profile-info {
     font-size: 16px;
     color: #e0e0e0;
-  }
+}
 </style>

@@ -33,9 +33,9 @@
 
       <!-- partidas pendientes -->
       <div v-if="pendingMatches.length > 0 && !isLoadingPending">
+        
+        <v-col cols="12"><CardTitleMisPartidas message="Partidas pendientes de validar" textsize="text-h5"></CardTitleMisPartidas></v-col>
         <v-sheet border >
-
-          <v-col cols="12"><CardTitleMisPartidas message="Partidas pendientes de validar" textsize="text-h5"></CardTitleMisPartidas></v-col>
           <v-col cols="12" sm="8" offset-sm="2" md="6" offset-md="3" v-for="match in pendingMatches" :key="match.idPartidaAmistosa">
             <PendingMatchCard
               :match="match"
@@ -49,9 +49,9 @@
       <!-- partidas validadas -->
       <!-- TODO Hacer un infinite scroll-->
       <div v-if="!isLoadingValidadas && validMatches.length > 0">
-        <v-sheet border >
+        <v-col cols="12"><CardTitleMisPartidas message="Partidas validadas" textsize="text-h5"></CardTitleMisPartidas></v-col>
+        <v-sheet border>
           <v-row>
-            <v-col cols="12"><CardTitleMisPartidas message="Partidas validadas" textsize="text-h5"></CardTitleMisPartidas></v-col>
             <v-col cols="12" sm="6" md="6" lg="4" xl="4" class="pb-0" v-for="match in validMatches" :key="match.idPartidaAmistosa">
             <ValidadasMatchCard
               :idUsuario="parseInt(idUsuarioLogger!)"
