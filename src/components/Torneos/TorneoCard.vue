@@ -4,7 +4,7 @@
 
     <v-divider class="my-3"></v-divider>
 
-    <v-card-title class="ringbearer text-h6 text-center text-wrapper font-weight-bold mt-3">
+    <v-card-title class="ringbearer text-h6 text-center text-wrap font-weight-bold mt-3">
       {{ torneo.nombreTorneo }}
     </v-card-title>
     <v-card-subtitle class="text-center mb-3">

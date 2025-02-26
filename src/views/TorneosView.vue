@@ -38,7 +38,7 @@
                 <!-- Barra de herramientas con búsqueda -->
                 <v-container>
                   <v-row>
-                    <v-col cols="12" sm="8" offset-sm="2">
+                    <v-col cols="12" sm="8" offset-sm="2" >
                       <v-text-field
                         v-model="searchQuery"
                         label="Buscar torneo"
@@ -56,8 +56,9 @@
                   v-for="torneo in paginatedTorneos"
                   :key="torneo.idTorneo"
                   cols="12"
-                  sm="6"
-                  md="4"
+                  sm="8" offset-sm="2"
+                  md="6"
+                  lg="4"
                 >
                   <TorneoCard 
                     :torneo="torneo" 

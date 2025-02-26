@@ -19,12 +19,13 @@
                     {{ torneo.nombreTorneo }}
                   </v-card-title>
                   <v-card-subtitle class="text-center mb-3">
-                    <p class="text-wrap">
-                      <v-icon left>mdi-map-marker</v-icon>
+                    <p class="text-wrap" v-if="formattedAddress.trim()">
+                      <v-icon left class="location-icon">mdi-map-marker</v-icon>
                       <a :href="googleMapsUrl" target="_blank" rel="noopener noreferrer">
-                        {{ formattedAddress || "Ver en Google Maps" }}
+                        {{ formattedAddress }}
                       </a>
                     </p>
+                    <p v-else><v-icon left class="location-icon">mdi-map-marker</v-icon> {{ torneo.lugarTorneo }}</p>
                   </v-card-subtitle>
 
                   <v-divider class="mb-3"></v-divider>
