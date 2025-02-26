@@ -19,7 +19,12 @@
                     {{ torneo.nombreTorneo }}
                   </v-card-title>
                   <v-card-subtitle class="text-center mb-3">
-                    <v-icon left>mdi-map-marker</v-icon> {{ torneo.lugarTorneo }}
+                    <p class="text-wrap">
+                      <v-icon left>mdi-map-marker</v-icon>
+                      <a :href="googleMapsUrl" target="_blank" rel="noopener noreferrer">
+                        {{ formattedAddress || "Ver en Google Maps" }}
+                      </a>
+                    </p>
                   </v-card-subtitle>
 
                   <v-divider class="mb-3"></v-divider>
@@ -161,6 +166,62 @@ const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const isRegistering = ref<boolean>(false);
 
+
+
+// Variables reactivas
+const formattedAddress = ref<string>("");
+
+// Computed property para generar el enlace a Google Maps
+const googleMapsUrl = computed(() => {
+  if (!torneo.value?.lugarTorneo) return "#";
+  return `https://www.google.com/maps?q=${parseFloat(torneo.value!.lugarTorneo.split(", ")[0])},${parseFloat(torneo.value!.lugarTorneo.split(", ")[1])}`;
+});
+
+// Función para obtener dirección inversa desde coordenadas
+const getAddress = async (lat: number, lon: number) => {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.address) {
+      console.log(" data.address", data);
+
+      const { road, house_number, city, town, village, state, postcode } = data.address;
+
+      // Priorizar ciudad, pueblo o aldea
+      const locationCity = city || town || village || "";
+
+      // Construir dirección formateada
+      formattedAddress.value = [
+        road ? `${road}${house_number ? `, ${house_number}` : ""}` : "",
+        locationCity,
+        state,
+        postcode
+      ]
+        .filter(Boolean) // Eliminar valores vacíos
+        .join(", "); // Unir con comas
+    } else {
+      formattedAddress.value = "Dirección no disponible";
+    }
+  } catch (error) {
+    console.error("Error obteniendo la dirección:", error);
+  }
+};
+const isValidCoordinates = (value: string): boolean => {
+  if (!value) return false;
+
+  // Expresión regular para validar coordenadas (lat, lng)
+  const regex = /^-?\d{1,2}\.\d+,\s*-?\d{1,3}\.\d+$/;
+
+  return regex.test(value.trim());
+};
+
+
+
+
+
+
 // Computed para gestionar el estado de inscripción
 const inscripcionState = computed(() => {
   if (isTorneoCompletado.value) return "completo";
@@ -202,6 +263,7 @@ const eliminarInscripcion = async (idInscripcion: number) => {
   }
 };
 
+
 // Montaje y obtención de datos
 onMounted(async () => {
   isLoading.value = true;
@@ -240,6 +302,14 @@ onMounted(async () => {
       }
     }
   }
+  try {
+    if (isValidCoordinates(torneo.value!.lugarTorneo)){
+      getAddress(parseFloat(torneo.value!.lugarTorneo.split(", ")[0]), parseFloat(torneo.value!.lugarTorneo.split(", ")[1]));
+    }
+  } catch (err) {
+    console.error("Error al obtener el torneo:", err);
+  }
+
   isLoading.value = false;
 });
 

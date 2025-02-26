@@ -22,15 +22,50 @@
             type="text"
             clearable
           ></v-textarea>
+
+
+
+
           <!-- Lugar del torneo -->
-          <v-textarea
+          <!-- Campo de búsqueda de dirección -->
+          <v-text-field
+            v-model="searchQuery"
+            label="¿Donde es el torneo?"
+            placeholder="Ej: Calle Gran Vía, Madrid"
+            @keyup.enter="searchLocation"
+          >
+            <template v-slot:append>
+              <v-btn color="primary" @click="searchLocation">Buscar</v-btn>
+            </template>
+          </v-text-field>
+          
+          <!-- Mensaje de error -->
+          <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
+          <!-- Muestra la dirección formateada si es válida -->
+          <p v-if="formattedAddress">Dirección validada: {{ formattedAddress }}</p>
+          
+          <!-- Mapa solo para visualización (NO interactivo) -->
+          <l-map 
+            v-if="selectedLocation" 
+            :zoom="zoom" 
+            :center="[selectedLocation.lat, selectedLocation.lng]" 
+            :options="{ dragging: false, zoomControl: false, scrollWheelZoom: false }"
+            style="height: 300px; width: 100%;"
+          >
+            <l-tile-layer :url="tileLayerUrl"></l-tile-layer>
+            <l-marker :lat-lng="selectedLocation"></l-marker>
+          </l-map>
+
+
+
+          <!--<v-textarea
             v-model="lugarTorneo"
             label="¿Donde es el torneo?"
             type="text"
             clearable
             required
             :rules="[(v:string) => !!v || 'Campo obligatorio']"
-          ></v-textarea>
+          ></v-textarea>-->
           <!-- Límite de participantes -->
           <v-text-field
             v-model="limiteParticipantes"
@@ -160,7 +195,7 @@
       <v-card-actions>
         <v-row justify="center" class="my-4 ga-5">
           <v-btn
-            :disabled="isGenerating"
+            :disabled="isGenerating || formattedAddress == ''"
             @click="confirmarConfiguracion"
             color="primary"
             variant="tonal"
@@ -207,6 +242,72 @@ import ModalError from "../Commons/ModalError.vue";
 import { CrearTorneoDTO } from "@/interfaces/Torneo";
 import DatePicker from "../Commons/DatePicker.vue";
 import { crearTorneo } from "@/services/TorneosService";
+import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
+import "leaflet/dist/leaflet.css";
+import axios from "axios";
+
+
+// Variables reactivas
+const searchQuery = ref<string>("");
+const formattedAddress = ref<string>("");
+const selectedLocation = ref<{ lat: number; lng: number } | null>(null);
+const errorMessage = ref<string>("");
+const zoom = ref<number>(14);
+const tileLayerUrl = ref<string>("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+
+// Función para buscar la dirección ingresada por el usuario
+const searchLocation = async () => {
+  if (!searchQuery.value.trim()) return;
+
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value)}&addressdetails=1`;
+  
+  try {
+    const response = await axios.get(url);
+    if (response.data.length > 0) {
+      const firstResult = response.data[0];
+      selectedLocation.value = { lat: parseFloat(firstResult.lat), lng: parseFloat(firstResult.lon) };
+      lugarTorneo.value = firstResult.lat + ", " + firstResult.lon;
+      formattedAddress.value = formatAddress(firstResult);
+      errorMessage.value = "";
+    } else {
+      errorMessage.value = "No se encontró la dirección. Intente nuevamente.";
+      selectedLocation.value = null;
+      lugarTorneo.value = "";
+      formattedAddress.value = "";
+    }
+  } catch (error) {
+    console.error("Error buscando la dirección:", error);
+    errorMessage.value = "Error al buscar la dirección.";
+  }
+};
+
+const formatAddress = (data: any): string => {
+  if (!data || !data.display_name) return "Dirección no disponible";
+
+  const { name, address } = data;
+  
+  // Extraer componentes clave
+  const road = address.road || name || "";
+  const houseNumber = address.house_number ? `, ${address.house_number}` : "";
+  const city = address.city || address.town || address.village || "";
+  const state = address.state || "";
+  const postcode = address.postcode || "";
+  const country = address.country || "";
+
+  // Construir dirección con formato legible
+  return [
+    `${road}${houseNumber}`,
+    city,
+    state,
+    postcode,
+    country,
+  ]
+    .filter(Boolean) // Elimina valores vacíos
+    .join(", ");
+};
+
+
+
 
 const props = defineProps<{
   isVisible: boolean;

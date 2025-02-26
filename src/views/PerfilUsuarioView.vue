@@ -8,8 +8,8 @@
       
       <!-- Columna Derecha (Estadísticas, Rango/Nivel, Logros) -->
       <v-col cols="12" md="8">
-        <!-- Sección de Estadísticas -->
-        <CardEstadisticas></CardEstadisticas>
+        <!-- Sección de Estadísticas
+        <CardEstadisticas></CardEstadisticas> -->
 
         <!-- Sección de Rango/Nivel -->
         <CardRangoUsuario></CardRangoUsuario>
@@ -298,7 +298,6 @@ const closeModal = () => {
     padding: 20px;
     background: #212121;
     color: white;
-    border-radius: 12px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   }
   

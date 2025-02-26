@@ -11,16 +11,14 @@
       <v-spacer class="my-4"></v-spacer>
 
       <!-- Resumen partidas -->
-      <v-row justify="center">
-        <v-col cols="12" md="12">
-          <v-row dense>
-            <v-col cols="12" md="12" class="text-center">
-              <CardResumenPartidas :usuario="usuarioData" />
-              <CardEstadisticas></CardEstadisticas>
-            </v-col>
-          </v-row>
+      <v-card class="section-card">
+        <v-col cols="12"><p class="text-h5 ringbearer">Estadísticas</p></v-col>
+        <v-divider></v-divider>
+        <v-col cols="12" md="12" class="text-center">
+          <!--<CardResumenPartidas :usuario="usuarioData" />-->
+          <CardEstadisticas :usuario="usuarioData" />
         </v-col>
-      </v-row>
+      </v-card>
       <!-- Boton partidas -->
       <v-btn
         class="mt-2"
@@ -34,24 +32,26 @@
 
       <!-- partidas pendientes -->
       <div v-if="pendingMatches.length > 0 && !isLoadingPending">
-        
-        <v-col cols="12"><CardTitleMisPartidas message="Partidas pendientes de validar" textsize="text-h5"></CardTitleMisPartidas></v-col>
-        <v-sheet border >
+        <v-card class="section-card stats-section">
+          <!--<v-col cols="12"><CardTitleMisPartidas message="Partidas pendientes de validar" textsize="text-h5"></CardTitleMisPartidas></v-col>-->
+          <v-col cols="12"><p class="text-h5 ringbearer">Pendientes de validar</p></v-col>
+          <v-divider></v-divider>
           <v-col cols="12" sm="8" offset-sm="2" md="6" offset-md="3" v-for="match in pendingMatches" :key="match.idPartidaAmistosa">
             <PendingMatchCard
               :match="match"
               class="mb-4"
             />
-          </v-col>
-        </v-sheet>
+          </v-col>          
+        </v-card>
       </div>
 
 
       <!-- partidas validadas -->
       <!-- TODO Hacer un infinite scroll-->
       <div v-if="!isLoadingValidadas && validMatches.length > 0">
-        <v-col cols="12"><CardTitleMisPartidas message="Partidas validadas" textsize="text-h5"></CardTitleMisPartidas></v-col>
-        <v-sheet border>
+        <v-card class="section-card stats-section">
+          <v-col cols="12"><p class="text-h5 ringbearer">Partidas validadas</p></v-col>
+          <v-divider class="mb-3"></v-divider>
           <v-row>
             <v-col cols="12" sm="6" md="6" lg="4" xl="4" class="pb-0" v-for="match in validMatches" :key="match.idPartidaAmistosa">
             <ValidadasMatchCard
@@ -60,8 +60,8 @@
               class="mb-4"
             />
             </v-col>
-          </v-row>
-        </v-sheet>
+          </v-row>        
+        </v-card>
       </div>
       <div v-else>
         <h3>No tienes partidas validadas</h3>
@@ -196,10 +196,9 @@ const loadComunidad = async (idUser: number) => {
 <style scoped>
   .section-card {
     margin-bottom: 20px;
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
     background: #212121;
     color: white;
-    border-radius: 12px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 2px 10px #00000080;
   }
   </style>

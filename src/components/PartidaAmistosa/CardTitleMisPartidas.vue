@@ -1,7 +1,7 @@
 <template>
   <v-card class="jugador-card">
     <v-card-title class="title">
-      <span :class=props.textsize>{{ props.message }}</span>
+      <span :class=props.textsize class="ringbearer">{{ props.message }}</span>
     </v-card-title>
   </v-card>
 </template>
