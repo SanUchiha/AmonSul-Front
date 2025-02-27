@@ -1,7 +1,6 @@
 <template>
 
 
-  <v-col cols="12" sm="12" md="6" lg="4" class="text-right">
     <!-- TODO implementar ver detalles cuando haya algo mas que mostrar
      @click="goToDetallePartida()"
      -->
@@ -69,7 +68,6 @@
       </v-card-text>
 
     </v-card>
-  </v-col>
   <v-spacer class="my-3"></v-spacer>
 
   <div v-if="error" class="error">{{ error }}</div>

@@ -6,7 +6,7 @@
     <div v-else>
       <!-- Titulo -->
       <CardTitleMisTorneos />
-      <v-spacer class="my-4"></v-spacer>
+      
       <!-- Resumen partidas -->
       <v-row justify="center">
         <v-col cols="12" md="12">
@@ -37,20 +37,22 @@
         </v-col>
       </v-row>
 
-      <v-divider class="my-3"></v-divider>
-
       <!-- partidas validades -->
       <div v-if="!isLoadingMatches && matches.length > 0">
-        <v-row align="center" justify="center">
-          <CardPartidaTorneo
-            v-for="match in matches"
-            :key="match.idPartidaTorneo"
-            :idUsuario="parseInt(idUsuarioLogger!)"
-            :match="match"
-            class="mb-4"
-          />
-        </v-row>
-      </div>
+        <v-card class="section-card stats-section pt-0 mt-0">
+          <v-col cols="12"><p class="text-h5 ringbearer">Partidas de torneo</p></v-col>
+          <v-divider></v-divider>
+          <v-row>
+            <v-col cols="12" sm="6" md="6" lg="4" xl="4" class="pb-0" v-for="match in matches" :key="match.idPartidaTorneo">
+            <CardPartidaTorneo              
+              :idUsuario="parseInt(idUsuarioLogger!)"
+              :match="match"
+              class="mb-4"
+            />
+            </v-col>
+          </v-row>        
+        </v-card>
+      </div>      
       <div v-else>
         <h3>No tienes partidas en torneos</h3>
       </div>
@@ -178,4 +180,12 @@ const loadRankingElo = async (idUser: number) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+  .section-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #212121;
+    color: white;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  }
+</style>
