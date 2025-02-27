@@ -74,6 +74,7 @@ onMounted(async () => {
       (elo: { puntuacionElo: unknown }) => elo.puntuacionElo
     );
 
+    console.log("response.data", response.data);
     value.value = elos;
 
     mejorResultado.value = Math.max(...elos);

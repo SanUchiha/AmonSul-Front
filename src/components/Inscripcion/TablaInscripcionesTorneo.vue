@@ -1,50 +1,60 @@
 <template>
+  <v-divider class="mb-0 pb-0"></v-divider>
   <div v-if="!hasAcciones">
-    <v-table :loading="isLoading">
-      <thead>
-        <tr>
-          <th class="text-center">Nombre torneo</th>
-          <th class="text-center">Detalle torneo</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
-          <td>{{ torneo.nombreTorneo }}</td>
-          <td class="text-center">
-            <v-btn icon @click="verDetalleTorneo(torneo.idTorneo)">
-              <v-icon color="orange">mdi-eye</v-icon>
-            </v-btn>
-          </td>
-        </tr>
-      </tbody>
-    </v-table>
-  </div>
-
-  <div v-if="hasAcciones"> 
     <v-container :loading="isLoading">
-      <v-row>
-        <v-col cols="12" md="4" v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
-          <v-card>
-            <v-card-title class="text-wrap">
-              <span @click="verDetalleTorneo(torneo.idTorneo)" class="clickable-text">
-                {{ torneo.nombreTorneo }}
-              </span>
-            </v-card-title> 
-            <v-card-actions>
-              <v-btn icon @click="VerResultadoTorneo(torneo.idTorneo)">
-                <v-icon color="orange">mdi-format-list-numbered</v-icon>
-              </v-btn>
-              <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
-                <v-icon color="orange">mdi-eye</v-icon>
-              </v-btn>
-            </v-card-actions>
-          </v-card>   
-        </v-col>
-      </v-row>
-    </v-container>
+        <v-list>
+          <v-list-item
+            v-for="torneo in listaTorneos"
+            :key="torneo.idInscripcion"
+            @click="verDetalleTorneo(torneo.idTorneo)"
+            class="clickable-list-item"
+          >
+            <template v-slot:prepend>
+              <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
+            </template>
 
+            <v-list-item-title class="text-wrap text-left pl-2">{{ torneo.nombreTorneo }}</v-list-item-title>
+
+            <template v-slot:append>
+              <v-btn icon @click.stop="verDetalleTorneo(torneo.idTorneo)">
+                <img src="@/assets/icons/verLista.png" alt="Icono personalizado" width="40" height="40">
+              </v-btn>
+            </template>
+          </v-list-item>
+
+        </v-list>
+    </v-container>
   </div>
 
+  <div v-if="hasAcciones">
+    <v-container :loading="isLoading" class="mb-0 pb-0">
+        <v-list >
+          <v-list-item
+            v-for="torneo in listaTorneos"
+            :key="torneo.idInscripcion"
+            @click="verDetalleTorneo(torneo.idTorneo)"
+            class="clickable-list-item"
+          >
+            <template v-slot:prepend>
+              <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
+            </template>
+
+            <v-list-item-title class="text-wrap text-left pl-2">{{ torneo.nombreTorneo }}</v-list-item-title>
+
+            <template v-slot:append>
+              <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
+                <img src="@/assets/icons/clasificacionTorneo.png" alt="Icono personalizado" width="40" height="40">
+              </v-btn>
+              <v-btn icon @click.stop="verDetalleInscripcion(torneo.idInscripcion)">
+                <img src="@/assets/icons/verLista.png" alt="Icono personalizado" width="40" height="40">
+              </v-btn>
+            </template>
+          </v-list-item>
+
+          
+        </v-list>
+    </v-container>
+  </div>
   <ModalSuccess
     :isVisible="showSuccessModal"
     message="Eliminado con éxito."
@@ -177,21 +187,11 @@ const closeModal = () => {
 </script>
 
 <style scoped>
-thead {
-  background-color: #5b2269;
-  color: white;
-  text-align: center;
+.clickable-list-item {
+  cursor: pointer;
+  transition: background 0.2s;
 }
-
-tbody tr {
-  transition: background-color 0.3s;
-}
-
-tbody tr:hover {
-  background-color: #3c4041;
-}
-
-.text-center {
-  text-align: center;
+.clickable-list-item:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 </style>

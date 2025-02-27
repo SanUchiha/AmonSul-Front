@@ -46,6 +46,42 @@
           <AgCharts :options="chartOptions"></AgCharts>
       </v-col>
   </v-row>
+
+  <v-divider class="mb-3"></v-divider>
+
+      <div class="stats-container">
+        <v-row>
+          <v-col class="stat-item">
+            <img src="@/assets/icons/clasificacionTorneo.png" alt="Icono personalizado" width="60" height="60">
+            <p>Victorias: {{ winRate }}%</p>
+          </v-col>
+          <v-col v-if="usuario.rankingElo" class="stat-item">
+            <img src="@/assets/icons/ELO.png" alt="Icono personalizado" width="60" height="60">
+            <p>Ranking Elo: {{ usuario.rankingElo }}</p>
+          </v-col>
+        </v-row>
+      </div>
+      
+      <v-divider class="mb-3 mt-3"></v-divider>
+  
+      <div class="stats-container">
+        <v-row>
+          <v-col class="stat-item">
+            <img src="@/assets/icons/ejercitoMasUsado.png" alt="Icono personalizado" width="60" height="60">            
+            <p>Ejército más usado: próximamente</p>
+          </v-col>
+  
+          <v-col class="stat-item">
+            <img src="@/assets/icons/ejercitoMejorResultado.png" alt="Icono personalizado" width="60" height="60">            
+            <p>Ejército con mejor resultado: próximamente</p>
+          </v-col>
+  
+          <v-col class="stat-item">
+            <img src="@/assets/icons/ejercitoPeorResultado.png" alt="Icono personalizado" width="60" height="60">                        
+            <p>Ejército con peor resultado: próximamente</p>
+          </v-col>
+        </v-row>
+      </div>
 </template>
 
 <script setup lang="ts">
@@ -73,14 +109,14 @@ const player = ref({
     experienceToNextLevel: 1000,
 });
 
-const winRate = computed(() => ((usuarioData.value.partidasGanadas) / player.value.gamesPlayed) * 100);
-const lossRate = computed(() => ((usuarioData.value.partidasPerdidas) / player.value.gamesPlayed) * 100);
-const drawRate = computed(() => ((usuarioData.value.partidasEmpatadas) / player.value.gamesPlayed) * 100);
+const winRate = computed(() => ((usuarioData.value.partidasGanadas) / usuarioData.value.numeroPartidasJugadas) * 100);
+const lossRate = computed(() => ((usuarioData.value.partidasPerdidas) / usuarioData.value.numeroPartidasJugadas) * 100);
+const drawRate = computed(() => ((usuarioData.value.partidasEmpatadas) / usuarioData.value.numeroPartidasJugadas) * 100);
 
 const onSliceClick = (event: any) => {
   console.log("Categoría seleccionada:", event.datum.categoria);
   console.log("Cantidad:", event.datum.cantidad);
-  alert(`Has hecho clic en ${event.datum.categoria}: ${event.datum.cantidad}`);
+  //alert(`Has hecho clic en ${event.datum.categoria}: ${event.datum.cantidad}`);
 };
 
 const myTheme = {

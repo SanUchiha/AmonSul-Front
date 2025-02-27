@@ -11,7 +11,7 @@
       <v-spacer class="my-4"></v-spacer>
 
       <!-- Resumen partidas -->
-      <v-card class="section-card">
+      <v-card class="section-card stats-section pt-0 mt-0">
         <v-col cols="12"><p class="text-h5 ringbearer">Estadísticas</p></v-col>
         <v-divider></v-divider>
         <v-col cols="12" md="12" class="text-center">
@@ -32,9 +32,9 @@
 
       <!-- partidas pendientes -->
       <div v-if="pendingMatches.length > 0 && !isLoadingPending">
-        <v-card class="section-card stats-section">
+        <v-card class="section-card stats-section pt-0 mt-0">
           <!--<v-col cols="12"><CardTitleMisPartidas message="Partidas pendientes de validar" textsize="text-h5"></CardTitleMisPartidas></v-col>-->
-          <v-col cols="12"><p class="text-h5 ringbearer">Pendientes de validar</p></v-col>
+          <v-col cols="12"><p class="text-h5 ringbearer">Partidas pendientes de validar</p></v-col>
           <v-divider></v-divider>
           <v-col cols="12" sm="8" offset-sm="2" md="6" offset-md="3" v-for="match in pendingMatches" :key="match.idPartidaAmistosa">
             <PendingMatchCard
@@ -49,9 +49,9 @@
       <!-- partidas validadas -->
       <!-- TODO Hacer un infinite scroll-->
       <div v-if="!isLoadingValidadas && validMatches.length > 0">
-        <v-card class="section-card stats-section">
+        <v-card class="section-card stats-section pt-0 mt-0">
           <v-col cols="12"><p class="text-h5 ringbearer">Partidas validadas</p></v-col>
-          <v-divider class="mb-3"></v-divider>
+          <v-divider></v-divider>
           <v-row>
             <v-col cols="12" sm="6" md="6" lg="4" xl="4" class="pb-0" v-for="match in validMatches" :key="match.idPartidaAmistosa">
             <ValidadasMatchCard
@@ -196,9 +196,9 @@ const loadComunidad = async (idUser: number) => {
 <style scoped>
   .section-card {
     margin-bottom: 20px;
-    padding: 0px 20px 20px 20px;
+    padding: 20px;
     background: #212121;
     color: white;
-    box-shadow: 2px 2px 10px #00000080;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   }
   </style>

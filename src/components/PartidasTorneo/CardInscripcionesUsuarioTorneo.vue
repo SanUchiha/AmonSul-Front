@@ -3,8 +3,8 @@
     <ProgressCircular />
   </div>
   <div v-else class="center">
-    <v-card class="mx-auto text-center">
-      <v-card-title>Mis inscripciones</v-card-title>
+    <v-card class="mb-0 pb-0 text-center">
+      <v-card-title class="ringbearer">Mis inscripciones</v-card-title>
 
       <v-card-text>
         <TablaInscripcionesTorneo

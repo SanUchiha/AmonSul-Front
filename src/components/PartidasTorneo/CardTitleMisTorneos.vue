@@ -1,5 +1,5 @@
 <template>
-  <v-card class="jugador-card">
+  <v-card class="jugador-card ringbearer">
     <v-card-title class="title">
       <h2>Mis torneos</h2>
     </v-card-title>

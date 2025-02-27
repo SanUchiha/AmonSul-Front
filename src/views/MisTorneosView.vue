@@ -16,13 +16,22 @@
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="12" md="12" class="text-center">
-              <SparklineElo :email="usuarioData.email" />
-            </v-col>
+            
           </v-row>
           <v-row dense>
-            <v-col cols="12" md="12" class="text-center">
-              <CardResumenPartidas :usuario="usuarioData" />
+            <v-col cols="12" sm="6" class="text-center">
+              <!-- Resumen partidas -->
+              <v-card class="section-card stats-section pt-0 mt-0">
+                <v-col cols="12"><p class="text-h5 ringbearer">Estadísticas</p></v-col>
+                <v-divider></v-divider>
+                <v-col cols="12" md="12" class="text-center">
+                  <!--<CardResumenPartidas :usuario="usuarioData" />-->
+                  <CardEstadisticas :usuario="usuarioData" />
+                </v-col>
+              </v-card>
+            </v-col>
+            <v-col cols="12" sm="6" class="text-center">
+              <SparklineElo :email="usuarioData.email" />
             </v-col>
           </v-row>
         </v-col>
@@ -54,7 +63,6 @@
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import CardPartidaTorneo from "@/components/PartidasTorneo/CardPartidaTorneo.vue";
-import CardResumenPartidas from "@/components/PartidaAmistosa/CardResumenPartidas.vue";
 import CardInscripcionesUsuarioTorneo from "@/components/PartidasTorneo/CardInscripcionesUsuarioTorneo.vue";
 import CardTitleMisTorneos from "@/components/PartidasTorneo/CardTitleMisTorneos.vue";
 import { useAuth } from "@/composables/useAuth";
@@ -66,6 +74,7 @@ import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
 
 const isLoading = ref(true);
 const { getidUsuario, getUser } = useAuth();
