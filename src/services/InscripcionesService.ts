@@ -1,5 +1,6 @@
 import {
   CrearInscripcionDTO,
+  InscripcionEquipoDTO,
   UpdateEstadoListaDTO,
   UpdateEstadoPagoDTO,
 } from "@/interfaces/Inscripcion";
@@ -7,6 +8,10 @@ import { http } from "./index";
 
 export const getIncripcionById = async (idInscripcion: number) => {
   return http.get(`Inscripcion/${idInscripcion}`);
+};
+
+export const getIncripcionEquipoById = async (idInscripcion: number) => {
+  return http.get(`Inscripcion/equipo/${idInscripcion}`);
 };
 
 export const getAllInscripciones = async () => {
@@ -37,4 +42,10 @@ export const updateEstadoLista = async (nuevaEstado: UpdateEstadoListaDTO) => {
 
 export const updateEstadoPago = async (nuevaEstado: UpdateEstadoPagoDTO) => {
   return http.put(`Inscripcion/Estado-Pago`, nuevaEstado);
+};
+
+export const registrarEquipo = async (
+  nuevaInscripcion: InscripcionEquipoDTO
+) => {
+  return http.post(`Inscripcion/equipo`, nuevaInscripcion);
 };

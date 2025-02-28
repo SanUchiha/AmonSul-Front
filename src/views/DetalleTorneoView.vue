@@ -91,13 +91,24 @@
                       Ya estás apuntado
                     </div>
                     <div v-else>
-                      <v-btn
-                        variant="tonal"
-                        color="success lighten-1"
-                        @click="showModalResponse"
-                        :disabled="isRegistering"
-                        >Apúntate</v-btn
-                      >
+                      <div v-if="torneo.tipoTorneo == 'Individual'">
+                        <v-btn
+                          variant="tonal"
+                          color="success lighten-1"
+                          @click="inscripcionIndividual"
+                          :disabled="isRegistering"
+                          >Apúntate</v-btn
+                        >
+                      </div>
+                      <div v-else>
+                        <v-btn
+                          variant="tonal"
+                          color="success lighten-1"
+                          @click="inscripcionPorEquipos(torneo.tipoTorneo)"
+                          :disabled="isRegistering"
+                          >Apúntate</v-btn
+                        >
+                      </div>
                     </div>
                   </v-card-actions>
                 </v-card>
@@ -150,6 +161,14 @@
       </v-card-text>
     </v-card>
 
+    <!-- Registro equipo -->
+    <ModalRegistroEquipo
+      :isVisible="showModalInscripcionPorEquipos"
+      :tipoTorneo="torneo?.tipoTorneo"
+      :idTorneo="torneo?.idTorneo"
+      @update:isVisible="showModalInscripcionPorEquipos = $event"
+    />
+
     <!-- Modal Success -->
     <ModalSuccess
       :isVisible="showSuccessModal"
@@ -199,6 +218,7 @@ import {
 } from "@/interfaces/Inscripcion";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
+import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
 
 const { getidUsuario } = useAuth();
 const route = useRoute();
@@ -219,6 +239,7 @@ const headers = [{ title: "Nick", key: "nick" }];
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const isRegistering = ref<boolean>(false);
+const showModalInscripcionPorEquipos = ref<boolean>(false);
 
 // Computed para gestionar el estado de inscripción
 const inscripcionState = computed(() => {
@@ -306,7 +327,7 @@ const descargarBases = async () => {
   }
 };
 
-const showModalResponse = async () => {
+const inscripcionIndividual = async () => {
   if (
     idUsuario.value != null &&
     idTorneo.value != null &&
@@ -325,6 +346,16 @@ const showModalResponse = async () => {
     } finally {
       isRegistering.value = false;
     }
+  }
+};
+
+const inscripcionPorEquipos = async (tipoTorneo: string) => {
+  if (
+    idUsuario.value != null &&
+    idTorneo.value != null &&
+    !isInscripcionCerrada.value
+  ) {
+    showModalInscripcionPorEquipos.value = true;
   }
 };
 </script>

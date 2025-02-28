@@ -31,9 +31,20 @@
         <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
           <td>{{ torneo.nombreTorneo }}</td>
           <td class="text-center">
-            <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
-              <v-icon color="orange">mdi-eye</v-icon>
-            </v-btn>
+            <div v-if="torneo.idEquipo">
+              <v-btn
+                icon
+                @click="verDetalleInscripcionEquipo(torneo.idInscripcion)"
+              >
+                <v-icon color="orange">mdi-eye</v-icon>
+              </v-btn>
+            </div>
+            <div v-else>
+              <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
+                <v-icon color="orange">mdi-eye</v-icon>
+              </v-btn>
+            </div>
+
             <!-- <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
               <v-icon color="primary">mdi-file-send</v-icon>
             </v-btn> -->
@@ -60,6 +71,15 @@
 
   <ModalInscripcion
     v-if="showModalInscripcion"
+    :idInscripcion="currentInscripcionId"
+    :idUsuario="parseInt(idUsuarioLogger!)"
+    :idTorneo="currentTorneoId"
+    :idOrganizador="currentTorneoId"
+    @eliminar-inscripcion="eliminarInscripcion"
+    @close="closeModal"
+  />
+  <ModalInscripcionEquipo
+    v-if="showModalInscripcionEquipo"
     :idInscripcion="currentInscripcionId"
     :idUsuario="parseInt(idUsuarioLogger!)"
     :idTorneo="currentTorneoId"
@@ -97,6 +117,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useAuth } from "@/composables/useAuth";
 import ModalInscripcion from "./ModalInscripcion.vue";
+import ModalInscripcionEquipo from "./ModalInscripcionEquipo.vue";
 
 const props = defineProps<{
   isLoading: boolean;
@@ -114,6 +135,7 @@ const listaTorneos = ref<InscripcionUsuarioDTO[]>([]);
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showModalInscripcion = ref<boolean>(false);
+const showModalInscripcionEquipo = ref<boolean>(false);
 
 const hasAcciones = ref<boolean>(false);
 const { getidUsuario } = useAuth();
@@ -131,6 +153,20 @@ const verDetalleInscripcion = (idInscripcion: number) => {
     )?.idOrganizador ?? null;
 
   showModalInscripcion.value = true;
+};
+
+const verDetalleInscripcionEquipo = (idInscripcion: number) => {
+  currentInscripcionId.value = idInscripcion;
+  currentTorneoId.value =
+    listaTorneos.value.find(
+      (i) => i.idInscripcion == currentInscripcionId.value
+    )?.idTorneo ?? null;
+  currentIdOrganizador.value =
+    listaTorneos.value.find(
+      (i) => i.idInscripcion == currentInscripcionId.value
+    )?.idOrganizador ?? null;
+
+  showModalInscripcionEquipo.value = true;
 };
 
 const verDetalleTorneo = (idTorneo: number) => {
@@ -171,6 +207,7 @@ onMounted(async () => {
 // Cierra el modal
 const closeModal = () => {
   showModalInscripcion.value = false;
+  showModalInscripcionEquipo.value = false;
 };
 </script>
 

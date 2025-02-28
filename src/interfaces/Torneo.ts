@@ -30,7 +30,7 @@ export interface TorneoPropioDTO {
   idTorneo: number; // Identificador único del torneo (PK)
   idUsuario: number; // ID del usuario administrador del torneo (FK)
   nombreTorneo: string; // Nombre del torneo
-  estadoTorneo: string; // Estado del torneo
+  tipoTorneo: string;
 }
 
 export interface TorneoGestionInfoDTO {
@@ -112,7 +112,7 @@ export interface ModificarTorneoDTO {
   puntosTorneo?: number;
   estadoTorneo?: number;
   lugarTorneo?: string;
-  tipoTorneo?: string;
+  tipoTorneo: "Individual" | "Parejas" | "Equipos_4" | "Equipos_6";
   esLiga?: boolean;
   idRangoTorneo?: number;
   esMatchedPlayTorneo?: boolean;

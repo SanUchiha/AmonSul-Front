@@ -31,19 +31,35 @@
       <template v-slot:item="{ item }">
         <tr class="table-row">
           <td>{{ item.nombreTorneo }}</td>
+
           <td class="action-buttons">
-            <v-btn
-              @click="viewDetails(item.idTorneo)"
-              icon="mdi-eye"
-              color="primary"
-              elevation="2"
-            >
-            </v-btn>
+            <div v-if="item.tipoTorneo != 'Individual'">
+              <v-btn
+                @click="viewDetailsTorneoEquipos(item.idTorneo)"
+                icon="mdi-eye"
+                color="primary"
+                elevation="2"
+                variant="tonal"
+              >
+              </v-btn>
+            </div>
+            <div v-else>
+              <v-btn
+                @click="viewDetails(item.idTorneo)"
+                icon="mdi-eye"
+                color="primary"
+                elevation="2"
+                variant="tonal"
+              >
+              </v-btn>
+            </div>
+
             <v-btn
               @click="deleteTournament(item.idTorneo)"
               color="error"
               icon="mdi-close"
               elevation="2"
+              variant="tonal"
             ></v-btn>
           </td>
         </tr>
@@ -79,6 +95,10 @@ const headers = [{ title: "NOMBRE", key: "nombreTorneo" }];
 
 const viewDetails = (idTorneo: number) => {
   router.push({ name: "detalle-torneo-gestion", params: { idTorneo } });
+};
+
+const viewDetailsTorneoEquipos = (idTorneo: number) => {
+  router.push({ name: "detalle-torneo-gestion-equipos", params: { idTorneo } });
 };
 
 const deleteTournament = async (idTorneo: number) => {
