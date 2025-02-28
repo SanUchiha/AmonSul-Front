@@ -20,14 +20,15 @@
         </v-col>
       </v-card>
       <!-- Boton partidas -->
-      <v-btn
-        class="mt-2"
-        variant="tonal"
-        size="large"
-        color="blue darken-1"
-        @click="handleFormCreateMatch"
-        >Registrar partida</v-btn
+      <v-btn 
+        icon  
+        variant="text"
+        class="fab-btn"
+        @click="dialog = true"
       >
+      <img src="@/assets/icons/nuevaPartida.png" alt="Icono personalizado" width="80" height="80">
+
+      </v-btn>
 
 
       <!-- partidas pendientes -->
@@ -40,6 +41,7 @@
             <PendingMatchCard
               :match="match"
               class="mb-4"
+              @registroExitoso="refrescarPartidas"
             />
           </v-col>          
         </v-card>
@@ -68,13 +70,19 @@
       </div>
       <v-divider class="my-3"></v-divider>
     </div>
+
+    <!-- Modal con el componente RegistrarPartidas -->
+    <v-dialog v-model="dialog" >
+      
+          <FormCrearPartida @close="dialog = false" @registroExitoso="refrescarPartidas"/>
+        
+    </v-dialog>
+
   </v-container>
 </template>
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import ModalAviso from "@/components/Commons/ModalAviso.vue";
-import CardResumenPartidas from "@/components/PartidaAmistosa/CardResumenPartidas.vue";
 import CardTitleMisPartidas from "@/components/PartidaAmistosa/CardTitleMisPartidas.vue";
 import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
@@ -87,6 +95,7 @@ import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getPartidasAmistosasByIdUser } from "@/services/PartidasAmistosasService";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import FormCrearPartida from '@/components/PartidaAmistosa/FormCrearPartida.vue';
 
 const isLoading = ref(true);
 const { getidUsuario } = useAuth();
@@ -121,6 +130,7 @@ const usuarioData = ref<UsuarioDataDTO>({
   ClasificacionTorneos: [],
 });
 const showModalAviso = ref<boolean>(true);
+const dialog = ref<boolean>(false);
 
 const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
@@ -177,10 +187,6 @@ const loadResume = async (matches: ViewPartidaAmistosaDTO[]) => {
   usuarioData.value.partidasPerdidas = contadorPerdidas;
 };
 
-const handleFormCreateMatch = () => {
-  router.push({ name: "registrar-partida" });
-};
-
 onMounted(initializeComponent);
 
 const loadComunidad = async (idUser: number) => {
@@ -191,6 +197,34 @@ const loadComunidad = async (idUser: number) => {
     console.error("Error al obtener las comunidades: ", error);
   }
 };
+
+const refrescarPartidas = async () => {
+  console.log("Refresco partida...")
+  pendingMatches.value=[];
+  if (idUsuarioLogger.value) {
+    // Aquí llamas a la API para obtener las partidas actualizadas
+    try {
+      const response = await getPartidasAmistosasByIdUser(
+        parseInt(idUsuarioLogger.value)
+      );
+      matches.value = response.data;
+      matches.value.forEach((element) => {
+        if (element.partidaValidadaUsuario1 && element.partidaValidadaUsuario2)
+          validMatches.value.push(element);
+        else pendingMatches.value.push(element);
+      });
+      validMatches.value = validMatches.value.reverse();
+      pendingMatches.value = pendingMatches.value.reverse();
+    } catch (error) {
+      console.error(error);
+      router.push({ name: "error" });
+    } finally {
+      isLoadingPending.value = false;
+    }
+  }
+  console.log("Termino el refresco de partidas", pendingMatches)
+
+};
 </script>
 
 <style scoped>
@@ -200,5 +234,11 @@ const loadComunidad = async (idUser: number) => {
     background: #212121;
     color: white;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  }
+  .fab-btn {
+    position: fixed;
+    bottom: 60px;
+    right: 60px;
+    z-index: 1000;
   }
   </style>

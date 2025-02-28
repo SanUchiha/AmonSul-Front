@@ -97,7 +97,7 @@ const defaultUsuario = {
   partidasEmpatadas: 0
 };
 const usuarioData = computed(() => props.usuario ?? defaultUsuario);
-
+console.log("usuario estadisticas", props.usuario);
 const player = ref({
     name: "Aragorn, Rey de Gondor",
     clan: "Hijos de Númenor",

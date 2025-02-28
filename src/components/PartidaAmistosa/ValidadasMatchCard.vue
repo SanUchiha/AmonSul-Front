@@ -57,6 +57,8 @@
         </v-row>
       </v-card-text>
 
+      <ShareMatch :match-amistosa=match></ShareMatch>
+
     </v-card>
   <v-spacer class="my-3"></v-spacer>
 
@@ -74,6 +76,7 @@ import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
 import ModalDetallePartida from "@/components/PartidaAmistosa/ModalDetallePartida.vue";
+import ShareMatch from "@/components/Commons/ShareMatch.vue";
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);

@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-3">
-    <v-img :src="torneo.cartelTorneo || require('@/assets/images/ImagenTorneo.jpg')" height="250px" class="rounded-lg" />
+    <v-img :src="torneo.cartelTorneo || require('@/assets/images/cartelMissing.jpg')" height="250px" class="rounded-lg" />
 
     <v-divider class="my-3"></v-divider>
 

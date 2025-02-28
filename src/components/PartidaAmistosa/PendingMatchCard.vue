@@ -154,7 +154,7 @@ const fechaPartidaFormateada = ref<string>("");
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
 }>();
-const emit = defineEmits(["partidaValidada"]);
+const emit = defineEmits(["close", "registroExitoso"]); // Se emiten eventos
 
 onMounted(async () => {
   isLoading.value = true;
@@ -197,8 +197,8 @@ const cancelPartida = async () => {
   try {
     isLoading.value = true;
     await cancelarPartida(props.match.idPartidaAmistosa);
+    console.log("partida cancelada")
     showSuccessCancelarModal.value = true;
-    emit("partidaValidada");
   } catch (err) {
     showErrorCancelarModal.value = true;
   } finally {
@@ -206,11 +206,24 @@ const cancelPartida = async () => {
   }
 };
 
-watch(showSuccessValidarModal, (newValue) => {
-  if (!newValue) {
-    emit("partidaValidada");
+watch(
+  [showSuccessValidarModal],
+  ([newshowSuccessValidarModal]) => {
+    if (!newshowSuccessValidarModal) {
+      emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
+      console.log("Evento success validar")
+    }
   }
-});
+);
+watch(
+  [showSuccessCancelarModal],
+  ([newshowSuccessCancelarModal]) => {
+    if (!newshowSuccessCancelarModal) {
+      emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
+      console.log("Evento cancel validar")
+    }
+  }
+);
 
 const controlValidacionesPartidas = () => {
   if (
@@ -239,28 +252,6 @@ const controlValidacionesPartidas = () => {
   ) {
     IsValidadaRival.value = true;
   }
-};
-
-watch(
-  () => showSuccessValidarModal.value,
-  (newValue, oldValue) => {
-    if (oldValue && !newValue) {
-      recargarPagina();
-    }
-  }
-);
-
-watch(
-  () => showSuccessCancelarModal.value,
-  (newValue, oldValue) => {
-    if (oldValue && !newValue) {
-      recargarPagina();
-    }
-  }
-);
-
-const recargarPagina = () => {
-  window.location.reload();
 };
 </script>
 

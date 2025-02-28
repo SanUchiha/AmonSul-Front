@@ -4,7 +4,7 @@
     <!-- TODO implementar ver detalles cuando haya algo mas que mostrar
      @click="goToDetallePartida()"
      -->
-    <v-card :class="['match-card', cardColorClass]" :style="{ '--border-color': resultado === 'Victoria' ? '#145c1750' : resultado === 'Derrota'? '#75171050' : '#e6c40050'}">
+    <v-card ref="matchCards" :class="['match-card', cardColorClass]" :style="{ '--border-color': resultado === 'Victoria' ? '#145c1750' : resultado === 'Derrota'? '#75171050' : '#e6c40050'}">
       
       <!-- Título con los jugadores y avatares -->
       <v-card-text class="text-center text-wrap text-h5">
@@ -66,6 +66,8 @@
           </v-col>-->
         </v-row>
       </v-card-text>
+     
+      <ShareMatch :match-torneo=match></ShareMatch>
 
     </v-card>
   <v-spacer class="my-3"></v-spacer>
@@ -84,6 +86,7 @@ import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
 import ModalDetallePartida from "@/components/PartidaAmistosa/ModalDetallePartida.vue";
+import ShareMatch from "@/components/Commons/ShareMatch.vue";
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);

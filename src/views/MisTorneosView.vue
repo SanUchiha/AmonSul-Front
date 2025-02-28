@@ -6,7 +6,7 @@
     <div v-else>
       <!-- Titulo -->
       <CardTitleMisTorneos />
-      
+
       <!-- Resumen partidas -->
       <v-row justify="center">
         <v-col cols="12" md="12">
@@ -77,6 +77,7 @@ import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
+import { getUsuarioData } from "@/services/UsuariosService";
 
 const isLoading = ref(true);
 const { getidUsuario, getUser } = useAuth();
@@ -172,8 +173,10 @@ const loadComunidad = async (idUser: number) => {
 
 const loadRankingElo = async (idUser: number) => {
   try {
-    const response = await getRankingEloByIdUser(idUser);
-    usuarioData.value.rankingElo = response.data;
+    const response = await getUsuarioData(idUser);
+//TODO Arreglo getRankingEloByIdUser
+    //const response = await getRankingEloByIdUser(idUser);
+    usuarioData.value.rankingElo = response.data.clasificacionElo;
   } catch (error) {
     console.error("Error al obtener el ranking del jugador: ", error);
   }

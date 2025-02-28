@@ -110,7 +110,7 @@
                   variant="tonal"
                   color="blue darken-1"
                   :disabled="isLoading"
-                  @click="cancelar"
+                  @click="$emit('close')"
                 >
                   Cancelar
                 </v-btn>
@@ -145,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed, ComputedRef } from "vue";
+import { ref, reactive, watch, computed, ComputedRef, defineEmits } from "vue";
 import { useRouter } from "vue-router";
 import { registrarPartida } from "@/services/PartidasAmistosasService";
 import { UsuarioNickDTO, ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
@@ -186,6 +186,8 @@ const showSuccessModal = ref<boolean>(false);
 const rawListaUsuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(
   () => usuariosStore.usuarios
 );
+
+const emit = defineEmits(["close", "registroExitoso"]); // Se emiten eventos
 
 const rules = {
   required: (value: string | null) => !!value || "Este campo es obligatorio.",
@@ -256,10 +258,6 @@ const validateForm = () => {
   }
 };
 
-const cancelar = () => {
-  router.push("mis-partidas");
-};
-
 const handlerNuevaPartida = async () => {
   isLoading.value = true;
 
@@ -288,7 +286,7 @@ const handlerNuevaPartida = async () => {
     };
 
     try {
-      await registrarPartida(nuevaPartida);
+      await registrarPartida(nuevaPartida);      
       showSuccessModal.value = true;
     } catch (error: unknown) {
       showErrorModal.value = true;
@@ -302,7 +300,9 @@ watch(
   [showSuccessModal, showErrorModal],
   ([newShowSuccessModal, newShowErrorModal]) => {
     if (!newShowSuccessModal && !newShowErrorModal) {
-      router.push("mis-partidas");
+      emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
+      console.log("Evento success validar")
+      emit("close"); // Cerramos el modal
     }
   }
 );

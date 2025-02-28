@@ -14,7 +14,7 @@
             <v-row justify="center">
               <v-col cols="12" md="10">
                 <v-card v-if="torneo" class="pa-3">
-                  <v-img :src="torneo.cartelTorneo || require('@/assets/images/ImagenTorneo.jpg')" height="250px" class="rounded-lg" />
+                  <v-img :src="torneo.cartelTorneo || require('@/assets/images/cartelMissing.jpg')" height="250px" class="rounded-lg" />
                   <v-card-title class="text-h5 text-center font-weight-bold mt-3">
                     {{ torneo.nombreTorneo }}
                   </v-card-title>

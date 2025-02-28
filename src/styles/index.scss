@@ -42,6 +42,11 @@ v-tabs-item{
   background-color: #1E1E1E;
 }
 
+.footer {
+  background-color: #1e1e1e;
+  color: white;
+  padding: 10px 0;
+}
 /* Extra extra pequeño (xxs): móviles */
 @media (max-width: 399px) {
   .marcador {

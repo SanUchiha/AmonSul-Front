@@ -15,6 +15,7 @@
     "canvas-confetti": "^1.9.3",
     "core-js": "^3.8.3",
     "d3": "^7.9.0",
+    "html2canvas": "^1.4.1",
     "leaflet-control-geocoder": "^3.1.0",
     "leaflet-geosearch": "^4.2.0",
     "material-design-icons-iconfont": "^6.7.0",
