@@ -50,12 +50,26 @@
       </template>
     </v-data-table>
   </v-card>
+
+  <ModalSuccess
+    :isVisible="showSuccessBorrarModal"
+    message="Torneo borrado con éxito."
+    @update:isVisible="showSuccessBorrarModal = $event"
+  />
+
+  <ModalError
+    :isVisible="showErrorBorrarModal"
+    message="No se ha podido borrar el torneo. Contacta con el administrador."
+    @update:isVisible="showErrorBorrarModal = $event"
+  />
 </template>
 
 <script setup lang="ts">
 import { TorneoPropioDTO } from "@/interfaces/Torneo";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import ModalError from "../Commons/ModalError.vue";
 import {
   VDataTable,
   VCard,
@@ -64,7 +78,7 @@ import {
   VTextField,
 } from "vuetify/components";
 import { useAuth } from "@/composables/useAuth";
-import { getTorneosCreadosUsuario } from "@/services/TorneosService";
+import { getTorneosCreadosUsuario, deleteTorneo } from "@/services/TorneosService";
 
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
@@ -74,6 +88,8 @@ const items = ref<TorneoPropioDTO[]>([]);
 const isLoading = ref<boolean>(true);
 
 const router = useRouter();
+const showSuccessBorrarModal = ref<boolean>(false);
+const showErrorBorrarModal = ref<boolean>(false);
 
 const headers = [{ title: "NOMBRE", key: "nombreTorneo" }];
 
@@ -83,11 +99,12 @@ const viewDetails = (idTorneo: number) => {
 
 const deleteTournament = async (idTorneo: number) => {
   try {
-    //await deleteTorneo(idTorneo);
+    await deleteTorneo(idTorneo);
     items.value = items.value.filter((item) => item.idTorneo !== idTorneo);
-    alert("No está disponible está funcionalidad.");
+    showSuccessBorrarModal.value = true;
   } catch (error) {
     console.error("Error deleting tournament:", error);
+    showErrorBorrarModal.value = true;
   }
 };
 

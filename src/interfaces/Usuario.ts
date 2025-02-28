@@ -15,6 +15,8 @@ export interface NewUserDTO {
   idFaccion?: number;
   FechaNacimiento: string;
   Telefono: string;
+  nickLGDA: string;
+  imagen?: string;
 }
 
 export interface EditarUsuarioDTO {
@@ -29,6 +31,8 @@ export interface EditarUsuarioDTO {
   Faccion?: string;
   FechaNacimiento?: string;
   Telefono?: string;
+  nickLGDA?: string;
+  imagen?: string;
 }
 
 export interface UsuarioViewDTO {
@@ -44,6 +48,8 @@ export interface UsuarioViewDTO {
   faccion: FaccionDTO;
   idFaccion?: number;
   telefono?: string;
+  nickLGDA?: string;
+  imagen?: string;
 }
 
 export interface Jugador {
@@ -71,6 +77,8 @@ export interface ViewUsuarioPartidaDTO {
   partidasPerdidas: number;
   puntuacionElo: number;
   clasificacionElo: number;
+  nickLGDA?: string;
+  imagen?: string;
 }
 
 export interface UsuarioDTO {
@@ -99,6 +107,8 @@ export interface UsuarioDataDTO {
   PartidasTorneo: ViewPartidaTorneoDTO[];
   ClasificacionTorneos: ClasificacionTorneosDTO[];
   rankingElo: number;
+  nickLGDA?: string;
+  imagen?: string;
 }
 
 export interface ClasificacionTorneosDTO {

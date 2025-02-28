@@ -60,3 +60,7 @@ export const ModificarBasesTorneoAsync = async (
 ) => {
   return http.patch(`Torneo/Gestion/subir-bases`, torneoData);
 };
+
+export const deleteTorneo = async (idTorneo: number) => {
+  return http.delete(`Torneo/Gestion/${idTorneo}`);
+}

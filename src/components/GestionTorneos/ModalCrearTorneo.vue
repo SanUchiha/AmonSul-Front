@@ -42,7 +42,7 @@
           <!-- Mensaje de error -->
           <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
           <!-- Muestra la dirección formateada si es válida -->
-          <p v-if="formattedAddress">Dirección validada: {{ formattedAddress }}</p>
+          <p v-else>Dirección validada: {{ formattedAddress }}</p>
           
           <!-- Mapa solo para visualización (NO interactivo) -->
           <l-map 
@@ -270,10 +270,10 @@ const searchLocation = async () => {
       formattedAddress.value = formatAddress(firstResult);
       errorMessage.value = "";
     } else {
-      errorMessage.value = "No se encontró la dirección. Intente nuevamente.";
+      errorMessage.value = "No se encontró la dirección. Se guardará sin enlace a Google Maps.";
       selectedLocation.value = null;
-      lugarTorneo.value = "";
-      formattedAddress.value = "";
+      lugarTorneo.value = searchQuery.value;
+      formattedAddress.value = searchQuery.value;
     }
   } catch (error) {
     console.error("Error buscando la dirección:", error);
