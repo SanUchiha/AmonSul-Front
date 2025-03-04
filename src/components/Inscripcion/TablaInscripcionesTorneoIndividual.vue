@@ -1,54 +1,58 @@
 <template>
   <div v-if="!hasAcciones">
-    <v-table :loading="isLoading">
-      <thead>
-        <tr>
-          <th class="text-center">Nombre torneo</th>
-          <th class="text-center">Detalle torneo</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
-          <td>{{ torneo.nombreTorneo }}</td>
-          <td class="text-center">
-            <v-btn icon @click="verDetalleTorneo(torneo.idTorneo)">
-              <v-icon color="orange">mdi-eye</v-icon>
-            </v-btn>
-          </td>
-        </tr>
-      </tbody>
-    </v-table>
+    <v-container :loading="isLoading">
+        <v-list>
+          <v-list-item
+            v-for="torneo in listaTorneos"
+            :key="torneo.idInscripcion"
+            @click="verDetalleTorneo(torneo.idTorneo)"
+            class="clickable-list-item"
+          >
+            <template v-slot:prepend>
+              <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
+            </template>
+
+            <v-list-item-title class="text-wrap text-left pl-2">{{ torneo.nombreTorneo }}</v-list-item-title>
+
+            <template v-slot:append>
+              <v-btn icon @click.stop="verDetalleTorneo(torneo.idTorneo)">
+                <img src="@/assets/icons/verLista.png" alt="Icono personalizado" width="40" height="40">
+              </v-btn>
+            </template>
+          </v-list-item>
+
+        </v-list>
+    </v-container>
   </div>
   <div v-if="hasAcciones">
-    <v-table :loading="isLoading">
-      <tbody>
-        <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
-          <td>{{ torneo.nombreTorneo }}</td>
-          <td class="text-center">
-            <div v-if="torneo.idEquipo">
-              <v-btn
-                icon
-                @click="verDetalleInscripcionEquipo(torneo.idInscripcion)"
-              >
-                <v-icon color="orange">mdi-eye</v-icon>
-              </v-btn>
-            </div>
-            <div v-else>
-              <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
-                <v-icon color="orange">mdi-eye</v-icon>
-              </v-btn>
-            </div>
+    <v-container :loading="isLoading" class="mb-0 pb-0">
+        <v-list >
+          <v-list-item
+            v-for="torneo in listaTorneos"
+            :key="torneo.idInscripcion"
+            @click="verDetalleTorneo(torneo.idTorneo)"
+            class="clickable-list-item"
+          >
+            <template v-slot:prepend>
+              <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
+            </template>
 
-            <!-- <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
-              <v-icon color="primary">mdi-file-send</v-icon>
-            </v-btn> -->
-            <!-- <v-btn icon @click="eliminarInscripcion(torneo.idInscripcion)">
-              <v-icon color="red">mdi-cancel</v-icon>
-            </v-btn> -->
-          </td>
-        </tr>
-      </tbody>
-    </v-table>
+            <v-list-item-title class="text-wrap text-left pl-2">{{ torneo.nombreTorneo }}</v-list-item-title>
+
+            <template v-slot:append>
+              <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
+                <img src="@/assets/icons/clasificacionTorneo.png" alt="Icono personalizado" width="40" height="40">
+              </v-btn>
+              
+              <v-btn icon @click.stop="verDetalleInscripcion(torneo.idInscripcion)">
+                <img src="@/assets/icons/verLista.png" alt="Icono personalizado" width="40" height="40">
+              </v-btn>
+            </template>
+          </v-list-item>
+
+          
+        </v-list>
+    </v-container>
   </div>
 
   <ModalSuccess
@@ -159,6 +163,9 @@ const verDetalleInscripcionEquipo = (idInscripcion: number) => {
 
 const verDetalleTorneo = (idTorneo: number) => {
   router.push({ name: "detalle-torneo", params: { idTorneo } });
+};
+const VerResultadoTorneo = (idTorneo: number) => {
+  router.push({ name: "detalle-torneo-live", params: { idTorneo } });
 };
 
 const eliminarInscripcion = async (idInscripcion: number) => {

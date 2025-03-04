@@ -108,8 +108,54 @@
           </v-window-item>
         </v-window>
       </v-card-text>
-    </v-card>
 
+      <!-- Participantes -->
+      <v-card-text>
+        <v-window v-model="tab">
+          <v-window-item value="two">
+            <v-card flat>
+              <v-card-title class="d-flex align-center">
+                <p v-if="torneo?.tipoTorneo == 'Individual'"><v-icon left>mdi-account-group</v-icon> Participantes</p>
+                <p v-else><v-icon left>mdi-account-group</v-icon> Equipos</p>
+                <v-spacer></v-spacer>
+                <v-text-field v-model="search" label="Buscar" prepend-inner-icon="mdi-magnify" variant="outlined" dense></v-text-field>
+              </v-card-title>
+              <v-divider></v-divider>
+              <div v-if="torneo?.tipoTorneo == 'Individual'">
+                <v-data-table v-model:search="search" :items="participantes" :loading="isLoading" :headers="headers">
+                  <template v-slot:item="{ item }">
+                    <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
+                      <td><v-chip color="orange" dark>{{ item.nick }}</v-chip></td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </div>
+              <div v-else>
+                <v-data-table
+                  v-model:search="search"
+                  :items="infoEquipos"
+                  :loading="isLoading"
+                  :headers="headersEquipos"
+                  class="custom-table"
+                  item-key="nombreEquipo"
+                >
+                  <template v-slot:item="{ item }">
+                    <tr @click="goToEquipoDetail(item)" class="clickable-row">
+                      <td>
+                        <v-chip color="orange" dark>{{
+                          item.nombreEquipo
+                        }}</v-chip>
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </div>
+            </v-card>
+          </v-window-item>
+        </v-window>
+      </v-card-text>
+    </v-card>
+    
     <!-- Registro equipo -->
     <ModalRegistroEquipo
       :isVisible="showModalInscripcionPorEquipos"
@@ -131,48 +177,7 @@
       message="No se ha podido registrar la inscripción. Contacta con el administrador."
       @update:isVisible="showErrorModal = $event"
     />
-    
-    <!-- Participantes -->
-    <v-window-item value="two">
-      <v-card flat>
-        <v-card-title class="d-flex align-center">
-          <p v-if="torneo?.tipoTorneo == 'Individual'"><v-icon left>mdi-account-group</v-icon> Participantes</p>
-          <p v-else><v-icon left>mdi-account-group</v-icon> Equipos</p>
-          <v-spacer></v-spacer>
-          <v-text-field v-model="search" label="Buscar" prepend-inner-icon="mdi-magnify" variant="outlined" dense></v-text-field>
-        </v-card-title>
-        <v-divider></v-divider>
-        <div v-if="torneo?.tipoTorneo == 'Individual'">
-          <v-data-table v-model:search="search" :items="participantes" :loading="isLoading" :headers="headers">
-            <template v-slot:item="{ item }">
-              <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
-                <td><v-chip color="orange" dark>{{ item.nick }}</v-chip></td>
-              </tr>
-            </template>
-          </v-data-table>
-        </div>
-        <div v-else>
-          <v-data-table
-            v-model:search="search"
-            :items="infoEquipos"
-            :loading="isLoading"
-            :headers="headersEquipos"
-            class="custom-table"
-            item-key="nombreEquipo"
-          >
-            <template v-slot:item="{ item }">
-              <tr @click="goToEquipoDetail(item)" class="clickable-row">
-                <td>
-                  <v-chip color="orange" dark>{{
-                    item.nombreEquipo
-                  }}</v-chip>
-                </td>
-              </tr>
-            </template>
-          </v-data-table>
-        </div>
-      </v-card>
-    </v-window-item>
+
   </v-container>
 </template>
 
@@ -322,9 +327,6 @@ const eliminarInscripcion = async (idInscripcion: number) => {
 
     if (response.request?.status === 200) {
       showSuccessModal.value = true;
-      const responseInscriptionesUser = await getInscripcionesUser(
-        idUsuario.value!
-      );
     } else {
       showErrorModal.value = true;
     }
