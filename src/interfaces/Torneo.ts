@@ -47,6 +47,7 @@ export interface TorneoCreadoDTO {
   estadoTorneo: string;
   fechaEntregaListas?: string | null;
   fechaFinInscripcion?: string | null;
+  inicioInscripciones?: string | null;
 }
 
 export interface InscripcionTorneoCreadoDTO {

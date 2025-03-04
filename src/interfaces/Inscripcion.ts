@@ -74,3 +74,46 @@ export interface ComponentesEquipoDTO {
   ejercito?: string;
   idLista: number;
 }
+
+export interface TorneoEquipoGestionInfoDTO {
+  torneo: TorneoCreadoDTO;
+  equipos: EquipoDTO[];
+}
+
+export interface TorneoCreadoDTO {
+  idTorneo: number;
+  idUsuario: number;
+  nombreTorneo: string;
+  limiteParticipantes?: number | null;
+  numeroPartidas: number;
+  estadoTorneo: string;
+  fechaEntregaListas?: string | null;
+  fechaFinInscripcion?: string | null;
+  inicioInscripciones?: string | null;
+  jugadoresXEquipo: number;
+}
+
+export interface EquipoDTO {
+  nombreEquipo?: string | null;
+  idEquipo: number;
+  idCapitan: number;
+  nickCapitan?: string | null;
+  emailCapitan?: string | null;
+  esPago?: string | null;
+  fechaInscripcion?: string | null;
+  inscripciones: InscripcionTorneoDTO[];
+}
+
+export interface InscripcionTorneoDTO {
+  idInscripcion: number;
+  idTorneo: number;
+  idUsuario: number;
+  fechaInscripcion?: string | null;
+  estadoLista?: string | null;
+  fechaEntregaLista?: string | null;
+  esPago?: string | null;
+  listaData?: string | null;
+  ejercito?: string | null;
+  idLista: number;
+  nick: string;
+}

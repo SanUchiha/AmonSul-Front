@@ -117,46 +117,89 @@
           </v-tabs-window-item>
 
           <!-- Tab Participantes -->
-          <v-tabs-window-item value="two">
-            <v-card flat>
-              <v-card-title class="d-flex align-center pe-2">
-                Participantes
-                <v-spacer></v-spacer>
-                <v-text-field
-                  v-model="search"
-                  density="compact"
-                  label="Buscar"
-                  prepend-inner-icon="mdi-magnify"
-                  variant="solo-filled"
-                  flat
-                  hide-details
-                  single-line
-                ></v-text-field>
-              </v-card-title>
+          <div v-if="torneo?.tipoTorneo == 'Individual'">
+            <v-tabs-window-item value="two">
+              <v-card flat>
+                <v-card-title class="d-flex align-center pe-2">
+                  Participantes
+                  <v-spacer></v-spacer>
+                  <v-text-field
+                    v-model="search"
+                    density="compact"
+                    label="Buscar"
+                    prepend-inner-icon="mdi-magnify"
+                    variant="solo-filled"
+                    flat
+                    hide-details
+                    single-line
+                  ></v-text-field>
+                </v-card-title>
 
-              <v-divider></v-divider>
+                <v-divider></v-divider>
 
-              <v-data-table
-                v-model:search="search"
-                :items="participantes"
-                :loading="isLoading"
-                :headers="headers"
-                class="custom-table"
-                item-key="nick"
-              >
-                <template v-slot:item="{ item }">
-                  <tr
-                    @click="goToUserDetail(item.idUsuario)"
-                    class="clickable-row"
-                  >
-                    <td>
-                      <v-chip color="orange" dark>{{ item.nick }}</v-chip>
-                    </td>
-                  </tr>
-                </template>
-              </v-data-table>
-            </v-card>
-          </v-tabs-window-item>
+                <v-data-table
+                  v-model:search="search"
+                  :items="participantes"
+                  :loading="isLoading"
+                  :headers="headers"
+                  class="custom-table"
+                  item-key="nick"
+                >
+                  <template v-slot:item="{ item }">
+                    <tr
+                      @click="goToUserDetail(item.idUsuario)"
+                      class="clickable-row"
+                    >
+                      <td>
+                        <v-chip color="orange" dark>{{ item.nick }}</v-chip>
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-tabs-window-item>
+          </div>
+          <div v-else>
+            <v-tabs-window-item value="two">
+              <v-card flat>
+                <v-card-title class="d-flex align-center pe-2">
+                  Equipos
+                  <v-spacer></v-spacer>
+                  <v-text-field
+                    v-model="search"
+                    density="compact"
+                    label="Buscar"
+                    prepend-inner-icon="mdi-magnify"
+                    variant="solo-filled"
+                    flat
+                    hide-details
+                    single-line
+                  ></v-text-field>
+                </v-card-title>
+
+                <v-divider></v-divider>
+
+                <v-data-table
+                  v-model:search="search"
+                  :items="infoEquipos"
+                  :loading="isLoading"
+                  :headers="headersEquipos"
+                  class="custom-table"
+                  item-key="nombreEquipo"
+                >
+                  <template v-slot:item="{ item }">
+                    <tr @click="goToEquipoDetail(item)" class="clickable-row">
+                      <td>
+                        <v-chip color="orange" dark>{{
+                          item.nombreEquipo
+                        }}</v-chip>
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-tabs-window-item>
+          </div>
         </v-tabs-window>
       </v-card-text>
     </v-card>
@@ -205,7 +248,11 @@
 import { ref, onMounted, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Torneo } from "@/interfaces/Torneo";
-import { descargarBasesTorneo, getTorneo } from "@/services/TorneosService";
+import {
+  descargarBasesTorneo,
+  getEquiposByTorneoAsync,
+  getTorneo,
+} from "@/services/TorneosService";
 import {
   getInscripcionesIndividualByUser,
   getInscripcionesTorneo,
@@ -214,6 +261,7 @@ import {
 import { useAuth } from "@/composables/useAuth";
 import {
   CrearInscripcionDTO,
+  EquipoDTO,
   InscripcionUsuarioIndividualDTO,
 } from "@/interfaces/Inscripcion";
 import ModalError from "@/components/Commons/ModalError.vue";
@@ -236,10 +284,13 @@ const tab = ref(0);
 const search = ref<string>("");
 const isLoading = ref<boolean>(true);
 const headers = [{ title: "Nick", key: "nick" }];
+const headersEquipos = [{ title: "Nombre del equipo", key: "nombreEquipo" }];
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const isRegistering = ref<boolean>(false);
 const showModalInscripcionPorEquipos = ref<boolean>(false);
+
+const infoEquipos = ref<EquipoDTO | null>(null);
 
 // Computed para gestionar el estado de inscripción
 const inscripcionState = computed(() => {
@@ -258,6 +309,9 @@ const isInscripcionCerrada = computed(() => {
 
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
+};
+const goToEquipoDetail = (idEquipo: number) => {
+  //TODO: modal con la info (nick) de los jugadores que se pueda pulsar en ellos y te lleven a su perfil
 };
 
 // Montaje y obtención de datos
@@ -292,6 +346,14 @@ onMounted(async () => {
       }
     }
   }
+
+  if (idTorneo.value) {
+    const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
+
+    infoEquipos.value = responseEquipos.data;
+    console.log("Equipos", responseEquipos.data);
+  }
+
   isLoading.value = false;
 });
 

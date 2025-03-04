@@ -28,12 +28,16 @@
               <!-- tab Gestion -->
               <v-tabs-window-item :value="0" :key="0">
                 <div>
-                  <CardGestionTorneo :torneo="torneoGestion" />
+                  <CardGestionInfoTorneoEquipo :torneo="torneoGestion" />
+                  <CardGestionAccionesTorneoEquipo :torneo="torneoGestion" />
 
-                  <TablaInscritos
-                    :torneo="torneoGestion"
-                    @inscripcionEliminada="handleInscripcionEliminada"
-                  />
+                  <div class="grid-container">
+                    <CardInfoEquipo
+                      v-for="equipo in torneoGestion?.equipos"
+                      :key="equipo.idEquipo"
+                      :equipo="equipo"
+                    />
+                  </div>
                 </div>
               </v-tabs-window-item>
 
@@ -630,7 +634,7 @@
     />
 
     <!-- Modal generar siguiente ronda -->
-    <ModalParametrosRondas
+    <ModalParametrosRondasEquipo
       :isVisible="showConfigModal"
       :torneo="torneoGestion"
       :clasificacion="clasificacion"
@@ -703,16 +707,10 @@ import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import router from "@/router";
 import {
-  getInfoTorneoCreado,
+  getInfoTorneoEquipoCreado,
   guardarResultados,
 } from "@/services/TorneosService";
-import TablaInscritos from "@/components/GestionTorneos/TablaInscritos.vue";
-import CardGestionTorneo from "@/components/GestionTorneos/CardGestionTorneo.vue";
-import {
-  GuardarResultadosDTO,
-  ResultadoJugador,
-  TorneoGestionInfoDTO,
-} from "@/interfaces/Torneo";
+import { GuardarResultadosDTO, ResultadoJugador } from "@/interfaces/Torneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEscenarioPartida.vue";
 import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
@@ -734,7 +732,6 @@ import {
   getTorneo,
   isSaveTournament,
 } from "@/services/TorneosService";
-import ModalParametrosRondas from "@/components/GestionTorneos/ModalParametrosRondas.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPartidaGestion.vue";
@@ -742,6 +739,12 @@ import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.v
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
+import TablaInscritosEquipo from "@/components/GestionTorneos/Equipos/TablaInscritosEquipo.vue";
+import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
+import ModalParametrosRondasEquipo from "@/components/GestionTorneos/Equipos/ModalParametrosRondasEquipo.vue";
+import CardGestionInfoTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionInfoTorneoEquipo.vue";
+import CardGestionAccionesTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionAccionesTorneoEquipo.vue";
+import CardInfoEquipo from "@/components/GestionTorneos/Equipos/CardInfoEquipo.vue";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -763,7 +766,7 @@ const tabClasificacion = ref<number>();
 const route = useRoute();
 const idTorneo = ref<number>();
 const isLoading = ref<boolean>(false);
-const torneoGestion = ref<TorneoGestionInfoDTO | null>(null);
+const torneoGestion = ref<TorneoEquipoGestionInfoDTO | null>(null);
 const clasificacion = ref<Clasificacion[]>([]);
 const jugadoresZona1 = ref<Clasificacion[]>([]);
 const jugadoresZona2 = ref<Clasificacion[]>([]);
@@ -810,8 +813,10 @@ onMounted(async () => {
   isLoading.value = true;
 
   try {
-    const responseTorneo = await getInfoTorneoCreado(idTorneo.value);
+    const responseTorneo = await getInfoTorneoEquipoCreado(idTorneo.value);
     torneoGestion.value = responseTorneo.data;
+
+    console.log(torneoGestion.value);
   } catch (error) {
     console.error(error);
     router.push({ name: "error" });
@@ -1316,13 +1321,12 @@ const isRondaValidada = (numeroRonda: number) => {
   );
 };
 
-const handleInscripcionEliminada = (idInscripcion: number) => {
+const handleInscripcionEliminada = (idEquipo: number) => {
   if (torneoGestion.value) {
     // Actualiza las inscripciones eliminando la inscripción correspondiente
-    torneoGestion.value.inscripciones =
-      torneoGestion.value.inscripciones.filter(
-        (inscripcion) => inscripcion.idInscripcion !== idInscripcion
-      );
+    torneoGestion.value.equipos = torneoGestion.value.equipos.filter(
+      (inscripcion) => inscripcion.idEquipo !== idEquipo
+    );
   }
 };
 
