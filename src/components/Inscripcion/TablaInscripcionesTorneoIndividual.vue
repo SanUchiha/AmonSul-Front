@@ -21,12 +21,6 @@
   </div>
   <div v-if="hasAcciones">
     <v-table :loading="isLoading">
-      <!-- <thead>
-        <tr>
-          <th class="text-center">Torneo</th>
-          <th class="text-center"></th>
-        </tr>
-      </thead> -->
       <tbody>
         <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
           <td>{{ torneo.nombreTorneo }}</td>
@@ -107,11 +101,11 @@
 
 <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
-import { InscripcionUsuarioDTO } from "@/interfaces/Inscripcion";
+import { InscripcionUsuarioIndividualDTO } from "@/interfaces/Inscripcion";
 import router from "@/router";
 import {
   cancelarInscripcion,
-  getInscripcionesUser,
+  getInscripcionesIndividualByUser,
 } from "@/services/InscripcionesService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
@@ -121,7 +115,7 @@ import ModalInscripcionEquipo from "./ModalInscripcionEquipo.vue";
 
 const props = defineProps<{
   isLoading: boolean;
-  listaTorneos: InscripcionUsuarioDTO[];
+  listaTorneos: InscripcionUsuarioIndividualDTO[];
   idUsuario: number;
 }>();
 
@@ -130,7 +124,7 @@ const isRegistering = ref<boolean>(false);
 const currentInscripcionId = ref<number | null>(null);
 const currentTorneoId = ref<number | null>(null);
 const currentIdOrganizador = ref<number | null>(null);
-const listaTorneos = ref<InscripcionUsuarioDTO[]>([]);
+const listaTorneos = ref<InscripcionUsuarioIndividualDTO[]>([]);
 
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
@@ -157,14 +151,8 @@ const verDetalleInscripcion = (idInscripcion: number) => {
 
 const verDetalleInscripcionEquipo = (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
-  currentTorneoId.value =
-    listaTorneos.value.find(
-      (i) => i.idInscripcion == currentInscripcionId.value
-    )?.idTorneo ?? null;
-  currentIdOrganizador.value =
-    listaTorneos.value.find(
-      (i) => i.idInscripcion == currentInscripcionId.value
-    )?.idOrganizador ?? null;
+
+  console.log(idInscripcion);
 
   showModalInscripcionEquipo.value = true;
 };
@@ -180,7 +168,7 @@ const eliminarInscripcion = async (idInscripcion: number) => {
 
     if (response.request?.status === 200) {
       showSuccessModal.value = true;
-      const responseInscriptionesUser = await getInscripcionesUser(
+      const responseInscriptionesUser = await getInscripcionesIndividualByUser(
         listaTorneos.value[0].idUsuario.toString()
       );
       listaTorneos.value = responseInscriptionesUser.data;

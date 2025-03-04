@@ -102,7 +102,8 @@ const usuarioData = ref<UsuarioDataDTO>({
   partidasValidadas: [],
   partidasPendientes: [],
   elos: [],
-  inscripcionesTorneo: [],
+  InscripcionesIndividualTorneo: [],
+  InscripcionesEquipoTorneo: [],
   clasificacionElo: 0,
   puntuacionElo: 0,
   numeroPartidasJugadas: 0,
@@ -112,6 +113,7 @@ const usuarioData = ref<UsuarioDataDTO>({
   proteccionDatos: null,
   PartidasTorneo: [],
   ClasificacionTorneos: [],
+  rankingElo: 0,
 });
 const showModalAviso = ref<boolean>(true);
 

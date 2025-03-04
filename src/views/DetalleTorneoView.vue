@@ -207,14 +207,14 @@ import { useRoute, useRouter } from "vue-router";
 import { Torneo } from "@/interfaces/Torneo";
 import { descargarBasesTorneo, getTorneo } from "@/services/TorneosService";
 import {
+  getInscripcionesIndividualByUser,
   getInscripcionesTorneo,
-  getInscripcionesUser,
   registrarInscripcion,
 } from "@/services/InscripcionesService";
 import { useAuth } from "@/composables/useAuth";
 import {
   CrearInscripcionDTO,
-  InscripcionUsuarioDTO,
+  InscripcionUsuarioIndividualDTO,
 } from "@/interfaces/Inscripcion";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
@@ -225,12 +225,12 @@ const route = useRoute();
 const router = useRouter();
 
 const torneo = ref<Torneo>();
-const participantes = ref<InscripcionUsuarioDTO[]>([]);
+const participantes = ref<InscripcionUsuarioIndividualDTO[]>([]);
 const idUsuario = ref<string | null>(getidUsuario.value);
 const idTorneo = ref<number>();
 const estaApuntado = ref<boolean>(false);
 const isTorneoCompletado = ref<boolean>(false);
-const torneosApuntado = ref<InscripcionUsuarioDTO[]>();
+const torneosApuntado = ref<InscripcionUsuarioIndividualDTO[]>();
 
 const tab = ref(0);
 const search = ref<string>("");
@@ -271,7 +271,7 @@ onMounted(async () => {
       await Promise.all([
         getTorneo(idTorneo.value),
         getInscripcionesTorneo(idTorneo.value),
-        getInscripcionesUser(idUsuario.value),
+        getInscripcionesIndividualByUser(idUsuario.value),
       ]);
 
     torneo.value = responseTorneo.data;

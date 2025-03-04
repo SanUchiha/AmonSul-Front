@@ -10,10 +10,6 @@ export const getIncripcionById = async (idInscripcion: number) => {
   return http.get(`Inscripcion/${idInscripcion}`);
 };
 
-export const getIncripcionEquipoById = async (idInscripcion: number) => {
-  return http.get(`Inscripcion/equipo/${idInscripcion}`);
-};
-
 export const getAllInscripciones = async () => {
   return http.get("Inscripcion");
 };
@@ -28,8 +24,12 @@ export const cancelarInscripcion = async (idInscripcion: number) => {
   return http.delete(`Inscripcion/${idInscripcion}`);
 };
 
-export const getInscripcionesUser = async (idUsuario: string) => {
-  return http.get(`Inscripcion/byUser/${idUsuario}`);
+export const getInscripcionesIndividualByUser = async (idUsuario: string) => {
+  return http.get(`Inscripcion/individual/byUser/${idUsuario}`);
+};
+
+export const getInscripcionesEquipoByUser = async (idUsuario: number) => {
+  return http.get(`Inscripcion/Equipo/byUser/${idUsuario}`);
 };
 
 export const getInscripcionesTorneo = async (idTorneo: number) => {
@@ -48,4 +48,8 @@ export const registrarEquipo = async (
   nuevaInscripcion: InscripcionEquipoDTO
 ) => {
   return http.post(`Inscripcion/equipo`, nuevaInscripcion);
+};
+
+export const getInscripcionEquipo = async (idInscripcion: number) => {
+  return http.get(`Inscripcion/Equipo/${idInscripcion}`);
 };

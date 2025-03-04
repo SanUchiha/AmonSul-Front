@@ -3,7 +3,7 @@ export interface CrearInscripcionDTO {
   idUsuario: number;
 }
 
-export interface InscripcionUsuarioDTO {
+export interface InscripcionUsuarioIndividualDTO {
   idInscripcion: number;
   idTorneo: number;
   idUsuario: number;
@@ -16,6 +16,15 @@ export interface InscripcionUsuarioDTO {
   esPago: boolean;
   nombreTorneo: string;
   idEquipo?: number;
+}
+
+export interface InscripcionUsuarioEquipoDTO {
+  idInscripcion: number;
+  idTorneo: number;
+  idUsuario: number;
+  nick: string;
+  nombreTorneo: string;
+  idEquipo: number;
 }
 
 export interface Equipo {
@@ -41,19 +50,27 @@ export interface InscripcionEquipoDTO {
   miembros: number[];
 }
 
-export interface InscripcionTorneoEquiposDTO {
+export interface InscripcionEquipoDTO {
   idInscripcion: number;
   idTorneo: number;
+  idUsuario: number;
   idCapitan: number;
-  fechaInscripcion?: string; // DateOnly no existe en TS, se usa string (ISO 8601)
-  esPago?: string;
-  idsListas: number[];
-  componentesEquipo: ComponentesEquipoDTO[];
   idEquipo: number;
-  nombreEquipo?: string;
+  idOrganizador: number;
+  emailOrganizador: string;
+  fechaInscripcion?: string;
+  esPago?: string;
+  componentesEquipoDTO: ComponentesEquipoDTO[];
 }
 
 export interface ComponentesEquipoDTO {
   idUsuario: number;
+  idInscripcion: number;
   nick: string;
+  esCapitan: boolean;
+  estadoLista?: string;
+  fechaEntregaLista?: string;
+  listaData?: string;
+  ejercito?: string;
+  idLista: number;
 }
