@@ -59,7 +59,7 @@
             v-model="tipoTorneo"
             label="¿De qué tipo es el torneo?"
             required
-            :items="['Individual', 'Parejas', 'Equipos_4', 'Equipos_6']"
+            :items="['Individual', 'Parejas', 'Equipos de 4', 'Equipos de 6']"
             :rules="[(v:string) => !!v || 'Campo obligatorio']"
           />
           <!-- fecha de inicio -->
@@ -393,6 +393,7 @@ const confirmarConfiguracion = async () => {
       missingFields.push("Hora de finalización del torneo");
     if (!horaInicioTorneo.value)
       missingFields.push("Hora de inicio del torneo");
+    if (!tipoTorneo.value) missingFields.push("Tipo de torneo");
 
     // Alert with missing fields
     alert(
@@ -411,6 +412,9 @@ const confirmarConfiguracion = async () => {
         )
       )
     : null;
+
+  if (tipoTorneo.value == "Equipos de 4") tipoTorneo.value = "Equipos_4";
+  if (tipoTorneo.value == "Equipos de 6") tipoTorneo.value = "Equipos_6";
 
   const nuevoTorneo: CrearTorneoDTO = {
     idUsuario: props.idUsuario,
