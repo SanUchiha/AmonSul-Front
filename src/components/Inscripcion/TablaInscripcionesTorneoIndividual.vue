@@ -1,60 +1,56 @@
 <template>
-  <v-divider class="mb-0 pb-0"></v-divider>
   <div v-if="!hasAcciones">
-    <v-container :loading="isLoading">
-        <v-list>
-          <v-list-item
-            v-for="torneo in listaTorneos"
-            :key="torneo.idInscripcion"
-            @click="verDetalleTorneo(torneo.idTorneo)"
-            class="clickable-list-item"
-          >
-            <template v-slot:prepend>
-              <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
-            </template>
-
-            <v-list-item-title class="text-wrap text-left pl-2">{{ torneo.nombreTorneo }}</v-list-item-title>
-
-            <template v-slot:append>
-              <v-btn icon @click.stop="verDetalleTorneo(torneo.idTorneo)">
-                <img src="@/assets/icons/verLista.png" alt="Icono personalizado" width="40" height="40">
-              </v-btn>
-            </template>
-          </v-list-item>
-
-        </v-list>
-    </v-container>
+    <v-table :loading="isLoading">
+      <thead>
+        <tr>
+          <th class="text-center">Nombre torneo</th>
+          <th class="text-center">Detalle torneo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
+          <td>{{ torneo.nombreTorneo }}</td>
+          <td class="text-center">
+            <v-btn icon @click="verDetalleTorneo(torneo.idTorneo)">
+              <v-icon color="orange">mdi-eye</v-icon>
+            </v-btn>
+          </td>
+        </tr>
+      </tbody>
+    </v-table>
   </div>
-
   <div v-if="hasAcciones">
-    <v-container :loading="isLoading" class="mb-0 pb-0">
-        <v-list >
-          <v-list-item
-            v-for="torneo in listaTorneos"
-            :key="torneo.idInscripcion"
-            @click="verDetalleTorneo(torneo.idTorneo)"
-            class="clickable-list-item"
-          >
-            <template v-slot:prepend>
-              <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
-            </template>
-
-            <v-list-item-title class="text-wrap text-left pl-2">{{ torneo.nombreTorneo }}</v-list-item-title>
-
-            <template v-slot:append>
-              <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
-                <img src="@/assets/icons/clasificacionTorneo.png" alt="Icono personalizado" width="40" height="40">
+    <v-table :loading="isLoading">
+      <tbody>
+        <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
+          <td>{{ torneo.nombreTorneo }}</td>
+          <td class="text-center">
+            <div v-if="torneo.idEquipo">
+              <v-btn
+                icon
+                @click="verDetalleInscripcionEquipo(torneo.idInscripcion)"
+              >
+                <v-icon color="orange">mdi-eye</v-icon>
               </v-btn>
-              <v-btn icon @click.stop="verDetalleInscripcion(torneo.idInscripcion)">
-                <img src="@/assets/icons/verLista.png" alt="Icono personalizado" width="40" height="40">
+            </div>
+            <div v-else>
+              <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
+                <v-icon color="orange">mdi-eye</v-icon>
               </v-btn>
-            </template>
-          </v-list-item>
+            </div>
 
-          
-        </v-list>
-    </v-container>
+            <!-- <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
+              <v-icon color="primary">mdi-file-send</v-icon>
+            </v-btn> -->
+            <!-- <v-btn icon @click="eliminarInscripcion(torneo.idInscripcion)">
+              <v-icon color="red">mdi-cancel</v-icon>
+            </v-btn> -->
+          </td>
+        </tr>
+      </tbody>
+    </v-table>
   </div>
+
   <ModalSuccess
     :isVisible="showSuccessModal"
     message="Eliminado con éxito."
@@ -69,6 +65,15 @@
 
   <ModalInscripcion
     v-if="showModalInscripcion"
+    :idInscripcion="currentInscripcionId"
+    :idUsuario="parseInt(idUsuarioLogger!)"
+    :idTorneo="currentTorneoId"
+    :idOrganizador="currentTorneoId"
+    @eliminar-inscripcion="eliminarInscripcion"
+    @close="closeModal"
+  />
+  <ModalInscripcionEquipo
+    v-if="showModalInscripcionEquipo"
     :idInscripcion="currentInscripcionId"
     :idUsuario="parseInt(idUsuarioLogger!)"
     :idTorneo="currentTorneoId"
@@ -96,20 +101,21 @@
 
 <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
-import { InscripcionUsuarioDTO } from "@/interfaces/Inscripcion";
+import { InscripcionUsuarioIndividualDTO } from "@/interfaces/Inscripcion";
 import router from "@/router";
 import {
   cancelarInscripcion,
-  getInscripcionesUser,
+  getInscripcionesIndividualByUser,
 } from "@/services/InscripcionesService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useAuth } from "@/composables/useAuth";
 import ModalInscripcion from "./ModalInscripcion.vue";
+import ModalInscripcionEquipo from "./ModalInscripcionEquipo.vue";
 
 const props = defineProps<{
   isLoading: boolean;
-  listaTorneos: InscripcionUsuarioDTO[];
+  listaTorneos: InscripcionUsuarioIndividualDTO[];
   idUsuario: number;
 }>();
 
@@ -118,11 +124,12 @@ const isRegistering = ref<boolean>(false);
 const currentInscripcionId = ref<number | null>(null);
 const currentTorneoId = ref<number | null>(null);
 const currentIdOrganizador = ref<number | null>(null);
-const listaTorneos = ref<InscripcionUsuarioDTO[]>([]);
+const listaTorneos = ref<InscripcionUsuarioIndividualDTO[]>([]);
 
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showModalInscripcion = ref<boolean>(false);
+const showModalInscripcionEquipo = ref<boolean>(false);
 
 const hasAcciones = ref<boolean>(false);
 const { getidUsuario } = useAuth();
@@ -142,11 +149,16 @@ const verDetalleInscripcion = (idInscripcion: number) => {
   showModalInscripcion.value = true;
 };
 
+const verDetalleInscripcionEquipo = (idInscripcion: number) => {
+  currentInscripcionId.value = idInscripcion;
+
+  console.log(idInscripcion);
+
+  showModalInscripcionEquipo.value = true;
+};
+
 const verDetalleTorneo = (idTorneo: number) => {
   router.push({ name: "detalle-torneo", params: { idTorneo } });
-};
-const VerResultadoTorneo = (idTorneo: number) => {
-  router.push({ name: "detalle-torneo-live", params: { idTorneo } });
 };
 
 const eliminarInscripcion = async (idInscripcion: number) => {
@@ -156,7 +168,7 @@ const eliminarInscripcion = async (idInscripcion: number) => {
 
     if (response.request?.status === 200) {
       showSuccessModal.value = true;
-      const responseInscriptionesUser = await getInscripcionesUser(
+      const responseInscriptionesUser = await getInscripcionesIndividualByUser(
         listaTorneos.value[0].idUsuario.toString()
       );
       listaTorneos.value = responseInscriptionesUser.data;
@@ -183,15 +195,26 @@ onMounted(async () => {
 // Cierra el modal
 const closeModal = () => {
   showModalInscripcion.value = false;
+  showModalInscripcionEquipo.value = false;
 };
 </script>
 
 <style scoped>
-.clickable-list-item {
-  cursor: pointer;
-  transition: background 0.2s;
+thead {
+  background-color: #5b2269;
+  color: white;
+  text-align: center;
 }
-.clickable-list-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+
+tbody tr {
+  transition: background-color 0.3s;
+}
+
+tbody tr:hover {
+  background-color: #3c4041;
+}
+
+.text-center {
+  text-align: center;
 }
 </style>

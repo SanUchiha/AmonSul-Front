@@ -25,13 +25,14 @@ export interface Torneo {
   horaFinTorneo: string; // Hora de fin del torneo (HH:mm)
   limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
   tieneBases: boolean;
+  inicioInscripciones: string; // Fecha límite de inscripción
 }
 
 export interface TorneoPropioDTO {
   idTorneo: number; // Identificador único del torneo (PK)
   idUsuario: number; // ID del usuario administrador del torneo (FK)
   nombreTorneo: string; // Nombre del torneo
-  estadoTorneo: string; // Estado del torneo
+  tipoTorneo: string;
 }
 
 export interface TorneoGestionInfoDTO {
@@ -48,6 +49,7 @@ export interface TorneoCreadoDTO {
   estadoTorneo: string;
   fechaEntregaListas?: string | null;
   fechaFinInscripcion?: string | null;
+  inicioInscripciones?: string | null;
 }
 
 export interface InscripcionTorneoCreadoDTO {
@@ -94,6 +96,7 @@ export interface CrearTorneoDTO {
   esMatchedPlayTorneo: boolean;
   fechaEntregaListas: string; // formato de fecha "YYYY-MM-DD"
   fechaFinInscripcion: string; // formato de fecha "YYYY-MM-DD"
+  inicioInscripciones: string; // formato de fecha "YYYY-MM-DD"
   basesTorneo?: string;
   cartelTorneo?: string; //  base64
   metodosPago?: string;
@@ -113,7 +116,7 @@ export interface ModificarTorneoDTO {
   puntosTorneo?: number;
   estadoTorneo?: number;
   lugarTorneo?: string;
-  tipoTorneo?: string;
+  tipoTorneo: "Individual" | "Parejas" | "Equipos_4" | "Equipos_6";
   esLiga?: boolean;
   idRangoTorneo?: number;
   esMatchedPlayTorneo?: boolean;
@@ -124,6 +127,7 @@ export interface ModificarTorneoDTO {
   metodosPago?: string;
   horaInicioTorneo?: string; // formato de hora "HH:mm:ss"
   horaFinTorneo?: string; // formato de hora "HH:mm:ss"
+  inicioInscripciones: string; // Fecha límite de inscripción
 }
 
 export interface ModificarBasesTorneoDTO {

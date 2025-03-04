@@ -1,5 +1,6 @@
 import {
   CrearInscripcionDTO,
+  InscripcionEquipoDTO,
   UpdateEstadoListaDTO,
   UpdateEstadoPagoDTO,
 } from "@/interfaces/Inscripcion";
@@ -23,8 +24,12 @@ export const cancelarInscripcion = async (idInscripcion: number) => {
   return http.delete(`Inscripcion/${idInscripcion}`);
 };
 
-export const getInscripcionesUser = async (idUsuario: string) => {
-  return http.get(`Inscripcion/byUser/${idUsuario}`);
+export const getInscripcionesIndividualByUser = async (idUsuario: string) => {
+  return http.get(`Inscripcion/individual/byUser/${idUsuario}`);
+};
+
+export const getInscripcionesEquipoByUser = async (idUsuario: number) => {
+  return http.get(`Inscripcion/Equipo/byUser/${idUsuario}`);
 };
 
 export const getInscripcionesTorneo = async (idTorneo: number) => {
@@ -37,4 +42,14 @@ export const updateEstadoLista = async (nuevaEstado: UpdateEstadoListaDTO) => {
 
 export const updateEstadoPago = async (nuevaEstado: UpdateEstadoPagoDTO) => {
   return http.put(`Inscripcion/Estado-Pago`, nuevaEstado);
+};
+
+export const registrarEquipo = async (
+  nuevaInscripcion: InscripcionEquipoDTO
+) => {
+  return http.post(`Inscripcion/equipo`, nuevaInscripcion);
+};
+
+export const getInscripcionEquipo = async (idInscripcion: number) => {
+  return http.get(`Inscripcion/Equipo/${idInscripcion}`);
 };

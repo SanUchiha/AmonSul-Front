@@ -87,9 +87,9 @@
            Inscription a los tornoes (mis torneos)
            Lista de partidas -->
             <v-window-item value="4">
-              <TablaInscripcionesTorneo
+              <TablaInscripcionesTorneoIndividual
                 :isLoading="isLoading"
-                :listaTorneos="usuarioData.inscripcionesTorneo"
+                :listaTorneos="usuarioData.InscripcionesIndividualTorneo"
                 :idUsuario="usuarioData.idUsuario"
               />
             </v-window-item>
@@ -123,12 +123,12 @@ import {
   ViewPartidaTorneoDTO,
 } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
-import TablaInscripcionesTorneo from "@/components/Inscripcion/TablaInscripcionesTorneo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import CardPartidaTorneo from "@/components/PartidasTorneo/CardPartidaTorneo.vue";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
+import TablaInscripcionesTorneoIndividual from "@/components/Inscripcion/TablaInscripcionesTorneoIndividual.vue";
 
 const tab = ref<string>("one");
 const usuariosStore = useUsuariosStore();

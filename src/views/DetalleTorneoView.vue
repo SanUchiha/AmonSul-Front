@@ -46,6 +46,7 @@
 
                       <v-col cols="12" sm="6">
                         <p><v-icon left color="green">mdi-calendar</v-icon> <strong>Fecha:</strong> {{ formatDate(torneo.fechaInicioTorneo) }} a las {{ torneo.horaInicioTorneo }}</p>
+                        <p><v-icon left color="red">mdi-calendar-clock</v-icon> <strong>Inscripciones abiertas:</strong> {{ formatDate(torneo.inicioInscripciones) }}</p>
                         <p><v-icon left color="red">mdi-calendar-clock</v-icon> <strong>Inscripción hasta:</strong> {{ formatDate(torneo.fechaFinInscripcion) }}</p>
                         <p><v-icon left color="orange">mdi-list-status</v-icon> <strong>Entrega de Listas:</strong> {{ formatDate(torneo.fechaEntregaListas) }}</p>
                       </v-col>
@@ -67,19 +68,37 @@
                         </v-btn>
                       </v-col>
                       <v-col cols="12" sm="6">
-                        <span v-if="!isInscripcionCerrada">
-                          <span v-if="estaApuntado" class="text-green text-subtitle-1">
-                            <v-btn variant="tonal" color="red" @click="showModalResponse" block>
+                        <span v-if="isInscripcionCerrada" class="text-red text-subtitle-1">
+                          Plazo de inscripción cerrado
+                        </span>
+                        <span v-else-if="inscripcionState === 'completo'" class="text-red text-subtitle-1">
+                          Plazas agotadas
+                        </span>
+                        <span v-else-if="estaApuntado">
+                          <span v-if="!isInscripcionCerrada">
+                            <v-btn variant="tonal" color="red" @click="inscripcionIndividual" block>
                               <v-icon left>mdi-check-circle</v-icon> Borrar inscripción
-                            </v-btn>   
+                            </v-btn>
                           </span>
-                          <span v-else>
-                            <v-btn variant="tonal" color="green" @click="showModalResponse" block>
-                              <v-icon left>mdi-check-circle</v-icon> Apuntarse
-                            </v-btn>                        
+                          <span v-else class="text-subtitle-1">
+                            Estás apuntado pero las inscripciones están cerradas, no está permitido borrar la inscripción.
                           </span>
                         </span>
-                        <span v-else class="text-red text-subtitle-1">Plazo de inscripción cerrado</span>
+                        <span v-else>
+                          <span v-if="torneo.tipoTorneo == 'Individual'">
+                            <v-btn variant="tonal" color="green" @click="inscripcionIndividual" block>
+                              <v-icon left>mdi-check-circle</v-icon> Apuntarse
+                            </v-btn>
+                          </span>
+                          <span v-else>
+                            <v-btn variant="tonal" color="green" @click="inscripcionPorEquipos(torneo.tipoTorneo)" block>
+                              <v-icon left>mdi-check-circle</v-icon> Apuntarse
+                            </v-btn>
+                          </span>
+                          <!--<v-btn variant="tonal" color="green" @click="showModalResponse" block>
+                            <v-icon left>mdi-check-circle</v-icon> Apuntarse
+                          </v-btn>-->
+                        </span>
                       </v-col>
                     </v-row>
                   </v-card-actions>
@@ -87,8 +106,19 @@
               </v-col>
             </v-row>
           </v-window-item>
+        </v-window>
+      </v-card-text>
+    </v-card>
 
-          <!-- Modal Success -->
+    <!-- Registro equipo -->
+    <ModalRegistroEquipo
+      :isVisible="showModalInscripcionPorEquipos"
+      :tipoTorneo="torneo?.tipoTorneo"
+      :idTorneo="torneo?.idTorneo"
+      @update:isVisible="showModalInscripcionPorEquipos = $event"
+    />
+
+    <!-- Modal Success -->
     <ModalSuccess
       :isVisible="showSuccessModal"
       message="Te has registrado con éxito."
@@ -102,27 +132,47 @@
       @update:isVisible="showErrorModal = $event"
     />
     
-          <!-- Participantes -->
-          <v-window-item value="two">
-            <v-card flat>
-              <v-card-title class="d-flex align-center">
-                <p><v-icon left>mdi-account-group</v-icon> Participantes</p>
-                <v-spacer></v-spacer>
-                <v-text-field v-model="search" label="Buscar" prepend-inner-icon="mdi-magnify" variant="outlined" dense></v-text-field>
-              </v-card-title>
-              <v-divider></v-divider>
-              <v-data-table v-model:search="search" :items="participantes" :loading="isLoading" :headers="headers">
-                <template v-slot:item="{ item }">
-                  <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
-                    <td><v-chip color="orange" dark>{{ item.nick }}</v-chip></td>
-                  </tr>
-                </template>
-              </v-data-table>
-            </v-card>
-          </v-window-item>
-        </v-window>
-      </v-card-text>
-    </v-card>
+    <!-- Participantes -->
+    <v-window-item value="two">
+      <v-card flat>
+        <v-card-title class="d-flex align-center">
+          <p v-if="torneo?.tipoTorneo == 'Individual'"><v-icon left>mdi-account-group</v-icon> Participantes</p>
+          <p v-else><v-icon left>mdi-account-group</v-icon> Equipos</p>
+          <v-spacer></v-spacer>
+          <v-text-field v-model="search" label="Buscar" prepend-inner-icon="mdi-magnify" variant="outlined" dense></v-text-field>
+        </v-card-title>
+        <v-divider></v-divider>
+        <div v-if="torneo?.tipoTorneo == 'Individual'">
+          <v-data-table v-model:search="search" :items="participantes" :loading="isLoading" :headers="headers">
+            <template v-slot:item="{ item }">
+              <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
+                <td><v-chip color="orange" dark>{{ item.nick }}</v-chip></td>
+              </tr>
+            </template>
+          </v-data-table>
+        </div>
+        <div v-else>
+          <v-data-table
+            v-model:search="search"
+            :items="infoEquipos"
+            :loading="isLoading"
+            :headers="headersEquipos"
+            class="custom-table"
+            item-key="nombreEquipo"
+          >
+            <template v-slot:item="{ item }">
+              <tr @click="goToEquipoDetail(item)" class="clickable-row">
+                <td>
+                  <v-chip color="orange" dark>{{
+                    item.nombreEquipo
+                  }}</v-chip>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+        </div>
+      </v-card>
+    </v-window-item>
   </v-container>
 </template>
 
@@ -131,41 +181,51 @@
 import { ref, onMounted, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Torneo } from "@/interfaces/Torneo";
-import { descargarBasesTorneo, getTorneo } from "@/services/TorneosService";
 import {
+  descargarBasesTorneo,
+  getEquiposByTorneoAsync,
+  getTorneo,
+} from "@/services/TorneosService";
+import {
+  getInscripcionesIndividualByUser,
   getInscripcionesTorneo,
-  getInscripcionesUser,
   registrarInscripcion,
   cancelarInscripcion
 } from "@/services/InscripcionesService";
 import { useAuth } from "@/composables/useAuth";
 import {
   CrearInscripcionDTO,
-  InscripcionUsuarioDTO,
+  EquipoDTO,
+  InscripcionUsuarioIndividualDTO,
 } from "@/interfaces/Inscripcion";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
+import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
 
 const { getidUsuario } = useAuth();
 const route = useRoute();
 const router = useRouter();
 
 const torneo = ref<Torneo>();
-const participantes = ref<InscripcionUsuarioDTO[]>([]);
+const participantes = ref<InscripcionUsuarioIndividualDTO[]>([]);
 const idUsuario = ref<string | null>(getidUsuario.value);
 const idTorneo = ref<number>();
 const estaApuntado = ref<boolean>(false);
 const isTorneoCompletado = ref<boolean>(false);
-const torneosApuntado = ref<InscripcionUsuarioDTO[]>();
 const idInscripcion = ref<number>(0);
+const torneosApuntado = ref<InscripcionUsuarioIndividualDTO[]>();
 
 const tab = ref(0);
 const search = ref<string>("");
 const isLoading = ref<boolean>(true);
 const headers = [{ title: "Nick", key: "nick" }];
+const headersEquipos = [{ title: "Nombre del equipo", key: "nombreEquipo" }];
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const isRegistering = ref<boolean>(false);
+const showModalInscripcionPorEquipos = ref<boolean>(false);
+
+const infoEquipos = ref<EquipoDTO | null>(null);
 
 
 
@@ -232,14 +292,26 @@ const inscripcionState = computed(() => {
 
 // Computed para verificar si el plazo de inscripción está cerrado
 const isInscripcionCerrada = computed(() => {
-  if (!torneo.value || !torneo.value.fechaFinInscripcion) return false;
+  if (
+    !torneo.value ||
+    !torneo.value.fechaFinInscripcion ||
+    !torneo.value.inicioInscripciones
+  )
+    return false;
   const fechaActual = new Date();
   const fechaFinInscripcion = new Date(torneo.value.fechaFinInscripcion);
-  return fechaActual > fechaFinInscripcion;
+  const fechaInicioInscripcion = new Date(torneo.value.inicioInscripciones);
+
+  return (
+    fechaActual > fechaFinInscripcion || fechaActual < fechaInicioInscripcion
+  );
 });
 
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
+};
+const goToEquipoDetail = (idEquipo: number) => {
+  //TODO: modal con la info (nick) de los jugadores que se pueda pulsar en ellos y te lleven a su perfil
 };
 
 
@@ -278,7 +350,7 @@ onMounted(async () => {
       await Promise.all([
         getTorneo(idTorneo.value),
         getInscripcionesTorneo(idTorneo.value),
-        getInscripcionesUser(idUsuario.value),
+        getInscripcionesIndividualByUser(idUsuario.value),
       ]);
 
     torneo.value = responseTorneo.data;
@@ -303,14 +375,20 @@ onMounted(async () => {
       }
     }
   }
+  //TODO Mejorar y solo traer los equipos si es torneo por equipos
+  if (idTorneo.value) {
+    const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
+
+    infoEquipos.value = responseEquipos.data;
+    //console.log("Equipos", responseEquipos.data);
+  }
   try {
     if (isValidCoordinates(torneo.value!.lugarTorneo)){
       getAddress(parseFloat(torneo.value!.lugarTorneo.split(", ")[0]), parseFloat(torneo.value!.lugarTorneo.split(", ")[1]));
     }
   } catch (err) {
-    console.error("Error al obtener el torneo:", err);
+    console.error("Error al obtener coordenadas del torneo:", err);
   }
-
   isLoading.value = false;
 });
 
@@ -346,8 +424,7 @@ const descargarBases = async () => {
   }
 };
 
-const showModalResponse = async () => {
-  console.log("idInscripcion.value", idInscripcion.value)
+const inscripcionIndividual = async () => {
   if (
     idUsuario.value != null &&
     idTorneo.value != null &&
@@ -371,6 +448,16 @@ const showModalResponse = async () => {
   else{
     //TODO necesito la inscripcion del torneo a borrar
     eliminarInscripcion(idInscripcion.value);
+  }
+};
+
+const inscripcionPorEquipos = async (tipoTorneo: string) => {
+  if (
+    idUsuario.value != null &&
+    idTorneo.value != null &&
+    !isInscripcionCerrada.value
+  ) {
+    showModalInscripcionPorEquipos.value = true;
   }
 };
 </script>
