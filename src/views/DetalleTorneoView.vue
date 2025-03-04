@@ -32,6 +32,10 @@
                       {{ torneo.horaInicioTorneo }}
                     </p>
                     <p>
+                      <strong>Abierto el plazo de inscripción: </strong>
+                      {{ formatDate(torneo.inicioInscripciones) }}
+                    </p>
+                    <p>
                       <strong>Inscripción hasta:</strong>
                       {{ formatDate(torneo.fechaFinInscripcion) }}
                     </p>
@@ -229,10 +233,19 @@ const inscripcionState = computed(() => {
 
 // Computed para verificar si el plazo de inscripción está cerrado
 const isInscripcionCerrada = computed(() => {
-  if (!torneo.value || !torneo.value.fechaFinInscripcion) return false;
+  if (
+    !torneo.value ||
+    !torneo.value.fechaFinInscripcion ||
+    !torneo.value.inicioInscripciones
+  )
+    return false;
   const fechaActual = new Date();
   const fechaFinInscripcion = new Date(torneo.value.fechaFinInscripcion);
-  return fechaActual > fechaFinInscripcion;
+  const fechaInicioInscripcion = new Date(torneo.value.inicioInscripciones);
+
+  return (
+    fechaActual > fechaFinInscripcion || fechaActual < fechaInicioInscripcion
+  );
 });
 
 const goToUserDetail = (idUsuario: number) => {

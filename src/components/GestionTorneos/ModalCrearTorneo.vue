@@ -55,27 +55,34 @@
             type="number"
             :rules="[(v:number) => !!v || 'Campo obligatorio']"
           ></v-text-field>
-          <!-- fecha de inicio -->
-          <DatePicker
-            v-model="showFechaInicioTorneo"
+          <v-select
+            v-model="tipoTorneo"
+            label="¿De qué tipo es el torneo?"
+            required
+            :items="['Individual', 'Parejas', 'Equipos_4', 'Equipos_6']"
             :rules="[(v:string) => !!v || 'Campo obligatorio']"
-            clearable
-            hide-details="auto"
-            color="primary"
+          />
+          <!-- fecha de inicio -->
+          <v-text-field
+            v-model="fechaInicioTorneo"
             label="Fecha de inicio del torneo"
+            type="date"
+            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            required
+            clearable
             @dateChanged="handleDateChangeInicio"
-          ></DatePicker>
+          ></v-text-field>
           <v-spacer class="my-4"></v-spacer>
           <!-- Fecha de fin del torneo -->
-          <DatePicker
-            v-model="showFechaFinTorneo"
-            :rules="[(v:string) => !!v || 'Campo obligatorio']"
-            clearable
-            hide-details="auto"
-            color="primary"
+          <v-text-field
+            v-model="fechaFinTorneo"
             label="Fecha de fin del torneo"
+            type="date"
+            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            required
+            clearable
             @dateChanged="handleDateChangeFin"
-          ></DatePicker>
+          ></v-text-field>
           <v-spacer class="my-4"></v-spacer>
           <!-- Precio del torneo -->
           <v-text-field
@@ -92,31 +99,38 @@
             type="text"
             clearable
           ></v-textarea>
-          <!-- Último día para apuntarse -->
-          <DatePicker
-            v-model="showFechaFinInscripcion"
-            :rules="[
-              (v:string) => !!v || 'Campo obligatorio',
-            ]"
+          <!-- Inicio de las inscripciones -->
+          <v-text-field
+            v-model="fechaInicioInscripcion"
+            label="Inicio de las inscripciones"
+            type="date"
+            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            required
             clearable
-            hide-details="auto"
-            color="primary"
+            @dateChanged="handleDateChangeInicioInscripcion"
+          ></v-text-field>
+          <v-spacer class="my-4"></v-spacer>
+          <!-- Último día para apuntarse -->
+          <v-text-field
+            v-model="fechaFinInscripcion"
             label="Último día para apuntarse al torneo"
+            type="date"
+            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            required
+            clearable
             @dateChanged="handleDateChangeInscripcion"
-          ></DatePicker>
+          ></v-text-field>
           <v-spacer class="my-4"></v-spacer>
           <!-- Último día para entregar las listas -->
-          <DatePicker
-            v-model="showFechaEntregaListas"
-            :rules="[
-              (v:string) => !!v || 'Campo obligatorio',
-            ]"
-            clearable
-            hide-details="auto"
-            color="primary"
+          <v-text-field
+            v-model="fechaFinEntregaListas"
             label="Último día para entregar las listas"
+            type="date"
+            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            required
+            clearable
             @dateChanged="handleDateChangeListas"
-          ></DatePicker>
+          ></v-text-field>
           <v-spacer class="my-4"></v-spacer>
           <!-- bases del torneo -->
           <v-file-input
@@ -205,7 +219,6 @@ import { ref, defineProps, defineEmits, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { CrearTorneoDTO } from "@/interfaces/Torneo";
-import DatePicker from "../Commons/DatePicker.vue";
 import { crearTorneo } from "@/services/TorneosService";
 
 const props = defineProps<{
@@ -225,22 +238,23 @@ watch(
 );
 
 const handleDateChangeInicio = (newDate: string | null) => {
-  if (newDate) fechaInicio.value = convertirFecha(newDate);
+  if (newDate) fechaInicioTorneo.value = convertirFecha(newDate);
 };
 const handleDateChangeFin = (newDate: string | null) => {
-  if (newDate) fechaFin.value = convertirFecha(newDate);
+  if (newDate) fechaFinTorneo.value = convertirFecha(newDate);
 };
 const handleDateChangeInscripcion = (newDate: string | null) => {
-  if (newDate) fechaInscripcion.value = convertirFecha(newDate);
+  if (newDate) fechaFinInscripcion.value = convertirFecha(newDate);
 };
 const handleDateChangeListas = (newDate: string | null) => {
-  if (newDate) fechaListas.value = convertirFecha(newDate);
+  if (newDate) fechaFinEntregaListas.value = convertirFecha(newDate);
+};
+const handleDateChangeInicioInscripcion = (newDate: string | null) => {
+  if (newDate) fechaInicioInscripcion.value = convertirFecha(newDate);
 };
 const nombreTorneo = ref<string>();
 const limiteParticipantes = ref<number>();
 const descripcionTorneo = ref<string>();
-const showFechaInicioTorneo = ref<boolean>(false);
-const showFechaFinTorneo = ref<boolean>(false);
 const precioTorneo = ref<number>();
 const numeroPartidas = ref<number>();
 const puntosTorneo = ref<number>();
@@ -250,16 +264,15 @@ const tipoTorneo = ref<string>("");
 const esLiga = ref<boolean>(false);
 const idRangoTorneo = ref<number>(1);
 const esMatchedPlayTorneo = ref<boolean>(false);
-const showFechaEntregaListas = ref<boolean>(false);
-const showFechaFinInscripcion = ref<boolean>(false);
 const metodosPago = ref<string>("");
 const horaInicioTorneo = ref<string>("00:00");
 const horaFinTorneo = ref<string>("00:00");
 
-const fechaInicio = ref<string>();
-const fechaFin = ref<string>();
-const fechaListas = ref<string>();
-const fechaInscripcion = ref<string>();
+const fechaInicioTorneo = ref<string>();
+const fechaFinTorneo = ref<string>();
+const fechaFinEntregaListas = ref<string>();
+const fechaFinInscripcion = ref<string>();
+const fechaInicioInscripcion = ref<string>();
 
 const imageInput = ref<HTMLInputElement | null>(null);
 const imageBase64 = ref<string | null>(null);
@@ -275,10 +288,17 @@ const closeModal = () => {
   emit("close");
 };
 
-watch([fechaInicio, fechaFin], ([newStart, newEnd]) => {
+watch([fechaInicioTorneo, fechaFinTorneo], ([newStart, newEnd]) => {
   if (newStart && newEnd && new Date(newStart) > new Date(newEnd)) {
     alert("La fecha de inicio debe ser anterior a la fecha de fin.");
-    fechaFin.value = "";
+    fechaFinTorneo.value = "";
+  }
+});
+
+watch([fechaInicioInscripcion, fechaFinInscripcion], ([newStart, newEnd]) => {
+  if (newStart && newEnd && new Date(newStart) > new Date(newEnd)) {
+    alert("La fecha de inicio debe ser anterior a la fecha de fin.");
+    fechaFinInscripcion.value = "";
   }
 });
 
@@ -359,12 +379,15 @@ const confirmarConfiguracion = async () => {
     if (!lugarTorneo.value) missingFields.push("Lugar del torneo");
     if (!puntosTorneo.value) missingFields.push("Puntos del torneo");
     if (!numeroPartidas.value) missingFields.push("Número de rondas");
-    if (!fechaInicio.value) missingFields.push("Fecha de inicio del torneo");
-    if (!fechaFin.value) missingFields.push("Fecha de fin del torneo");
+    if (!fechaInicioTorneo.value)
+      missingFields.push("Fecha de inicio del torneo");
+    if (!fechaFinTorneo.value) missingFields.push("Fecha de fin del torneo");
     if (!precioTorneo.value) missingFields.push("Precio del torneo");
-    if (!fechaInscripcion.value)
+    if (!fechaFinInscripcion.value)
       missingFields.push("Último día para apuntarse");
-    if (!fechaListas.value)
+    if (!fechaInicioInscripcion.value)
+      missingFields.push("Primer día para apuntarse");
+    if (!fechaFinEntregaListas.value)
       missingFields.push("Último día para entregar listas");
     if (!horaFinTorneo.value)
       missingFields.push("Hora de finalización del torneo");
@@ -391,26 +414,27 @@ const confirmarConfiguracion = async () => {
 
   const nuevoTorneo: CrearTorneoDTO = {
     idUsuario: props.idUsuario,
-    nombreTorneo: nombreTorneo.value!,
-    limiteParticipantes: limiteParticipantes.value!,
-    fechaInicioTorneo: fechaInicio.value!,
-    fechaFinTorneo: fechaFin.value!,
-    precioTorneo: precioTorneo.value!,
-    numeroPartidas: numeroPartidas.value!,
-    puntosTorneo: puntosTorneo.value!,
+    nombreTorneo: nombreTorneo.value ?? "",
+    limiteParticipantes: limiteParticipantes.value ?? 50,
+    fechaInicioTorneo: fechaInicioTorneo.value ?? "",
+    fechaFinTorneo: fechaFinTorneo.value ?? "",
+    precioTorneo: precioTorneo.value ?? 0,
+    numeroPartidas: numeroPartidas.value ?? 3,
+    puntosTorneo: puntosTorneo.value ?? 500,
     estadoTorneo: estadoTorneo.value,
-    lugarTorneo: lugarTorneo.value!,
+    lugarTorneo: lugarTorneo.value ?? "",
     tipoTorneo: tipoTorneo.value,
     esLiga: esLiga.value,
     idRangoTorneo: idRangoTorneo.value,
     esMatchedPlayTorneo: esMatchedPlayTorneo.value,
-    fechaEntregaListas: fechaListas.value!,
-    fechaFinInscripcion: fechaInscripcion.value!,
+    fechaEntregaListas: fechaFinEntregaListas.value ?? "",
+    fechaFinInscripcion: fechaFinInscripcion.value ?? "",
     horaInicioTorneo: horaInicioTorneo.value + ":00",
     horaFinTorneo: horaFinTorneo.value + ":00",
-    cartelTorneo: imageBase64.value!,
-    basesTorneo: basesTorneoBase64!,
+    cartelTorneo: imageBase64.value ?? "",
+    basesTorneo: basesTorneoBase64 ?? "",
     descripcionTorneo: descripcionTorneo.value,
+    inicioInscripciones: fechaInicioInscripcion.value ?? "",
   };
   try {
     isGenerating.value = true;

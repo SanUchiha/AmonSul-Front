@@ -24,6 +24,7 @@ export interface Torneo {
   horaInicioTorneo: string; // Hora de inicio del torneo (HH:mm)
   horaFinTorneo: string; // Hora de fin del torneo (HH:mm)
   limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
+  inicioInscripciones: string; // Fecha límite de inscripción
 }
 
 export interface TorneoPropioDTO {
@@ -93,6 +94,7 @@ export interface CrearTorneoDTO {
   esMatchedPlayTorneo: boolean;
   fechaEntregaListas: string; // formato de fecha "YYYY-MM-DD"
   fechaFinInscripcion: string; // formato de fecha "YYYY-MM-DD"
+  inicioInscripciones: string; // formato de fecha "YYYY-MM-DD"
   basesTorneo?: string;
   cartelTorneo?: string; //  base64
   metodosPago?: string;
@@ -123,6 +125,7 @@ export interface ModificarTorneoDTO {
   metodosPago?: string;
   horaInicioTorneo?: string; // formato de hora "HH:mm:ss"
   horaFinTorneo?: string; // formato de hora "HH:mm:ss"
+  inicioInscripciones: string; // Fecha límite de inscripción
 }
 
 export interface ModificarBasesTorneoDTO {
