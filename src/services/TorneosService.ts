@@ -30,6 +30,10 @@ export const getInfoTorneoCreado = async (idTorneo: number) => {
   return http.get(`Torneo/Gestion/Info-torneo/${idTorneo}`);
 };
 
+export const getInfoTorneoEquipoCreado = async (idTorneo: number) => {
+  return http.get(`Torneo/Gestion/Info-torneo-Equipo/${idTorneo}`);
+};
+
 export const getPartidasTorneo = async (idTorneo: number) => {
   return http.get(`Torneo/Gestion/Partidas/${idTorneo}`);
 };
@@ -59,4 +63,8 @@ export const ModificarBasesTorneoAsync = async (
   torneoData: ModificarBasesTorneoDTO
 ) => {
   return http.patch(`Torneo/Gestion/subir-bases`, torneoData);
+};
+
+export const getEquiposByTorneoAsync = async (idTorneo: number) => {
+  return http.get(`Torneo/equipos/${idTorneo}`);
 };

@@ -21,19 +21,24 @@
   </div>
   <div v-if="hasAcciones">
     <v-table :loading="isLoading">
-      <!-- <thead>
-        <tr>
-          <th class="text-center">Torneo</th>
-          <th class="text-center"></th>
-        </tr>
-      </thead> -->
       <tbody>
         <tr v-for="torneo in listaTorneos" :key="torneo.idInscripcion">
           <td>{{ torneo.nombreTorneo }}</td>
           <td class="text-center">
-            <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
-              <v-icon color="orange">mdi-eye</v-icon>
-            </v-btn>
+            <div v-if="torneo.idEquipo">
+              <v-btn
+                icon
+                @click="verDetalleInscripcionEquipo(torneo.idInscripcion)"
+              >
+                <v-icon color="orange">mdi-eye</v-icon>
+              </v-btn>
+            </div>
+            <div v-else>
+              <v-btn icon @click="verDetalleInscripcion(torneo.idInscripcion)">
+                <v-icon color="orange">mdi-eye</v-icon>
+              </v-btn>
+            </div>
+
             <!-- <v-btn icon @click="handleVerLista(torneo.idInscripcion)">
               <v-icon color="primary">mdi-file-send</v-icon>
             </v-btn> -->
@@ -67,6 +72,15 @@
     @eliminar-inscripcion="eliminarInscripcion"
     @close="closeModal"
   />
+  <ModalInscripcionEquipo
+    v-if="showModalInscripcionEquipo"
+    :idInscripcion="currentInscripcionId"
+    :idUsuario="parseInt(idUsuarioLogger!)"
+    :idTorneo="currentTorneoId"
+    :idOrganizador="currentTorneoId"
+    @eliminar-inscripcion="eliminarInscripcion"
+    @close="closeModal"
+  />
 
   <!-- Spinner Modal -->
   <v-dialog v-model="isRegistering" persistent width="300">
@@ -87,20 +101,21 @@
 
 <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
-import { InscripcionUsuarioDTO } from "@/interfaces/Inscripcion";
+import { InscripcionUsuarioIndividualDTO } from "@/interfaces/Inscripcion";
 import router from "@/router";
 import {
   cancelarInscripcion,
-  getInscripcionesUser,
+  getInscripcionesIndividualByUser,
 } from "@/services/InscripcionesService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useAuth } from "@/composables/useAuth";
 import ModalInscripcion from "./ModalInscripcion.vue";
+import ModalInscripcionEquipo from "./ModalInscripcionEquipo.vue";
 
 const props = defineProps<{
   isLoading: boolean;
-  listaTorneos: InscripcionUsuarioDTO[];
+  listaTorneos: InscripcionUsuarioIndividualDTO[];
   idUsuario: number;
 }>();
 
@@ -109,11 +124,12 @@ const isRegistering = ref<boolean>(false);
 const currentInscripcionId = ref<number | null>(null);
 const currentTorneoId = ref<number | null>(null);
 const currentIdOrganizador = ref<number | null>(null);
-const listaTorneos = ref<InscripcionUsuarioDTO[]>([]);
+const listaTorneos = ref<InscripcionUsuarioIndividualDTO[]>([]);
 
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showModalInscripcion = ref<boolean>(false);
+const showModalInscripcionEquipo = ref<boolean>(false);
 
 const hasAcciones = ref<boolean>(false);
 const { getidUsuario } = useAuth();
@@ -133,6 +149,14 @@ const verDetalleInscripcion = (idInscripcion: number) => {
   showModalInscripcion.value = true;
 };
 
+const verDetalleInscripcionEquipo = (idInscripcion: number) => {
+  currentInscripcionId.value = idInscripcion;
+
+  console.log(idInscripcion);
+
+  showModalInscripcionEquipo.value = true;
+};
+
 const verDetalleTorneo = (idTorneo: number) => {
   router.push({ name: "detalle-torneo", params: { idTorneo } });
 };
@@ -144,7 +168,7 @@ const eliminarInscripcion = async (idInscripcion: number) => {
 
     if (response.request?.status === 200) {
       showSuccessModal.value = true;
-      const responseInscriptionesUser = await getInscripcionesUser(
+      const responseInscriptionesUser = await getInscripcionesIndividualByUser(
         listaTorneos.value[0].idUsuario.toString()
       );
       listaTorneos.value = responseInscriptionesUser.data;
@@ -171,6 +195,7 @@ onMounted(async () => {
 // Cierra el modal
 const closeModal = () => {
   showModalInscripcion.value = false;
+  showModalInscripcionEquipo.value = false;
 };
 </script>
 

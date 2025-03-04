@@ -3,15 +3,19 @@ import { ArmyDTO } from "./Army";
 export interface CrearListaTorneoRequestDTO {
   idInscripcion: number;
   idUsuario: number;
-  idTorneo: number;
-  idOrganizador?: number;
+  idTorneo?: number;
   listaData: string;
   ejercito: ArmyDTO;
+  nick: string;
+  emailOrganizador?: string;
+  nombreEquipo?: string;
 }
 
 export interface RequesListaDTO {
   listaData: string;
   ejercito: ArmyDTO;
+  idUsuario: number;
+  nick: string;
 }
 
 export interface ModificarListaTorneoRequestDTO {
@@ -31,4 +35,10 @@ export interface ListaTorneoRequestDTO {
 
 export interface ListaTorneoResponseDTO {
   listaData: string;
+}
+
+export interface ListaJugador {
+  listaData: string;
+  nombreEjercito: string;
+  nick: string;
 }

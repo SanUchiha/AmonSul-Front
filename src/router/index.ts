@@ -13,6 +13,7 @@ import EloView from "@/views/EloView.vue";
 import DetalleInscripcionView from "@/views/DetalleInscripcionView.vue";
 import GestionTorneosView from "@/views/GestionTorneosView.vue";
 import DetalleTorneoGestionView from "@/views/DetalleTorneoGestionView.vue";
+import DetalleTorneoGestionEquiposView from "@/views/DetalleTorneoGestionEquiposView.vue";
 import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
 import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
 import MisPartidasView from "@/views/MisPartidasView.vue";
@@ -31,6 +32,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/detalle-torneo-gestion/:idTorneo",
     name: "detalle-torneo-gestion",
     component: DetalleTorneoGestionView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/detalle-torneo-gestion-equipos/:idTorneo",
+    name: "detalle-torneo-gestion-equipos",
+    component: DetalleTorneoGestionEquiposView,
     meta: { requiresAuth: true },
   },
   {

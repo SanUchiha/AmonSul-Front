@@ -258,9 +258,6 @@ const enviarLista = async (newLista: RequesListaDTO) => {
       idInscripcion: currentInscripcionId.value,
       listaData: listaText.value,
       ejercito: newLista.ejercito,
-      idUsuario: props.idUsuario!,
-      idTorneo: props.idTorneo!,
-      idOrganizador: props.idOrganizador!,
     };
 
     try {
