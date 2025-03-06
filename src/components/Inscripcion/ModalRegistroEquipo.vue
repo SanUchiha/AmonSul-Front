@@ -90,15 +90,15 @@
 import { InscripcionEquipoDTO } from "@/interfaces/Inscripcion";
 import { JugadorParaEmparejamiento } from "@/interfaces/Live";
 import { UsuarioFastDTO } from "@/interfaces/Usuario";
-import { getUsuariosFast } from "@/services/UsuariosService";
 import { defineProps, defineEmits, computed, ref, onMounted } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { registrarEquipo } from "@/services/InscripcionesService";
+import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 
 const props = defineProps<{
   isVisible: boolean;
   tipoTorneo: string | undefined;
-  idTorneo: number | undefined;
+  idTorneo: number;
 }>();
 
 const emit = defineEmits(["update:isVisible"]);
@@ -177,6 +177,12 @@ const submitForm = async () => {
       idCapitan: id,
       nombreEquipo: teamName.value,
       miembros: idsSelected.value,
+      idInscripcion: 0,
+      idUsuario: 0,
+      idEquipo: 0,
+      idOrganizador: 0,
+      emailOrganizador: "",
+      componentesEquipoDTO: [],
     };
     try {
       isRegistering.value = true;
@@ -208,8 +214,12 @@ const closeDialog = () => {
 
 onMounted(async () => {
   try {
-    const responseJugadores = await getUsuariosFast();
-    jugadores.value = responseJugadores?.data ?? [];
+    const responseJugadores = await getUsuariosNoInscritosTorneoAsync(
+      props.idTorneo
+    );
+    jugadores.value = (responseJugadores?.data ?? []).sort(
+      (a: { nick: string }, b: { nick: string }) => a.nick.localeCompare(b.nick)
+    );
   } catch (error) {
     console.error("Error al obtener la información del torneo:", error);
     jugadores.value = []; // Evitar que sea undefined

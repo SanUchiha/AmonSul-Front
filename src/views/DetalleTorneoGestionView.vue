@@ -912,8 +912,6 @@ const resultados = async (ronda: number) => {
     );
     const idTorneo: number | undefined = torneo.value?.idTorneo;
 
-    console.log(idTorneo);
-
     if (idTorneo == undefined) return;
 
     const partidasUltimasRonda: GenerarRonda = {
