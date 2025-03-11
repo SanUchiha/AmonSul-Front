@@ -72,8 +72,11 @@
 
 <script setup lang="ts">
 import { ref, defineEmits, watch, defineProps, onMounted } from "vue";
-import { UsuarioFastDTO } from "@/interfaces/Usuario";
-import { getUsuariosFast } from "@/services/UsuariosService";
+import {
+  UsuarioFastDTO,
+  UsuarioInscripcionTorneoDTO,
+} from "@/interfaces/Usuario";
+import { getUsuariosByTorneo } from "@/services/UsuariosService";
 import {
   RequestUpdatePairingTorneoDTO,
   UpdatePairingTorneoDTO,
@@ -85,6 +88,7 @@ import ModalError from "../Commons/ModalError.vue";
 const props = defineProps<{
   isVisible: boolean;
   partida: UpdatePairingTorneoDTO;
+  idTorneo: number;
 }>();
 
 const emit = defineEmits(["confirm", "cerrar"]);
@@ -99,7 +103,7 @@ const pairingEditado = ref<UpdatePairingTorneoDTO>({
   idUsuario2: props.partida.idUsuario2,
 });
 const isFormValid = ref<boolean>(false);
-const jugadores = ref<UsuarioFastDTO[]>();
+const jugadores = ref<UsuarioInscripcionTorneoDTO[]>();
 const isGenerating = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
@@ -168,7 +172,8 @@ const changeJugador = async () => {
 
 onMounted(async () => {
   try {
-    const responseJugadores = await getUsuariosFast();
+    const responseJugadores = await getUsuariosByTorneo(props.idTorneo);
+    jugadores.value = responseJugadores.data;
 
     // Mapeamos el array de jugadores para obtener solo el idUsuario y el nick
     jugadores.value = responseJugadores.data.map((jugador: UsuarioFastDTO) => ({

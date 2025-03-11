@@ -9,6 +9,7 @@ export interface CrearListaTorneoRequestDTO {
   nick: string;
   emailOrganizador?: string;
   nombreEquipo?: string;
+  idOrganizador?: number;
 }
 
 export interface RequesListaDTO {

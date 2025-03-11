@@ -128,3 +128,27 @@ export interface UsuarioFastDTO {
   idUsuario: number;
   nick: string;
 }
+
+export interface UsuarioInscripcionTorneoDTO {
+  idUsuario: number;
+  nick?: string;
+  idFaccion?: number;
+  ciudad?: string;
+  faccion?: FaccionDTO;
+  inscripcionTorneos: InscripcionDTO[];
+}
+
+export interface InscripcionDTO {
+  idInscripcion: number;
+  idTorneo: number;
+  idUsuario: number;
+  idEquipo?: number;
+  lista: ListaDTO[];
+}
+
+export interface ListaDTO {
+  idLista?: number;
+  listaData?: string;
+  bando?: string;
+  ejercito?: string;
+}
