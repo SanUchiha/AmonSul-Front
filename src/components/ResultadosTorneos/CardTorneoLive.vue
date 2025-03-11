@@ -89,7 +89,6 @@ onMounted(async () => {
     const response = await getTorneos();
     listaTorneos.value = response.data;
     listaTorneos.value = listaTorneos.value.reverse();
-    console.log(listaTorneos.value);
   } catch (error) {
     console.error("Error al cargar los torneos:", error);
   } finally {

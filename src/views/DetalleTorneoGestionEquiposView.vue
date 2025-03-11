@@ -815,8 +815,6 @@ onMounted(async () => {
   try {
     const responseTorneo = await getInfoTorneoEquipoCreado(idTorneo.value);
     torneoGestion.value = responseTorneo.data;
-
-    console.log(torneoGestion.value);
   } catch (error) {
     console.error(error);
     router.push({ name: "error" });
@@ -916,8 +914,6 @@ const resultados = async (ronda: number) => {
       }
     );
     const idTorneo: number | undefined = torneo.value?.idTorneo;
-
-    console.log(idTorneo);
 
     if (idTorneo == undefined) return;
 

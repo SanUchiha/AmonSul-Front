@@ -91,7 +91,7 @@
                             </v-btn>
                           </span>
                           <span v-else>
-                            <v-btn variant="tonal" color="green" @click="inscripcionPorEquipos(torneo.tipoTorneo)" block>
+                            <v-btn variant="tonal" color="green" @click="inscripcionPorEquipos()" block>
                               <v-icon left>mdi-check-circle</v-icon> Apuntarse
                             </v-btn>
                           </span>
@@ -160,7 +160,7 @@
     <ModalRegistroEquipo
       :isVisible="showModalInscripcionPorEquipos"
       :tipoTorneo="torneo?.tipoTorneo"
-      :idTorneo="torneo?.idTorneo"
+      :idTorneo="idTorneo"
       @update:isVisible="showModalInscripcionPorEquipos = $event"
     />
 
@@ -192,6 +192,7 @@ import {
   getTorneo,
 } from "@/services/TorneosService";
 import {
+  estaApuntadoTorneoAsync,
   getInscripcionesIndividualByUser,
   getInscripcionesTorneo,
   registrarInscripcion,
@@ -214,7 +215,7 @@ const router = useRouter();
 const torneo = ref<Torneo>();
 const participantes = ref<InscripcionUsuarioIndividualDTO[]>([]);
 const idUsuario = ref<string | null>(getidUsuario.value);
-const idTorneo = ref<number>();
+const idTorneo = ref<number>(0);
 const estaApuntado = ref<boolean>(false);
 const isTorneoCompletado = ref<boolean>(false);
 const idInscripcion = ref<number>(0);
@@ -222,6 +223,8 @@ const torneosApuntado = ref<InscripcionUsuarioIndividualDTO[]>();
 
 const tab = ref(0);
 const search = ref<string>("");
+const tipoTorneo = ref<string>("");
+
 const isLoading = ref<boolean>(true);
 const headers = [{ title: "Nick", key: "nick" }];
 const headersEquipos = [{ title: "Nombre del equipo", key: "nombreEquipo" }];
@@ -377,7 +380,9 @@ onMounted(async () => {
       }
     }
   }
-  //TODO Mejorar y solo traer los equipos si es torneo por equipos
+
+  if (torneo.value) tipoTorneo.value = torneo.value.tipoTorneo;
+
   if (idTorneo.value) {
     const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
 
@@ -390,6 +395,15 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error("Error al obtener coordenadas del torneo:", err);
+  }
+  if (idTorneo.value && idUsuario.value) {
+    const responseEstaApuntado = await estaApuntadoTorneoAsync(
+      idTorneo.value,
+      parseInt(idUsuario.value)
+    );
+
+    if (responseEstaApuntado.data) estaApuntado.value = true;
+    console.log(responseEstaApuntado.data);
   }
   isLoading.value = false;
 });
@@ -453,10 +467,11 @@ const inscripcionIndividual = async () => {
   }
 };
 
-const inscripcionPorEquipos = async (tipoTorneo: string) => {
+const inscripcionPorEquipos = async () => {
   if (
     idUsuario.value != null &&
-    idTorneo.value != null &&
+    idTorneo.value != 0 &&
+    (tipoTorneo.value != "" || tipoTorneo.value != undefined) &&
     !isInscripcionCerrada.value
   ) {
     showModalInscripcionPorEquipos.value = true;

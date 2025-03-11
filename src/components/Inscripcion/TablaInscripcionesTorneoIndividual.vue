@@ -155,9 +155,6 @@ const verDetalleInscripcion = (idInscripcion: number) => {
 
 const verDetalleInscripcionEquipo = (idInscripcion: number) => {
   currentInscripcionId.value = idInscripcion;
-
-  console.log(idInscripcion);
-
   showModalInscripcionEquipo.value = true;
 };
 

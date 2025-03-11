@@ -54,7 +54,6 @@ const ejercito = ref<string>();
 const cargarLista = async () => {
   isLoading.value = true;
   try {
-    console.log("unde", props.listaJugador);
     imageBase64.value = props.listaJugador.listaData;
     nick.value = props.listaJugador.nick;
     ejercito.value = props.listaJugador.nombreEjercito;
