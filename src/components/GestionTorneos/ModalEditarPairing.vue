@@ -7,7 +7,7 @@
           <!-- Nick del jugador 1 -->
           <v-combobox
             label="Selecciona el nuevo jugador 1"
-            v-model="pairingEditado.idUsuario1"
+            v-model="pairingEditado.nick1"
             :items="jugadores"
             item-title="nick"
             item-value="idUsuario"
@@ -17,7 +17,7 @@
           <!-- Nombre del jugador 2 -->
           <v-combobox
             label="Selecciona el nuevo jugador 2"
-            v-model="pairingEditado.idUsuario2"
+            v-model="pairingEditado.nick2"
             :items="jugadores"
             item-title="nick"
             item-value="idUsuario"

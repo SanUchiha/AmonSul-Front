@@ -136,19 +136,51 @@
                   :items="infoEquipos"
                   :loading="isLoading"
                   :headers="headersEquipos"
-                  class="custom-table"
+                  class="styled-table"
                   item-key="nombreEquipo"
                 >
+                  <!-- Estilizar la fila de equipos -->
                   <template v-slot:item="{ item }">
-                    <tr @click="goToEquipoDetail(item)" class="clickable-row">
+                    <tr @click="toggleExpand(item.nombreEquipo)" class="clickable-row">
                       <td>
-                        <v-chip color="orange" dark>{{
-                          item.nombreEquipo
-                        }}</v-chip>
+                        <v-avatar color="indigo" size="40">
+                          <img src="@/assets/icons/equipos.png" alt="Icono personalizado" width="40" height="40">
+                        </v-avatar>
+                        &nbsp;
+                        <v-chip color="orange darken-2" text-color="white" class="font-weight-bold">
+                          {{ item.nombreEquipo }}
+                        </v-chip>
+                      </td>
+                      <td class="text-center">
+                        <v-icon>{{ expanded.includes(item.nombreEquipo) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                      </td>
+                    </tr>
+
+                    <!-- Contenido expandido con los participantes -->
+                    <tr v-if="expanded.includes(item.nombreEquipo)">
+                      <td colspan="3">
+                        <v-card class="pa-3 mx-4 expanded-card">
+                          <p class="text-subtitle-1 font-weight-bold">Participantes:</p>
+                          <v-list dense>
+                            <v-list-item v-for="participante in item.inscripciones" :key="participante.idUsuario">
+                              
+                                <template v-slot:prepend>
+                                  <v-btn icon @click="goToUserDetail(participante.idUsuario)">
+                                    <img src="@/assets/icons/verdetalle.png" alt="Icono personalizado" width="50" height="50">
+                                  </v-btn>
+                                </template>
+                                <v-list-item-title>&nbsp; {{ participante.nick }}</v-list-item-title>
+                                
+                            </v-list-item>
+                          </v-list>
+                        </v-card>
                       </td>
                     </tr>
                   </template>
                 </v-data-table>
+
+
+
               </div>
             </v-card>
           </v-window-item>
@@ -233,8 +265,18 @@ const showErrorModal = ref<boolean>(false);
 const isRegistering = ref<boolean>(false);
 const showModalInscripcionPorEquipos = ref<boolean>(false);
 
-const infoEquipos = ref<EquipoDTO | null>(null);
+const infoEquipos = ref<EquipoDTO>();
 
+const expanded = ref<string[]>([]); // Guardará los equipos expandidos
+const toggleExpand = (nombreEquipo: string) => {
+  if (expanded.value.includes(nombreEquipo)) {
+    console.log("expanded.value.includes(nombreEquipo)",expanded.value.includes(nombreEquipo))
+    expanded.value = expanded.value.filter(item => item !== nombreEquipo);
+  } else {
+    console.log("expanded.value.push(nombreEquipo)",expanded.value.push(nombreEquipo))
+    expanded.value.push(nombreEquipo);
+  }
+};
 
 
 // Variables reactivas
@@ -387,7 +429,7 @@ onMounted(async () => {
     const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
 
     infoEquipos.value = responseEquipos.data;
-    //console.log("Equipos", responseEquipos.data);
+    console.log("Equipos", infoEquipos.value);
   }
   try {
     if (isValidCoordinates(torneo.value!.lugarTorneo)){
@@ -483,8 +525,33 @@ const inscripcionPorEquipos = async () => {
   display: flex;
   justify-content: space-between;
 }
+.styled-table {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05); /* Fondo translúcido */
+}
 
-.color-text {
-  color: #4caf50; /* Success Lighten-1 color */
+.clickable-row {
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.clickable-row:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.expanded-card {
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #ffa726;
+  border-radius: 8px;
+}
+
+.search-field {
+  max-width: 250px;
+}
+
+.v-chip {
+  font-size: 1.1em;
+  padding: 8px;
 }
 </style>

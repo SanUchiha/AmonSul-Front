@@ -11,10 +11,12 @@ export const getTorneos = async () => {
 };
 
 export const isSaveTournament = async (idTorneo: number) => {
+  console.log("isSaveTournament idTorneo: ", idTorneo)
   return http.get(`Torneo/Gestion/issave/${idTorneo}`);
 };
 
 export const getTorneo = async (idTorneo: number) => {
+  console.log("getTorneo idTorneo: ", idTorneo)
   return http.get(`Torneo/id/${idTorneo}`);
 };
 
@@ -27,6 +29,7 @@ export const getTorneosCreadosUsuario = async (idUsuario: string) => {
 };
 
 export const getInfoTorneoCreado = async (idTorneo: number) => {
+  console.log("getInfoTorneoCreado idTorneo: ", idTorneo)
   return http.get(`Torneo/Gestion/Info-torneo/${idTorneo}`);
 };
 
@@ -35,6 +38,7 @@ export const getInfoTorneoEquipoCreado = async (idTorneo: number) => {
 };
 
 export const getPartidasTorneo = async (idTorneo: number) => {
+  console.log("getPartidasTorneo idTorneo: ", idTorneo)
   return http.get(`Torneo/Gestion/Partidas/${idTorneo}`);
 };
 

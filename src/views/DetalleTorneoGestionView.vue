@@ -652,7 +652,7 @@
     <ModalEditarPairing
       :isVisible="showModificarPairingModal"
       :partida="partidaActual"
-      :idTorneo="idTorneo!"
+      :idTorneo="idTorneoComputed"
       @cerrar="closeModificarPairingModal"
       @confirm="handleModificarPairingTorneoConfirm"
     />
@@ -700,7 +700,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import router from "@/router";
 import {
@@ -743,7 +743,7 @@ import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.v
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
-import { getUsuariosByTorneo } from "@/services/UsuariosService";
+//import { getUsuariosByTorneo } from "@/services/UsuariosService";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -805,6 +805,8 @@ const partidaActual = ref<PartidaTorneoDTO>({
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
+const idTorneoComputed = computed(() => idTorneo.value ?? 0);
+
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
@@ -836,7 +838,7 @@ onMounted(async () => {
         (_, index) => index + 1
       );
     }
-    if (partidas.value) {
+  if (partidas.value) {
       partidasPorRonda.value = partidas.value.reduce((acc, partida) => {
         const { numeroRonda } = partida;
         if (!acc[numeroRonda]) {
@@ -852,17 +854,15 @@ onMounted(async () => {
     calcularClasificacion();
 
     ultimaRonda.value = numeroRondas.value.length;
-    const ganador: number = clasificacionZona1.value[0].idUsuario;
-    if (ganador != null) hasGanador.value = true;
+    //const ganador: number = clasificacionZona1.value[0].idUsuario;
+    //if (ganador != null) hasGanador.value = true;
 
     const isSave = await isSaveTournament(idTorneo.value);
     wasSave.value = isSave.data;
 
-    const responseJugadoresInscritosTorneo = await getUsuariosByTorneo(
-      idTorneo.value
-    );
+    //const responseJugadoresInscritosTorneo = await getUsuariosByTorneo(idTorneo.value);
   } catch (error) {
-    console.error(error);
+    console.error("error onMounted", error);
   } finally {
     isLoading.value = false;
   }
