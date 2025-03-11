@@ -252,12 +252,21 @@ const handleEnviarLista = async (newLista: RequesListaDTO) => {
 };
 
 const enviarLista = async (newLista: RequesListaDTO) => {
-  if (currentInscripcionId.value !== null) {
+  if (
+    currentInscripcionId.value &&
+    props.idUsuario &&
+    props.idTorneo &&
+    props.idOrganizador
+  ) {
     isRegistering.value = true;
     const requestLista: CrearListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       listaData: listaText.value,
       ejercito: newLista.ejercito,
+      idUsuario: props.idUsuario,
+      nick: "",
+      idTorneo: props.idTorneo,
+      idOrganizador: props.idOrganizador,
     };
 
     try {
@@ -285,15 +294,21 @@ const handleModificarLista = async (newLista: RequesListaDTO) => {
 
 const modificarLista = async (newLista: RequesListaDTO) => {
   isRegistering.value = true;
-  if (currentInscripcionId.value !== null && idLista.value != null) {
+  if (
+    currentInscripcionId.value !== null &&
+    idLista.value != null &&
+    props.idUsuario &&
+    props.idTorneo &&
+    props.idOrganizador
+  ) {
     const requestLista: ModificarListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       listaData: listaText.value,
       idLista: idLista.value,
       ejercito: newLista.ejercito,
-      idUsuario: props.idUsuario!,
-      idTorneo: props.idTorneo!,
-      idOrganizador: props.idOrganizador!,
+      idUsuario: props.idUsuario,
+      idTorneo: props.idTorneo,
+      idOrganizador: props.idOrganizador,
     };
     try {
       await modificarListaTorneo(requestLista);

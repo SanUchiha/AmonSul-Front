@@ -656,6 +656,7 @@
     <ModalEditarPairing
       :isVisible="showModificarPairingModal"
       :partida="partidaActual"
+      :idTorneo="idTorneo!"
       @cerrar="closeModificarPairingModal"
       @confirm="handleModificarPairingTorneoConfirm"
     />
@@ -745,6 +746,7 @@ import ModalParametrosRondasEquipo from "@/components/GestionTorneos/Equipos/Mod
 import CardGestionInfoTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionInfoTorneoEquipo.vue";
 import CardGestionAccionesTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionAccionesTorneoEquipo.vue";
 import CardInfoEquipo from "@/components/GestionTorneos/Equipos/CardInfoEquipo.vue";
+import { getUsuariosByTorneo } from "@/services/UsuariosService";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();

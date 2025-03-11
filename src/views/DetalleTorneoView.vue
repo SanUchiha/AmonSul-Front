@@ -403,7 +403,6 @@ onMounted(async () => {
     );
 
     if (responseEstaApuntado.data) estaApuntado.value = true;
-    console.log(responseEstaApuntado.data);
   }
   isLoading.value = false;
 });

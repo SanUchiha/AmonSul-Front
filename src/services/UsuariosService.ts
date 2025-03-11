@@ -26,6 +26,10 @@ export const getUsuariosFast = async () => {
   return http.get(`Usuario`);
 };
 
+export const getUsuariosByTorneo = async (idTorneo: number) => {
+  return http.get(`Usuario/torneo/${idTorneo}`);
+};
+
 export const getUsuariosNoInscritosTorneoAsync = async (idTorneo: number) => {
   return http.get(`Usuario/no-inscritos-torneo/${idTorneo}`);
 };

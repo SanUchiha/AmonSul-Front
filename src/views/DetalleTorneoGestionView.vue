@@ -652,6 +652,7 @@
     <ModalEditarPairing
       :isVisible="showModificarPairingModal"
       :partida="partidaActual"
+      :idTorneo="idTorneo!"
       @cerrar="closeModificarPairingModal"
       @confirm="handleModificarPairingTorneoConfirm"
     />
@@ -742,6 +743,7 @@ import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.v
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
+import { getUsuariosByTorneo } from "@/services/UsuariosService";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -855,6 +857,10 @@ onMounted(async () => {
 
     const isSave = await isSaveTournament(idTorneo.value);
     wasSave.value = isSave.data;
+
+    const responseJugadoresInscritosTorneo = await getUsuariosByTorneo(
+      idTorneo.value
+    );
   } catch (error) {
     console.error(error);
   } finally {
