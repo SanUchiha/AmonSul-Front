@@ -1,6 +1,6 @@
 <template>
     <v-card-actions class="pb-10 v-card-actions">
-        <v-btn @click="compartirPartida" variant="text">
+        <v-btn @click="compartirPartida" variant="plain">
             <img src="@/assets/icons/shareMatch.png" alt="Icono personalizado" width="60" height="60">
         </v-btn>
     </v-card-actions>

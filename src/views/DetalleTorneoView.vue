@@ -71,14 +71,25 @@
                         <span v-if="isInscripcionCerrada" class="text-red text-subtitle-1">
                           Plazo de inscripción cerrado
                         </span>
+                        <span v-else-if="new Date(torneo.fechaInicioTorneo) < new Date()" class="text-red text-subtitle-1">
+                          Torneo ya disputado
+                        </span>
                         <span v-else-if="inscripcionState === 'completo'" class="text-red text-subtitle-1">
                           Plazas agotadas
                         </span>
                         <span v-else-if="estaApuntado">
                           <span v-if="!isInscripcionCerrada">
-                            <v-btn variant="tonal" color="red" @click="inscripcionIndividual" block>
-                              <v-icon left>mdi-check-circle</v-icon> Borrar inscripción
-                            </v-btn>
+                            <span v-if="torneo.tipoTorneo!='Individual'">
+                              <!--TODO PONER BOTÓN SOLO PARA EL CAPITAN-->
+                              <v-btn variant="tonal" color="red" @click="inscripcionPorEquipos" block>
+                                <v-icon left>mdi-check-circle</v-icon> Borrar Equipo
+                              </v-btn>
+                            </span>
+                            <span v-else>
+                              <v-btn variant="tonal" color="red" @click="inscripcionIndividual" block>
+                                <v-icon left>mdi-check-circle</v-icon> Borrar inscripción
+                              </v-btn>
+                            </span>
                           </span>
                           <span v-else class="text-subtitle-1">
                             Estás apuntado pero las inscripciones están cerradas, no está permitido borrar la inscripción.
@@ -106,12 +117,8 @@
               </v-col>
             </v-row>
           </v-window-item>
-        </v-window>
-      </v-card-text>
-
-      <!-- Participantes -->
-      <v-card-text>
-        <v-window v-model="tab">
+      
+          <!-- Participantes -->
           <v-window-item value="two">
             <v-card flat>
               <v-card-title class="d-flex align-center">
@@ -184,8 +191,10 @@
               </div>
             </v-card>
           </v-window-item>
+
         </v-window>
       </v-card-text>
+
     </v-card>
     
     <!-- Registro equipo -->
@@ -199,7 +208,7 @@
     <!-- Modal Success -->
     <ModalSuccess
       :isVisible="showSuccessModal"
-      message="Te has registrado con éxito."
+      :message="messageSuccess"
       @update:isVisible="showSuccessModal = $event"
     />
 
@@ -261,6 +270,7 @@ const isLoading = ref<boolean>(true);
 const headers = [{ title: "Nick", key: "nick" }];
 const headersEquipos = [{ title: "Nombre del equipo", key: "nombreEquipo" }];
 const showSuccessModal = ref<boolean>(false);
+const messageSuccess = ref<string>("");
 const showErrorModal = ref<boolean>(false);
 const isRegistering = ref<boolean>(false);
 const showModalInscripcionPorEquipos = ref<boolean>(false);
@@ -371,6 +381,7 @@ const eliminarInscripcion = async (idInscripcion: number) => {
     const response = await cancelarInscripcion(idInscripcion);
 
     if (response.request?.status === 200) {
+      messageSuccess.value = "Te has borrado con éxito.";
       showSuccessModal.value = true;
     } else {
       showErrorModal.value = true;
@@ -495,6 +506,7 @@ const inscripcionIndividual = async () => {
     try {
       isRegistering.value = true;
       await registrarInscripcion(inscripcion);
+      messageSuccess.value = "Te has registrado con éxito.";
       showSuccessModal.value = true;
     } catch (error) {
       showErrorModal.value = true;

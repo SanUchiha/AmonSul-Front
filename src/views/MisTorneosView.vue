@@ -6,7 +6,8 @@
     <div v-else>
       <!-- Titulo -->
       <CardTitleMisTorneos />
-
+      <v-spacer class="my-4"></v-spacer>
+      
       <!-- Resumen partidas -->
       <v-row justify="center">
         <v-col cols="12" md="12">

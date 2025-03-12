@@ -16,7 +16,7 @@
       <v-card-title class="text-center text-wrap">
         <v-row align="center" justify="center" class="match-score" no-gutters>
           <v-col @click="verProfileUser(match.idUsuario1)" cols="5" class="player-name text-left">
-            <span class="ml-2 text-wrap">{{ match.nickUsuario1 }}</span>
+            <span class="ml-2 text-wrap" style="cursor:pointer">{{ match.nickUsuario1 }}</span>
             <v-card-subtitle class="text-wrap">{{match.ejercitoUsuario1}}</v-card-subtitle>              
           </v-col>
 
@@ -26,7 +26,7 @@
           </v-col>
 
           <v-col @click="verProfileUser(match.idUsuario2)" cols="5" class="player-name text-right">
-            <span class="ml-2 text-wrap">{{ match.nickUsuario2 }}</span><br>
+            <span class="ml-2 text-wrap" style="cursor:pointer">{{ match.nickUsuario2 }}</span><br>
             <v-card-subtitle class="text-wrap">{{match.ejercitoUsuario2}}</v-card-subtitle>              
           </v-col>
         </v-row>

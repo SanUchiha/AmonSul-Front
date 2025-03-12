@@ -70,6 +70,7 @@
             </v-list-item>
 
             <!-- Botón para eliminar la inscripcion-->
+            <!-- TODO comprobar fecha del torneo, si ya se ha disputado, no mostrar el botón PTE de Jose-->
             <v-list-item>
               <v-list-item-content>
                 <v-btn

@@ -47,7 +47,7 @@
       <v-col cols="12" md="6" class="text-center">
         <h2 class="text-h5 font-weight-bold">Colabora con la app</h2>
         <p class="text-body-2">Si te gusta nuestra aplicación y quieres apoyarnos, puedes hacer una donación a través de PayPal. ¡Gracias por tu ayuda!</p>
-        <v-btn color="primary" class="mt-3" href="https://www.paypal.com/donate?hosted_button_id=PCW6MDL3WBE6N" target="_blank">
+        <v-btn color="primary" variant="tonal" class="mt-3" href="https://www.paypal.com/donate?hosted_button_id=PCW6MDL3WBE6N" target="_blank">
           Donar con PayPal
         </v-btn>
       </v-col>

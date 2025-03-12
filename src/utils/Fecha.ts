@@ -17,7 +17,7 @@ export const convertirFecha = (dateString: string) => {
   const dateParts = dateString.split("-");
 
   if (dateParts.length !== 3) {
-    throw new Error("El formato de la fecha debe ser dd-mm-aaaa");
+    return dateString;
   }
 
   const day = dateParts[0];

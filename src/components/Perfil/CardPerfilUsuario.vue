@@ -15,7 +15,7 @@
             <p class="profile-info" v-if="user.nickLGDA"><strong>Nick LGDA:</strong> <a href="https://www.laguerradelanillo.com/tu-perfil/${ user.nickLGDA }" target="_blank">{{ user.nickLGDA }}</a></p>
             <p class="profile-info"><strong>Población:</strong> {{ user.ciudad }}</p>
             <p class="profile-info"><strong>Email:</strong> {{ user.email }}</p>
-            <p class="profile-info"><strong>Fecha de nacimiento:</strong> {{ user.fechaNacimiento }}</p>
+            <p class="profile-info"><strong>Fecha de nacimiento:</strong> {{ convertirFecha(user.fechaNacimiento) }}</p>
             <p class="profile-info"><strong>Teléfono:</strong> {{ user.telefono }}</p>
         </v-card-text>
     </v-card>
@@ -25,6 +25,7 @@ import {UsuarioViewDTO} from "@/interfaces/Usuario";
 import {
   defineProps,
 } from "vue";
+import { convertirFecha } from "@/utils/Fecha";
 
 const props = defineProps<{
   user: UsuarioViewDTO;

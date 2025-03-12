@@ -20,15 +20,17 @@
         </v-col>
       </v-card>
       <!-- Boton partidas -->
-      <v-btn 
-        icon  
-        variant="text"
-        class="fab-btn"
+      <div
+        class="custom-btn d-flex align-center fab-btn"
         @click="dialog = true"
+        @mouseenter="isHovering = true"
+        @mouseleave="isHovering = false"
       >
-      <img src="@/assets/icons/nuevaPartida.png" alt="Icono personalizado" width="80" height="80">
-
-      </v-btn>
+        <transition name="slide-fade">
+          <span v-if="isHovering" class="text-button ringbearer">Nueva partida</span>
+        </transition>
+        <img src="@/assets/icons/nuevaPartida.png" alt="Icono personalizado" width="80" height="80">
+      </div>
 
 
       <!-- partidas pendientes -->
@@ -133,6 +135,7 @@ const usuarioData = ref<UsuarioDataDTO>({
 });
 const showModalAviso = ref<boolean>(true);
 const dialog = ref<boolean>(false);
+const isHovering = ref(false);
 
 const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
@@ -242,5 +245,42 @@ const refrescarPartidas = async () => {
     bottom: 60px;
     right: 60px;
     z-index: 1000;
+  }
+  /* Estilos del botón */
+  .custom-btn {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .custom-btn:hover {
+  }
+
+  /* Animación de entrada y salida */
+  .slide-fade-enter-active,
+  .slide-fade-leave-active {
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  }
+
+  .slide-fade-enter-from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  .slide-fade-leave-to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  /* Estilo del texto */
+  .text-button {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    margin-right: 10px;
+    white-space: nowrap;
   }
   </style>

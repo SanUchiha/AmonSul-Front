@@ -53,11 +53,11 @@
         <v-row>
           <v-col class="stat-item">
             <img src="@/assets/icons/clasificacionTorneo.png" alt="Icono personalizado" width="60" height="60">
-            <p>Victorias: {{ winRate }}%</p>
+            <p>Victorias: {{ winRate.toFixed(2) }}%</p>
           </v-col>
           <v-col v-if="usuario.rankingElo" class="stat-item">
             <img src="@/assets/icons/ELO.png" alt="Icono personalizado" width="60" height="60">
-            <p>Ranking Elo: {{ usuario.rankingElo }}</p>
+            <p>Ranking Elo: {{ usuario.rankingElo.toFixed(2) }}</p>
           </v-col>
         </v-row>
       </div>
@@ -147,9 +147,9 @@ const myTheme = {
 const chartOptions = ref({
     background: { fill: "#212121" }, // Color de fondo personalizado (ejemplo: gris oscuro)
   data: [
-    { categoria: `Ganadas ${winRate.value}%`, cantidad: usuarioData.value.partidasGanadas, color: "green" },
-    { categoria: `Empatadas ${drawRate.value}%`, cantidad: usuarioData.value.partidasEmpatadas, color: "yellow" },
-    { categoria: `Perdidas ${lossRate.value}%`, cantidad: usuarioData.value.partidasPerdidas, color: "red" }
+    { categoria: `Ganadas ${winRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasGanadas, color: "green" },
+    { categoria: `Empatadas ${drawRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasEmpatadas, color: "yellow" },
+    { categoria: `Perdidas ${lossRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasPerdidas, color: "red" }
   ],
   theme: myTheme,
   series: [
@@ -171,9 +171,9 @@ watchEffect(() => {
   chartOptions.value = {
     background: { fill: "#212121" }, // Color de fondo personalizado (ejemplo: gris oscuro)
     data: [
-    { categoria: `Ganadas ${winRate.value}%`, cantidad: usuarioData.value.partidasGanadas, color: "green" },
-    { categoria: `Empatadas ${drawRate.value}%`, cantidad: usuarioData.value.partidasEmpatadas, color: "yellow" },
-    { categoria: `Perdidas ${lossRate.value}%`, cantidad: usuarioData.value.partidasPerdidas, color: "red" }
+    { categoria: `Ganadas ${winRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasGanadas, color: "green" },
+    { categoria: `Empatadas ${drawRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasEmpatadas, color: "yellow" },
+    { categoria: `Perdidas ${lossRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasPerdidas, color: "red" }
   ],
   theme: myTheme,
   series: [
