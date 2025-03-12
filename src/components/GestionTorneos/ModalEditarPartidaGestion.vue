@@ -31,7 +31,7 @@
           <!-- Líder del jugador 1 -->
           <v-radio-group
             v-model="partidaEditada.liderMuertoUsuario1"
-            :label="`¿${props.partida.nick1} ha matado al líder?`"
+            :label="`¿${props.partida.nick1} ha matado al general?`"
             :rules="[rules.isBool]"
           >
             <v-radio label="Sí" :value="true"></v-radio>
@@ -41,7 +41,7 @@
           <!-- Líder del jugador 2 -->
           <v-radio-group
             v-model="partidaEditada.liderMuertoUsuario2"
-            :label="`¿${props.partida.nick2} ha matado al líder?`"
+            :label="`¿${props.partida.nick2} ha matado al general?`"
             :rules="[rules.isBool]"
           >
             <v-radio label="Sí" :value="true"></v-radio>

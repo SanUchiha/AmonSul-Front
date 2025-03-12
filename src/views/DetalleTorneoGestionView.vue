@@ -215,7 +215,7 @@
                           <!-- lider 1 -->
                           <div class="player-info">
                             <span v-if="partida.liderMuertoUsuario1 != null">
-                              ¿Líder?
+                              ¿General?
                               {{
                                 partida.liderMuertoUsuario1 === true
                                   ? "Sí"
@@ -225,7 +225,7 @@
                               }}
                             </span>
                             <span v-else>
-                              ¿Líder?
+                              ¿General?
                               <v-icon color="red">mdi-close</v-icon>
                             </span>
                           </div>
@@ -303,7 +303,7 @@
                           <!-- lider 2 -->
                           <div class="player-info">
                             <span v-if="partida.liderMuertoUsuario2 != null">
-                              ¿Líder?
+                              ¿General?
                               {{
                                 partida.liderMuertoUsuario2 === true
                                   ? "Sí"
@@ -313,7 +313,7 @@
                               }}
                             </span>
                             <span v-else>
-                              ¿Líder?
+                              ¿General?
                               <v-icon color="red">mdi-close</v-icon>
                             </span>
                           </div>
@@ -445,7 +445,7 @@
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">Líder</th>
+                          <th class="tect-center">General</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -486,7 +486,7 @@
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">Líder</th>
+                          <th class="tect-center">General</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -528,7 +528,7 @@
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">Líder</th>
+                          <th class="tect-center">General</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -807,7 +807,6 @@ const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
 const idTorneoComputed = computed(() => idTorneo.value ?? 0);
 
-
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
 
@@ -838,7 +837,7 @@ onMounted(async () => {
         (_, index) => index + 1
       );
     }
-  if (partidas.value) {
+    if (partidas.value) {
       partidasPorRonda.value = partidas.value.reduce((acc, partida) => {
         const { numeroRonda } = partida;
         if (!acc[numeroRonda]) {

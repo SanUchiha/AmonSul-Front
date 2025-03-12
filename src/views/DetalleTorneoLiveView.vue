@@ -95,7 +95,7 @@
                       <th class="text-center">Puntos a favor</th>
                       <th class="text-center">Puntos en contra</th>
                       <th class="text-center">Diferencia de puntos</th>
-                      <th class="tect-center">Líder</th>
+                      <th class="tect-center">General</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -136,7 +136,7 @@
                       <th class="text-center">Puntos a favor</th>
                       <th class="text-center">Puntos en contra</th>
                       <th class="text-center">Diferencia de puntos</th>
-                      <th class="tect-center">Líder</th>
+                      <th class="tect-center">General</th>
                     </tr>
                   </thead>
                   <tbody>

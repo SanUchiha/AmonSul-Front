@@ -2,7 +2,7 @@
 <template>
   <v-dialog v-model="isModalLiderVisible" max-width="400">
     <v-card>
-      <v-card-title> ¿Has matado al líder enemigo? </v-card-title>
+      <v-card-title> ¿Has matado al general enemigo? </v-card-title>
       <v-card-text>
         <v-form>
           <v-radio-group v-model="lider" :mandatory="true">

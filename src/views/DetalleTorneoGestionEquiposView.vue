@@ -219,7 +219,7 @@
                           <!-- lider 1 -->
                           <div class="player-info">
                             <span v-if="partida.liderMuertoUsuario1 != null">
-                              ¿Líder?
+                              ¿General?
                               {{
                                 partida.liderMuertoUsuario1 === true
                                   ? "Sí"
@@ -229,7 +229,7 @@
                               }}
                             </span>
                             <span v-else>
-                              ¿Líder?
+                              ¿General?
                               <v-icon color="red">mdi-close</v-icon>
                             </span>
                           </div>
@@ -307,7 +307,7 @@
                           <!-- lider 2 -->
                           <div class="player-info">
                             <span v-if="partida.liderMuertoUsuario2 != null">
-                              ¿Líder?
+                              ¿General?
                               {{
                                 partida.liderMuertoUsuario2 === true
                                   ? "Sí"
@@ -317,7 +317,7 @@
                               }}
                             </span>
                             <span v-else>
-                              ¿Líder?
+                              ¿General?
                               <v-icon color="red">mdi-close</v-icon>
                             </span>
                           </div>
@@ -449,7 +449,7 @@
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">Líder</th>
+                          <th class="tect-center">General</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -490,7 +490,7 @@
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">Líder</th>
+                          <th class="tect-center">General</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -532,7 +532,7 @@
                           <th class="text-center">Puntos a favor</th>
                           <th class="text-center">Puntos en contra</th>
                           <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">Líder</th>
+                          <th class="tect-center">General</th>
                         </tr>
                       </thead>
                       <tbody>
