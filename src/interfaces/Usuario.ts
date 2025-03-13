@@ -23,17 +23,17 @@ export interface NewUserDTO {
 }
 
 export interface EditarUsuarioDTO {
-  NombreUsuario?: string;
-  PrimerApellido?: string;
-  SegundoApellido?: string;
-  Email: string;
-  NuevoEmail?: string;
-  Contraseña?: string;
-  Nick?: string;
-  Ciudad?: string;
-  Faccion?: string;
-  FechaNacimiento?: string;
-  Telefono?: string;
+  nombreUsuario?: string;
+  primerApellido?: string;
+  segundoApellido?: string;
+  email: string;
+  nuevoEmail?: string;
+  contraseña?: string;
+  nick?: string;
+  ciudad?: string;
+  fechaNacimiento?: string;
+  idFaccion?: number;
+  telefono?: string;
   nickLGDA?: string;
   imagen?: string;
 }
