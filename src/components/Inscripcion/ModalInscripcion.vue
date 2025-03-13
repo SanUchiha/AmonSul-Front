@@ -4,103 +4,76 @@
   </div>
   <div v-else class="center">
     <v-dialog v-model="show" max-width="800px">
-      <v-card elevation="8" class="rounded-modal">
-        <v-card-title class="modal-title">
-          <h3>Detalle inscripción</h3>
-          <v-spacer></v-spacer>
+      <v-card elevation="12">
+        <v-card-title class="modal-title d-flex align-center justify-space-between">
+          <h3 class="text-h5 font-weight-bold">Detalles de Inscripción</h3>
           <v-btn icon @click="close" class="close-button">
             <v-icon color="grey darken-1">mdi-close</v-icon>
           </v-btn>
         </v-card-title>
         <v-divider></v-divider>
 
-        <v-card-text>
-          <v-list dense>
-            <!-- Estado Lista -->
+        <v-card-text class="px-6 py-4">
+          <v-list>
             <v-list-item>
               <v-list-item-title class="list-item-title">
-                LISTA: {{ inscripcionData?.estadoLista }}
+                <v-icon color="primary" class="mr-2">mdi-file-document</v-icon>
+                <strong>Lista:</strong> &nbsp;{{ inscripcionData?.estadoLista }}                
               </v-list-item-title>
-              <v-btn
+              <v-btn v-if="inscripcionData?.listaData" color="primary" variant="tonal" block @click="toggleLista">
+                <v-icon left>mdi-eye</v-icon>{{ showLista ? 'Ocultar lista' : 'Ver lista' }}
+              </v-btn>
+              <v-btn v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"
                 color="primary"
+                block
                 variant="tonal"
+                class="elevated-btn"
                 @click="handleVerLista(inscripcionData?.idInscripcion!)"
               >
-                Envia/modifica tu lista
+                <v-icon left>mdi-mail</v-icon> Enviar / Modificar Lista
               </v-btn>
-            </v-list-item>
+            </v-list-item>            
 
-            <v-list-item v-if="inscripcionData?.listaData != null">
-              <v-list-item-content v-if="inscripcionData?.listaData">
-                <v-btn color="orange" variant="tonal" @click="toggleLista">
-                  Mostrar Lista
-                </v-btn>
-              </v-list-item-content>
-              <v-list-item-content v-else>
-                <v-btn color="orange" variant="tonal" @click="toggleLista">
-                  Ocultar Lista
-                </v-btn>
-              </v-list-item-content>
-            </v-list-item>
-
-            <!-- Contenido de la lista -->
+            <v-divider class="mt-3 mb-1"></v-divider>
             <v-expand-transition>
               <v-list-item v-if="showLista">
                 <v-list-item-content>
-                  <h3>{{ inscripcionData?.ejercito }}</h3>
-                  <v-spacer class="my-3"></v-spacer>
+                  <h3 class="text-h6 font-weight-bold text-primary">{{ inscripcionData?.ejercito }}</h3>
+                  <v-divider class="my-3"></v-divider>
                   <template v-if="listaBase64">
-                    <img
-                      :src="listaBase64"
-                      alt="Lista"
-                      style="max-width: 100%; height: auto"
-                    />
+                    <v-img :src="listaBase64" alt="Lista de ejército" max-width="100%" class="rounded-img" contain />
                   </template>
                   <template v-else>
-                    <p>No hay lista disponible</p>
+                    <p class="text-grey-darken-1 text-center">No hay lista disponible</p>
                   </template>
                 </v-list-item-content>
               </v-list-item>
             </v-expand-transition>
-            <!-- Estado Pago -->
+
             <v-list-item>
               <v-list-item-title class="list-item-title">
-                PAGO: {{ inscripcionData?.esPago }}
+                <v-icon :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'" class="mr-2">mdi-credit-card</v-icon>
+                <span class="font-weight-bold">Estado de pago:</span>
+                <v-chip :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'" dark class="ml-2">
+                  {{ inscripcionData?.esPago === "SI" ? "Pagado" : "No pagado" }}
+                </v-chip>
               </v-list-item-title>
             </v-list-item>
 
-            <!-- Botón para eliminar la inscripcion-->
-            <!-- TODO comprobar fecha del torneo, si ya se ha disputado, no mostrar el botón PTE de Jose-->
-            <v-list-item>
-              <v-list-item-content>
-                <v-btn
-                  color="error"
-                  variant="tonal"
-                  @click="eliminarInscripcion(idInscripcion!)"
-                  class="elevated-btn"
-                >
-                  Darse de baja del torneo
-                </v-btn>
-              </v-list-item-content>
+            <v-list-item v-if="new Date(torneo!.fechaFinTorneo) >= new Date()">
+              <v-btn
+                color="red-darken-3"
+                variant="tonal"
+                block
+                class="elevated-btn"
+                @click="eliminarInscripcion(idInscripcion!)"
+              >
+                <v-icon left>mdi-delete</v-icon> Darse de baja del torneo
+              </v-btn>
             </v-list-item>
           </v-list>
         </v-card-text>
       </v-card>
-      <!-- Spinner Modal -->
-      <v-dialog v-model="isRegistering" persistent width="300">
-        <v-card>
-          <v-card-text
-            class="d-flex justify-center align-center"
-            style="height: 150px"
-          >
-            <v-progress-circular
-              indeterminate
-              color="blue-lighten-3"
-              :size="57"
-            ></v-progress-circular>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
     </v-dialog>
   </div>
 
@@ -149,7 +122,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 import { getIncripcionById } from "@/services/InscripcionesService";
-import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
+import { InscripcionTorneoCreadoDTO, Torneo } from "@/interfaces/Torneo";
 import ModalLista from "./ModalLista.vue";
 import {
   CrearListaTorneoRequestDTO,
@@ -184,6 +157,7 @@ const isLoading = ref(true);
 const isRegistering = ref(false);
 
 const inscripcionData = ref<InscripcionTorneoCreadoDTO>();
+const torneo = ref<Torneo>();
 const currentInscripcionId = ref<number | null>(null);
 const showVerListaModal = ref<boolean>(false);
 const hasLista = ref<boolean>(false);
@@ -339,6 +313,8 @@ onMounted(async () => {
     isLoading.value = true;
     const response = await getIncripcionById(props.idInscripcion!);
     inscripcionData.value = response.data;
+    torneo.value = inscripcionData.value?.torneo
+    console.log("inscripcionData.value:", inscripcionData.value);
   } catch (error) {
     console.error("Error al obtener datos de la inscripcion:", error);
   } finally {
@@ -348,27 +324,30 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+
 .modal-title {
-  display: flex;
-  align-items: center;
-  font-size: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 16px;
 }
-
-.list-item-title {
-  display: flex;
-  align-items: center;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
 .close-button {
   margin-left: auto;
 }
-
-.v-list-item {
-  margin-bottom: 16px;
+.list-item-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
 }
 .elevated-btn {
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 12px;
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.rounded-img {
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
 }
 </style>

@@ -64,10 +64,22 @@
                       {{ miembro.nick }}
                     </td>
                     <td>
-                      <v-btn v-if="miembro.listaData" color="primary" variant="tonal" @click="verLista(miembro.listaData, miembro.nick, miembro.ejercito!)">
-                        Ver lista
-                      </v-btn>
-                      <span v-else>No hay lista</span>
+                      <span>
+                        <v-btn v-if="miembro.listaData" color="primary" variant="tonal" @click="verLista(miembro.listaData, miembro.nick, miembro.ejercito!)">
+                          Ver lista
+                        </v-btn>  
+                        <span v-else>No hay lista</span>
+                        <!--TODO  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"-->
+                        <v-btn v-if="inscripcionData?.idCapitan == idUsuario"
+                          color="primary"
+                          block
+                          variant="tonal"
+                          class="elevated-btn"
+                          @click="enviarCambiarLista(miembro.idInscripcion, miembro.listaData!, miembro.idUsuario, miembro.nick)"
+                        >
+                          <v-icon left>mdi-mail</v-icon> Enviar/Modificar Lista
+                        </v-btn>
+                      </span>
                     </td>
                   </tr>
                 </tbody>
@@ -80,12 +92,22 @@
                   {{ miembro.nick }}
                 </v-card-title>
                 <v-card-actions class="justify-center">
-                  <v-btn v-if="miembro.listaData" color="primary" variant="tonal" @click="verLista(miembro.listaData, miembro.nick, miembro.ejercito!)">
-                    Ver lista
-                  </v-btn>
-                  <v-btn v-else color="grey" disabled>
-                    No hay lista
-                  </v-btn>
+                  <span>
+                    <v-btn v-if="miembro.listaData" color="primary" variant="tonal" @click="verLista(miembro.listaData, miembro.nick, miembro.ejercito!)">
+                      Ver lista
+                    </v-btn>  
+                    <span v-else><p class="text-center">No hay lista</p></span>
+                    <!--TODO  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"-->
+                    <v-btn v-if="inscripcionData?.idCapitan == idUsuario"
+                      color="primary"
+                      block
+                      variant="tonal"
+                      class="elevated-btn"
+                      @click="enviarCambiarLista(miembro.idInscripcion, miembro.listaData!, miembro.idUsuario, miembro.nick)"
+                    >
+                      <v-icon left>mdi-mail</v-icon> Enviar / Modificar Lista
+                    </v-btn>
+                  </span>
                 </v-card-actions>
               </v-card>
             </v-col>
@@ -239,6 +261,11 @@ const enviarCambiarLista = (
   currentNick.value = nick;
   if (!listaData) hasLista.value = false;
   else hasLista.value = true;
+
+  console.log("currentInscripcionId: ", currentInscripcionId)
+  console.log("listaData: ", listaData)
+  console.log("idUsuario: ", idUsuario)
+  console.log("nick: ", nick)
   showEnviarCambiarListaModal.value = true;
 };
 

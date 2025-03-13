@@ -55,7 +55,7 @@ export interface TorneoCreadoDTO {
 export interface InscripcionTorneoCreadoDTO {
   idInscripcion: number;
   idUsuario: number;
-  idTorneo: number;
+  torneo: Torneo;
   nick?: string | null;
   fechaInscripcion?: string | null;
   bando?: "evil" | "good" | null;

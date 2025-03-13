@@ -167,16 +167,19 @@
                     <tr v-if="expanded.includes(item.nombreEquipo)">
                       <td colspan="3">
                         <v-card class="pa-3 mx-4 expanded-card">
-                          <p class="text-subtitle-1 font-weight-bold">Participantes:</p>
+                          <p class="text-subtitle-1 font-weight-bold">Participantes</p>
                           <v-list dense>
                             <v-list-item v-for="participante in item.inscripciones" :key="participante.idUsuario">
                               
                                 <template v-slot:prepend>
                                   <v-btn icon @click="goToUserDetail(participante.idUsuario)">
-                                    <img src="@/assets/icons/verdetalle.png" alt="Icono personalizado" width="50" height="50">
+                                    <img src="@/assets/icons/teamLeader.png" alt="Icono personalizado" width="50" height="50" v-if="participante.idUsuario === item?.idCapitan">
+                                    <img src="@/assets/icons/verdetalle.png" alt="Icono personalizado" width="50" height="50" v-else>
                                   </v-btn>
                                 </template>
-                                <v-list-item-title>&nbsp; {{ participante.nick }}</v-list-item-title>
+                                <v-list-item-title>
+                                  &nbsp; {{ participante.nick || "Desconocido" }}
+                                </v-list-item-title>
                                 
                             </v-list-item>
                           </v-list>
