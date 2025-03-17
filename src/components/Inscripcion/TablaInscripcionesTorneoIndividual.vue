@@ -1,63 +1,93 @@
 <template>
   <div v-if="!hasAcciones">
     <v-container :loading="isLoading">
-        <v-list>
-          <v-list-item
-            v-for="torneo in listaTorneos"
-            :key="torneo.idInscripcion"
-            @click="verDetalleTorneo(torneo.idTorneo)"
-            class="clickable-list-item"
-          >
-            <template v-slot:prepend>
-              <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
-            </template>
+      <v-list>
+        <v-list-item
+          v-for="torneo in listaTorneos"
+          :key="torneo.idInscripcion"
+          @click="verDetalleTorneo(torneo.idTorneo)"
+          class="clickable-list-item"
+        >
+          <template v-slot:prepend>
+            <img
+              src="@/assets/icons/misTorneos.png"
+              alt="Icono personalizado"
+              width="30"
+              height="30"
+            />
+          </template>
 
-            <v-list-item-title class="text-wrap text-left pl-2">{{ torneo.nombreTorneo }}</v-list-item-title>
+          <v-list-item-title class="text-wrap text-left pl-2">{{
+            torneo.nombreTorneo
+          }}</v-list-item-title>
 
-            <template v-slot:append>
-              <v-btn icon @click.stop="verDetalleTorneo(torneo.idTorneo)">
-                <img src="@/assets/icons/verLista.png" alt="Icono personalizado" width="40" height="40">
-              </v-btn>
-            </template>
-          </v-list-item>
-
-        </v-list>
+          <template v-slot:append>
+            <v-btn icon @click.stop="verDetalleTorneo(torneo.idTorneo)">
+              <img
+                src="@/assets/icons/verLista.png"
+                alt="Icono personalizado"
+                width="40"
+                height="40"
+              />
+            </v-btn>
+          </template>
+        </v-list-item>
+      </v-list>
     </v-container>
   </div>
   <div v-if="hasAcciones">
     <v-container :loading="isLoading" class="mb-0 pb-0">
-        <v-list >
-          <v-list-item
-            v-for="torneo in listaTorneos"
-            :key="torneo.idInscripcion"
-            @click="verDetalleTorneo(torneo.idTorneo)"
-            class="clickable-list-item"
-          >
-            <template v-slot:prepend>
-              <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="30" height="30">
-            </template>
+      <v-list>
+        <v-list-item
+          v-for="torneo in listaTorneos"
+          :key="torneo.idInscripcion"
+          @click="verDetalleTorneo(torneo.idTorneo)"
+          class="clickable-list-item"
+        >
+          <template v-slot:prepend>
+            <img
+              src="@/assets/icons/misTorneos.png"
+              alt="Icono personalizado"
+              width="30"
+              height="30"
+            />
+          </template>
 
-            <v-list-item-title class="text-wrap text-left pl-2">{{ torneo.nombreTorneo }}</v-list-item-title>
+          <v-list-item-title class="text-wrap text-left pl-2">{{
+            torneo.nombreTorneo
+          }}</v-list-item-title>
 
-            <template v-slot:append>
-              <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
-                <img src="@/assets/icons/clasificacionTorneo.png" alt="Icono personalizado" width="40" height="40">
-              </v-btn>
-              
-              <v-btn icon @click.stop="verDetalleInscripcion(torneo.idInscripcion)">
-                <img src="@/assets/icons/verLista.png" alt="Icono personalizado" width="40" height="40">
-              </v-btn>
-            </template>
-          </v-list-item>
+          <template v-slot:append>
+            <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
+              <img
+                src="@/assets/icons/clasificacionTorneo.png"
+                alt="Icono personalizado"
+                width="40"
+                height="40"
+              />
+            </v-btn>
 
-          
-        </v-list>
+            <v-btn
+              icon
+              @click.stop="verDetalleInscripcion(torneo.idInscripcion)"
+            >
+              <img
+                src="@/assets/icons/verLista.png"
+                alt="Icono personalizado"
+                width="40"
+                height="40"
+              />
+            </v-btn>
+          </template>
+        </v-list-item>
+      </v-list>
     </v-container>
   </div>
 
+  <!-- Modal Success -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Eliminado con éxito."
+    message="Eliminado con exito."
     @update:isVisible="showSuccessModal = $event"
   />
 
@@ -69,15 +99,6 @@
 
   <ModalInscripcion
     v-if="showModalInscripcion"
-    :idInscripcion="currentInscripcionId"
-    :idUsuario="parseInt(idUsuarioLogger!)"
-    :idTorneo="currentTorneoId"
-    :idOrganizador="currentTorneoId"
-    @eliminar-inscripcion="eliminarInscripcion"
-    @close="closeModal"
-  />
-  <ModalInscripcionEquipo
-    v-if="showModalInscripcionEquipo"
     :idInscripcion="currentInscripcionId"
     :idUsuario="parseInt(idUsuarioLogger!)"
     :idTorneo="currentTorneoId"
@@ -115,7 +136,6 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useAuth } from "@/composables/useAuth";
 import ModalInscripcion from "./ModalInscripcion.vue";
-import ModalInscripcionEquipo from "./ModalInscripcionEquipo.vue";
 
 const props = defineProps<{
   isLoading: boolean;
@@ -151,11 +171,6 @@ const verDetalleInscripcion = (idInscripcion: number) => {
     )?.idOrganizador ?? null;
 
   showModalInscripcion.value = true;
-};
-
-const verDetalleInscripcionEquipo = (idInscripcion: number) => {
-  currentInscripcionId.value = idInscripcion;
-  showModalInscripcionEquipo.value = true;
 };
 
 const verDetalleTorneo = (idTorneo: number) => {

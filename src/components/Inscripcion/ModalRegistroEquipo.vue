@@ -84,6 +84,17 @@
       </v-card-text>
     </v-card>
   </v-dialog>
+
+  <!-- SnackBar -->
+  <v-snackbar
+    color="red-darken-2"
+    :timeout="snackBarTimeOut"
+    v-model="snackBarShow"
+    eager
+    auto-height
+  >
+    {{ snackBarMessage }}
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
@@ -114,6 +125,10 @@ const isRegistering = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const isSuccess = ref<boolean>(false);
+
+const snackBarShow = ref<boolean>(false);
+const snackBarMessage = ref<string>("");
+const snackBarTimeOut = ref<number>(3000);
 
 // Determina la cantidad máxima de jugadores según el tipo de torneo
 const maxPlayers = computed(() => {
@@ -149,14 +164,11 @@ const removePlayer = (index: number) => {
 
 const validateForm = () => {
   if (!teamName.value.trim()) {
-    showErrorModal.value = true;
+    snackBarMessage.value = "El nombre es obligatorio";
+    snackBarShow.value = true;
     return false;
   }
   if (!props.idTorneo) {
-    showErrorModal.value = true;
-    return false;
-  }
-  if (selectedPlayers.value.length !== maxPlayers.value - 1) {
     showErrorModal.value = true;
     return false;
   }
@@ -166,11 +178,7 @@ const validateForm = () => {
 // Función para manejar el registro del equipo
 const submitForm = async () => {
   if (!validateForm()) return;
-  if (
-    selectedPlayers.value.length === maxPlayers.value - 1 &&
-    props.idTorneo &&
-    idUsuarioLogger.value
-  ) {
+  if (props.idTorneo && idUsuarioLogger.value) {
     const id: number = parseInt(idUsuarioLogger.value);
     const inscripcionEquipo: InscripcionEquipoDTO = {
       idTorneo: props.idTorneo,
@@ -197,7 +205,7 @@ const submitForm = async () => {
       isRegistering.value = false;
     }
   } else {
-    alert("Por favor, selecciona el número correcto de jugadores.");
+    showErrorModal.value = true;
   }
 };
 

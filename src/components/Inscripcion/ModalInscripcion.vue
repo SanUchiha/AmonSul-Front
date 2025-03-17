@@ -5,8 +5,10 @@
   <div v-else class="center">
     <v-dialog v-model="show" max-width="800px">
       <v-card elevation="12">
-        <v-card-title class="modal-title d-flex align-center justify-space-between">
-          <h3 class="text-h5 font-weight-bold">Detalles de Inscripción</h3>
+        <v-card-title
+          class="modal-title d-flex align-center justify-space-between"
+        >
+          <h3 class="text-h5 font-weight-bold">Detalle de la inscripción</h3>
           <v-btn icon @click="close" class="close-button">
             <v-icon color="grey darken-1">mdi-close</v-icon>
           </v-btn>
@@ -18,12 +20,20 @@
             <v-list-item>
               <v-list-item-title class="list-item-title">
                 <v-icon color="primary" class="mr-2">mdi-file-document</v-icon>
-                <strong>Lista:</strong> &nbsp;{{ inscripcionData?.estadoLista }}                
+                <strong>Lista:</strong> &nbsp;{{ inscripcionData?.estadoLista }}
               </v-list-item-title>
-              <v-btn v-if="inscripcionData?.listaData" color="primary" variant="tonal" block @click="toggleLista">
-                <v-icon left>mdi-eye</v-icon>{{ showLista ? 'Ocultar lista' : 'Ver lista' }}
+              <v-btn
+                v-if="inscripcionData?.listaData"
+                color="primary"
+                variant="tonal"
+                block
+                @click="toggleLista"
+              >
+                <v-icon left>mdi-eye</v-icon
+                >{{ showLista ? "Ocultar lista" : "Ver lista" }}
               </v-btn>
-              <v-btn v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"
+              <v-btn
+                v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"
                 color="primary"
                 block
                 variant="tonal"
@@ -32,19 +42,29 @@
               >
                 <v-icon left>mdi-mail</v-icon> Enviar / Modificar Lista
               </v-btn>
-            </v-list-item>            
+            </v-list-item>
 
             <v-divider class="mt-3 mb-1"></v-divider>
             <v-expand-transition>
               <v-list-item v-if="showLista">
                 <v-list-item-content>
-                  <h3 class="text-h6 font-weight-bold text-primary">{{ inscripcionData?.ejercito }}</h3>
+                  <h3 class="text-h6 font-weight-bold text-primary">
+                    {{ inscripcionData?.ejercito }}
+                  </h3>
                   <v-divider class="my-3"></v-divider>
                   <template v-if="listaBase64">
-                    <v-img :src="listaBase64" alt="Lista de ejército" max-width="100%" class="rounded-img" contain />
+                    <v-img
+                      :src="listaBase64"
+                      alt="Lista de ejército"
+                      max-width="100%"
+                      class="rounded-img"
+                      contain
+                    />
                   </template>
                   <template v-else>
-                    <p class="text-grey-darken-1 text-center">No hay lista disponible</p>
+                    <p class="text-grey-darken-1 text-center">
+                      No hay lista disponible
+                    </p>
                   </template>
                 </v-list-item-content>
               </v-list-item>
@@ -52,10 +72,20 @@
 
             <v-list-item>
               <v-list-item-title class="list-item-title">
-                <v-icon :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'" class="mr-2">mdi-credit-card</v-icon>
+                <v-icon
+                  :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'"
+                  class="mr-2"
+                  >mdi-credit-card</v-icon
+                >
                 <span class="font-weight-bold">Estado de pago:</span>
-                <v-chip :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'" dark class="ml-2">
-                  {{ inscripcionData?.esPago === "SI" ? "Pagado" : "No pagado" }}
+                <v-chip
+                  :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'"
+                  dark
+                  class="ml-2"
+                >
+                  {{
+                    inscripcionData?.esPago === "SI" ? "Pagado" : "No pagado"
+                  }}
                 </v-chip>
               </v-list-item-title>
             </v-list-item>
@@ -313,8 +343,7 @@ onMounted(async () => {
     isLoading.value = true;
     const response = await getIncripcionById(props.idInscripcion!);
     inscripcionData.value = response.data;
-    torneo.value = inscripcionData.value?.torneo
-    console.log("inscripcionData.value:", inscripcionData.value);
+    torneo.value = inscripcionData.value?.torneo;
   } catch (error) {
     console.error("Error al obtener datos de la inscripcion:", error);
   } finally {
@@ -324,30 +353,21 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-
+.rounded-modal {
+  border-radius: 12px;
+}
 .modal-title {
-  font-size: 22px;
-  font-weight: bold;
   padding: 16px;
+  font-weight: bold;
 }
 .close-button {
-  margin-left: auto;
+  margin-right: 8px;
 }
-.list-item-title {
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
+.info-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
 }
 .elevated-btn {
-  margin-top: 12px;
-  width: 100%;
-  text-transform: uppercase;
-  font-weight: bold;
-}
-.rounded-img {
-  border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+  margin: auto;
 }
 </style>

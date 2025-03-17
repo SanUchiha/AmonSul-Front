@@ -14,18 +14,34 @@
             <v-row justify="center">
               <v-col cols="12" md="10">
                 <v-card v-if="torneo" class="pa-3">
-                  <v-img :src="torneo.cartelTorneo || require('@/assets/images/cartelMissing.jpg')" height="250px" class="rounded-lg" />
-                  <v-card-title class="text-h5 text-center font-weight-bold mt-3">
+                  <v-img
+                    :src="
+                      torneo.cartelTorneo ||
+                      require('@/assets/images/cartelMissing.jpg')
+                    "
+                    height="250px"
+                    class="rounded-lg"
+                  />
+                  <v-card-title
+                    class="text-h5 text-center font-weight-bold mt-3"
+                  >
                     {{ torneo.nombreTorneo }}
                   </v-card-title>
                   <v-card-subtitle class="text-center mb-3">
                     <p class="text-wrap" v-if="formattedAddress.trim()">
                       <v-icon left class="location-icon">mdi-map-marker</v-icon>
-                      <a :href="googleMapsUrl" target="_blank" rel="noopener noreferrer">
+                      <a
+                        :href="googleMapsUrl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         {{ formattedAddress }}
                       </a>
                     </p>
-                    <p v-else><v-icon left class="location-icon">mdi-map-marker</v-icon> {{ torneo.lugarTorneo }}</p>
+                    <p v-else>
+                      <v-icon left class="location-icon">mdi-map-marker</v-icon>
+                      {{ torneo.lugarTorneo }}
+                    </p>
                   </v-card-subtitle>
 
                   <v-divider class="mb-3"></v-divider>
@@ -33,27 +49,63 @@
                   <v-card-text>
                     <v-row>
                       <v-col cols="12">
-                        <p class="text-subtitle-1"><v-icon left color="blue">mdi-text</v-icon> <strong>Descripción</strong><br/> {{ torneo.descripcionTorneo }}</p>
+                        <p class="text-subtitle-1">
+                          <v-icon left color="blue">mdi-text</v-icon>
+                          <strong>Descripción</strong><br />
+                          {{ torneo.descripcionTorneo }}
+                        </p>
                       </v-col>
 
                       <v-divider></v-divider>
 
                       <v-col cols="10" offset="1" class="text-center">
-                        <p class="text-h6"><v-icon color="cyan">mdi-trophy</v-icon> <strong>Puntos:</strong> {{ torneo.puntosTorneo }}</p>
+                        <p class="text-h6">
+                          <v-icon color="cyan">mdi-trophy</v-icon>
+                          <strong>Puntos:</strong> {{ torneo.puntosTorneo }}
+                        </p>
                       </v-col>
 
                       <v-divider class="mb-3"></v-divider>
 
                       <v-col cols="12" sm="6">
-                        <p><v-icon left color="green">mdi-calendar</v-icon> <strong>Fecha:</strong> {{ formatDate(torneo.fechaInicioTorneo) }} a las {{ torneo.horaInicioTorneo }}</p>
-                        <p><v-icon left color="red">mdi-calendar-clock</v-icon> <strong>Inscripciones abiertas:</strong> {{ formatDate(torneo.inicioInscripciones) }}</p>
-                        <p><v-icon left color="red">mdi-calendar-clock</v-icon> <strong>Inscripción hasta:</strong> {{ formatDate(torneo.fechaFinInscripcion) }}</p>
-                        <p><v-icon left color="orange">mdi-list-status</v-icon> <strong>Entrega de Listas:</strong> {{ formatDate(torneo.fechaEntregaListas) }}</p>
+                        <p>
+                          <v-icon left color="green">mdi-calendar</v-icon>
+                          <strong>Fecha:</strong>
+                          {{ formatDate(torneo.fechaInicioTorneo) }} a las
+                          {{ torneo.horaInicioTorneo }}
+                        </p>
+                        <p>
+                          <v-icon left color="red">mdi-calendar-clock</v-icon>
+                          <strong>Inscripciones abiertas:</strong>
+                          {{ formatDate(torneo.inicioInscripciones) }}
+                        </p>
+                        <p>
+                          <v-icon left color="red">mdi-calendar-clock</v-icon>
+                          <strong>Inscripción hasta:</strong>
+                          {{ formatDate(torneo.fechaFinInscripcion) }}
+                        </p>
+                        <p>
+                          <v-icon left color="orange">mdi-list-status</v-icon>
+                          <strong>Entrega de Listas:</strong>
+                          {{ formatDate(torneo.fechaEntregaListas) }}
+                        </p>
                       </v-col>
                       <v-col cols="12" sm="6">
-                        <p><v-icon left color="green">mdi-cash</v-icon> <strong>Precio:</strong> {{ torneo.precioTorneo }}€</p>
-                        <p><v-icon left color="teal">mdi-account-group</v-icon> <strong>Participantes:</strong> {{ participantes.length }}/{{ torneo.limiteParticipantes || "Sin límite" }}</p>
-                        <p><v-icon left color="pink">mdi-dice-multiple</v-icon> <strong>Partidas:</strong> {{ torneo.numeroPartidas }}</p>
+                        <p>
+                          <v-icon left color="green">mdi-cash</v-icon>
+                          <strong>Precio:</strong> {{ torneo.precioTorneo }}€
+                        </p>
+                        <p>
+                          <v-icon left color="teal">mdi-account-group</v-icon>
+                          <strong>Participantes:</strong>
+                          {{ participantes.length }}/{{
+                            torneo.limiteParticipantes || "Sin límite"
+                          }}
+                        </p>
+                        <p>
+                          <v-icon left color="pink">mdi-dice-multiple</v-icon>
+                          <strong>Partidas:</strong> {{ torneo.numeroPartidas }}
+                        </p>
                       </v-col>
                     </v-row>
                   </v-card-text>
@@ -63,52 +115,119 @@
                   <v-card-actions class="d-flex justify-space-between">
                     <v-row>
                       <v-col cols="12" sm="6">
-                        <v-btn variant="tonal" color="blue" :disabled="!torneo.tieneBases" @click="descargarBases" block>
-                          <v-icon left>mdi-file-download</v-icon> Descargar Bases
+                        <v-btn
+                          variant="tonal"
+                          color="blue"
+                          :disabled="!torneo.tieneBases"
+                          @click="descargarBases"
+                          block
+                        >
+                          <v-icon left>mdi-file-download</v-icon> Descargar
+                          Bases
                         </v-btn>
                       </v-col>
                       <v-col cols="12" sm="6">
-                        <span v-if="isInscripcionCerrada" class="text-red text-subtitle-1">
+                        <span
+                          v-if="isInscripcionCerrada"
+                          class="text-red text-subtitle-1"
+                        >
                           Plazo de inscripción cerrado
                         </span>
-                        <span v-else-if="new Date(torneo.fechaInicioTorneo) < new Date()" class="text-red text-subtitle-1">
+                        <span
+                          v-else-if="
+                            new Date(torneo.fechaInicioTorneo) < new Date()
+                          "
+                          class="text-red text-subtitle-1"
+                        >
                           Torneo ya disputado
                         </span>
-                        <span v-else-if="inscripcionState === 'completo'" class="text-red text-subtitle-1">
+                        <span
+                          v-else-if="inscripcionState === 'completo'"
+                          class="text-red text-subtitle-1"
+                        >
                           Plazas agotadas
                         </span>
-                        <span v-else-if="estaApuntado">
+                        <span v-else-if="!estaApuntado">
                           <span v-if="!isInscripcionCerrada">
-                            <span v-if="torneo.tipoTorneo!='Individual'">
-                              <v-btn 
-                                variant="tonal" 
-                                color="red" 
-                                @click="inscripcionPorEquipos" 
-                                block 
-                                :disabled="infoEquipos?.idCapitan !== (idUsuario ? parseInt(idUsuario) : undefined)">
-                                <v-icon left>mdi-check-circle</v-icon> 
-                                {{ buttonText }}
+                            <span v-if="torneo.tipoTorneo != 'Individual'">
+                              <v-btn
+                                variant="tonal"
+                                color="green"
+                                @click="inscripcionPorEquipos"
+                                block
+                              >
+                                <v-icon left>mdi-check-circle</v-icon> Apuntar
+                                equipo
                               </v-btn>
                             </span>
                             <span v-else>
-                              <v-btn variant="tonal" color="red" @click="inscripcionIndividual" block>
-                                <v-icon left>mdi-check-circle</v-icon> Borrar inscripción
+                              <v-btn
+                                variant="tonal"
+                                color="green"
+                                @click="inscripcionIndividual"
+                                block
+                              >
+                                <v-icon left>mdi-check-circle</v-icon> Apúntate
                               </v-btn>
                             </span>
                           </span>
                           <span v-else class="text-subtitle-1">
-                            Estás apuntado pero las inscripciones están cerradas, no está permitido borrar la inscripción.
+                            Estás apuntado pero las inscripciones están
+                            cerradas, no está permitido borrar la inscripción.
+                          </span>
+                        </span>
+                        <span v-else-if="estaApuntado">
+                          <span v-if="!isInscripcionCerrada">
+                            <span v-if="torneo.tipoTorneo != 'Individual'">
+                              <v-btn
+                                variant="tonal"
+                                color="red"
+                                @click="eliminarInscripcionEquipo(idEquipo)"
+                                block
+                                :disabled="!isCapitan"
+                              >
+                                <v-icon left>mdi-check-circle</v-icon>
+                                {{ buttonText }}
+                              </v-btn>
+                            </span>
+                            <span v-else>
+                              <v-btn
+                                variant="tonal"
+                                color="red"
+                                @click="inscripcionIndividual"
+                                block
+                              >
+                                <v-icon left>mdi-check-circle</v-icon> Borrar
+                                inscripción
+                              </v-btn>
+                            </span>
+                          </span>
+                          <span v-else class="text-subtitle-1">
+                            Estás apuntado pero las inscripciones están
+                            cerradas, no está permitido borrar la inscripción.
                           </span>
                         </span>
                         <span v-else>
                           <span v-if="torneo.tipoTorneo == 'Individual'">
-                            <v-btn variant="tonal" v-if="!isLoading" color="green" @click="inscripcionIndividual" block>
-                              <v-icon left>mdi-check-circle</v-icon> Apuntarse
+                            <v-btn
+                              variant="tonal"
+                              v-if="!isLoading"
+                              color="green"
+                              @click="inscripcionIndividual"
+                              block
+                            >
+                              <v-icon left>mdi-check-circle</v-icon> Apúntate
                             </v-btn>
                           </span>
                           <span v-else>
-                            <v-btn variant="tonal" v-if="!isLoading" color="green" @click="inscripcionPorEquipos()" block>
-                              <v-icon left>mdi-check-circle</v-icon> Apuntarse
+                            <v-btn
+                              variant="tonal"
+                              v-if="!isLoading"
+                              color="green"
+                              @click="inscripcionPorEquipos()"
+                              block
+                            >
+                              <v-icon left>mdi-check-circle</v-icon> Apúntate
                             </v-btn>
                           </span>
                           <!--<v-btn variant="tonal" color="green" @click="showModalResponse" block>
@@ -122,22 +241,40 @@
               </v-col>
             </v-row>
           </v-window-item>
-      
+
           <!-- Participantes -->
           <v-window-item value="two">
             <v-card flat>
               <v-card-title class="d-flex align-center">
-                <p v-if="torneo?.tipoTorneo == 'Individual'"><v-icon left>mdi-account-group</v-icon> Participantes</p>
+                <p v-if="torneo?.tipoTorneo == 'Individual'">
+                  <v-icon left>mdi-account-group</v-icon> Participantes
+                </p>
                 <p v-else><v-icon left>mdi-account-group</v-icon> Equipos</p>
                 <v-spacer></v-spacer>
-                <v-text-field v-model="search" label="Buscar" prepend-inner-icon="mdi-magnify" variant="outlined" dense></v-text-field>
+                <v-text-field
+                  v-model="search"
+                  label="Buscar"
+                  prepend-inner-icon="mdi-magnify"
+                  variant="outlined"
+                  dense
+                ></v-text-field>
               </v-card-title>
               <v-divider></v-divider>
               <div v-if="torneo?.tipoTorneo == 'Individual'">
-                <v-data-table v-model:search="search" :items="participantes" :loading="isLoading" :headers="headers">
+                <v-data-table
+                  v-model:search="search"
+                  :items="participantes"
+                  :loading="isLoading"
+                  :headers="headers"
+                >
                   <template v-slot:item="{ item }">
-                    <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
-                      <td><v-chip color="orange" dark>{{ item.nick }}</v-chip></td>
+                    <tr
+                      @click="goToUserDetail(item.idUsuario)"
+                      class="clickable-row"
+                    >
+                      <td>
+                        <v-chip color="orange" dark>{{ item.nick }}</v-chip>
+                      </td>
                     </tr>
                   </template>
                 </v-data-table>
@@ -153,18 +290,34 @@
                 >
                   <!-- Estilizar la fila de equipos -->
                   <template v-slot:item="{ item }">
-                    <tr @click="toggleExpand(item.nombreEquipo)" class="clickable-row">
+                    <tr
+                      @click="toggleExpand(item.nombreEquipo)"
+                      class="clickable-row"
+                    >
                       <td>
                         <v-avatar color="indigo" size="40">
-                          <img src="@/assets/icons/equipos.png" alt="Icono personalizado" width="40" height="40">
+                          <img
+                            src="@/assets/icons/equipos.png"
+                            alt="Icono personalizado"
+                            width="40"
+                            height="40"
+                          />
                         </v-avatar>
                         &nbsp;
-                        <v-chip color="orange darken-2" text-color="white" class="font-weight-bold">
+                        <v-chip
+                          color="orange darken-2"
+                          text-color="white"
+                          class="font-weight-bold"
+                        >
                           {{ item.nombreEquipo }}
                         </v-chip>
                       </td>
                       <td class="text-center">
-                        <v-icon>{{ expanded.includes(item.nombreEquipo) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                        <v-icon>{{
+                          expanded.includes(item.nombreEquipo)
+                            ? "mdi-chevron-up"
+                            : "mdi-chevron-down"
+                        }}</v-icon>
                       </td>
                     </tr>
 
@@ -172,20 +325,42 @@
                     <tr v-if="expanded.includes(item.nombreEquipo)">
                       <td colspan="3">
                         <v-card class="pa-3 mx-4 expanded-card">
-                          <p class="text-subtitle-1 font-weight-bold">Participantes</p>
+                          <p class="text-subtitle-1 font-weight-bold">
+                            Participantes
+                          </p>
                           <v-list dense>
-                            <v-list-item v-for="participante in item.inscripciones" :key="participante.idUsuario">
-                              
-                                <template v-slot:prepend>
-                                  <v-btn icon @click="goToUserDetail(participante.idUsuario)">
-                                    <img src="@/assets/icons/teamLeader.png" alt="Icono personalizado" width="50" height="50" v-if="participante.idUsuario === item?.idCapitan">
-                                    <img src="@/assets/icons/verdetalle.png" alt="Icono personalizado" width="50" height="50" v-else>
-                                  </v-btn>
-                                </template>
-                                <v-list-item-title>
-                                  &nbsp; {{ participante.nick || "Desconocido" }}
-                                </v-list-item-title>
-                                
+                            <v-list-item
+                              v-for="participante in item.inscripciones"
+                              :key="participante.idUsuario"
+                            >
+                              <template v-slot:prepend>
+                                <v-btn
+                                  icon
+                                  @click="
+                                    goToUserDetail(participante.idUsuario)
+                                  "
+                                >
+                                  <img
+                                    src="@/assets/icons/teamLeader.png"
+                                    alt="Icono personalizado"
+                                    width="50"
+                                    height="50"
+                                    v-if="
+                                      participante.idUsuario === item?.idCapitan
+                                    "
+                                  />
+                                  <img
+                                    src="@/assets/icons/verdetalle.png"
+                                    alt="Icono personalizado"
+                                    width="50"
+                                    height="50"
+                                    v-else
+                                  />
+                                </v-btn>
+                              </template>
+                              <v-list-item-title>
+                                &nbsp; {{ participante.nick || "Desconocido" }}
+                              </v-list-item-title>
                             </v-list-item>
                           </v-list>
                         </v-card>
@@ -193,18 +368,13 @@
                     </tr>
                   </template>
                 </v-data-table>
-
-
-
               </div>
             </v-card>
           </v-window-item>
-
         </v-window>
       </v-card-text>
-
     </v-card>
-    
+
     <!-- Registro equipo -->
     <ModalRegistroEquipo
       :isVisible="showModalInscripcionPorEquipos"
@@ -227,9 +397,23 @@
       @update:isVisible="showErrorModal = $event"
     />
 
+    <!-- Spinner Modal -->
+    <v-dialog v-model="isRegistering" persistent width="300">
+      <v-card>
+        <v-card-text
+          class="d-flex justify-center align-center"
+          style="height: 150px"
+        >
+          <v-progress-circular
+            indeterminate
+            color="blue-lighten-3"
+            :size="57"
+          ></v-progress-circular>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
-
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue";
@@ -245,7 +429,8 @@ import {
   getInscripcionesIndividualByUser,
   getInscripcionesTorneo,
   registrarInscripcion,
-  cancelarInscripcion
+  cancelarInscripcion,
+  eliminarEquipo,
 } from "@/services/InscripcionesService";
 import { useAuth } from "@/composables/useAuth";
 import {
@@ -268,6 +453,8 @@ const idTorneo = ref<number>(0);
 const estaApuntado = ref<boolean>(false);
 const isTorneoCompletado = ref<boolean>(false);
 const idInscripcion = ref<number>(0);
+const idEquipo = ref<number | undefined>(undefined);
+
 const torneosApuntado = ref<InscripcionUsuarioIndividualDTO[]>();
 
 const tab = ref(0);
@@ -283,24 +470,65 @@ const showErrorModal = ref<boolean>(false);
 const isRegistering = ref<boolean>(false);
 const showModalInscripcionPorEquipos = ref<boolean>(false);
 
-const infoEquipos = ref<EquipoDTO>();
+const infoEquipos = ref<EquipoDTO[]>([]);
 
 const expanded = ref<string[]>([]); // Guardará los equipos expandidos
+
 const toggleExpand = (nombreEquipo: string) => {
   if (expanded.value.includes(nombreEquipo)) {
-    console.log("expanded.value.includes(nombreEquipo)",expanded.value.includes(nombreEquipo))
-    expanded.value = expanded.value.filter(item => item !== nombreEquipo);
+    console.log(
+      "expanded.value.includes(nombreEquipo)",
+      expanded.value.includes(nombreEquipo)
+    );
+    expanded.value = expanded.value.filter((item) => item !== nombreEquipo);
   } else {
-    console.log("expanded.value.push(nombreEquipo)",expanded.value.push(nombreEquipo))
+    console.log(
+      "expanded.value.push(nombreEquipo)",
+      expanded.value.push(nombreEquipo)
+    );
     expanded.value.push(nombreEquipo);
   }
 };
 
 //Conmuted para personalizar el botón de borrar inscripcion por equipos
 const buttonText = computed(() => {
-  return infoEquipos.value?.idCapitan === (idUsuario.value ? parseInt(idUsuario.value) : undefined)
-    ? "Eliminar Equipo"
-    : "Solo el Capitán puede borrar";
+  const isCapitan = infoEquipos.value.some(
+    (equipo) =>
+      equipo.idCapitan ===
+      (idUsuario.value ? parseInt(idUsuario.value) : undefined)
+  );
+
+  if (isCapitan) {
+    return "Eliminar Equipo";
+  } else {
+    return "Solo el Capitán puede borrar";
+  }
+});
+
+// Computado para determinar si el usuario es el capitán
+const isCapitan = computed(() => {
+  const equipoCapitan = infoEquipos.value.find(
+    (equipo) =>
+      equipo.idCapitan ===
+      (idUsuario.value ? parseInt(idUsuario.value) : undefined)
+  );
+  console.log("equipoCapitan", equipoCapitan);
+  return equipoCapitan !== undefined;
+});
+
+// Watch para actualizar el idEquipo cuando se encuentra el capitán
+watch([infoEquipos, idUsuario], () => {
+  const equipoCapitan = infoEquipos.value.find(
+    (equipo) =>
+      equipo.idCapitan ===
+      (idUsuario.value ? parseInt(idUsuario.value) : undefined)
+  );
+
+  if (equipoCapitan) {
+    idEquipo.value = equipoCapitan.idEquipo;
+  } else {
+    idEquipo.value = undefined;
+  }
 });
 
 // Variables reactivas
@@ -309,7 +537,9 @@ const formattedAddress = ref<string>("");
 // Computed property para generar el enlace a Google Maps
 const googleMapsUrl = computed(() => {
   if (!torneo.value?.lugarTorneo) return "#";
-  return `https://www.google.com/maps?q=${parseFloat(torneo.value!.lugarTorneo.split(", ")[0])},${parseFloat(torneo.value!.lugarTorneo.split(", ")[1])}`;
+  return `https://www.google.com/maps?q=${parseFloat(
+    torneo.value!.lugarTorneo.split(", ")[0]
+  )},${parseFloat(torneo.value!.lugarTorneo.split(", ")[1])}`;
 });
 
 // Función para obtener dirección inversa desde coordenadas
@@ -322,7 +552,8 @@ const getAddress = async (lat: number, lon: number) => {
     if (data.address) {
       console.log(" data.address", data);
 
-      const { road, house_number, city, town, village, state, postcode } = data.address;
+      const { road, house_number, city, town, village, state, postcode } =
+        data.address;
 
       // Priorizar ciudad, pueblo o aldea
       const locationCity = city || town || village || "";
@@ -332,7 +563,7 @@ const getAddress = async (lat: number, lon: number) => {
         road ? `${road}${house_number ? `, ${house_number}` : ""}` : "",
         locationCity,
         state,
-        postcode
+        postcode,
       ]
         .filter(Boolean) // Eliminar valores vacíos
         .join(", "); // Unir con comas
@@ -351,11 +582,6 @@ const isValidCoordinates = (value: string): boolean => {
 
   return regex.test(value.trim());
 };
-
-
-
-
-
 
 // Computed para gestionar el estado de inscripción
 const inscripcionState = computed(() => {
@@ -388,7 +614,6 @@ const goToEquipoDetail = (idEquipo: number) => {
   //TODO: modal con la info (nick) de los jugadores que se pueda pulsar en ellos y te lleven a su perfil
 };
 
-
 const eliminarInscripcion = async (idInscripcion: number) => {
   isRegistering.value = true;
   try {
@@ -408,6 +633,30 @@ const eliminarInscripcion = async (idInscripcion: number) => {
   }
 };
 
+const eliminarInscripcionEquipo = async (
+  idEquipo: number | null | undefined
+) => {
+  isRegistering.value = true;
+  if (!idEquipo) {
+    showErrorModal.value = true;
+    return;
+  }
+  try {
+    const response = await eliminarEquipo(idEquipo);
+
+    if (response.request?.status === 200) {
+      messageSuccess.value = "Equipo eliminado con exito.";
+      showSuccessModal.value = true;
+    } else {
+      showErrorModal.value = true;
+    }
+  } catch {
+    isRegistering.value = false;
+    showErrorModal.value = true;
+  } finally {
+    isRegistering.value = false;
+  }
+};
 
 // Montaje y obtención de datos
 onMounted(async () => {
@@ -415,7 +664,7 @@ onMounted(async () => {
   if (idUsuario.value != null) {
     idTorneo.value = Number(route.params.idTorneo);
 
-    //TODO Cambiar getInscripcionesUser por servicio que devuelva el estado de la inscripción al torneo. 
+    //TODO Cambiar getInscripcionesUser por servicio que devuelva el estado de la inscripción al torneo.
     // No es necesario tener una lista de inscripciones, es mas optimo solo la inscripción al torneo.
     // Paralelizar las solicitudes
     const [responseTorneo, responseInscripcion, responseInscriptionesUser] =
@@ -426,7 +675,6 @@ onMounted(async () => {
       ]);
 
     torneo.value = responseTorneo.data;
-    //console.log("Torneo",torneo.value);
     participantes.value = responseInscripcion.data;
     torneosApuntado.value = responseInscriptionesUser.data;
 
@@ -434,8 +682,9 @@ onMounted(async () => {
     if (torneosApuntado.value != null) {
       torneosApuntado.value.forEach((element) => {
         if (element.idTorneo === idTorneo.value) {
-          idInscripcion.value=element.idInscripcion;
+          idInscripcion.value = element.idInscripcion;
           estaApuntado.value = true;
+          if (element.idEquipo != null) idEquipo.value = element.idEquipo;
         }
       });
 
@@ -454,11 +703,13 @@ onMounted(async () => {
     const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
 
     infoEquipos.value = responseEquipos.data;
-    console.log("Equipos", infoEquipos.value);
   }
   try {
-    if (isValidCoordinates(torneo.value!.lugarTorneo)){
-      getAddress(parseFloat(torneo.value!.lugarTorneo.split(", ")[0]), parseFloat(torneo.value!.lugarTorneo.split(", ")[1]));
+    if (isValidCoordinates(torneo.value!.lugarTorneo)) {
+      getAddress(
+        parseFloat(torneo.value!.lugarTorneo.split(", ")[0]),
+        parseFloat(torneo.value!.lugarTorneo.split(", ")[1])
+      );
     }
   } catch (err) {
     console.error("Error al obtener coordenadas del torneo:", err);
@@ -471,6 +722,7 @@ onMounted(async () => {
 
     if (responseEstaApuntado.data) estaApuntado.value = true;
   }
+
   isLoading.value = false;
 });
 
@@ -507,6 +759,8 @@ const descargarBases = async () => {
 };
 
 const inscripcionIndividual = async () => {
+  isRegistering.value = true;
+
   if (
     idUsuario.value != null &&
     idTorneo.value != null &&
@@ -518,18 +772,16 @@ const inscripcionIndividual = async () => {
       idTorneo: idTorneo.value!,
     };
     try {
-      isRegistering.value = true;
       await registrarInscripcion(inscripcion);
       messageSuccess.value = "Te has registrado con éxito.";
       showSuccessModal.value = true;
     } catch (error) {
+      isRegistering.value = false;
       showErrorModal.value = true;
     } finally {
       isRegistering.value = false;
     }
-  }
-  else{
-    //TODO necesito la inscripcion del torneo a borrar
+  } else {
     eliminarInscripcion(idInscripcion.value);
   }
 };

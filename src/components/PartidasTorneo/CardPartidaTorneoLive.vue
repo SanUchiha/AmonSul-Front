@@ -302,7 +302,6 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
 
     try {
       const listaResponse = await getlistaTorneo(body);
-      console.log("listaResponse.data", listaResponse.data);
       listaData.value = listaResponse.data;
       nickJugador.value = nick;
       isModalListaVisible.value = true;

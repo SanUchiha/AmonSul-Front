@@ -286,7 +286,7 @@ const handlerNuevaPartida = async () => {
     };
 
     try {
-      await registrarPartida(nuevaPartida);      
+      await registrarPartida(nuevaPartida);
       showSuccessModal.value = true;
     } catch (error: unknown) {
       showErrorModal.value = true;
@@ -301,7 +301,6 @@ watch(
   ([newShowSuccessModal, newShowErrorModal]) => {
     if (!newShowSuccessModal && !newShowErrorModal) {
       emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
-      console.log("Evento success validar")
       emit("close"); // Cerramos el modal
     }
   }

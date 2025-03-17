@@ -1,89 +1,104 @@
 <template>
   <div class="center">
-        <v-card v-if="!isLoading" :class="['match-card']">
-               
-               <v-divider></v-divider>
-         
-               <v-card-title class="text-center text-wrap">
-                 <v-row align="center" justify="center" class="match-score" no-gutters>
-                   <v-col @click="verProfileUser(match.idUsuario1)" cols="5" class="player-name text-left">
-                     <span class="ml-2 text-wrap">{{ match.nickUsuario1 }}</span>
-                     <v-card-subtitle class="text-wrap">{{match.ejercitoUsuario1}}</v-card-subtitle>              
-                   </v-col>
-         
-                   <v-col cols="2" class="score text-center marcador">
-                     <p>vs</p>
-                     <p>{{ match.resultadoUsuario1 }}-{{ match.resultadoUsuario2 }}</p>
-                   </v-col>
-         
-                   <v-col @click="verProfileUser(match.idUsuario2)" cols="5" class="player-name text-right">
-                     <span class="ml-2 text-wrap">{{ match.nickUsuario2 }}</span><br>
-                     <v-card-subtitle class="text-wrap">{{match.ejercitoUsuario2}}</v-card-subtitle>              
-                   </v-col>
-                 </v-row>
-               </v-card-title>
+    <v-card v-if="!isLoading" :class="['match-card']">
+      <v-divider></v-divider>
 
-               <!-- Información de la partida -->
-              <v-card-text>
-                <v-row align="center">
+      <v-card-title class="text-center text-wrap">
+        <v-row align="center" justify="center" class="match-score" no-gutters>
+          <v-col
+            @click="verProfileUser(match.idUsuario1)"
+            cols="5"
+            class="player-name text-left"
+          >
+            <span class="ml-2 text-wrap">{{ match.nickUsuario1 }}</span>
+            <v-card-subtitle class="text-wrap">{{
+              match.ejercitoUsuario1
+            }}</v-card-subtitle>
+          </v-col>
 
-                  <v-col cols="4" class="text-center">
-                    <v-icon left>mdi-cash-multiple</v-icon> {{ match.puntosPartida }} pts
-                  </v-col>
+          <v-col cols="2" class="score text-center marcador">
+            <p>vs</p>
+            <p>{{ match.resultadoUsuario1 }}-{{ match.resultadoUsuario2 }}</p>
+          </v-col>
 
-                  <v-col cols="4" class="text-center">
-                    <v-icon left>mdi-calendar</v-icon> {{ fechaPartidaFormateada }}
-                  </v-col>
-                </v-row>
+          <v-col
+            @click="verProfileUser(match.idUsuario2)"
+            cols="5"
+            class="player-name text-right"
+          >
+            <span class="ml-2 text-wrap">{{ match.nickUsuario2 }}</span
+            ><br />
+            <v-card-subtitle class="text-wrap">{{
+              match.ejercitoUsuario2
+            }}</v-card-subtitle>
+          </v-col>
+        </v-row>
+      </v-card-title>
 
-                <v-row class="mt-3 match-scenario">
-                  <v-col cols="12" class="text-center">
-                    <v-icon left class="location-icon">mdi-map-marker</v-icon> Escenario:
-                    <strong>{{ match.escenarioPartida || "No disponible" }}</strong>
-                  </v-col>
-                  
-                  <!--TODO Implementar detalles, de momento no hay nada que mostrar
+      <!-- Información de la partida -->
+      <v-card-text>
+        <v-row align="center">
+          <v-col cols="4" class="text-center">
+            <v-icon left>mdi-cash-multiple</v-icon>
+            {{ match.puntosPartida }} pts
+          </v-col>
+
+          <v-col cols="4" class="text-center">
+            <v-icon left>mdi-calendar</v-icon> {{ fechaPartidaFormateada }}
+          </v-col>
+        </v-row>
+
+        <v-row class="mt-3 match-scenario">
+          <v-col cols="12" class="text-center">
+            <v-icon left class="location-icon">mdi-map-marker</v-icon>
+            Escenario:
+            <strong>{{ match.escenarioPartida || "No disponible" }}</strong>
+          </v-col>
+
+          <!--TODO Implementar detalles, de momento no hay nada que mostrar
                   <v-col cols="6" class="text-center">
                     <v-btn small color="blue lighten-2" @click.stop="goToDetallePartida()">
                       Ver Detalles
                     </v-btn>
                   </v-col>-->
-                </v-row>
-              </v-card-text>
+        </v-row>
+      </v-card-text>
 
-               <v-card-actions style="font-family: 'Roboto', sans-serif;">
-                  <v-row>
-                    <v-col cols="12" sm="6" class="text-center">
-                      <div v-if="!IsValidadaOwner">
-                        <v-btn color="success" @click="validarPartida" variant="tonal">
-                          <v-icon left>mdi-check</v-icon> 
-                          Validar Resultado
-                        </v-btn>
-                      </div>
-                      <div v-else>
-                        <span class="no-validada partida-en-juego">Esperando la validación del rival</span>
-                      </div>
-                    </v-col>
-                    <v-col cols="12" sm="6" class="text-center">
-                      <v-btn
-                        :disabled="isLoading"
-                        variant="tonal"
-                        color="red darken-1"
-                        @click="cancelPartida"
-                        block
-                      >
-                        <v-icon left>mdi-close</v-icon>
-                        Cancelar
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-               </v-card-actions>
-        </v-card>
-        <v-progress-circular
-          v-else
-          indeterminate
-          color="blue darken-1"
-        ></v-progress-circular>
+      <v-card-actions style="font-family: 'Roboto', sans-serif">
+        <v-row>
+          <v-col cols="12" sm="6" class="text-center">
+            <div v-if="!IsValidadaOwner">
+              <v-btn color="success" @click="validarPartida" variant="tonal">
+                <v-icon left>mdi-check</v-icon>
+                Validar Resultado
+              </v-btn>
+            </div>
+            <div v-else>
+              <span class="no-validada partida-en-juego"
+                >Esperando la validación del rival</span
+              >
+            </div>
+          </v-col>
+          <v-col cols="12" sm="6" class="text-center">
+            <v-btn
+              :disabled="isLoading"
+              variant="tonal"
+              color="red darken-1"
+              @click="cancelPartida"
+              block
+            >
+              <v-icon left>mdi-close</v-icon>
+              Cancelar
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+    <v-progress-circular
+      v-else
+      indeterminate
+      color="blue darken-1"
+    ></v-progress-circular>
 
     <ModalSuccess
       :isVisible="showSuccessValidarModal"
@@ -108,18 +123,11 @@
       message="No se ha podido cancelar la partida. Contacta con el administrador."
       @update:isVisible="showErrorCancelarModal = $event"
     />
-
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  defineProps,
-  ref,
-  onMounted,
-  defineEmits,
-  watch,
-} from "vue";
+import { defineProps, ref, onMounted, defineEmits, watch } from "vue";
 import {
   ValidarPartidaDTO,
   ViewPartidaAmistosaDTO,
@@ -190,14 +198,13 @@ const validarPartida = async () => {
 };
 
 const verProfileUser = (idUser: number) => {
-  router.push({ name: "detalle-jugador", params: { idUsuario:idUser } });
+  router.push({ name: "detalle-jugador", params: { idUsuario: idUser } });
 };
 
 const cancelPartida = async () => {
   try {
     isLoading.value = true;
     await cancelarPartida(props.match.idPartidaAmistosa);
-    console.log("partida cancelada")
     showSuccessCancelarModal.value = true;
   } catch (err) {
     showErrorCancelarModal.value = true;
@@ -206,24 +213,16 @@ const cancelPartida = async () => {
   }
 };
 
-watch(
-  [showSuccessValidarModal],
-  ([newshowSuccessValidarModal]) => {
-    if (!newshowSuccessValidarModal) {
-      emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
-      console.log("Evento success validar")
-    }
+watch([showSuccessValidarModal], ([newshowSuccessValidarModal]) => {
+  if (!newshowSuccessValidarModal) {
+    emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
   }
-);
-watch(
-  [showSuccessCancelarModal],
-  ([newshowSuccessCancelarModal]) => {
-    if (!newshowSuccessCancelarModal) {
-      emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
-      console.log("Evento cancel validar")
-    }
+});
+watch([showSuccessCancelarModal], ([newshowSuccessCancelarModal]) => {
+  if (!newshowSuccessCancelarModal) {
+    emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
   }
-);
+});
 
 const controlValidacionesPartidas = () => {
   if (
@@ -260,4 +259,3 @@ const controlValidacionesPartidas = () => {
   color: rgb(233, 69, 69);
 }
 </style>
-
