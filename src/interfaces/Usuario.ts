@@ -15,6 +15,7 @@ export interface NewUserDTO {
   Rol: "JUGADOR";
   Nick: string;
   Ciudad: string;
+  Provincia: string;
   idFaccion?: number;
   FechaNacimiento: string;
   Telefono: string;
@@ -26,7 +27,7 @@ export interface EditarUsuarioDTO {
   nombreUsuario?: string;
   primerApellido?: string;
   segundoApellido?: string;
-  email: string;
+  email?: string;
   nuevoEmail?: string;
   contraseña?: string;
   nick?: string;
@@ -89,6 +90,7 @@ export interface UsuarioDTO {
   nick: string;
   ciudad?: string | null;
   faccion: FaccionDTO;
+  imagen?: string;
 }
 
 export interface UsuarioDataDTO {

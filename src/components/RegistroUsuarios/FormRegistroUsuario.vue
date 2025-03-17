@@ -71,6 +71,14 @@
                 :rules="[rules.required]"
                 :error="errors.ciudad"
               ></v-text-field>
+              <v-select
+                v-model="provincia"
+                :items="provinciasEspaña"
+                label="Provincia"
+                required
+                :rules="[rules.required]"
+                :error="errors.provincia"
+              ></v-select>
               <v-text-field
                 v-model="telefono"
                 label="Telefono"
@@ -220,6 +228,7 @@ const password = ref("");
 const password2 = ref("");
 const nick = ref("");
 const ciudad = ref("");
+const provincia = ref("");
 const fechaNacimiento = ref("");
 const router = useRouter();
 const dialogNick = ref<boolean>(false);
@@ -236,6 +245,15 @@ const nuevaFaccion = ref<string>("");
 const idFaccionSelected = ref<number>();
 
 const showErrorModal = ref<boolean>(false);
+const provinciasEspaña = [
+  "Álava", "Albacete", "Alicante", "Almería", "Asturias", "Ávila", "Badajoz", "Barcelona",
+  "Burgos", "Cáceres", "Cádiz", "Cantabria", "Castellón", "Ceuta", "Ciudad Real", "Córdoba",
+  "Cuenca", "Gerona", "Granada", "Guadalajara", "Guipúzcoa", "Huelva", "Huesca", "Islas Baleares",
+  "Jaén", "La Coruña", "La Rioja", "Las Palmas", "León", "Lérida", "Lugo", "Madrid", "Málaga",
+  "Melilla", "Murcia", "Navarra", "Orense", "Palencia", "Pontevedra", "Salamanca", "Santa Cruz de Tenerife",
+  "Segovia", "Sevilla", "Soria", "Tarragona", "Teruel", "Toledo", "Valencia", "Valladolid", "Vizcaya",
+  "Zamora", "Zaragoza"
+];
 
 const formatFecha = (fechaString: string) => {
   const fecha = new Date(fechaString);
@@ -272,6 +290,7 @@ const errors = reactive({
   password2: false,
   nick: false,
   ciudad: false,
+  provincia: false,
   fechaNacimiento: false,
   telefono: false,
 });
@@ -330,6 +349,7 @@ const validateForm = () => {
   errors.password2 = !password2.value || password.value !== password2.value;
   errors.nick = !nick.value;
   errors.ciudad = !ciudad.value;
+  errors.provincia= !provincia.value;
   errors.fechaNacimiento =
     !fechaNacimiento.value || !rules.validDate(fechaNacimiento.value);
   errors.telefono = !!telefono.value && !rules.phone(telefono.value);
@@ -364,7 +384,9 @@ const handlerNewUser = async () => {
     Contraseña: password.value,
     Rol: "JUGADOR",
     Nick: nick.value,
+    nickLGDA: "",
     Ciudad: ciudad.value,
+    Provincia: provincia.value,
     idFaccion: idFaccionSelected.value,
     FechaNacimiento: formatFecha(fechaNacimiento.value),
     Telefono: telefono.value,

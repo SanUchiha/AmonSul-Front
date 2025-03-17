@@ -6,8 +6,8 @@
     <v-container class="profile-container">
       <v-row>
         <!-- Columna Izquierda (Perfil) -->
-        <v-col cols="12" md="4">
-          <CardPerfilUsuario :user=user! :selectedFaccionName=selectedFaccionName></CardPerfilUsuario>
+        <v-col cols="12" md="4" offset-md="4">
+          <CardPerfilUsuario :user=user! :selectedFaccionName=selectedFaccionName :editable=editable></CardPerfilUsuario>
         </v-col>
         
         <!-- Columna Derecha (Estadísticas, Rango/Nivel, Logros) -->
@@ -15,11 +15,11 @@
           <!-- Sección de Estadísticas
           <CardEstadisticas></CardEstadisticas> -->
 
-          <!-- Sección de Rango/Nivel -->
-          <CardRangoUsuario></CardRangoUsuario>
+          <!-- Sección de Rango/Nivel 
+          <CardRangoUsuario></CardRangoUsuario>-->
           
-          <!-- Sección de Logros -->
-          <LogrosUsuario></LogrosUsuario>
+          <!-- Sección de Logros 
+          <LogrosUsuario></LogrosUsuario>-->
         </v-col>
       </v-row>
     </v-container>
@@ -27,64 +27,6 @@
 
 
 
-  <!--<v-container class="pa-4">
-  <v-row justify="center">
-    <v-col cols="12" md="8" lg="6">
-      <v-card elevation="6" class="rounded-lg pa-6">
-        <v-card-title class="text-h5 font-weight-bold text-center">Perfil de Usuario</v-card-title>
-        <v-divider class="mb-4"></v-divider>
-        <v-card-text>
-          <div v-if="isLoading" class="d-flex justify-center align-center" style="height: 150px;">
-            <LoadingGandalf />
-          </div>
-          <div v-else-if="user">
-            <v-row dense>
-              <v-col cols="12">
-                <v-text-field label="Nombre" v-model="user!.nombreUsuario"  dense variant="solo" class="rounded"></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field label="Primer Apellido" v-model="user!.primerApellido"  dense variant="solo" class="rounded"></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field label="Segundo Apellido" v-model="user!.segundoApellido"  dense variant="solo" class="rounded"></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field label="Email" v-model="user!.email" type="email"  dense variant="solo" class="rounded"></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field label="Nick" v-model="user!.nick"  dense variant="solo" class="rounded"></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field label="Ciudad" v-model="user!.ciudad"  dense variant="solo" class="rounded"></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field label="Fecha de nacimiento" v-model="user!.fechaNacimiento"  dense variant="solo" class="rounded"></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  ref="nombreFaccionField"
-                  label="Comunidad de juego"
-                  v-model="selectedFaccionName"                  
-                  dense
-                  variant="solo"
-                  class="rounded"
-                  append-inner-icon="mdi-pencil"
-                  @click:append-inner="openEditFaccionDialog"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field label="Teléfono" v-model="user!.telefono"  dense variant="solo" class="rounded"></v-text-field>
-              </v-col>
-              <v-col cols="12" class="text-center mt-4">
-                <v-btn color="primary" block rounded="lg" @click="handleCambiarPassword">Cambiar la contraseña</v-btn>
-              </v-col>
-            </v-row>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-col>
-  </v-row>
--->
 
   <!-- Modal para modificar la contraseña -->
   <!--<ModalCambiarPass v-if="showModalCambiarPass" @close="closeModal" />-->
@@ -108,14 +50,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, ComputedRef } from "vue";
+import { onMounted, ref, defineProps, withDefaults, watch } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import ModalCambiarPass from "@/components/Perfil/ModalCambiarPass.vue";
 import CardPerfilUsuario from "@/components/Perfil/CardPerfilUsuario.vue";
-import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
 import CardRangoUsuario from "@/components/Perfil/CardRangoUsuario.vue";
 import LogrosUsuario from "@/components/Perfil/LogrosUsuario.vue";
 
@@ -125,42 +66,58 @@ const isLoading = ref(true);
 const { getUser } = useAuth();
 const email = ref<string>(await getUser.value!);
 const selectedFaccionName = ref<number>(0);
-
-const feedbackDialog = ref(false);
-
 const showModalCambiarPass = ref(false);
-
 const user = ref<UsuarioViewDTO>();
 
-
-
-onMounted(async () => {
-try {
-  isLoading.value = true;
-  if (!usuariosStore.usuario.idUsuario) {
-    await usuariosStore.requestUsuario(email.value);
-  }
-  user.value = usuariosStore.usuario; // ✅ Asegura que `user` tiene datos antes de renderizar
-  selectedFaccionName.value = user.value.idFaccion || 0;
-} catch (error) {
-  console.error("Error al obtener el usuario:", error);
-} finally {
-  isLoading.value = false;
-}
+// Definimos props opcionales con TypeScript
+const props = withDefaults(defineProps<{
+  editable?: boolean;
+  email?: string; // Opcional
+}>(),{
+  editable: true,
+  email: ""
 });
 
-
-const closeFeedbackDialog = () => {
-  feedbackDialog.value = false;
+// Función para cargar los datos del usuario
+const cargarUsuario = async () => {
+  try {
+    isLoading.value = true;
+    if (props.email==""){
+      console.log("email.email:", email.value);
+      await usuariosStore.requestUsuario(email.value);
+    }
+    else{
+      console.log("props.email:", props.email);
+      await usuariosStore.requestUsuario(props.email);
+    }
+    user.value = usuariosStore.usuario; // ✅ Asegura que user tiene datos antes de renderizar
+    selectedFaccionName.value = user.value.idFaccion || 0;
+  } catch (error) {
+    console.error("Error al obtener el usuario:", error);
+  } finally {
+    isLoading.value = false;
+  }
 };
+
+// Ejecutar cuando el componente se monta
+onMounted(() => {
+    console.log("onMounted ejecutado");
+    cargarUsuario();
+});
+
+// Observar cambios en la prop `email` y recargar datos
+watch(() => props.email, async (newEmail, oldEmail) => {
+  if (newEmail && newEmail !== oldEmail) {
+    console.log("Email cambiado, recargando usuario:", newEmail);
+    await cargarUsuario();
+  }
+});
+
 
 const handleCambiarPassword = () => {
   showModalCambiarPass.value = true;
 };
 
-const closeModal = () => {
-  showModalCambiarPass.value = false;
-};
 </script>
 
 <style scoped>

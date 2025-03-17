@@ -80,9 +80,14 @@
                         <span v-else-if="estaApuntado">
                           <span v-if="!isInscripcionCerrada">
                             <span v-if="torneo.tipoTorneo!='Individual'">
-                              <!--TODO PONER BOTÓN SOLO PARA EL CAPITAN-->
-                              <v-btn variant="tonal" color="red" @click="inscripcionPorEquipos" block>
-                                <v-icon left>mdi-check-circle</v-icon> Borrar Equipo
+                              <v-btn 
+                                variant="tonal" 
+                                color="red" 
+                                @click="inscripcionPorEquipos" 
+                                block 
+                                :disabled="infoEquipos?.idCapitan !== (idUsuario ? parseInt(idUsuario) : undefined)">
+                                <v-icon left>mdi-check-circle</v-icon> 
+                                {{ buttonText }}
                               </v-btn>
                             </span>
                             <span v-else>
@@ -97,12 +102,12 @@
                         </span>
                         <span v-else>
                           <span v-if="torneo.tipoTorneo == 'Individual'">
-                            <v-btn variant="tonal" color="green" @click="inscripcionIndividual" block>
+                            <v-btn variant="tonal" v-if="!isLoading" color="green" @click="inscripcionIndividual" block>
                               <v-icon left>mdi-check-circle</v-icon> Apuntarse
                             </v-btn>
                           </span>
                           <span v-else>
-                            <v-btn variant="tonal" color="green" @click="inscripcionPorEquipos()" block>
+                            <v-btn variant="tonal" v-if="!isLoading" color="green" @click="inscripcionPorEquipos()" block>
                               <v-icon left>mdi-check-circle</v-icon> Apuntarse
                             </v-btn>
                           </span>
@@ -291,6 +296,12 @@ const toggleExpand = (nombreEquipo: string) => {
   }
 };
 
+//Conmuted para personalizar el botón de borrar inscripcion por equipos
+const buttonText = computed(() => {
+  return infoEquipos.value?.idCapitan === (idUsuario.value ? parseInt(idUsuario.value) : undefined)
+    ? "Eliminar Equipo"
+    : "Solo el Capitán puede borrar";
+});
 
 // Variables reactivas
 const formattedAddress = ref<string>("");

@@ -1,9 +1,18 @@
 <template>
-
+    
     <v-card class="profile-section">
         <v-avatar size="120" class="avatar">
-            <v-img :src="editableUser.imagen || 'https://placehold.co/120'" alt="Avatar"></v-img>
+            <v-img :src="editableUser.imagen || defaultAvatar" alt="Avatar"></v-img>
         </v-avatar>
+        <v-file-input 
+            v-if="isEditing" 
+            accept="image/*" 
+            label="Subir nueva imagen" 
+            @change="handleImageUpload"
+            variant="solo"
+            dense
+        ></v-file-input>
+
         <h2 class="player-name text-wrap">
             <v-btn v-if="isEditing"  @click="toggleEditMode" variant="text">Cancelar</v-btn>
             <v-text-field v-if="isEditing" v-model="editableUser.nombreUsuario" label="Nombre" dense variant="solo"></v-text-field>
@@ -11,10 +20,10 @@
             <v-text-field v-if="isEditing" v-model="editableUser.segundoApellido" label="Segundo apellido" dense variant="solo"></v-text-field>
             <p v-if="!isEditing">
                 {{ editableUser.nombreUsuario }} {{ editableUser.primerApellido }} {{ editableUser.segundoApellido }}
-                <v-btn icon @click="toggleEditMode"><v-icon size="x-small">mdi-pen</v-icon></v-btn>
+                <v-btn icon @click="toggleEditMode" v-if="editable"><v-icon size="x-small">mdi-pen</v-icon></v-btn>
             </p>
         </h2>
-        <h2 class="player-name text-wrap" v-if="!isEditing">{{ editableUser.nick }}</h2>
+        <h2 class="player-name text-wrap ringbearer" v-if="!isEditing">{{ editableUser.nick }}</h2>
         <v-divider class="mb-3"></v-divider>
         <v-card-text class="mt-0 text-left">
             <v-combobox 
@@ -58,7 +67,7 @@
             <p v-else class="profile-info"><strong>Fecha de nacimiento:</strong> {{ convertirFecha(editableUser.fechaNacimiento) }}</p>
             
             <v-text-field v-if="isEditing" v-model="editableUser.telefono" label="Teléfono" dense variant="solo"></v-text-field>
-            <p v-else class="profile-info"><strong>Teléfono:</strong> {{ editableUser.telefono }}</p>
+            <p v-else class="profile-info"><span v-if="editable"><strong>Teléfono:</strong> {{ editableUser.telefono }}</span></p>
             
             <v-btn v-if="isEditing" color="primary" block @click="saveChanges">Guardar</v-btn>
         </v-card-text>
@@ -66,14 +75,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, reactive, onMounted, computed } from "vue";
+import { ref, defineProps, reactive, onMounted, computed, withDefaults } from "vue";
 import { UsuarioViewDTO, EditarUsuarioDTO } from "@/interfaces/Usuario";
 import { convertirFecha } from "@/utils/Fecha";
 import { getFacciones } from "@/services/FaccionesService";
 import { editarUsuario } from "@/services/UsuariosService";
 import { FaccionDTO } from "@/interfaces/Faccion";
+import defaultAvatar from "@/assets/icons/perfil.png";
 
-const props = defineProps<{ user: UsuarioViewDTO; selectedFaccionName: number }>();
+const props = withDefaults(defineProps<{ 
+    user: UsuarioViewDTO; 
+    selectedFaccionName: number; 
+    editable?: boolean 
+}>(),{
+    editable: false
+});
 
 const isEditing = ref(false);
 const editableUser = reactive({ ...props.user });
@@ -121,19 +137,35 @@ const logFaccionSelection = (value: FaccionDTO) => {
 
 const saveChanges = async () => {
     isEditing.value = false;
-    let editusu :EditarUsuarioDTO = {} as EditarUsuarioDTO;
-    editusu.nombreUsuario = editableUser.nombreUsuario;
-    editusu.primerApellido = editableUser.primerApellido;
-    editusu.segundoApellido = editableUser.segundoApellido;
-    editusu.nuevoEmail = editableUser.email;
-    editusu.idFaccion = faccionSelected.value;
-    editusu.fechaNacimiento = editableUser.fechaNacimiento;
-    editusu.telefono = editableUser.telefono;
-    editusu.nickLGDA = editableUser.nickLGDA;
-    editusu.ciudad = editableUser.ciudad;
+    
+    let editusu: EditarUsuarioDTO = {
+        nombreUsuario: editableUser.nombreUsuario,
+        primerApellido: editableUser.primerApellido,
+        segundoApellido: editableUser.segundoApellido,
+        nuevoEmail: editableUser.email,
+        idFaccion: faccionSelected.value,
+        fechaNacimiento: editableUser.fechaNacimiento,
+        telefono: editableUser.telefono,
+        nickLGDA: editableUser.nickLGDA,
+        ciudad: editableUser.ciudad,
+        imagen: editableUser.imagen // Se envía la imagen en base64
+    };
+
     console.log("editusu:", editusu);
     
+    // Enviar al backend
     //await editarUsuario(editusu);
+};
+
+const handleImageUpload = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+        editableUser.imagen = reader.result as string;
+    };
 };
 
 onMounted(async () => {
@@ -168,7 +200,7 @@ onMounted(async () => {
     text-align: center;
     background: #212121;
     color: white;
-    border-radius: 12px;
+    border-radius: 0px 12px 12px 12px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
 }
 .avatar {

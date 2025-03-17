@@ -4,28 +4,38 @@
   </div>
   <div v-else>
     <v-card flat>
-      <v-card-title class="d-flex align-center pe-2"
-        >Usuarios
-
+      <v-card-title class="d-flex align-center pe-2">
+        <v-icon class="me-2" color="primary">mdi-account-group</v-icon>
+        Usuarios
         <v-spacer></v-spacer>
-
         <v-text-field
           v-model="search"
           density="compact"
-          label="Buscar"
+          label="Buscar usuario"
           prepend-inner-icon="mdi-magnify"
           variant="solo-filled"
           flat
           hide-details
           single-line
         ></v-text-field>
+        <v-select
+          v-model="selectedProvince"
+          :items="provinces"
+          label="Filtrar por provincia"
+          clearable
+          class="ml-2"
+        ></v-select>
+        <v-select
+          v-model="selectedFaction"
+          :items="factions"
+          label="Filtrar por facción"
+          clearable
+          class="ml-2"
+        ></v-select>
       </v-card-title>
-
-      <v-divider></v-divider>
       <v-divider></v-divider>
       <v-data-table
-        v-model:search="search"
-        :items="items"
+        :items="filteredItems"
         :loading="isLoading"
         :headers="headers"
         class="custom-table"
@@ -33,9 +43,20 @@
       >
         <template v-slot:item="{ item }">
           <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
-            <td>{{ item.nick }}</td>
-            <td>{{ item.faccion?.nombreFaccion || "N/A" }}</td>
-            <td>{{ item.ciudad }}</td>
+            <td>
+              <v-avatar size="32" class="me-2">
+                <v-img :src="item.avatar || defaultAvatar" alt="Avatar" />
+              </v-avatar>
+              {{ item.nick }}
+            </td>
+            <td>
+              <v-icon class="me-2" color="success">mdi-shield-sword</v-icon>
+              {{ item.faccion?.nombreFaccion || "N/A" }}
+            </td>
+            <td>
+              <v-icon class="me-2" color="info">mdi-map-marker</v-icon>
+              {{ item.ciudad }}
+            </td>
           </tr>
         </template>
       </v-data-table>
@@ -45,17 +66,10 @@
 
 <script setup lang="ts">
 import { UsuarioDTO } from "@/interfaces/Usuario";
-
-import { onMounted, ref, defineProps } from "vue";
+import { onMounted, ref, computed, defineProps } from "vue";
 import { useRouter } from "vue-router";
-import {
-  VDataTable,
-  VCard,
-  VCardTitle,
-  VDivider,
-  VTextField,
-} from "vuetify/components";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
+import defaultAvatar from "@/assets/icons/perfil.png";
 
 const props = defineProps({
   usuarios: {
@@ -68,12 +82,32 @@ const search = ref<string>("");
 const items = ref<UsuarioDTO[]>([]);
 const isLoading = ref<boolean>(true);
 const router = useRouter();
+const selectedProvince = ref<string | null>(null);
+const selectedFaction = ref<string | null>(null);
 
 const headers = [
-  { title: "NICK", key: "nick", class: "blue lighten-5" },
-  { title: "FACCIÓN", key: "faccion.nombreFaccion" },
-  { title: "CIUDAD", key: "ciudad" },
+  { title: "Nick", key: "nick", align: "start" },
+  { title: "Facción", key: "faccion.nombreFaccion" },
+  { title: "Ciudad", key: "ciudad" },
 ];
+
+const provinces = computed(() => [
+  ...new Set(items.value.map((user) => user.ciudad).filter(Boolean)),
+]);
+
+const factions = computed(() => [
+  ...new Set(items.value.map((user) => user.faccion?.nombreFaccion).filter(Boolean)),
+]);
+
+const filteredItems = computed(() => {
+  return items.value.filter((user) => {
+    return (
+      (!selectedProvince.value || user.ciudad === selectedProvince.value) &&
+      (!selectedFaction.value || user.faccion?.nombreFaccion === selectedFaction.value) &&
+      (search.value === "" || user.nick.toLowerCase().includes(search.value.toLowerCase()))
+    );
+  });
+});
 
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
@@ -82,8 +116,8 @@ const goToUserDetail = (idUsuario: number) => {
 onMounted(async () => {
   try {
     isLoading.value = true;
-    items.value = [...props.usuarios];
-    items.value = items.value.sort((a, b) => a.nick.localeCompare(b.nick));
+    items.value = [...props.usuarios].sort((a, b) => a.nick.localeCompare(b.nick));
+    console.log("items.value:", items.value);
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
   } finally {
@@ -94,11 +128,14 @@ onMounted(async () => {
 
 <style scoped>
 .custom-table {
-  text-align: left;
-  background-color: rgb(55, 59, 59);
+  background-color: #2d2f33;
+  color: white;
 }
-
 .clickable-row {
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+.clickable-row:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 </style>
