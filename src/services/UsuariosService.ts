@@ -27,7 +27,6 @@ export const getUsuariosFast = async () => {
 };
 
 export const getUsuariosByTorneo = async (idTorneo: number) => {
-  console.log("getUsuariosByTorneo idTorneo: ", idTorneo)
   return http.get(`Usuario/torneo/${idTorneo}`);
 };
 

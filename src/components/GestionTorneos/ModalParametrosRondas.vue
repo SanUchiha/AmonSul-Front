@@ -164,7 +164,6 @@ import {
   getInfoTorneoCreado,
   getPartidasTorneoByRonda,
 } from "@/services/TorneosService";
-import { getUsuariosFast } from "@/services/UsuariosService";
 import { UsuarioFastDTO } from "@/interfaces/Usuario";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
@@ -261,9 +260,6 @@ onMounted(async () => {
       const totalRondas = torneoSelected.value.torneo.numeroPartidas;
       rondas.value = Array.from({ length: totalRondas }, (_, i) => i + 1);
     }
-
-    const responseJugadores = await getUsuariosFast();
-    jugadores.value = responseJugadores.data;
   } catch (error) {
     console.error("Error al obtener la información del torneo:", error);
   }

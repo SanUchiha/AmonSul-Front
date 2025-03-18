@@ -49,7 +49,7 @@ export interface UsuarioViewDTO {
   ciudad?: string;
   fechaRegistro: string;
   fechaNacimiento: string;
-  faccion: FaccionDTO;
+  faccion?: FaccionDTO;
   idFaccion?: number;
   telefono?: string;
   nickLGDA?: string;
@@ -89,7 +89,7 @@ export interface UsuarioDTO {
   idUsuario: number;
   nick: string;
   ciudad?: string | null;
-  faccion: FaccionDTO;
+  faccion?: FaccionDTO;
   imagen?: string;
 }
 
@@ -137,6 +137,11 @@ export interface UsuarioFastDTO {
   ciudad: string;
   faccion: FaccionDTO;
   idFaccion: number;
+  idUsuario: number;
+  nick: string;
+}
+
+export interface UsuarioSinEquipoDTO {
   idUsuario: number;
   nick: string;
 }

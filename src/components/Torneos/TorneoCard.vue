@@ -1,10 +1,16 @@
 <template>
   <v-card class="pa-3">
-    <v-img :src="torneo.cartelTorneo || require('@/assets/images/cartelMissing.jpg')" height="250px" class="rounded-lg" />
+    <v-img
+      :src="torneo.cartelTorneo || require('@/assets/images/cartelMissing.jpg')"
+      height="250px"
+      class="rounded-lg"
+    />
 
     <v-divider class="my-3"></v-divider>
 
-    <v-card-title class="ringbearer text-h6 text-center text-wrap font-weight-bold mt-3">
+    <v-card-title
+      class="ringbearer text-h6 text-center text-wrap font-weight-bold mt-3"
+    >
       {{ torneo.nombreTorneo }}
     </v-card-title>
     <v-card-subtitle class="text-center mb-3">
@@ -14,7 +20,10 @@
           {{ formattedAddress }}
         </a>
       </p>
-      <p v-else><v-icon left class="location-icon">mdi-map-marker</v-icon> {{ torneo.lugarTorneo }}</p>
+      <p v-else>
+        <v-icon left class="location-icon">mdi-map-marker</v-icon>
+        {{ torneo.lugarTorneo }}
+      </p>
     </v-card-subtitle>
 
     <v-divider class="my-3"></v-divider>
@@ -22,9 +31,19 @@
     <v-card-text>
       <v-row>
         <v-col cols="10" offset="1" class="text-left">
-          <p><v-icon left color="green">mdi-calendar</v-icon> <strong>Fecha:</strong> {{ fechaTorneo }} a las {{ torneo.horaInicioTorneo }}</p>  
-          <p><v-icon color="cyan">mdi-trophy</v-icon> <strong>Puntos:</strong> {{ torneo.puntosTorneo }}</p>
-          <p><v-icon color="cyan">mdi-format-list-bulleted</v-icon> <strong>Rondas:</strong> {{ torneo.numeroPartidas }}</p>
+          <p>
+            <v-icon left color="green">mdi-calendar</v-icon>
+            <strong>Fecha:</strong> {{ fechaTorneo }} a las
+            {{ torneo.horaInicioTorneo }}
+          </p>
+          <p>
+            <v-icon color="cyan">mdi-trophy</v-icon> <strong>Puntos:</strong>
+            {{ torneo.puntosTorneo }}
+          </p>
+          <p>
+            <v-icon color="cyan">mdi-format-list-bulleted</v-icon>
+            <strong>Rondas:</strong> {{ torneo.numeroPartidas }}
+          </p>
         </v-col>
       </v-row>
     </v-card-text>
@@ -34,15 +53,11 @@
     <v-card-actions class="d-flex justify-space-between">
       <v-row>
         <v-col cols="12" sm="6">
-          <v-btn
-            variant="tonal"
-            color="orange lighten-2"
-            @click="goToDetalle"
-          >
+          <v-btn variant="tonal" color="orange lighten-2" @click="goToDetalle">
             Ver Detalle
           </v-btn>
         </v-col>
-        <v-col v-if=(verClasificacion) cols="12" sm="6">
+        <v-col v-if="verClasificacion" cols="12" sm="6">
           <v-btn
             variant="tonal"
             color="blue lighten-2"
@@ -66,14 +81,15 @@ const props = defineProps<{ torneo: Torneo; verClasificacion: boolean }>();
 const router = useRouter();
 const fechaTorneo = ref<string>("");
 
-
 // Variables reactivas
 const formattedAddress = ref<string>("");
 
 // Computed property para generar el enlace a Google Maps
 const googleMapsUrl = computed(() => {
   if (!props.torneo.lugarTorneo) return "#";
-  return `https://www.google.com/maps?q=${parseFloat(props.torneo.lugarTorneo.split(", ")[0])},${parseFloat(props.torneo.lugarTorneo.split(", ")[1])}`;
+  return `https://www.google.com/maps?q=${parseFloat(
+    props.torneo.lugarTorneo.split(", ")[0]
+  )},${parseFloat(props.torneo.lugarTorneo.split(", ")[1])}`;
 });
 
 // Función para obtener dirección inversa desde coordenadas
@@ -86,7 +102,8 @@ const getAddress = async (lat: number, lon: number) => {
     if (data.address) {
       console.log(" data.address", data);
 
-      const { road, house_number, city, town, village, state, postcode } = data.address;
+      const { road, house_number, city, town, village, state, postcode } =
+        data.address;
 
       // Priorizar ciudad, pueblo o aldea
       const locationCity = city || town || village || "";
@@ -96,7 +113,7 @@ const getAddress = async (lat: number, lon: number) => {
         road ? `${road}${house_number ? `, ${house_number}` : ""}` : "",
         locationCity,
         state,
-        postcode
+        postcode,
       ]
         .filter(Boolean) // Eliminar valores vacíos
         .join(", "); // Unir con comas
@@ -116,12 +133,13 @@ const isValidCoordinates = (value: string): boolean => {
   return regex.test(value.trim());
 };
 
-
-
 onMounted(async () => {
   fechaTorneo.value = await formatFechaSpa(props.torneo.fechaInicioTorneo);
-  if (isValidCoordinates(props.torneo.lugarTorneo)){
-    getAddress(parseFloat(props.torneo.lugarTorneo.split(", ")[0]), parseFloat(props.torneo.lugarTorneo.split(", ")[1]));
+  if (isValidCoordinates(props.torneo.lugarTorneo)) {
+    getAddress(
+      parseFloat(props.torneo.lugarTorneo.split(", ")[0]),
+      parseFloat(props.torneo.lugarTorneo.split(", ")[1])
+    );
   }
 });
 
@@ -131,7 +149,6 @@ const goToDetalle = () => {
 const goToResultadoTorneo = () => {
   router.push(`/detalle-torneo-live/${props.torneo.idTorneo}`);
 };
-
 </script>
 
 <style scoped>

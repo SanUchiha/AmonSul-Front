@@ -763,7 +763,7 @@ const isModalEscenarioVisible = ref<boolean>(false);
 const isModalValidarVisible = ref<boolean>(false);
 const tabClasificacion = ref<number>();
 const route = useRoute();
-const idTorneo = ref<number>();
+const idTorneo = ref<number>(parseInt(route.params.idTorneo.toString()));
 const isLoading = ref<boolean>(false);
 const torneoGestion = ref<TorneoGestionInfoDTO | null>(null);
 const clasificacion = ref<Clasificacion[]>([]);
@@ -808,8 +808,6 @@ const wasSave = ref<boolean>(false);
 const idTorneoComputed = computed(() => idTorneo.value ?? 0);
 
 onMounted(async () => {
-  idTorneo.value = parseInt(route.params.idTorneo.toString());
-
   isLoading.value = true;
 
   try {

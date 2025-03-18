@@ -57,7 +57,7 @@
 import { JugadorParaEmparejamiento } from "@/interfaces/Live";
 import { TorneoGestionInfoDTO } from "@/interfaces/Torneo";
 import { ref, defineProps, defineEmits, watch, onMounted } from "vue";
-import { getUsuariosFast } from "@/services/UsuariosService";
+import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { UsuarioFastDTO } from "@/interfaces/Usuario";
 import { CrearInscripcionDTO } from "@/interfaces/Inscripcion";
 import { registrarInscripcion } from "@/services/InscripcionesService";
@@ -66,7 +66,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 
 const props = defineProps<{
   isVisible: boolean;
-  torneo: TorneoGestionInfoDTO | null;
+  torneo: TorneoGestionInfoDTO;
 }>();
 const emit = defineEmits(["close", "confirm"]);
 
@@ -119,10 +119,15 @@ const addJugador = async () => {
 
 onMounted(async () => {
   try {
-    const responseJugadores = await getUsuariosFast();
-    jugadores.value = responseJugadores.data;
+    const responseJugadores = await getUsuariosNoInscritosTorneoAsync(
+      props.torneo.torneo.idTorneo
+    );
+    jugadores.value = (responseJugadores?.data ?? []).sort(
+      (a: { nick: string }, b: { nick: string }) => a.nick.localeCompare(b.nick)
+    );
   } catch (error) {
     console.error("Error al obtener la información del torneo:", error);
+    jugadores.value = [];
   }
 });
 </script>

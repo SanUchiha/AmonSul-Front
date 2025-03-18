@@ -103,8 +103,7 @@
 
 <script setup lang="ts">
 import { InscripcionEquipoDTO } from "@/interfaces/Inscripcion";
-import { JugadorParaEmparejamiento } from "@/interfaces/Live";
-import { UsuarioFastDTO } from "@/interfaces/Usuario";
+import { UsuarioSinEquipoDTO } from "@/interfaces/Usuario";
 import { defineProps, defineEmits, computed, ref, onMounted } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { registrarEquipo } from "@/services/InscripcionesService";
@@ -119,9 +118,9 @@ const props = defineProps<{
 const emit = defineEmits(["update:isVisible"]);
 
 const teamName = ref<string>("");
-const jugadorSelected = ref<JugadorParaEmparejamiento | null>(null);
-const jugadores = ref<UsuarioFastDTO[]>([]);
-const selectedPlayers = ref<UsuarioFastDTO[]>([]);
+const jugadorSelected = ref<UsuarioSinEquipoDTO | null>(null);
+const jugadores = ref<UsuarioSinEquipoDTO[]>([]);
+const selectedPlayers = ref<UsuarioSinEquipoDTO[]>([]);
 const idsSelected = ref<number[]>([]);
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
@@ -148,7 +147,7 @@ const dialogVisible = computed({
 });
 
 // Agregar jugador seleccionado si no está ya en la lista
-const addPlayer = (player: UsuarioFastDTO) => {
+const addPlayer = (player: UsuarioSinEquipoDTO) => {
   if (
     player &&
     !selectedPlayers.value.find((p) => p.idUsuario === player.idUsuario) &&
@@ -234,11 +233,9 @@ onMounted(async () => {
     );
   } catch (error) {
     console.error("Error al obtener la información del torneo:", error);
-    jugadores.value = []; // Evitar que sea undefined
+    jugadores.value = [];
   }
 });
 </script>
 
-<style scoped>
-/* Puedes agregar estilos específicos aquí si es necesario */
-</style>
+<style scoped></style>

@@ -160,8 +160,6 @@ import {
 import { generarRonda } from "@/services/PartidaTorneoService";
 import { ref, defineProps, defineEmits, watch, onMounted, computed } from "vue";
 import { getInfoTorneoCreado } from "@/services/TorneosService";
-import { getUsuariosFast } from "@/services/UsuariosService";
-import { UsuarioFastDTO } from "@/interfaces/Usuario";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 
@@ -198,7 +196,6 @@ const jugador2 = ref<JugadorParaEmparejamiento>();
 const rondas = ref<number[]>();
 const isGenerating = ref<boolean>(false);
 const torneoSelected = ref<TorneoGestionInfoDTO>();
-const jugadores = ref<UsuarioFastDTO[]>();
 
 const errorRonda = ref<string | null>(null);
 const showErrorModal = ref<boolean>(false);
@@ -253,9 +250,6 @@ onMounted(async () => {
       const totalRondas = torneoSelected.value.torneo.numeroPartidas;
       rondas.value = Array.from({ length: totalRondas }, (_, i) => i + 1);
     }
-
-    const responseJugadores = await getUsuariosFast();
-    jugadores.value = responseJugadores.data;
   } catch (error) {
     console.error("Error al obtener la información del torneo:", error);
   }

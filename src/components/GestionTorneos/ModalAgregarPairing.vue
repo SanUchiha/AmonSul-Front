@@ -73,7 +73,7 @@
 <script setup lang="ts">
 import { ref, defineEmits, watch, defineProps, onMounted } from "vue";
 import { UsuarioFastDTO } from "@/interfaces/Usuario";
-import { getUsuariosFast } from "@/services/UsuariosService";
+import { getUsuariosByTorneo } from "@/services/UsuariosService";
 import {
   AddPairingTorneoDTO,
   RequestAddPairingTorneoDTO,
@@ -84,7 +84,7 @@ import ModalError from "../Commons/ModalError.vue";
 
 const props = defineProps<{
   isVisible: boolean;
-  idTorneo: number | undefined;
+  idTorneo: number;
   idRonda: number;
 }>();
 
@@ -92,7 +92,7 @@ const emit = defineEmits(["cerrar"]);
 
 const isModalAgregarPairingVisible = ref<boolean>(props.isVisible);
 const pairingAgregado = ref<AddPairingTorneoDTO>({
-  idTorneo: props.idTorneo!,
+  idTorneo: props.idTorneo,
   idRonda: props.idRonda,
 });
 const isFormValid = ref<boolean>(false);
@@ -179,7 +179,7 @@ const changeJugador = async () => {
 
 onMounted(async () => {
   try {
-    const responseJugadores = await getUsuariosFast();
+    const responseJugadores = await getUsuariosByTorneo(props.idTorneo);
 
     // Mapeamos el array de jugadores para obtener solo el idUsuario y el nick
     jugadores.value = responseJugadores.data.map((jugador: UsuarioFastDTO) => ({

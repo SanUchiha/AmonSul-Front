@@ -445,11 +445,11 @@ import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vu
 const { getidUsuario } = useAuth();
 const route = useRoute();
 const router = useRouter();
+const idTorneo = ref<number>(parseInt(route.params.idTorneo as string));
 
 const torneo = ref<Torneo>();
 const participantes = ref<InscripcionUsuarioIndividualDTO[]>([]);
 const idUsuario = ref<string | null>(getidUsuario.value);
-const idTorneo = ref<number>(0);
 const estaApuntado = ref<boolean>(false);
 const isTorneoCompletado = ref<boolean>(false);
 const idInscripcion = ref<number>(0);

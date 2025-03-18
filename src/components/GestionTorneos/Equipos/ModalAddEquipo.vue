@@ -56,7 +56,7 @@
 <script setup lang="ts">
 import { JugadorParaEmparejamiento } from "@/interfaces/Live";
 import { ref, defineProps, defineEmits, watch, onMounted } from "vue";
-import { getUsuariosFast } from "@/services/UsuariosService";
+import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { UsuarioFastDTO } from "@/interfaces/Usuario";
 import {
   CrearInscripcionDTO,
@@ -68,7 +68,7 @@ import ModalError from "@/components/Commons/ModalError.vue";
 
 const props = defineProps<{
   isVisible: boolean;
-  torneo: TorneoEquipoGestionInfoDTO | null;
+  torneo: TorneoEquipoGestionInfoDTO;
 }>();
 const emit = defineEmits(["close", "confirm"]);
 
@@ -121,7 +121,9 @@ const addJugador = async () => {
 
 onMounted(async () => {
   try {
-    const responseJugadores = await getUsuariosFast();
+    const responseJugadores = await getUsuariosNoInscritosTorneoAsync(
+      props.torneo.torneo.idTorneo
+    );
     jugadores.value = responseJugadores.data;
   } catch (error) {
     console.error("Error al obtener la información del torneo:", error);
