@@ -4,13 +4,12 @@
       <v-card-title class="text-h5">Registrar Equipo</v-card-title>
       <v-card-text>
         <p>Registra a tu equipo para el torneo.</p>
-        <p>Puedes añadir un máximo de {{ maxPlayers - 1 }} participantes.</p>
+        <p>Debes añadir un máximo de {{ maxPlayers - 1 }} participantes.</p>
         <p>
-          Tu serás el capitán del equipo, Amon Sûl te añadirá automaticamente a
+          Tu serás el capitán del equipo, Amon Sûl te añadirá automáticamente a
           tu equipo.
         </p>
 
-        <!-- Campo para ingresar el nombre del equipo -->
         <v-text-field
           v-model="teamName"
           label="Nombre del equipo"
@@ -19,7 +18,6 @@
         ></v-text-field>
 
         <v-form>
-          <!-- Selección de jugadores según el tipo de torneo -->
           <v-combobox
             v-model="jugadorSelected"
             :items="jugadores"
@@ -29,9 +27,9 @@
             outlined
             required
             @update:modelValue="addPlayer"
+            :return-object="true"
           ></v-combobox>
 
-          <!-- Lista de jugadores seleccionados -->
           <div v-show="selectedPlayers.length">
             <p>Jugadores seleccionados:</p>
             <v-chip
@@ -52,28 +50,24 @@
         <v-btn variant="tonal" color="primary" @click="submitForm"
           >Registrar equipo</v-btn
         >
-        <v-btn variant="tonal" color="secondary" @click="closeDialog">
-          Cerrar
-        </v-btn>
+        <v-btn variant="tonal" color="secondary" @click="closeDialog"
+          >Cerrar</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
 
-  <!-- Modal Success -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Equipo registrado con exito."
+    message="Equipo registrado con éxito."
     @update:isVisible="showSuccessModal = $event"
   />
-
-  <!-- Modal Error -->
   <ModalError
     :isVisible="showErrorModal"
     message="No se ha podido registrar el equipo. Contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
 
-  <!-- Spinner Modal -->
   <v-dialog v-model="isRegistering" persistent width="300">
     <v-card>
       <v-card-text
@@ -89,7 +83,6 @@
     </v-card>
   </v-dialog>
 
-  <!-- SnackBar -->
   <v-snackbar
     color="red-darken-2"
     :timeout="snackBarTimeOut"
@@ -102,43 +95,43 @@
 </template>
 
 <script setup lang="ts">
-import { InscripcionEquipoDTO } from "@/interfaces/Inscripcion";
-import { UsuarioSinEquipoDTO } from "@/interfaces/Usuario";
-import { defineProps, defineEmits, computed, ref, onMounted } from "vue";
+import { ref, computed, defineProps, defineEmits, onMounted } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { registrarEquipo } from "@/services/InscripcionesService";
 import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
+import { InscripcionEquipoDTO } from "@/interfaces/Inscripcion";
+import { UsuarioSinEquipoDTO } from "@/interfaces/Usuario";
 
 const props = defineProps<{
   isVisible: boolean;
   tipoTorneo: string | undefined;
   idTorneo: number;
 }>();
-
 const emit = defineEmits(["update:isVisible"]);
 
-const teamName = ref<string>("");
+const teamName = ref("");
 const jugadorSelected = ref<UsuarioSinEquipoDTO | null>(null);
 const jugadores = ref<UsuarioSinEquipoDTO[]>([]);
 const selectedPlayers = ref<UsuarioSinEquipoDTO[]>([]);
 const idsSelected = ref<number[]>([]);
+const isRegistering = ref(false);
+const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
+const snackBarShow = ref(false);
+const snackBarMessage = ref("");
+const snackBarTimeOut = ref(3000);
+
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
-const isRegistering = ref<boolean>(false);
-const showSuccessModal = ref<boolean>(false);
-const showErrorModal = ref<boolean>(false);
-const isSuccess = ref<boolean>(false);
 
-const snackBarShow = ref<boolean>(false);
-const snackBarMessage = ref<string>("");
-const snackBarTimeOut = ref<number>(3000);
-
-// Determina la cantidad máxima de jugadores según el tipo de torneo
 const maxPlayers = computed(() => {
-  if (props.tipoTorneo === "Parejas") return 2;
-  if (props.tipoTorneo === "Equipos_4") return 4;
-  if (props.tipoTorneo === "Equipos_6") return 6;
-  return 0;
+  return props.tipoTorneo === "Parejas"
+    ? 2
+    : props.tipoTorneo === "Equipos_4"
+    ? 4
+    : props.tipoTorneo === "Equipos_6"
+    ? 6
+    : 0;
 });
 
 const dialogVisible = computed({
@@ -146,20 +139,17 @@ const dialogVisible = computed({
   set: (value) => emit("update:isVisible", value),
 });
 
-// Agregar jugador seleccionado si no está ya en la lista
 const addPlayer = (player: UsuarioSinEquipoDTO) => {
   if (
     player &&
-    !selectedPlayers.value.find((p) => p.idUsuario === player.idUsuario) &&
-    selectedPlayers.value.length < maxPlayers.value - 1
+    !selectedPlayers.value.some((p) => p.idUsuario === player.idUsuario)
   ) {
     selectedPlayers.value.push(player);
     idsSelected.value.push(player.idUsuario);
   }
-  jugadorSelected.value = null; // Resetea el combobox después de seleccionar un jugador
+  jugadorSelected.value = null;
 };
 
-// Remover jugador de la lista
 const removePlayer = (index: number) => {
   selectedPlayers.value.splice(index, 1);
   idsSelected.value.splice(index, 1);
@@ -167,7 +157,7 @@ const removePlayer = (index: number) => {
 
 const validateForm = () => {
   if (!teamName.value.trim()) {
-    snackBarMessage.value = "El nombre es obligatorio";
+    snackBarMessage.value = "El nombre del equipo es obligatorio";
     snackBarShow.value = true;
     return false;
   }
@@ -178,11 +168,10 @@ const validateForm = () => {
   return true;
 };
 
-// Función para manejar el registro del equipo
 const submitForm = async () => {
   if (!validateForm()) return;
   if (props.idTorneo && idUsuarioLogger.value) {
-    const id: number = parseInt(idUsuarioLogger.value);
+    const id = parseInt(idUsuarioLogger.value);
     const inscripcionEquipo: InscripcionEquipoDTO = {
       idTorneo: props.idTorneo,
       idCapitan: id,
@@ -199,7 +188,6 @@ const submitForm = async () => {
       isRegistering.value = true;
       await registrarEquipo(inscripcionEquipo);
       showSuccessModal.value = true;
-      isSuccess.value = true;
       emit("update:isVisible", false);
       window.location.reload();
     } catch (error) {
@@ -212,15 +200,11 @@ const submitForm = async () => {
   }
 };
 
-const resetForm = () => {
+const closeDialog = () => {
+  emit("update:isVisible", false);
   teamName.value = "";
   selectedPlayers.value = [];
   idsSelected.value = [];
-};
-
-const closeDialog = () => {
-  emit("update:isVisible", false);
-  resetForm();
 };
 
 onMounted(async () => {
@@ -228,11 +212,11 @@ onMounted(async () => {
     const responseJugadores = await getUsuariosNoInscritosTorneoAsync(
       props.idTorneo
     );
-    jugadores.value = (responseJugadores?.data ?? []).sort(
-      (a: { nick: string }, b: { nick: string }) => a.nick.localeCompare(b.nick)
+    jugadores.value = (responseJugadores?.data ?? []).sort((a, b) =>
+      a.nick.localeCompare(b.nick)
     );
   } catch (error) {
-    console.error("Error al obtener la información del torneo:", error);
+    console.error("Error al obtener jugadores: ", error);
     jugadores.value = [];
   }
 });
