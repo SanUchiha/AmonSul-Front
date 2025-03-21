@@ -127,7 +127,7 @@ export interface ModificarTorneoDTO {
   metodosPago?: string;
   horaInicioTorneo?: string; // formato de hora "HH:mm:ss"
   horaFinTorneo?: string; // formato de hora "HH:mm:ss"
-  inicioInscripciones: string; // Fecha límite de inscripción
+  inicioInscripciones?: string; // Fecha límite de inscripción
 }
 
 export interface ModificarBasesTorneoDTO {

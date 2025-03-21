@@ -92,6 +92,15 @@
             type="text"
             clearable
           ></v-textarea>
+          <v-text-field
+            v-model="fechaInicioInscripcion"
+            label="Inicio de las inscripciones"
+            type="date"
+            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            required
+            clearable
+            @dateChanged="handleDateChangeInicioInscripcion"
+          ></v-text-field>
           <!-- Último día para apuntarse -->
           <DatePicker
             v-model="showFechaFinInscripcion"
@@ -236,6 +245,9 @@ const handleDateChangeInscripcion = (newDate: string | null) => {
 const handleDateChangeListas = (newDate: string | null) => {
   if (newDate) fechaListas.value = convertirFecha(newDate);
 };
+const handleDateChangeInicioInscripcion = (newDate: string | null) => {
+  if (newDate) fechaInicioInscripcion.value = convertirFecha(newDate);
+};
 const nombreTorneo = ref<string>();
 const limiteParticipantes = ref<number>();
 const descripcionTorneo = ref<string>();
@@ -255,6 +267,7 @@ const showFechaFinInscripcion = ref<boolean>(false);
 const metodosPago = ref<string[]>([]);
 const horaInicioTorneo = ref<string>("00:00");
 const horaFinTorneo = ref<string>("00:00");
+const fechaInicioInscripcion = ref<string>();
 
 const fechaInicio = ref<string>();
 const fechaFin = ref<string>();
@@ -437,6 +450,16 @@ const confirmarConfiguracion = async () => {
       )
     : null;
 
+  const tiposValidos = [
+    "Parejas",
+    "Equipos_4",
+    "Equipos_6",
+    "Individual",
+  ] as const;
+  const tipoValido = tiposValidos.includes(tipoTorneo.value as any)
+    ? (tipoTorneo.value as "Parejas" | "Equipos_4" | "Equipos_6" | "Individual")
+    : "Individual"; // O un valor por defecto
+
   const nuevoTorneo: ModificarTorneoDTO = {
     nombreTorneo: nombreTorneo.value,
     limiteParticipantes: limiteParticipantes.value,
@@ -447,7 +470,7 @@ const confirmarConfiguracion = async () => {
     puntosTorneo: puntosTorneo.value,
     estadoTorneo: estadoTorneo.value,
     lugarTorneo: lugarTorneo.value,
-    tipoTorneo: tipoTorneo.value,
+    tipoTorneo: tipoValido,
     esLiga: esLiga.value,
     idRangoTorneo: idRangoTorneo.value,
     esMatchedPlayTorneo: esMatchedPlayTorneo.value,
@@ -459,6 +482,7 @@ const confirmarConfiguracion = async () => {
     basesTorneo: basesTorneoBase64!,
     descripcionTorneo: descripcionTorneo.value,
     idTorneo: props.torneo?.idTorneo,
+    inicioInscripciones: fechaInicioInscripcion.value,
   };
   try {
     isGenerating.value = true;

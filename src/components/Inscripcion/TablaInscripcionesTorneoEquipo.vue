@@ -129,9 +129,9 @@ import { InscripcionUsuarioEquipoDTO } from "@/interfaces/Inscripcion";
 import router from "@/router";
 import {
   cancelarInscripcion,
-  eliminarEquipo,
   getInscripcionesEquipoByUser,
   getInscripcionesIndividualByUser,
+  eliminarEquipoAsync,
 } from "@/services/InscripcionesService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
@@ -174,7 +174,7 @@ const VerResultadoTorneo = (idTorneo: number) => {
 const eliminarInscripcionEquipo = async (idEquipo: number) => {
   isRegistering.value = true;
   try {
-    const response = await eliminarEquipo(idEquipo);
+    const response = await eliminarEquipoAsync(idEquipo);
 
     if (response.request?.status === 200) {
       showSuccessModal.value = true;

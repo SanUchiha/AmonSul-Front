@@ -5,17 +5,23 @@
       <p>Capitán: {{ equipo.nickCapitan }}</p>
       <p>Email: {{ equipo.emailCapitan }}</p>
       <p>Pago: {{ equipo.esPago }}</p>
-      <button
+      <v-btn
         v-show="equipo.esPago == 'NO'"
+        variant="tonal"
         class="btn actualizar"
         @click.stop="actualizarPago"
       >
         ACTUALIZAR PAGO
-      </button>
+      </v-btn>
       <p></p>
       <p>
         Fecha de inscripción:
         {{ convertirFecha(equipo.fechaInscripcion!) }}
+      </p>
+      <p>
+        <v-btn color="red darken" variant="tonal" @click="eliminarEquipo"
+          >eliminar equipo</v-btn
+        >
       </p>
     </div>
 
@@ -73,6 +79,13 @@
     @update:isVisible="showSuccessModalPago = $event"
   />
 
+  <!-- Modal response estado pago -->
+  <ModalSuccess
+    :isVisible="showSuccessModalEliminarEquipo"
+    message="Equipo eliminado."
+    @update:isVisible="showSuccessModalPago = $event"
+  />
+
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
@@ -97,7 +110,10 @@ import { ref } from "vue";
 import { defineProps } from "vue";
 import type { EquipoDTO } from "@/interfaces/Inscripcion";
 import { convertirFecha } from "@/utils/Fecha";
-import { updateEstadoPagoEquipo } from "@/services/InscripcionesService";
+import {
+  eliminarEquipoAsync,
+  updateEstadoPagoEquipo,
+} from "@/services/InscripcionesService";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
 
@@ -106,6 +122,8 @@ const props = defineProps<{ equipo: EquipoDTO }>();
 const isExpanded = ref(false);
 const isLoading = ref<boolean>(false);
 const showSuccessModalPago = ref<boolean>(false);
+const showSuccessModalEliminarEquipo = ref<boolean>(false);
+
 const showErrorModal = ref<boolean>(false);
 
 const toggleExpand = () => {
@@ -138,6 +156,21 @@ const actualizarPago = async () => {
     isLoading.value = false;
   } finally {
     isLoading.value = false;
+  }
+};
+
+const eliminarEquipo = async () => {
+  isLoading.value = true;
+  try {
+    await eliminarEquipoAsync(props.equipo.idEquipo);
+    showSuccessModalEliminarEquipo.value = true;
+    isLoading.value = false;
+  } catch (error) {
+    showErrorModal.value = true;
+    isLoading.value = false;
+  } finally {
+    isLoading.value = false;
+    window.location.reload();
   }
 };
 </script>

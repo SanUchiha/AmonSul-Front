@@ -7,6 +7,7 @@
         @click="openAddJugadorModal"
         color="secondary"
         size="large"
+        disabled
       >
         Añadir Equipo
       </v-btn>
@@ -15,6 +16,7 @@
         @click="openConfigModal"
         color="primary"
         size="large"
+        disabled
       >
         Generar Ronda 1
       </v-btn>

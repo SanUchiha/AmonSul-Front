@@ -212,8 +212,8 @@ onMounted(async () => {
     const responseJugadores = await getUsuariosNoInscritosTorneoAsync(
       props.idTorneo
     );
-    jugadores.value = (responseJugadores?.data ?? []).sort((a, b) =>
-      a.nick.localeCompare(b.nick)
+    jugadores.value = (responseJugadores?.data ?? []).sort(
+      (a: { nick: string }, b: { nick: string }) => a.nick.localeCompare(b.nick)
     );
   } catch (error) {
     console.error("Error al obtener jugadores: ", error);

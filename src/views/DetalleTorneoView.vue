@@ -430,7 +430,7 @@ import {
   getInscripcionesTorneo,
   registrarInscripcion,
   cancelarInscripcion,
-  eliminarEquipo,
+  eliminarEquipoAsync,
 } from "@/services/InscripcionesService";
 import { useAuth } from "@/composables/useAuth";
 import {
@@ -642,7 +642,7 @@ const eliminarInscripcionEquipo = async (
     return;
   }
   try {
-    const response = await eliminarEquipo(idEquipo);
+    const response = await eliminarEquipoAsync(idEquipo);
 
     if (response.request?.status === 200) {
       messageSuccess.value = "Equipo eliminado con exito.";

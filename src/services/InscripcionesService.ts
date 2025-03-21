@@ -25,7 +25,7 @@ export const cancelarInscripcion = async (idInscripcion: number) => {
   return http.delete(`Inscripcion/${idInscripcion}`);
 };
 
-export const eliminarEquipo = async (idEquipo: number) => {
+export const eliminarEquipoAsync = async (idEquipo: number) => {
   return http.delete(`Inscripcion/equipo/${idEquipo}`);
 };
 
