@@ -5,6 +5,14 @@
       <p>Capitán: {{ equipo.nickCapitan }}</p>
       <p>Email: {{ equipo.emailCapitan }}</p>
       <p>Pago: {{ equipo.esPago }}</p>
+      <button
+        v-show="equipo.esPago == 'NO'"
+        class="btn actualizar"
+        @click.stop="actualizarPago"
+      >
+        ACTUALIZAR PAGO
+      </button>
+      <p></p>
       <p>
         Fecha de inscripción:
         {{ convertirFecha(equipo.fechaInscripcion!) }}
@@ -19,13 +27,14 @@
           class="inscripcion-card"
         >
           <div class="chips">
-            <span class="chip chip-ejercito">
+            <span class="chip chip-estado">{{ inscripcion.nick }}</span>
+            <span v-show="inscripcion.listaData" class="chip chip-ejercito">
               {{ inscripcion.ejercito }}
             </span>
-            <span class="chip chip-estado">
-              {{ inscripcion.estadoLista }}
-            </span>
-            <span class="chip chip-fecha">
+            <span class="chip chip-estado"
+              >Lista: {{ inscripcion.estadoLista }}</span
+            >
+            <span v-show="inscripcion.listaData" class="chip chip-fecha">
               {{ inscripcion.fechaEntregaLista }}
             </span>
           </div>
@@ -56,6 +65,31 @@
       </div>
     </transition>
   </div>
+
+  <!-- Modal response estado pago -->
+  <ModalSuccess
+    :isVisible="showSuccessModalPago"
+    message="Estado del pago actualizado."
+    @update:isVisible="showSuccessModalPago = $event"
+  />
+
+  <!-- Modal response si error -->
+  <ModalError
+    :isVisible="showErrorModal"
+    message="No se ha podido actualizar la inscripción. Contacta con el administrador."
+    @update:isVisible="showErrorModal = $event"
+  />
+
+  <!-- Modal de Carga -->
+  <v-dialog v-model="isLoading" hide-overlay persistent>
+    <v-card class="progress-card">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="70"
+      ></v-progress-circular>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -63,42 +97,61 @@ import { ref } from "vue";
 import { defineProps } from "vue";
 import type { EquipoDTO } from "@/interfaces/Inscripcion";
 import { convertirFecha } from "@/utils/Fecha";
+import { updateEstadoPagoEquipo } from "@/services/InscripcionesService";
+import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
+import ModalError from "@/components/Commons/ModalError.vue";
 
 const props = defineProps<{ equipo: EquipoDTO }>();
 
-// Controla si la card está expandida o no
 const isExpanded = ref(false);
+const isLoading = ref<boolean>(false);
+const showSuccessModalPago = ref<boolean>(false);
+const showErrorModal = ref<boolean>(false);
 
 const toggleExpand = () => {
   isExpanded.value = !isExpanded.value;
 };
 
-// Métodos para manejar acciones
 const verLista = (listaData: string) => {
   console.log("Ver lista de: ", listaData);
-  // Aquí puedes emitir un evento o abrir un modal con la información
 };
 
 const modificarLista = (idInscripcion: number) => {
   console.log("Modificar lista: ", idInscripcion);
-  // Aquí puedes emitir un evento para modificar la lista
 };
 
 const cambiarEstadoLista = (idInscripcion: number) => {
   console.log("Modificar lista: ", idInscripcion);
-  // Aquí puedes emitir un evento para modificar la lista
+};
+
+const actualizarPago = async () => {
+  isLoading.value = true;
+  try {
+    await updateEstadoPagoEquipo({
+      idEquipo: props.equipo.idEquipo,
+      esPago: "SI",
+    });
+    showSuccessModalPago.value = true;
+    isLoading.value = false;
+  } catch (error) {
+    showErrorModal.value = true;
+    isLoading.value = false;
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>
 
 <style scoped>
 .card {
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   border: 1px solid #ddd;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   margin-bottom: 12px;
+  background: rgb(44, 44, 44);
 }
 
 .card:hover {
@@ -108,7 +161,12 @@ const cambiarEstadoLista = (idInscripcion: number) => {
 .card-header {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+}
+
+.btn.actualizar {
+  background: #5cb85c;
+  color: white;
 }
 
 .card-title {
@@ -123,21 +181,21 @@ const cambiarEstadoLista = (idInscripcion: number) => {
 
 .inscripcion-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border-radius: 8px;
+  flex-direction: column;
+  padding: 12px;
+  border-radius: 10px;
   margin-bottom: 8px;
 }
 
 .chips {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 8px;
 }
 
 .chip {
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 16px;
   font-size: 14px;
   font-weight: 500;
@@ -150,32 +208,34 @@ const cambiarEstadoLista = (idInscripcion: number) => {
 }
 
 .chip-estado {
-  background: #f0ad4e;
-  color: #8a6d3b;
+  background: #9e6d28;
+  color: black;
 }
 
 .chip-fecha {
-  background: #dff0d8;
+  background: #9e6d28;
   color: #3c763d;
 }
 
 .buttons {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .btn {
-  padding: 6px 12px;
+  padding: 8px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   transition: background 0.3s ease-in-out;
+  width: 100%;
 }
 
 .btn.ver {
   background: #5bc0de;
-  color: white;
+  color: black;
 }
 
 .btn.ver:hover {
@@ -184,11 +244,26 @@ const cambiarEstadoLista = (idInscripcion: number) => {
 
 .btn.modificar {
   background: #f0ad4e;
-  color: white;
+  color: black;
 }
 
 .btn.modificar:hover {
   background: #ec971f;
+  color: black;
+}
+
+@media (min-width: 600px) {
+  .inscripcion-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .buttons {
+    flex-direction: row;
+  }
+  .btn {
+    width: auto;
+  }
 }
 
 /* Animación de expansión */

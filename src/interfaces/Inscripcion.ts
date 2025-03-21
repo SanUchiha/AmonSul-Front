@@ -43,6 +43,11 @@ export interface UpdateEstadoPagoDTO {
   esPago: string;
 }
 
+export interface UpdateEstadoPagoEquipoDTO {
+  idEquipo: number;
+  esPago: string;
+}
+
 export interface InscripcionEquipoDTO {
   idTorneo: number;
   idCapitan: number;

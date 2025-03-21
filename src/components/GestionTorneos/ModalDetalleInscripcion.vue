@@ -292,7 +292,7 @@ const toggleLista = async () => {
   isLoading.value = true;
   // Traer la lista del back
   const requestLista: ListaTorneoRequestDTO = {
-    idTorneo: localInscripcion.value.idTorneo!,
+    idTorneo: localInscripcion.value.torneo!.idTorneo,
     idUsuario: localInscripcion.value.idUsuario!,
   };
   try {
@@ -359,9 +359,10 @@ const enviarLista = async (newLista: RequesListaDTO) => {
     const requestLista: CrearListaTorneoRequestDTO = {
       idInscripcion: localInscripcion.value.idInscripcion!,
       idUsuario: localInscripcion.value.idUsuario!,
-      idTorneo: localInscripcion.value.idTorneo!,
+      idTorneo: localInscripcion.value.torneo?.idTorneo,
       listaData: newLista.listaData,
       ejercito: newLista.ejercito,
+      nick: "",
     };
     try {
       await subirListaTorneo(requestLista);
