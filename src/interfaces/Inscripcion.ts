@@ -1,3 +1,5 @@
+import { TorneoReducidoDTO } from "./Torneo";
+
 export interface CrearInscripcionDTO {
   idTorneo: number;
   idUsuario: number;
@@ -14,17 +16,18 @@ export interface InscripcionUsuarioIndividualDTO {
   estadoLista: string;
   fechaEntregaLista: string;
   esPago: boolean;
-  nombreTorneo: string;
+  torneo: TorneoReducidoDTO;
   idEquipo?: number;
 }
 
 export interface InscripcionUsuarioEquipoDTO {
   idInscripcion: number;
   idTorneo: number;
+  nombreTorneo: string;
   idUsuario: number;
   nick: string;
-  nombreTorneo: string;
   idEquipo: number;
+  torneo: TorneoReducidoDTO;
 }
 
 export interface Equipo {

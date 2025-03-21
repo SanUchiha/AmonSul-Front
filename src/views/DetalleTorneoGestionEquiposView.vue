@@ -24,9 +24,9 @@
             </v-tabs>
 
             <!-- Contenido de las Tabs -->
-            <v-tabs-window v-model="activeTab">
+            <v-window v-model="activeTab">
               <!-- tab Gestion -->
-              <v-tabs-window-item :value="0" :key="0">
+              <v-window-item :value="0" :key="0">
                 <div>
                   <CardGestionInfoTorneoEquipo :torneo="torneoGestion" />
                   <CardGestionAccionesTorneoEquipo :torneo="torneoGestion" />
@@ -39,7 +39,7 @@
                     />
                   </div>
                 </div>
-              </v-tabs-window-item>
+              </v-window-item>
 
               <div
                 v-if="isRondaValidada(activeTab)"
@@ -423,7 +423,7 @@
               </v-tabs-item>
 
               <!-- Tab clasificacion -->
-              <v-tabs-window-item
+              <v-window-item
                 :value="tabClasificacion"
                 :key="tabClasificacion"
               >
@@ -563,8 +563,8 @@
                   </div>
                   <div v-else><p>Esperando resultados...</p></div>
                 </div>
-              </v-tabs-window-item>
-            </v-tabs-window>
+              </v-window-item>
+            </v-window>
           </v-card>
         </div>
       </v-col>

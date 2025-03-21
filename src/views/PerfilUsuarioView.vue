@@ -64,7 +64,7 @@ const usuariosStore = useUsuariosStore();
 
 const isLoading = ref(true);
 const { getUser } = useAuth();
-const email = ref<string>(await getUser.value!);
+const correo = ref<string>(await getUser.value!);
 const selectedFaccionName = ref<number>(0);
 const showModalCambiarPass = ref(false);
 const user = ref<UsuarioViewDTO>();
@@ -83,8 +83,8 @@ const cargarUsuario = async () => {
   try {
     isLoading.value = true;
     if (props.email==""){
-      console.log("email.email:", email.value);
-      await usuariosStore.requestUsuario(email.value);
+      console.log("email.email:", correo.value);
+      await usuariosStore.requestUsuario(correo.value);
     }
     else{
       console.log("props.email:", props.email);
@@ -101,8 +101,10 @@ const cargarUsuario = async () => {
 
 // Ejecutar cuando el componente se monta
 onMounted(() => {
+  if (correo.value){
     console.log("onMounted ejecutado");
     cargarUsuario();
+  }
 });
 
 // Observar cambios en la prop `email` y recargar datos

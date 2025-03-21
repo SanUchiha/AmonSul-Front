@@ -28,6 +28,16 @@ export interface Torneo {
   inicioInscripciones: string; // Fecha límite de inscripción
 }
 
+export interface TorneoReducidoDTO {
+  idTorneo: number; // Identificador único del torneo (PK)
+  nombreTorneo: string; // Nombre del torneo
+  limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
+  fechaFinTorneo: string; // Fecha de fin del torneo
+  numeroPartidas: number; // Número de partidas del torneo
+  puntosTorneo: number; // Puntos asignados al torneo
+  tipoTorneo: string; // Tipo de torneo
+}
+
 export interface TorneoPropioDTO {
   idTorneo: number; // Identificador único del torneo (PK)
   idUsuario: number; // ID del usuario administrador del torneo (FK)

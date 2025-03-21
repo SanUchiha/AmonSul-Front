@@ -6,22 +6,49 @@
     <v-card class="mb-0 pb-0 text-center">
       <v-card-title class="ringbearer">Mis inscripciones</v-card-title>
 
-      <v-card-text>
-        <TablaInscripcionesTorneoIndividual
-          :isLoading="isLoading"
-          :listaTorneos="inscripcionesIndividual || []"
-          :idUsuario="idUsuario"
-        />
-      </v-card-text>
-      <v-card-text>
-        <TablaInscripcionesTorneoEquipo
-          :isLoading="isLoading"
-          :listaTorneos="inscripcionesEquipo || []"
-          :idUsuario="idUsuario"
-        />
-      </v-card-text>
+      <v-divider class="mt-3"></v-divider>
 
-      <v-card-text class="d-flex justify-center"> </v-card-text>
+      <v-tabs v-model="tab" background-color="primary" dark grow>
+        <v-tab value="sin-disputar">Sin disputar</v-tab>
+        <v-tab value="disputados">Disputados</v-tab>
+      </v-tabs>
+
+      <v-tabs-window v-model="tab">
+          <!-- Torneos sin disputar -->
+          <v-tabs-window-item value="sin-disputar" v-if="tab === 'sin-disputar'">
+            <v-card-text>
+              <TablaInscripcionesTorneoIndividual
+                :isLoading="isLoading"
+                :listaTorneos="(inscripcionesIndividual ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) >= new Date())"
+                :idUsuario="idUsuario"
+              />
+            </v-card-text>
+            <v-card-text>
+              <TablaInscripcionesTorneoEquipo
+                :isLoading="isLoading"
+                :listaTorneos="(inscripcionesEquipo ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) >= new Date())"
+                :idUsuario="idUsuario"
+              />
+            </v-card-text>
+          </v-tabs-window-item>
+          <!-- Torneos disputados -->
+          <v-tabs-window-item value="disputados" v-if="tab === 'disputados'">
+            <v-card-text>
+              <TablaInscripcionesTorneoIndividual
+                :isLoading="isLoading"
+                :listaTorneos="(inscripcionesIndividual ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) < new Date())"
+                :idUsuario="idUsuario"
+              />
+            </v-card-text>
+            <v-card-text>
+              <TablaInscripcionesTorneoEquipo
+                :isLoading="isLoading"
+                :listaTorneos="(inscripcionesEquipo ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) < new Date())"
+                :idUsuario="idUsuario"
+              />
+            </v-card-text>
+          </v-tabs-window-item>
+      </v-tabs-window>
     </v-card>
   </div>
 </template>
@@ -46,7 +73,8 @@ const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string>(getidUsuario.value || "");
 const inscripcionesIndividual = ref<InscripcionUsuarioIndividualDTO[]>();
 const inscripcionesEquipo = ref<InscripcionUsuarioEquipoDTO[]>();
-
+const tab = ref("sin-disputar");
+  
 const idUsuario = ref<number>(parseInt(idUsuarioLogger.value));
 
 onMounted(async () => {
