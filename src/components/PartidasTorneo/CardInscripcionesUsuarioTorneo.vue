@@ -3,7 +3,7 @@
     <ProgressCircular />
   </div>
   <div v-else class="center">
-    <v-card class="mb-0 pb-0 text-center">
+    <v-card class="mb-0 pl-4 pr-4 text-center">
       <v-card-title class="ringbearer">Mis inscripciones</v-card-title>
 
       <v-divider class="mt-3"></v-divider>

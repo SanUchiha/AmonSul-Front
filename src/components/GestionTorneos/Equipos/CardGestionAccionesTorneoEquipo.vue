@@ -1,30 +1,26 @@
 <template>
-  <v-card v-if="torneo" class="mb-4">
-    <!-- boton para generar los pairing pasandole el id del torneo -->
-    <v-row justify="center" class="my-4 ga-5">
-      <v-btn
-        variant="tonal"
-        @click="openAddJugadorModal"
-        color="secondary"
-        size="large"
-        disabled
-      >
-        Añadir Equipo
-      </v-btn>
-      <v-btn
-        variant="tonal"
-        @click="openConfigModal"
-        color="primary"
-        size="large"
-        disabled
-      >
-        Generar Ronda 1
-      </v-btn>
+  <v-card v-if="torneo" class="mb-4 pa-4">
+    <v-card-title class="text-h6 font-weight-bold">Acciones</v-card-title>
 
-      <v-btn variant="tonal" @click="openSorteo" color="primary" size="large">
-        Sorteo
-      </v-btn>
-    </v-row>
+    <v-card-text>
+      <v-row dense>
+        <v-col cols="12" sm="4">
+          <v-btn block variant="tonal" color="secondary" @click="openAddJugadorModal" disabled>
+            Añadir Equipo
+          </v-btn>
+        </v-col>
+        <v-col cols="12" sm="4">
+          <v-btn block variant="tonal" color="primary" @click="openConfigModal" disabled>
+            Generar Ronda 1
+          </v-btn>
+        </v-col>
+        <v-col cols="12" sm="4">
+          <v-btn block variant="tonal" color="primary" @click="openSorteo">
+            Sorteo
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card-text>
 
     <ModalParametrosPrimeraRondaEquipo
       :isVisible="showConfigModal"

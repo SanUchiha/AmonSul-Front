@@ -24,5 +24,5 @@ export const convertirFecha = (dateString: string) => {
   const month = dateParts[1];
   const year = dateParts[2];
 
-  return `${year}-${month}-${day}`;
+  return `${year}/${month}/${day}`;
 };

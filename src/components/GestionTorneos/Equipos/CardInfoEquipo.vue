@@ -1,76 +1,132 @@
 <template>
-  <div class="card" @click="toggleExpand">
-    <div class="card-header">
-      <h2 class="card-title">{{ equipo.nombreEquipo }}</h2>
-      <p>Capitán: {{ equipo.nickCapitan }}</p>
-      <p>Email: {{ equipo.emailCapitan }}</p>
-      <p>Pago: {{ equipo.esPago }}</p>
-      <v-btn
-        v-show="equipo.esPago == 'NO'"
-        variant="tonal"
-        class="btn actualizar"
-        @click.stop="actualizarPago"
-      >
-        ACTUALIZAR PAGO
-      </v-btn>
-      <p></p>
-      <p>
-        Fecha de inscripción:
-        {{ convertirFecha(equipo.fechaInscripcion!) }}
-      </p>
-      <p>
-        <v-btn color="red darken" variant="tonal" @click="eliminarEquipo"
-          >eliminar equipo</v-btn
-        >
-      </p>
-    </div>
-
-    <transition name="expand">
-      <div v-if="isExpanded" class="inscripciones-container">
-        <div
-          v-for="inscripcion in equipo.inscripciones"
-          :key="inscripcion.idInscripcion"
-          class="inscripcion-card"
-        >
-          <div class="chips">
-            <span class="chip chip-estado">{{ inscripcion.nick }}</span>
-            <span v-show="inscripcion.listaData" class="chip chip-ejercito">
-              {{ inscripcion.ejercito }}
-            </span>
-            <span class="chip chip-estado"
-              >Lista: {{ inscripcion.estadoLista }}</span
+  <div class="card-equipo" @click="toggleExpand">
+    <v-card elevation="2" class="ma-2 pa-3">
+      <v-row class="align-center">
+        <!-- Avatar + Nombre del equipo + Estado de Pago -->
+        <v-col cols="12" sm="4" class="d-flex align-center justify-start">
+          <v-avatar size="40">
+            <img src="@/assets/icons/equipos.png" alt="Equipo"  width="40" height="40"/>
+          </v-avatar>
+          <div class="ms-2">
+            <div class="text-subtitle-1 font-weight-bold ringbearer">{{ equipo.nombreEquipo }}</div>
+            <v-chip
+              class="mt-1"
+              :color="equipo.esPago === 'SI' ? 'green' : 'red'"
+              variant="tonal"
+              x-small
             >
-            <span v-show="inscripcion.listaData" class="chip chip-fecha">
-              {{ inscripcion.fechaEntregaLista }}
-            </span>
+              <v-icon size="16" class="me-1">mdi-cash</v-icon> 
+              Pago: {{ equipo.esPago }}
+            </v-chip>
           </div>
+        </v-col>
 
-          <div class="buttons">
-            <button
-              v-show="inscripcion.listaData"
-              class="btn ver"
-              @click.stop="verLista(inscripcion.listaData!)"
-            >
-              Ver Lista
-            </button>
-            <button
-              v-show="inscripcion.listaData"
-              class="btn ver"
-              @click.stop="cambiarEstadoLista(inscripcion.idInscripcion!)"
-            >
-              Cambiar estado lista
-            </button>
-            <button
-              class="btn modificar"
-              @click.stop="modificarLista(inscripcion.idInscripcion)"
-            >
-              Enviar/modificar Lista
-            </button>
+        <!-- Datos del Capitán con iconos -->
+        <v-col cols="12" sm="5" class="text-caption text-md-left text-center">
+          <div class="d-flex align-center">
+            <v-icon size="18" class="me-1">mdi-account-star</v-icon>
+            {{ equipo.nickCapitan }}
           </div>
+          <div class="d-flex align-center">
+            <v-icon size="18" class="me-1">mdi-email</v-icon>
+            {{ equipo.emailCapitan }}
+          </div>
+          <div class="d-flex align-center">
+            <v-icon size="18" class="me-1">mdi-calendar</v-icon>
+            {{ convertirFecha(equipo.fechaInscripcion!) }}
+          </div>
+        </v-col>
+
+        <!-- Botones -->
+        <v-col cols="12" sm="3" class="d-flex flex-column align-end justify-center mt-2 mt-sm-0">
+          <v-btn
+            v-show="equipo.esPago === 'NO'"
+            variant="tonal"
+            color="warning"
+            size="small"
+            class="mb-1"
+            @click.stop="actualizarPago"
+            block
+          >
+            <v-icon class="me-1">mdi-credit-card-edit</v-icon> 
+            Modificar Pago
+          </v-btn>
+          <v-btn
+            color="red"
+            variant="tonal"
+            size="small"
+            @click.stop="eliminarEquipo"
+            block
+          >
+            <v-icon class="me-1">mdi-trash-can</v-icon>
+            Borrar equipo
+          </v-btn>
+        </v-col>
+      </v-row>
+
+      <!-- Expand contenido -->
+      <v-expand-transition>
+        <div v-if="isExpanded" class="mt-4">
+          <v-divider class="mb-2" />
+          <v-data-table :items="equipo.inscripciones" class="styled-table" dense>
+            <template v-slot:headers>
+              <tr>
+                <th class="compact-header text-center">Nombre</th>
+                <th class="hide-on-mobile compact-header text-center">Ejército</th>
+                <th class="compact-header text-center">Lista</th>
+                <th class="hide-on-mobile compact-header text-center">Entrega</th>
+                <th class="compact-header text-center">Acciones</th>
+              </tr>
+            </template>
+            <template v-slot:item="{ item }">
+              <tr>
+                <td class="compact-cell text-left">
+                  <v-avatar size="40" class="hide-on-mobile">
+                    <img src="@/assets/icons/verdetalle.png" alt="Participante" width="40" height="40"/>
+                  </v-avatar>
+                  &nbsp;{{ item.nick || "Desconocido" }}
+                </td>
+                <td class="hide-on-mobile compact-cell">{{ item.ejercito || "No asignado" }}</td>
+                <td class="compact-cell">
+                  <v-chip :color="item.estadoLista === 'OK' ? 'green' : item.estadoLista === 'ENTREGADA' ? 'yellow' : 'red'" variant="tonal">
+                    {{ item.estadoLista }}
+                  </v-chip>
+                </td>
+                <td class="hide-on-mobile compact-cell">{{ item.fechaEntregaLista || "N/A" }}</td>
+                <td class="compact-cell">
+                  <v-menu offset-y>
+                    <template v-slot:activator="{ props }">
+                      <v-btn color="primary" variant="tonal" v-bind="props">
+                        <v-icon>mdi-dots-vertical</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-list>
+                      <v-list-item v-if="item.listaData" @click.stop="verLista(item.listaData!)">
+                        <v-list-item-title>
+                          <v-icon class="me-2">mdi-eye</v-icon> Ver Lista
+                        </v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click.stop="cambiarEstadoLista(item.idInscripcion!)">
+                        <v-list-item-title>
+                          <v-icon class="me-2">mdi-refresh</v-icon> Cambiar Estado
+                        </v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click.stop="modificarLista(item.idInscripcion)">
+                        <v-list-item-title>
+                          <v-icon class="me-2">mdi-pencil</v-icon> Modificar Lista
+                        </v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
         </div>
-      </div>
-    </transition>
+      </v-expand-transition>
+    </v-card>
   </div>
+
 
   <!-- Modal response estado pago -->
   <ModalSuccess
@@ -125,7 +181,6 @@ const showSuccessModalPago = ref<boolean>(false);
 const showSuccessModalEliminarEquipo = ref<boolean>(false);
 
 const showErrorModal = ref<boolean>(false);
-
 const toggleExpand = () => {
   isExpanded.value = !isExpanded.value;
 };
@@ -176,127 +231,28 @@ const eliminarEquipo = async () => {
 </script>
 
 <style scoped>
-.card {
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  border: 1px solid #ddd;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  margin-bottom: 12px;
-  background: rgb(44, 44, 44);
-}
-
-.card:hover {
-  transform: scale(1.02);
-}
-
-.card-header {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.btn.actualizar {
-  background: #5cb85c;
-  color: white;
-}
-
-.card-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.inscripciones-container {
-  margin-top: 10px;
-}
-
-.inscripcion-card {
-  display: flex;
-  flex-direction: column;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 8px;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.chip {
-  padding: 6px 10px;
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  display: inline-block;
-}
-
-.chip-ejercito {
-  background: #d9edf7;
-  color: #31708f;
-}
-
-.chip-estado {
-  background: #9e6d28;
-  color: black;
-}
-
-.chip-fecha {
-  background: #9e6d28;
-  color: #3c763d;
-}
-
-.buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.btn {
-  padding: 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.3s ease-in-out;
-  width: 100%;
-}
-
-.btn.ver {
-  background: #5bc0de;
-  color: black;
-}
-
-.btn.ver:hover {
-  background: #31b0d5;
-}
-
-.btn.modificar {
-  background: #f0ad4e;
-  color: black;
-}
-
-.btn.modificar:hover {
-  background: #ec971f;
-  color: black;
-}
-
-@media (min-width: 600px) {
-  .inscripcion-card {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+@media (max-width: 600px) {
+  .hide-on-mobile {
+    display: none;
   }
-  .buttons {
-    flex-direction: row;
-  }
-  .btn {
-    width: auto;
-  }
+}
+.styled-table {
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px; /* Reduce el tamaño de fuente general */
+}
+
+/* Reducir padding y espacio en las celdas */
+.compact-header, .compact-cell, .compact-actions {
+  padding: 4px !important;
+  font-size: 12px;
+}
+
+/* Compactar botones */
+.compact-actions .v-btn {
+  min-width: 24px !important;
+  padding: 2px 6px !important;
 }
 
 /* Animación de expansión */
