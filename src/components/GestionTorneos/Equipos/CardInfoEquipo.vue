@@ -29,7 +29,9 @@
           </div>
           <div class="d-flex align-center">
             <v-icon size="18" class="me-1">mdi-email</v-icon>
-            {{ equipo.emailCapitan }}
+            <a :href="`mailto:${equipo.emailCapitan}`" class="text-decoration-none" target="_blank">
+              {{ equipo.emailCapitan }}
+            </a>
           </div>
           <div class="d-flex align-center">
             <v-icon size="18" class="me-1">mdi-calendar</v-icon>
