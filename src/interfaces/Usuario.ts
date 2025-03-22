@@ -24,6 +24,7 @@ export interface NewUserDTO {
 }
 
 export interface EditarUsuarioDTO {
+  idUsuario: number;
   nombreUsuario?: string;
   primerApellido?: string;
   segundoApellido?: string;

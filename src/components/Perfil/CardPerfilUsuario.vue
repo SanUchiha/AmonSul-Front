@@ -139,6 +139,7 @@ const saveChanges = async () => {
     isEditing.value = false;
     
     let editusu: EditarUsuarioDTO = {
+        idUsuario: props.user.idUsuario,
         nombreUsuario: editableUser.nombreUsuario,
         primerApellido: editableUser.primerApellido,
         segundoApellido: editableUser.segundoApellido,
@@ -154,7 +155,11 @@ const saveChanges = async () => {
     console.log("editusu:", editusu);
     
     // TODO Enviar al backend
-    //await editarUsuario(editusu);
+    try{
+        await editarUsuario(editusu);
+    }catch (error){
+        console.error("Error al editar usuario: "), error;
+    }
 };
 
 const handleImageUpload = (event: Event) => {
