@@ -47,7 +47,11 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="tonal" color="primary" @click="submitForm"
+        <v-btn
+          variant="tonal"
+          color="primary"
+          @click="submitForm"
+          :disabled="isRegistering"
           >Registrar equipo</v-btn
         >
         <v-btn variant="tonal" color="secondary" @click="closeDialog"
