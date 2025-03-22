@@ -118,6 +118,49 @@
       @cancelar="mostrarDialogoLogout = false"
     />
 
+    <v-bottom-navigation
+      v-if="$vuetify.display.smAndDown"
+      app
+      fixed
+      height="64"
+      color="primary"
+      grow
+      class="bottom-nav pb-1"
+    >
+      <!-- Botón 1: Modal registrar partida -->
+      <v-btn icon @click="openRegistroPartida" class="animated-btn">
+        <img src="@/assets/icons/nuevaPartida.png" alt="Icono personalizado" width="50" height="50">
+        Nueva Partida
+      </v-btn>
+
+      <!-- Botón 2: Ruta (cuando definas) -->
+      <v-btn
+        icon
+        :to="{ path: '/mis-partidas' }"
+        :class="{ 'active-btn': $route.path === '/mis-partidas' }"
+        class="animated-btn"
+      >
+        <img src="@/assets/icons/misPartidas.png" alt="Icono personalizado" width="50" height="50">
+        Mis Partidas
+      </v-btn>
+      
+      <!-- Botón 3: Ruta (cuando definas) -->
+      <v-btn
+        icon
+        :to="{ path: '/mis-torneos' }"
+        :class="{ 'active-btn': $route.path === '/mis-torneos' }"
+        class="animated-btn"
+      >
+        <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="50" height="50">
+        Mis Torneos
+      </v-btn>
+    </v-bottom-navigation>
+
+    <!-- Modal de registrar partida -->
+    <v-dialog v-model="dialog" >
+      <FormCrearPartida @close="dialog = false" @registroExitoso="refrescarPartidas" :isVisible="dialog"/>
+    </v-dialog>
+
     <FooterComponent absolute="true"/>
 
   </v-app>
@@ -131,12 +174,18 @@ import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
 import LogoAmonSulPNG from "@/assets/icons/Logo2.png";
 import LogoAmonSulSVG from "@/assets/icons/logo_horizontal3.png";
 import FooterComponent from '@/components/Commons/FooterComponent.vue';
+import FormCrearPartida from '@/components/PartidaAmistosa/FormCrearPartida.vue';
 
 const { logout } = useAuth();
 const router = useRouter();
 const drawer = ref(false);
 const mostrarDialogoLogout = ref(false);
 const { isAuthenticated } = useAuth();
+
+const dialog = ref(false)
+const openRegistroPartida = () => {
+  dialog.value = true
+}
 
 const handleLogout = async () => {
   await logout();
@@ -155,5 +204,24 @@ const handleLogout = async () => {
 
 .name {
   width: 140px;
+}
+
+/*Estilo para el menu inferior*/
+.bottom-nav {
+  z-index: 100; /* asegura que esté por encima del contenido */
+}
+
+/* Color para el botón activo */
+.active-btn .v-icon {
+  color: #ffeb3b !important; /* amarillo claro o el color que prefieras */
+}
+
+/* Animación sutil al pulsar */
+.animated-btn {
+  transition: transform 0.15s ease-in-out;
+}
+
+.animated-btn:active {
+  transform: scale(0.9);
 }
 </style>
