@@ -19,7 +19,6 @@
                 label="Antigua contraseña"
                 type="password"
                 required
-                class="my-4"
                 :rules="[requiredRule]"
               ></v-text-field>
             </v-list-item>
@@ -30,7 +29,6 @@
                 label="Nueva contraseña"
                 type="password"
                 required
-                class="my-4"
                 :rules="[requiredRule, passwordRule]"
               ></v-text-field>
             </v-list-item>
@@ -41,7 +39,6 @@
                 label="Repite la nueva contraseña"
                 type="password"
                 required
-                class="my-4"
                 :rules="[requiredRule, passwordMatchRule]"
               ></v-text-field>
             </v-list-item>
@@ -52,6 +49,7 @@
                 <v-btn
                   :loading="isLoading"
                   color="primary"
+                  variant="tonal"
                   @click="cambiar"
                   :disabled="isLoading || !isFormValid"
                 >

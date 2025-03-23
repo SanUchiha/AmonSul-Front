@@ -1,15 +1,23 @@
 <template>
-  <div v-if="isLoading" class="d-flex justify-center align-center" style="height: 150px;">
-      <LoadingGandalf />
+  <div
+    v-if="isLoading"
+    class="d-flex justify-center align-center"
+    style="height: 150px"
+  >
+    <LoadingGandalf />
   </div>
   <div v-else>
     <v-container class="profile-container">
       <v-row>
         <!-- Columna Izquierda (Perfil) -->
         <v-col cols="12" md="4" offset-md="4">
-          <CardPerfilUsuario :user=user! :selectedFaccionName=selectedFaccionName :editable=editable></CardPerfilUsuario>
+          <CardPerfilUsuario
+            :user="user!"
+            :selectedFaccionName="selectedFaccionName"
+            :editable="editable"
+          ></CardPerfilUsuario>
         </v-col>
-        
+
         <!-- Columna Derecha (Estadísticas, Rango/Nivel, Logros) -->
         <v-col cols="12" md="8">
           <!-- Sección de Estadísticas
@@ -17,16 +25,13 @@
 
           <!-- Sección de Rango/Nivel 
           <CardRangoUsuario></CardRangoUsuario>-->
-          
+
           <!-- Sección de Logros 
           <LogrosUsuario></LogrosUsuario>-->
         </v-col>
       </v-row>
     </v-container>
   </div>
-
-
-
 
   <!-- Modal para modificar la contraseña -->
   <!--<ModalCambiarPass v-if="showModalCambiarPass" @close="closeModal" />-->
@@ -46,8 +51,7 @@
     </v-card>
   </v-dialog>
 </v-container>
--->
-</template>
+--></template>
 
 <script setup lang="ts">
 import { onMounted, ref, defineProps, withDefaults, watch } from "vue";
@@ -70,24 +74,24 @@ const showModalCambiarPass = ref(false);
 const user = ref<UsuarioViewDTO>();
 
 // Definimos props opcionales con TypeScript
-const props = withDefaults(defineProps<{
-  editable?: boolean;
-  email?: string; // Opcional
-}>(),{
-  editable: true,
-  email: ""
-});
+const props = withDefaults(
+  defineProps<{
+    editable?: boolean;
+    email?: string; // Opcional
+  }>(),
+  {
+    editable: true,
+    email: "",
+  }
+);
 
 // Función para cargar los datos del usuario
 const cargarUsuario = async () => {
   try {
     isLoading.value = true;
-    if (props.email==""){
-      console.log("email.email:", correo.value);
+    if (props.email == "") {
       await usuariosStore.requestUsuario(correo.value);
-    }
-    else{
-      console.log("props.email:", props.email);
+    } else {
       await usuariosStore.requestUsuario(props.email);
     }
     user.value = usuariosStore.usuario; // ✅ Asegura que user tiene datos antes de renderizar
@@ -101,39 +105,37 @@ const cargarUsuario = async () => {
 
 // Ejecutar cuando el componente se monta
 onMounted(() => {
-  if (correo.value){
-    console.log("onMounted ejecutado");
+  if (correo.value) {
     cargarUsuario();
   }
 });
 
 // Observar cambios en la prop `email` y recargar datos
-watch(() => props.email, async (newEmail, oldEmail) => {
-  if (newEmail && newEmail !== oldEmail) {
-    console.log("Email cambiado, recargando usuario:", newEmail);
-    await cargarUsuario();
+watch(
+  () => props.email,
+  async (newEmail, oldEmail) => {
+    if (newEmail && newEmail !== oldEmail) {
+      await cargarUsuario();
+    }
   }
-});
-
+);
 
 const handleCambiarPassword = () => {
   showModalCambiarPass.value = true;
 };
-
 </script>
 
 <style scoped>
-  .section-card {
-    margin-bottom: 20px;
-    padding: 20px;
-    background: #212121;
-    color: white;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-  }
-  
-  .stat-bar {
-    margin-top: 10px;
-    font-size: 14px;
-  }
-  </style>
-  
+.section-card {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #212121;
+  color: white;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.stat-bar {
+  margin-top: 10px;
+  font-size: 14px;
+}
+</style>

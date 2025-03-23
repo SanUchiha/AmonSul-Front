@@ -405,7 +405,6 @@ onMounted(async () => {
     const response = await getInscripcionEquipo(props.idInscripcion!);
 
     inscripcionData.value = response.data;
-    console.log(inscripcionData.value);
 
     if (inscripcionData.value?.idCapitan == parseInt(idUsuarioLogger.value!)) {
       isCaptain.value = true;
