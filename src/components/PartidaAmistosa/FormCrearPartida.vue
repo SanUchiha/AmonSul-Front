@@ -1,120 +1,130 @@
 <template>
-  <v-container class="login-form">
+  <v-container class="login-form scrollable-modal">
     <div class="overlay" v-if="isLoading"></div>
 
     <v-row justify="center">
       <v-col cols="12" md="6">
-        <v-card>
-          <v-card-title>
-            <h3>Registrar partida</h3>
+        <v-card class="pa-4 rounded-lg elevation-3 dark-form-card">
+          <v-card-title class="text-h6 font-weight-bold text-center text-white">
+            <v-icon class="me-2" color="deep-orange">mdi-sword-cross</v-icon>
+            Registrar partida
           </v-card-title>
+<v-divider class="mt-3"></v-divider>
           <v-card-text>
             <v-form @submit.prevent="validateForm" ref="form">
+              <!-- CONTRINCANTE -->
               <v-combobox
                 v-model="nickDosSelected"
                 :items="listadoNicks"
-                label="¿Contra quien has jugado?"
+                label="¿Contra quién has jugado?"
                 @click="loadNicks"
                 :rules="[rules.required]"
                 required
-              ></v-combobox>
+                variant="outlined"
+                color="primary"
+                hide-details="auto"
+              />
               <v-progress-linear
                 v-if="isLoadingNicks"
                 indeterminate
                 color="primary"
                 class="progress-linear-margin"
-              ></v-progress-linear>
+              />
+              <v-divider class="my-4" />
 
+              <!-- EJÉRCITOS -->
               <v-combobox
                 v-model="ejercitoRival"
                 :items="listadoEjercitos"
-                label="¿Que llevaba tu rival?"
+                label="¿Qué llevaba tu rival?"
                 item-title="name"
                 @click="loadEjercitos"
                 :rules="[rules.required]"
                 required
-              ></v-combobox>
-              <v-progress-linear
-                v-if="loadingEjercitos"
-                indeterminate
+                variant="outlined"
                 color="primary"
-                class="progress-linear-margin"
-              ></v-progress-linear>
-
+                hide-details="auto"
+              />
               <v-combobox
                 v-model="ejercitoPropio"
                 :items="listadoEjercitos"
                 item-title="name"
-                label="¿Que llevabas tú?"
+                label="¿Qué llevabas tú?"
                 @click="loadEjercitos"
                 :rules="[rules.required]"
                 required
-              ></v-combobox>
+                variant="outlined"
+                color="primary"
+                hide-details="auto"
+              />
               <v-progress-linear
                 v-if="loadingEjercitos"
                 indeterminate
                 color="primary"
                 class="progress-linear-margin"
-              ></v-progress-linear>
+              />
+              <v-divider class="my-4" />
+
+              <!-- PUNTOS -->
               <v-text-field
                 v-model="puntosJugadorUno"
-                label="¿Cuantos puntos has conseguido?"
+                label="Tus puntos"
                 type="number"
                 :rules="[rules.required]"
                 required
-              ></v-text-field>
+                variant="outlined"
+                color="primary"
+                hide-details="auto"
+              />
               <v-text-field
                 v-model="puntosJugadorDos"
-                label="¿Cuantos puntos ha conseguido el rival?"
+                label="Puntos del rival"
                 type="number"
                 :rules="[rules.required]"
                 required
-              ></v-text-field>
+                variant="outlined"
+                color="primary"
+                hide-details="auto"
+              />
+              <v-divider class="my-4" />
+
+              <!-- ESCENARIO -->
               <v-switch
                 v-model="checkEsMatchedPlay"
                 color="primary"
-                label="¿El escenario es del Matched play??"
-              ></v-switch>
-
+                inset
+                label="¿Escenario del Matched Play?"
+              />
               <v-combobox
                 v-if="checkEsMatchedPlay"
                 v-model="escenarioSelected"
                 :items="listaEscenarios"
                 @click="loadEscenarios"
                 label="Escenario"
-              ></v-combobox>
+                variant="outlined"
+                color="primary"
+                hide-details="auto"
+              />
               <v-progress-linear
                 v-if="loadingEscenarios"
                 indeterminate
                 color="primary"
                 class="progress-linear-margin"
-              ></v-progress-linear>
+              />
+              <v-divider class="my-4" />
+
+              <!-- PUNTOS PARTIDA -->
               <v-text-field
                 v-model="puntosPartida"
-                label="¿A cuantos puntos has jugado?"
+                label="¿A cuántos puntos has jugado?"
                 type="number"
                 :rules="[rules.required]"
                 required
-              ></v-text-field>
-              <v-row justify="center" class="my-4">
-                <v-btn
-                  class="mr-4"
-                  variant="tonal"
-                  color="blue darken-1"
-                  @click="validateForm"
-                >
-                  Registrar
-                </v-btn>
-                <v-btn
-                  class="mr-4"
-                  variant="tonal"
-                  color="blue darken-1"
-                  :disabled="isLoading"
-                  @click="$emit('close')"
-                >
-                  Cancelar
-                </v-btn>
-              </v-row>
+                variant="outlined"
+                color="primary"
+                hide-details="auto"
+              />
+
               <v-row justify="center" v-if="isLoading" class="mt-3">
                 <v-progress-linear
                   :size="24"
@@ -122,20 +132,51 @@
                   indeterminate
                   color="primary"
                   class="progress-linear-margin"
-                ></v-progress-linear>
+                />
               </v-row>
+
+              <!-- BOTONES -->
+              <v-row justify="center" class="mt-6">
+                <v-col cols="12" sm="6">
+                  <v-btn
+                    class="mx-2"
+                    color="deep-orange"
+                    variant="flat"
+                    @click="validateForm"
+                    block
+                  >
+                    <v-icon start>mdi-check</v-icon>
+                    Registrar
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-btn
+                    class="mx-2"
+                    color="grey darken-1"
+                    variant="tonal"
+                    :disabled="isLoading"
+                    @click="$emit('close')"
+                    block
+                  >
+                    <v-icon start>mdi-close</v-icon>
+                    Cancelar
+                  </v-btn>
+                </v-col>
+              </v-row>
+
+              
             </v-form>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
+    <!-- MODALES DE RESULTADO -->
     <ModalSuccess
       :isVisible="showSuccessModal"
-      message="Partida creada con exito."
+      message="Partida creada con éxito."
       @update:isVisible="showSuccessModal = $event"
     />
-
     <ModalError
       :isVisible="showErrorModal"
       message="No se ha podido crear la partida."
@@ -308,30 +349,28 @@ watch(
 </script>
 
 <style scoped>
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  pointer-events: auto;
-  visibility: visible;
+.scrollable-modal {
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-bottom: 24px;
 }
 
-.overlay.hidden {
-  display: none;
+.dark-form-card {
+  background-color: #1e1e1e;
+  color: white;
+  border: 1px solid #2c2c2c;
 }
 
-.login-form {
-  position: relative;
+.v-label,
+.v-input__control {
+  color: white !important;
 }
 
-.progress-linear-margin {
-  margin-top: 20px;
+.v-icon {
+  vertical-align: middle;
+}
+
+.v-divider {
+  opacity: 0.1;
 }
 </style>
