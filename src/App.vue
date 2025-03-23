@@ -125,7 +125,7 @@
       height="64"
       color="primary"
       grow
-      class="bottom-nav mb-2 mt-2"
+      class="bottom-nav"
     >
       <!-- Botón 1: Modal registrar partida -->
       <v-btn icon @click="openRegistroPartida" class="animated-btn">
