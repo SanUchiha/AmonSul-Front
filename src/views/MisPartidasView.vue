@@ -20,7 +20,7 @@
         </v-col>
       </v-card>
       <!-- Boton partidas -->
-      <div
+      <div v-if="$vuetify.display.mdAndUp"
         class="custom-btn d-flex align-center fab-btn"
         @click="dialog = true"
         @mouseenter="isHovering = true"
