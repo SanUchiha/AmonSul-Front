@@ -118,7 +118,7 @@ const initializeComponent = async () => {
 };
 
 const setResultado = () => {
-  if (props.match.ganadorPartidaNick == null) {
+  if (props.match.ganadorPartidaNick == null || props.match.ganadorPartidaNick == '') {
     resultado.value = "Empate";
   } else if (props.match.ganadorPartidaTorneo == props.idUsuario) {
     resultado.value = "Victoria";

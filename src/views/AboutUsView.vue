@@ -69,10 +69,19 @@ export default {
         { icon: clasificacion, title: 'Ranking', description: 'Clasificación de jugadores individual y por equipos.' },
       ],
       roadmap: [
-        { date: 'Q2 2025', title: 'Torneos por equipos', description: 'Creación y gestión de torneos a parejas y por equipos.', color: 'primary' },
-        { date: 'Q3 2025', title: 'Pagos de inscripción', description: 'Gestión del pago de la inscripción a un torneo a través de la app.', color: 'primary' },
-        { date: 'Q4 2025', title: 'Integración con Discord', description: 'Notificaciones y chat en tiempo real.', color: 'red' },
-      ]
+        {
+          date: "Q2 2025",
+          title: "Torneos por equipos",
+          description: "Creación y gestión de torneos a parejas y por equipos.",
+          color: "primary",
+        },
+        {
+          date: "Q4 2025",
+          title: "Sistema de trofeos",
+          description: "Sistema de trofeos y niveles de experiencia por jugador. ",
+          color: "red",
+        },
+      ],
     };
   }
 };

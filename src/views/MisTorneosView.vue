@@ -122,6 +122,7 @@ const initializeComponent = async () => {
         parseInt(idUsuarioLogger.value)
       );
       matches.value = response.data;
+      console.log("matches",matches.value)
 
       loadComunidad(parseInt(idUsuarioLogger.value));
       usuarioData.value.email = emailOwner.value;
