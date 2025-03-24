@@ -10,7 +10,7 @@
     <v-container class="profile-container">
       <v-row>
         <!-- Columna Izquierda (Perfil) -->
-        <v-col cols="12" md="4" offset-md="4">
+        <v-col cols="12" md="4">
           <CardPerfilUsuario
             :user="user!"
             :selectedFaccionName="selectedFaccionName"
@@ -21,7 +21,8 @@
         <!-- Columna Derecha (Estadísticas, Rango/Nivel, Logros) -->
         <v-col cols="12" md="8">
           <!-- Sección de Estadísticas
-          <CardEstadisticas></CardEstadisticas> -->
+          <CardEstadisticas :usuario="user"></CardEstadisticas> -->
+          <SparklineElo :email="email" />
 
           <!-- Sección de Rango/Nivel 
           <CardRangoUsuario></CardRangoUsuario>-->
@@ -62,6 +63,8 @@ import { useUsuariosStore } from "@/store/usuarios";
 import CardPerfilUsuario from "@/components/Perfil/CardPerfilUsuario.vue";
 import CardRangoUsuario from "@/components/Perfil/CardRangoUsuario.vue";
 import LogrosUsuario from "@/components/Perfil/LogrosUsuario.vue";
+import SparklineElo from "@/components/Elo/SparklineElo.vue";
+import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
 
 const usuariosStore = useUsuariosStore();
 
