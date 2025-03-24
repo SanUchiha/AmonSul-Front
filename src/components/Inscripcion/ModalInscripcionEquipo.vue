@@ -144,7 +144,7 @@
                 <v-divider></v-divider>
 
                 <v-card-text>
-                  Estado de la lista
+                  Estado de la lista<br/>
                   <v-chip :color="miembro.estadoLista === 'OK' ? 'green' : miembro.estadoLista === 'ENTREGADA' ? 'yellow' : 'red'" variant="tonal">
                     {{ miembro.estadoLista }}
                   </v-chip>

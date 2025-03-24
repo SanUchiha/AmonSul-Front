@@ -114,13 +114,6 @@ watch(() => props.email, async (newEmail, oldEmail) => {
 });
 
 
-<<<<<<< Updated upstream
-const handleCambiarPassword = () => {
-  showModalCambiarPass.value = true;
-};
-
-=======
->>>>>>> Stashed changes
 </script>
 
 <style scoped>
