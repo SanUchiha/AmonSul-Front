@@ -145,15 +145,14 @@
       <v-btn icon to="contacto">
         <v-icon>mdi-email</v-icon>
       </v-btn>
-      <v-btn icon @click="() => router.push({ name: 'perfil-usuario' })">
+      <v-btn icon @click="() => router.push({ name: 'perfil-usuario' })" v-if="isAuthenticated">
         <v-avatar size="30" class="avatar">
           <v-img :src="user.imagen || defaultAvatar" alt="Avatar"></v-img>
         </v-avatar>
       </v-btn>
-      <v-btn
+      <v-btn v-if="isAuthenticated"
         icon
         @click="mostrarDialogoLogout = true"
-        :disabled="!isAuthenticated"
       >
         <v-icon>mdi-logout</v-icon>
       </v-btn>
@@ -185,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
 import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
@@ -211,6 +210,7 @@ const dialog = ref(false)
 const isLoggedIn = computed(() => !!getUser.value)
 
 const handleLogout = async () => {
+  usuariosStore.usuario = {} as UsuarioViewDTO; // Limpia los datos del usuario anterior
   logout();
   router.push({ name: "inicio-sesion" });
 };
@@ -226,6 +226,18 @@ const cargarUsuario = async () => {
     console.error("Error al obtener el usuario:", error);
   }
 };
+
+watch(
+  () => getUser.value,
+  (nuevoUsuario) => {
+    if (nuevoUsuario) {
+      cargarUsuario();
+    } else {
+      user.value = {} as UsuarioViewDTO;
+    }
+  },
+  { immediate: true }
+);
 
 // Ejecutar cuando el componente se monta
 onMounted(() => {
