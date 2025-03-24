@@ -1,5 +1,5 @@
 <template>
-        <!--<v-row class="mt-2 mb-2 text-left">
+  <!--<v-row class="mt-2 mb-2 text-left">
         <v-col cols="4">
             <span class="font-weight-bold">{{ props.usuario.numeroPartidasJugadas }} partidas jugadas</span>
         </v-col>
@@ -42,46 +42,71 @@
 
         -->
   <v-row>
-      <v-col cols="12">
-          <AgCharts :options="chartOptions"></AgCharts>
-      </v-col>
+    <v-col cols="12">
+      <AgCharts :options="chartOptions"></AgCharts>
+    </v-col>
   </v-row>
 
   <v-divider class="mb-3"></v-divider>
 
-      <div class="stats-container">
-        <v-row>
-          <v-col class="stat-item">
-            <img src="@/assets/icons/clasificacionTorneo.png" alt="Icono personalizado" width="60" height="60">
-            <p>Victorias: {{ winRate.toFixed(2) }}%</p>
-          </v-col>
-          <v-col v-if="usuario.rankingElo" class="stat-item">
-            <img src="@/assets/icons/ELO.png" alt="Icono personalizado" width="60" height="60">
-            <p>Ranking Elo: {{ usuario.rankingElo.toFixed(2) }}</p>
-          </v-col>
-        </v-row>
-      </div>
-      
-      <v-divider class="mb-3 mt-3"></v-divider>
-  
-      <div class="stats-container">
-        <v-row>
-          <v-col class="stat-item">
-            <img src="@/assets/icons/ejercitoMasUsado.png" alt="Icono personalizado" width="60" height="60">            
-            <p>Ejército más usado: próximamente</p>
-          </v-col>
-  
-          <v-col class="stat-item">
-            <img src="@/assets/icons/ejercitoMejorResultado.png" alt="Icono personalizado" width="60" height="60">            
-            <p>Ejército con mejor resultado: próximamente</p>
-          </v-col>
-  
-          <v-col class="stat-item">
-            <img src="@/assets/icons/ejercitoPeorResultado.png" alt="Icono personalizado" width="60" height="60">                        
-            <p>Ejército con peor resultado: próximamente</p>
-          </v-col>
-        </v-row>
-      </div>
+  <div class="stats-container">
+    <v-row>
+      <v-col class="stat-item">
+        <img
+          src="@/assets/icons/clasificacionTorneo.png"
+          alt="Icono personalizado"
+          width="60"
+          height="60"
+        />
+        <p>Victorias: {{ winRate.toFixed(2) }}%</p>
+      </v-col>
+      <v-col v-if="usuario.rankingElo" class="stat-item">
+        <img
+          src="@/assets/icons/ELO.png"
+          alt="Icono personalizado"
+          width="60"
+          height="60"
+        />
+        <p>Ranking Elo: {{ usuario.rankingElo.toFixed(2) }}</p>
+      </v-col>
+    </v-row>
+  </div>
+
+  <v-divider class="mb-3 mt-3"></v-divider>
+
+  <div class="stats-container">
+    <v-row>
+      <v-col class="stat-item">
+        <img
+          src="@/assets/icons/ejercitoMasUsado.png"
+          alt="Icono personalizado"
+          width="60"
+          height="60"
+        />
+        <p>Ejército más usado: próximamente</p>
+      </v-col>
+
+      <v-col class="stat-item">
+        <img
+          src="@/assets/icons/ejercitoMejorResultado.png"
+          alt="Icono personalizado"
+          width="60"
+          height="60"
+        />
+        <p>Ejército con mejor resultado: próximamente</p>
+      </v-col>
+
+      <v-col class="stat-item">
+        <img
+          src="@/assets/icons/ejercitoPeorResultado.png"
+          alt="Icono personalizado"
+          width="60"
+          height="60"
+        />
+        <p>Ejército con peor resultado: próximamente</p>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -94,24 +119,39 @@ const props = defineProps<{ usuario: UsuarioDataDTO }>();
 const defaultUsuario = {
   partidasGanadas: 0,
   partidasPerdidas: 0,
-  partidasEmpatadas: 0
+  partidasEmpatadas: 0,
 };
 const usuarioData = computed(() => props.usuario ?? defaultUsuario);
 console.log("usuario estadisticas", props.usuario);
 const player = ref({
-    name: "Aragorn, Rey de Gondor",
-    clan: "Hijos de Númenor",
-    location: "Minas Tirith",
-    gamesPlayed: props.usuario.numeroPartidasJugadas,
-    rank: "Capitán",
-    level: 12,
-    experience: 750,
-    experienceToNextLevel: 1000,
+  name: "Aragorn, Rey de Gondor",
+  clan: "Hijos de Númenor",
+  location: "Minas Tirith",
+  gamesPlayed: props.usuario.numeroPartidasJugadas,
+  rank: "Capitán",
+  level: 12,
+  experience: 750,
+  experienceToNextLevel: 1000,
 });
 
-const winRate = computed(() => ((usuarioData.value.partidasGanadas) / usuarioData.value.numeroPartidasJugadas) * 100);
-const lossRate = computed(() => ((usuarioData.value.partidasPerdidas) / usuarioData.value.numeroPartidasJugadas) * 100);
-const drawRate = computed(() => ((usuarioData.value.partidasEmpatadas) / usuarioData.value.numeroPartidasJugadas) * 100);
+const winRate = computed(
+  () =>
+    (usuarioData.value.partidasGanadas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
+);
+const lossRate = computed(
+  () =>
+    (usuarioData.value.partidasPerdidas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
+);
+const drawRate = computed(
+  () =>
+    (usuarioData.value.partidasEmpatadas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
+);
 
 const onSliceClick = (event: any) => {
   console.log("Categoría seleccionada:", event.datum.categoria);
@@ -121,59 +161,47 @@ const onSliceClick = (event: any) => {
 
 const myTheme = {
   palette: {
-    fills: ["#145c17", "#dbba00", "#751710",],
+    fills: ["#145c17", "#dbba00", "#751710"],
     strokes: ["#145c17", "#dbba00", "#751710"],
   },
   overrides: {
     common: {
       title: {
-        color: "#ffffff" // 🔹 Cambia el color del título del gráfico a blanco
-      }
+        color: "#ffffff", // 🔹 Cambia el color del título del gráfico a blanco
+      },
     },
     axis: {
       category: {
         label: { color: "#ffffff" }, // 🔹 Cambia el color de las etiquetas del eje X
-        line: { stroke: "#ffffff" }  // 🔹 Color de la línea del eje X
+        line: { stroke: "#ffffff" }, // 🔹 Color de la línea del eje X
       },
       number: {
         label: { color: "#ffffff" }, // 🔹 Cambia el color de las etiquetas del eje Y
-        line: { stroke: "#ffffff" }  // 🔹 Color de la línea del eje Y
-      }
-    }
-  }
+        line: { stroke: "#ffffff" }, // 🔹 Color de la línea del eje Y
+      },
+    },
+  },
 };
 
 // Configuración básica del gráfico
 const chartOptions = ref({
-    background: { fill: "#212121" }, // Color de fondo personalizado (ejemplo: gris oscuro)
+  background: { fill: "#212121" }, // Color de fondo personalizado (ejemplo: gris oscuro)
   data: [
-    { categoria: `Ganadas ${winRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasGanadas, color: "green" },
-    { categoria: `Empatadas ${drawRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasEmpatadas, color: "yellow" },
-    { categoria: `Perdidas ${lossRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasPerdidas, color: "red" }
-  ],
-  theme: myTheme,
-  series: [
     {
-        type: "donut",
-        calloutLabelKey: "categoria",
-        angleKey: "cantidad",
-        innerRadiusRatio: 0.5,
-        listeners: {
-          nodeClick: onSliceClick // ⬅️ Detecta la pulsación en cada sector
-        },
+      categoria: `Ganadas ${winRate.value.toFixed(2)}%`,
+      cantidad: usuarioData.value.partidasGanadas,
+      color: "green",
     },
-  ],
-  title: { text: `Partidas Jugadas ${props.usuario.numeroPartidasJugadas}`, fontSize: 18 }
-});
-
-// Asegurar que los datos sean reactivos
-watchEffect(() => {
-  chartOptions.value = {
-    background: { fill: "#212121" }, // Color de fondo personalizado (ejemplo: gris oscuro)
-    data: [
-    { categoria: `Ganadas ${winRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasGanadas, color: "green" },
-    { categoria: `Empatadas ${drawRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasEmpatadas, color: "yellow" },
-    { categoria: `Perdidas ${lossRate.value.toFixed(2)}%`, cantidad: usuarioData.value.partidasPerdidas, color: "red" }
+    {
+      categoria: `Empatadas ${drawRate.value.toFixed(2)}%`,
+      cantidad: usuarioData.value.partidasEmpatadas,
+      color: "yellow",
+    },
+    {
+      categoria: `Perdidas ${lossRate.value.toFixed(2)}%`,
+      cantidad: usuarioData.value.partidasPerdidas,
+      color: "red",
+    },
   ],
   theme: myTheme,
   series: [
@@ -183,12 +211,53 @@ watchEffect(() => {
       angleKey: "cantidad",
       innerRadiusRatio: 0.5,
       listeners: {
-        nodeClick: onSliceClick // ⬅️ Detecta la pulsación en cada sector
+        nodeClick: onSliceClick, // ⬅️ Detecta la pulsación en cada sector
       },
-    
     },
   ],
-  title: { text: `Partidas Jugadas ${props.usuario.numeroPartidasJugadas}`, fontSize: 18 }
-  }
+  title: {
+    text: `Partidas Jugadasaaa ${props.usuario.numeroPartidasJugadas}`,
+    fontSize: 18,
+  },
+});
+
+// Asegurar que los datos sean reactivos
+watchEffect(() => {
+  chartOptions.value = {
+    background: { fill: "#212121" }, // Color de fondo personalizado (ejemplo: gris oscuro)
+    data: [
+      {
+        categoria: `Ganadas ${winRate.value.toFixed(2)}%`,
+        cantidad: usuarioData.value.partidasGanadas,
+        color: "green",
+      },
+      {
+        categoria: `Empatadas ${drawRate.value.toFixed(2)}%`,
+        cantidad: usuarioData.value.partidasEmpatadas,
+        color: "yellow",
+      },
+      {
+        categoria: `Perdidas ${lossRate.value.toFixed(2)}%`,
+        cantidad: usuarioData.value.partidasPerdidas,
+        color: "red",
+      },
+    ],
+    theme: myTheme,
+    series: [
+      {
+        type: "donut",
+        calloutLabelKey: "categoria",
+        angleKey: "cantidad",
+        innerRadiusRatio: 0.5,
+        listeners: {
+          nodeClick: onSliceClick, // ⬅️ Detecta la pulsación en cada sector
+        },
+      },
+    ],
+    title: {
+      text: `Partidas Jugadas ${props.usuario.numeroPartidasJugadas}`,
+      fontSize: 18,
+    },
+  };
 });
 </script>
