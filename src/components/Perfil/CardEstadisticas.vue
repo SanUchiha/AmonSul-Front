@@ -216,7 +216,7 @@ const chartOptions = ref({
     },
   ],
   title: {
-    text: `Partidas Jugadasaaa ${props.usuario.numeroPartidasJugadas}`,
+    text: `Partidas Jugadas ${props.usuario.numeroPartidasJugadas}`,
     fontSize: 18,
   },
 });
