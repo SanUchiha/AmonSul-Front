@@ -96,15 +96,16 @@
     @update:isVisible="showErrorModal = $event"
   />
 
-  <ModalInscripcionEquipo
-    v-if="showModalInscripcionEquipo"
-    :idInscripcion="currentInscripcionId"
-    :idUsuario="parseInt(idUsuarioLogger!)"
-    :idTorneo="currentTorneoId"
-    :idOrganizador="currentTorneoId"
-    @eliminar-inscripcion-equipo="eliminarInscripcionEquipo"
-    @close="closeModal"
-  />
+  <v-dialog v-model="showModalInscripcionEquipo">
+    <ModalInscripcionEquipo
+      :idInscripcion="currentInscripcionId"
+      :idUsuario="parseInt(idUsuarioLogger!)"
+      :idTorneo="currentTorneoId"
+      :idOrganizador="currentTorneoId"
+      @eliminar-inscripcion-equipo="eliminarInscripcionEquipo"
+      @close="closeModal"
+    />
+  </v-dialog>
 
   <!-- Spinner Modal -->
   <v-dialog v-model="isRegistering" persistent width="300">

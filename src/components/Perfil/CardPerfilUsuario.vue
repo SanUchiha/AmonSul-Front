@@ -13,6 +13,7 @@
             dense
         ></v-file-input>
 
+<<<<<<< Updated upstream
         <h2 class="player-name text-wrap">
             <v-btn v-if="isEditing"  @click="toggleEditMode" variant="text">Cancelar</v-btn>
             <v-text-field v-if="isEditing" v-model="editableUser.nombreUsuario" label="Nombre" dense variant="solo"></v-text-field>
@@ -72,6 +73,172 @@
             <v-btn v-if="isEditing" color="primary" block @click="saveChanges">Guardar</v-btn>
         </v-card-text>
     </v-card>
+=======
+    <h2 class="player-name text-wrap">
+      <v-btn v-if="isEditing" @click="toggleEditMode" variant="text"
+        >Cancelar</v-btn
+      >
+      <v-text-field
+        v-if="isEditing"
+        v-model="editableUser.nick"
+        label="Nick"
+        dense
+        variant="solo"
+      ></v-text-field>
+      <v-text-field
+        v-if="isEditing"
+        v-model="editableUser.nombreUsuario"
+        label="Nombre"
+        dense
+        variant="solo"
+      ></v-text-field>
+      <v-text-field
+        v-if="isEditing"
+        v-model="editableUser.primerApellido"
+        label="Primer apellido"
+        dense
+        variant="solo"
+      ></v-text-field>
+      <v-text-field
+        v-if="isEditing"
+        v-model="editableUser.segundoApellido"
+        label="Segundo apellido"
+        dense
+        variant="solo"
+      ></v-text-field>
+      <p v-if="!isEditing">
+        {{ editableUser.nombreUsuario }} {{ editableUser.primerApellido }}
+        {{ editableUser.segundoApellido }}
+        <v-btn icon @click="toggleEditMode" v-if="editable"
+          ><v-icon size="x-small">mdi-pen</v-icon></v-btn
+        >
+      </p>
+    </h2>
+    <h2 class="player-name text-wrap ringbearer" v-if="!isEditing">
+      {{ editableUser.nick }}
+    </h2>
+
+    <v-divider class="mb-3"></v-divider>
+    <v-card-text class="mt-0 text-left">
+      <v-combobox
+        v-if="isEditing"
+        v-model="editableFaccionName"
+        :items="faccionesCombo"
+        item-title="nombreFaccion"
+        item-value="idFaccion"
+        label="Selecciona una comunidad"
+        @update:modelValue="logFaccionSelection"
+      >
+      </v-combobox>
+      <p v-else class="profile-info">
+        <strong>Comunidad:</strong> {{ editableFaccionName }}
+      </p>
+
+      <v-text-field
+        v-if="isEditing"
+        v-model="editableUser.nickLGDA"
+        label="Nick LGDA"
+        dense
+        variant="solo"
+      ></v-text-field>
+      <p v-else class="profile-info">
+        <strong>Nick LGDA:</strong>
+        <a
+          :href="
+            'https://www.laguerradelanillo.com/tu-perfil/' +
+            editableUser.nickLGDA
+          "
+          target="_blank"
+          >{{ editableUser.nickLGDA }}</a
+        >
+      </p>
+
+      <v-text-field
+        v-if="isEditing"
+        v-model="editableUser.ciudad"
+        label="Ciudad"
+        dense
+        variant="solo"
+      ></v-text-field>
+      <p v-else class="profile-info">
+        <strong>Ciudad:</strong> {{ editableUser.ciudad }}
+      </p>
+
+      <v-text-field
+        v-if="isEditing"
+        v-model="editableUser.email"
+        label="Email"
+        dense
+        variant="solo"
+      ></v-text-field>
+      <p v-else class="profile-info">
+        <strong>Email:</strong> {{ editableUser.email }}
+      </p>
+
+      <!-- Campo de Fecha con Date Picker en Modo Edición -->
+      <v-menu
+        v-if="isEditing"
+        v-model="datePickerMenu"
+        :close-on-content-click="false"
+        transition="scale-transition"
+        offset-y
+      >
+        <template v-slot:activator="{ props }">
+          <v-text-field
+            v-bind="props"
+            v-model="formattedFechaNacimiento"
+            label="Fecha de nacimiento"
+            prepend-icon="mdi-calendar"
+            readonly
+            @click="datePickerMenu = true"
+          ></v-text-field>
+        </template>
+        <v-date-picker
+          v-model="dateObject"
+          @update:modelValue="updateFechaNacimiento"
+        ></v-date-picker>
+      </v-menu>
+      <!-- Texto con fecha formateada en modo vista (no edición) -->
+      <p v-else class="profile-info">
+        <strong>Fecha de nacimiento:</strong>
+        {{ convertirFecha(editableUser.fechaNacimiento) }}
+      </p>
+
+      <v-text-field
+        v-if="isEditing"
+        v-model="editableUser.telefono"
+        label="Teléfono"
+        dense
+        variant="solo"
+      ></v-text-field>
+      <p v-else class="profile-info">
+        <span v-if="editable"
+          ><strong>Teléfono:</strong> {{ editableUser.telefono }}</span
+        >
+      </p>
+
+      <v-btn
+        v-if="isEditing"
+        color="primary"
+        variant="tonal"
+        block
+        @click="saveChanges"
+        >Guardar</v-btn
+      >
+    </v-card-text>
+  </v-card>
+
+  <v-card class="profile-section mt-4" v-if="editable">
+    <v-btn variant="tonal" color="primary" @click="handlerCambiarPass">
+      Cambiar Contraseña
+    </v-btn>
+  </v-card>
+
+  <ModalCambiarPass
+    v-if="showModalCambiarPass"
+    @close="closeModalCambiarPass"
+  />
+>>>>>>> Stashed changes
 </template>
 
 <script setup lang="ts">
