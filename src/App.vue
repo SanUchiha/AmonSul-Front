@@ -145,10 +145,11 @@
       <v-btn icon to="contacto">
         <v-icon>mdi-email</v-icon>
       </v-btn>
-      <v-btn
-        icon="mdi-account-circle"
-        @click="() => router.push({ name: 'perfil-usuario' })"
-      ></v-btn>
+      <v-btn icon @click="() => router.push({ name: 'perfil-usuario' })">
+        <v-avatar size="30" class="avatar">
+          <v-img :src="user.imagen || defaultAvatar" alt="Avatar"></v-img>
+        </v-avatar>
+      </v-btn>
       <v-btn
         icon
         @click="mostrarDialogoLogout = true"
@@ -173,97 +174,65 @@
       @cancelar="mostrarDialogoLogout = false"
     />
 
-    <v-bottom-navigation
-      v-if="$vuetify.display.smAndDown"
-      app
-      fixed
-      height="64"
-      color="primary"
-      grow
-      class="bottom-nav"
-    >
-      <!-- Botón 1: Modal registrar partida -->
-      <v-btn icon @click="openRegistroPartida" class="animated-btn">
-        <img
-          src="@/assets/icons/nuevaPartida.png"
-          alt="Icono personalizado"
-          width="50"
-          height="50"
-        />
-        Nueva Partida
-      </v-btn>
-
-      <!-- Botón 2: Ruta (cuando definas) -->
-      <v-btn
-        icon
-        :to="{ path: '/mis-partidas' }"
-        :class="{ 'active-btn': $route.path === '/mis-partidas' }"
-        class="animated-btn"
-      >
-        <img
-          src="@/assets/icons/misPartidas.png"
-          alt="Icono personalizado"
-          width="50"
-          height="50"
-        />
-        Mis Partidas
-      </v-btn>
-
-      <!-- Botón 3: Ruta (cuando definas) -->
-      <v-btn
-        icon
-        :to="{ path: '/mis-torneos' }"
-        :class="{ 'active-btn': $route.path === '/mis-torneos' }"
-        class="animated-btn"
-      >
-        <img
-          src="@/assets/icons/misTorneos.png"
-          alt="Icono personalizado"
-          width="50"
-          height="50"
-        />
-        Mis Torneos
-      </v-btn>
-    </v-bottom-navigation>
 
     <!-- Modal de registrar partida -->
-    <v-dialog v-model="dialog">
-      <FormCrearPartida
-        @close="dialog = false"
-        @registroExitoso="refrescarPartidas"
-        :isVisible="dialog"
-      />
+    <v-dialog v-model="dialog" >
+      <FormCrearPartida @close="dialog = false;" :isVisible="dialog"/>
     </v-dialog>
 
     <FooterComponent absolute="true" />
   </v-app>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
 import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
 import LogoAmonSulPNG from "@/assets/icons/Logo2.png";
 import LogoAmonSulSVG from "@/assets/icons/logo_horizontal3.png";
-import FooterComponent from "@/components/Commons/FooterComponent.vue";
-import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
+import FooterComponent from '@/components/Commons/FooterComponent.vue';
+import FormCrearPartida from '@/components/PartidaAmistosa/FormCrearPartida.vue';
+import { useUsuariosStore } from "@/store/usuarios";
+import { UsuarioViewDTO } from "@/interfaces/Usuario";
+import defaultAvatar from "@/assets/icons/perfil.png";
 
-const { logout } = useAuth();
+const usuariosStore = useUsuariosStore();
+const user = ref<UsuarioViewDTO>({} as UsuarioViewDTO);
+
+const { logout, getUser } = useAuth();
 const router = useRouter();
 const drawer = ref(false);
 const mostrarDialogoLogout = ref(false);
 const { isAuthenticated } = useAuth();
 
-const dialog = ref(false);
-const openRegistroPartida = () => {
-  dialog.value = true;
-};
+const dialog = ref(false)
+
+const isLoggedIn = computed(() => !!getUser.value)
 
 const handleLogout = async () => {
   logout();
   router.push({ name: "inicio-sesion" });
 };
+
+// Función para cargar los datos del usuario
+const cargarUsuario = async () => {
+  try {
+    console.log("getUser:", getUser.value);
+      await usuariosStore.requestUsuario(getUser.value!);
+    
+      user.value = usuariosStore.usuario; // ✅ Asegura que user tiene datos antes de renderizar
+  } catch (error) {
+    console.error("Error al obtener el usuario:", error);
+  }
+};
+
+// Ejecutar cuando el componente se monta
+onMounted(() => {
+  if (isLoggedIn.value) {
+    cargarUsuario();
+  }
+});
 </script>
 
 <style scoped>

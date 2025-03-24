@@ -165,9 +165,8 @@
       >
     </v-card-text>
   </v-card>
-  <v-spacer class="my-4"></v-spacer>
 
-  <v-card class="profile-section">
+  <v-card class="profile-section mt-4" v-if="editable">
     <v-btn variant="tonal" color="primary" @click="handlerCambiarPass">
       Cambiar Contraseña
     </v-btn>

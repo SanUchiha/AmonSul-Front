@@ -59,7 +59,6 @@ import { useAuth } from "@/composables/useAuth";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
-import ModalCambiarPass from "@/components/Perfil/ModalCambiarPass.vue";
 import CardPerfilUsuario from "@/components/Perfil/CardPerfilUsuario.vue";
 import CardRangoUsuario from "@/components/Perfil/CardRangoUsuario.vue";
 import LogrosUsuario from "@/components/Perfil/LogrosUsuario.vue";
@@ -70,7 +69,6 @@ const isLoading = ref(true);
 const { getUser } = useAuth();
 const correo = ref<string>(await getUser.value!);
 const selectedFaccionName = ref<number>(0);
-const showModalCambiarPass = ref(false);
 const user = ref<UsuarioViewDTO>();
 
 // Definimos props opcionales con TypeScript
@@ -120,9 +118,6 @@ watch(
   }
 );
 
-const handleCambiarPassword = () => {
-  showModalCambiarPass.value = true;
-};
 </script>
 
 <style scoped>

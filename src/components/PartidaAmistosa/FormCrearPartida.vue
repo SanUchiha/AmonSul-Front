@@ -1,15 +1,17 @@
 <template>
-  <v-container class="login-form scrollable-modal">
+  <v-container class="login-form">
     <div class="overlay" v-if="isLoading"></div>
 
     <v-row justify="center">
       <v-col cols="12" md="6">
-        <v-card class="pa-4 rounded-lg elevation-3 dark-form-card">
+        <v-card class="pa-4 rounded-lg elevation-3 dark-form-card scrollable-modal">
           <v-card-title class="text-h6 font-weight-bold text-center text-white">
             <v-icon class="me-2" color="deep-orange">mdi-sword-cross</v-icon>
             Registrar partida
           </v-card-title>
-<v-divider class="mt-3"></v-divider>
+
+          <v-divider class="mt-3"></v-divider>
+
           <v-card-text>
             <v-form @submit.prevent="validateForm" ref="form">
               <!-- CONTRINCANTE -->

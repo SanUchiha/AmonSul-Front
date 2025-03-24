@@ -102,6 +102,44 @@
       <v-divider class="my-3"></v-divider>
     </div>
 
+    <v-bottom-navigation
+      v-if="$vuetify.display.smAndDown"
+      app
+      fixed
+      height="64"
+      color="primary"
+      grow
+      class="bottom-nav"
+    >
+      <!-- Botón 1: Modal registrar partida -->
+      <v-btn icon @click="openRegistroPartida" class="animated-btn">
+        <img src="@/assets/icons/nuevaPartida.png" alt="Icono personalizado" width="50" height="50">
+        Nueva Partida
+      </v-btn>
+
+      <!-- Botón 2: Ruta (cuando definas) 
+      <v-btn
+        icon
+        :to="{ path: '/mis-partidas' }"
+        :class="{ 'active-btn': $route.path === '/mis-partidas' }"
+        class="animated-btn"
+      >
+        <img src="@/assets/icons/misPartidas.png" alt="Icono personalizado" width="50" height="50">
+        Mis Partidas
+      </v-btn>-->
+      
+      <!-- Botón 3: Ruta (cuando definas) 
+      <v-btn
+        icon
+        :to="{ path: '/mis-torneos' }"
+        :class="{ 'active-btn': $route.path === '/mis-torneos' }"
+        class="animated-btn"
+      >
+        <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="50" height="50">
+        Mis Torneos
+      </v-btn>-->
+    </v-bottom-navigation>
+
     <!-- Modal con el componente RegistrarPartidas -->
     <v-dialog v-model="dialog">
       <FormCrearPartida
@@ -148,6 +186,9 @@ const faccionDTO = ref<FaccionDTO>({
   idFaccion: 0,
   nombreFaccion: "",
 });
+const openRegistroPartida = () => {
+  dialog.value = true
+}
 const usuarioData = ref<UsuarioDataDTO>({
   idUsuario: 0,
   nick: "",
