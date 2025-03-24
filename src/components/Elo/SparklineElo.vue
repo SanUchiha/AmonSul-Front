@@ -18,7 +18,11 @@
             :stroke-linecap="lineCap"
             :type="type"
             auto-draw
-          ></v-sparkline>
+          >
+            <template v-slot:label="item">
+              {{ item.value }}
+            </template>
+          </v-sparkline>
         </v-sheet>
       </v-card-text>
 
