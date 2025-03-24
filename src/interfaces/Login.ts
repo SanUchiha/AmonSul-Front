@@ -9,7 +9,7 @@ export interface ResponseLoginDTO {
 }
 export interface AuthState {
   user: string | null;
-  idUsuario: string | null;
+  idUsuario: string;
   token: string;
   error: string | null;
 }

@@ -66,6 +66,10 @@ export const cambiarPass = async (body: UsuarioCambioPassDTO) => {
   return http.put(`Usuario/Cambiar-Pass`, body);
 };
 
+export const getProteccionDatos = async (idUsuario: number) => {
+  return http.get(`Usuario/Proteccion-Datos/${idUsuario}`);
+};
+
 export const aceptarProteccionDatos = async (body: AceptarProteccionDatos) => {
   return http.put(`Usuario/Proteccion-Datos`, body);
 };

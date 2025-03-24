@@ -49,7 +49,7 @@ const logout = () => {
   stateAuth.user = null;
   stateAuth.token = "";
   stateAuth.error = null;
-  stateAuth.idUsuario = null;
+  stateAuth.idUsuario = "";
 };
 
 const isAuthenticated = computed(() => !!stateAuth.token);

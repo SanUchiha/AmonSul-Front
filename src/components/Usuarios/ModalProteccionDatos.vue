@@ -51,10 +51,10 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useRouter } from "vue-router";
 
-const { getidUsuario, logout } = useAuth();
 const router = useRouter();
 
-const idUsuarioLogger = ref<string | null>(getidUsuario.value);
+const { logout, getidUsuario } = useAuth();
+const idUsuarioLogger = ref<number>(parseInt(getidUsuario.value));
 
 const isVisibleModal = ref<boolean>(true);
 
@@ -65,7 +65,7 @@ const emit = defineEmits(["modalClosed"]);
 
 const aceptarPolitica = async () => {
   const body: AceptarProteccionDatos = {
-    idUsuario: parseInt(idUsuarioLogger.value!),
+    idUsuario: idUsuarioLogger.value,
     proteccionDatos: true,
   };
   try {

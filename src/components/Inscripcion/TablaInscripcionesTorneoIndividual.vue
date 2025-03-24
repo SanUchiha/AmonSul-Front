@@ -18,7 +18,7 @@
           </template>
 
           <v-list-item-title class="text-wrap text-left pl-2">{{
-            torneo.nombreTorneo
+            torneo.torneo.nombreTorneo
           }}</v-list-item-title>
 
           <template v-slot:append>
@@ -54,7 +54,7 @@
           </template>
 
           <v-list-item-title class="text-wrap text-left pl-2">{{
-            torneo.nombreTorneo
+            torneo.torneo.nombreTorneo
           }}</v-list-item-title>
 
           <template v-slot:append>
