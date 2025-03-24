@@ -56,7 +56,7 @@
                   v-for="torneo in paginatedTorneos"
                   :key="torneo.idTorneo"
                   cols="12"
-                  sm="8" offset-sm="2"
+                  sm="8" 
                   md="6"
                   lg="4"
                 >

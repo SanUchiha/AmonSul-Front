@@ -1,82 +1,91 @@
 <template>
-  <v-row>
-    <v-col cols="12" sm="6">
-      <v-row>
-        <v-col cols="4">
-          <span class="font-weight-bold ">Victorias: {{ usuario.partidasGanadas }}</span>
-        </v-col>
-        <v-col cols="4">
-          <span class="font-weight-bold">Empates: {{ usuario.partidasEmpatadas }}</span>
-        </v-col>
-        <v-col cols="4" v-if="usuario.partidasPerdidas > 0">
-          <span class="font-weight-bold">Derrotas: {{ usuario.partidasPerdidas }}</span>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <div class="resultado-barra">
-            <div class="victorias" v-if="winRate > 0" :style="{ flex: winRate.toFixed(2) }">{{ winRate.toFixed(2) }}</div>
-            <div class="empates" v-if="drawRate > 0" :style="{ flex: drawRate.toFixed(2) }">{{ drawRate.toFixed(2) }}</div>
-            <div class="derrotas" v-if="lossRate > 0" :style="{ flex: lossRate.toFixed(2) }">{{ lossRate.toFixed(2) }}</div>
-          </div>
-        </v-col>
-      </v-row>
-      
-      <v-divider></v-divider>
-
-      <v-row>
-        <v-col class="stat-item">
-          <img
-            src="@/assets/icons/clasificacionTorneo.png"
-            alt="Icono personalizado"
-            width="60"
-            height="60"
-          />
-          <p>Victorias: {{ winRate.toFixed(2) }}%</p>
-        </v-col>
-      </v-row>
-      <v-col v-if="usuario.rankingElo" class="stat-item">
-        <img
-          src="@/assets/icons/ELO.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Ranking Elo: {{ usuario.rankingElo.toFixed(2) }}</p>
+  <v-container class="text-center pa-0 mb-0">
+    <v-row>
+      <v-col cols="12">
+        <!--Leyenda victorias empates derrotas-->
+        <v-row>
+          <v-col cols="4">
+            <span class="font-weight-bold ">Victorias: {{ usuario.partidasGanadas }}</span>
+          </v-col>
+          <v-col cols="4">
+            <span class="font-weight-bold">Empates: {{ usuario.partidasEmpatadas }}</span>
+          </v-col>
+          <v-col cols="4" v-if="usuario.partidasPerdidas > 0">
+            <span class="font-weight-bold">Derrotas: {{ usuario.partidasPerdidas }}</span>
+          </v-col>
+        </v-row>
+        <!--Barra de victorias empates derrotas-->
+        <v-row>
+          <v-col cols="12">
+            <div class="resultado-barra">
+              <div class="victorias" v-if="winRate > 0" :style="{ flex: winRate.toFixed(2) }">{{ winRate.toFixed(2) }}</div>
+              <div class="empates" v-if="drawRate > 0" :style="{ flex: drawRate.toFixed(2) }">{{ drawRate.toFixed(2) }}</div>
+              <div class="derrotas" v-if="lossRate > 0" :style="{ flex: lossRate.toFixed(2) }">{{ lossRate.toFixed(2) }}</div>
+            </div>
+          </v-col>
+        </v-row>
+        
+        <v-divider></v-divider>
+  
+        <!--Icono Victorias-->
+        <!--TODO ver el rankingElo porque no viaja
+        <v-row> 
+          <v-col>
+            <img
+              src="@/assets/icons/clasificacionTorneo.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Victorias: {{ winRate.toFixed(2) }}%</p>
+          </v-col>
+          <v-col v-if="usuario.rankingElo" class="">
+            <img
+              src="@/assets/icons/ELO.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Ranking Elo: {{ usuario.rankingElo.toFixed(2) }}</p>
+          </v-col>
+        </v-row>-->
       </v-col>
-    </v-col>
-    <v-col cols="12" sm="6">
-      <v-col class="stat-item">
-        <img
-          src="@/assets/icons/ejercitoMasUsado.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Ejército más usado: próximamente</p>
+  
+      <v-col cols="12">
+        <v-row>
+          <v-col class="">
+            <img
+              src="@/assets/icons/ejercitoMasUsado.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Ejército más usado: próximamente</p>
+          </v-col>
+    
+          <v-col class="">
+            <img
+              src="@/assets/icons/ejercitoMejorResultado.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Ejército con mejor resultado: próximamente</p>
+          </v-col>
+    
+          <v-col class="">
+            <img
+              src="@/assets/icons/ejercitoPeorResultado.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Ejército con peor resultado: próximamente</p>
+          </v-col>
+        </v-row>
       </v-col>
-
-      <v-col class="stat-item">
-        <img
-          src="@/assets/icons/ejercitoMejorResultado.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Ejército con mejor resultado: próximamente</p>
-      </v-col>
-
-      <v-col class="stat-item">
-        <img
-          src="@/assets/icons/ejercitoPeorResultado.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Ejército con peor resultado: próximamente</p>
-      </v-col>
-    </v-col>
-  </v-row>
+    </v-row>
+  </v-container>
 
 </template>
 
@@ -119,15 +128,14 @@ const drawRate = computed(() => ((usuarioData.value.partidasEmpatadas) / usuario
 }
 
 .victorias {
-  background-color: #145c1750; /* azul claro */
+  background-color: #145c17; /* azul claro */
 }
 
 .empates {
-  background-color: #e6c40050; /* naranja claro */
-  color: #000;
+  background-color: #dbba00; /* naranja claro */
 }
 
 .derrotas {
-  background-color: #75171050; /* verde claro */
+  background-color: #751710; /* verde claro */
 }
 </style>

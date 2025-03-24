@@ -233,7 +233,6 @@ const initializeComponent = async () => {
       pendingMatches.value = pendingMatches.value.reverse();
 
       loadComunidad(idUsuarioLogger.value);
-
       loadResume(validMatches.value);
     } catch (error) {
       console.error(error);

@@ -92,7 +92,7 @@
                         <v-icon v-else-if="miembro.estadoLista === 'ENTREGADA'" color="blue">mdi-send</v-icon><!--LISTA ENTREGA-->
                         <v-icon v-else color="red">mdi-close-circle</v-icon><!--LISTA ILEGAL-->
                       </span>
-                      <span v-else><v-icon color="yellow">mdi-email-off</v-icon></span><!--LISTA NO ENTREGADA-->
+                      <span v-else><v-icon color="red">mdi-email-off</v-icon></span><!--LISTA NO ENTREGADA-->
                     </td>
                     <td>
                       <v-menu offset-y>
@@ -145,7 +145,7 @@
 
                 <v-card-text>
                   Estado de la lista<br/>
-                  <v-chip :color="miembro.estadoLista === 'OK' ? 'green' : miembro.estadoLista === 'ENTREGADA' ? 'yellow' : 'red'" variant="tonal">
+                  <v-chip :color="miembro.estadoLista === 'OK' ? 'green' : miembro.estadoLista === 'ENTREGADA' ? 'blue' : 'red'" variant="tonal">
                     {{ miembro.estadoLista }}
                   </v-chip>
                 </v-card-text>

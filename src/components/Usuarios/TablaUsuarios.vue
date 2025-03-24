@@ -5,19 +5,34 @@
   <div v-else>
     <v-card flat>
       <v-card-title class="d-flex align-center pe-2">
-        <v-icon class="me-2" color="primary">mdi-account-group</v-icon>
-        Usuarios
-        <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          density="compact"
-          label="Buscar usuario"
-          prepend-inner-icon="mdi-magnify"
-          variant="solo-filled"
-          flat
-          hide-details
-          single-line
-        ></v-text-field>
+        <v-row>
+          <v-col cols="12" sm="4">
+            <v-icon class="me-2" color="primary">mdi-account-group</v-icon>
+            Usuarios
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-text-field
+              v-model="search"
+              density="compact"
+              label="Buscar usuario"
+              prepend-inner-icon="mdi-magnify"
+              variant="solo-filled"
+              flat
+              hide-details
+              single-line
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-select
+              v-model="selectedFaction"
+              :items="factions"
+              label="Filtrar por facción"
+              clearable
+            ></v-select>
+          </v-col>
+        </v-row>
+        
+        <!--TODO Filtrar por provincia
         <v-select
           v-model="selectedProvince"
           :items="provinces"
@@ -25,13 +40,8 @@
           clearable
           class="ml-2"
         ></v-select>
-        <v-select
-          v-model="selectedFaction"
-          :items="factions"
-          label="Filtrar por facción"
-          clearable
-          class="ml-2"
-        ></v-select>
+        -->
+        
       </v-card-title>
       <v-divider></v-divider>
       <v-data-table
