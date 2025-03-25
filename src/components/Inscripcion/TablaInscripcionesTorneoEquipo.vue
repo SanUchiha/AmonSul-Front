@@ -100,7 +100,7 @@
     <ModalInscripcionEquipo
       :idInscripcion="currentInscripcionId"
       :idUsuario="parseInt(idUsuarioLogger!)"
-      :idTorneo="currentTorneoId"
+      :idTorneo="currentTorneoId!"
       :idOrganizador="currentTorneoId"
       @eliminar-inscripcion-equipo="eliminarInscripcionEquipo"
       @close="closeModal"

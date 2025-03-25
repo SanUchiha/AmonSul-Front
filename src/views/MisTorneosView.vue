@@ -22,7 +22,7 @@
           <v-row dense>
             <v-col cols="12" sm="6" class="text-center">
               <!-- Resumen partidas -->
-              <v-card class="section-card stats-section pt-0 mt-0 mb-0">
+              <v-card class="section-card stats-section pt-0 mt-0 mb-2">
                 <v-col cols="12"><p class="text-h5 ringbearer">Estadísticas</p></v-col>
                 <v-divider></v-divider>
                 <v-col cols="12" md="12" class="text-center">

@@ -126,7 +126,7 @@ export interface ModificarTorneoDTO {
   precioTorneo?: number;
   numeroPartidas?: number;
   puntosTorneo?: number;
-  estadoTorneo: "ESPERANDO" | "LIVE" | "TERMINADO" | "CANCELADO"; // Estado del torneo (enum)
+  estadoTorneo: number; // Estado del torneo (enum)
   lugarTorneo?: string;
   tipoTorneo: "Individual" | "Parejas" | "Equipos_4" | "Equipos_6";
   esLiga?: boolean;

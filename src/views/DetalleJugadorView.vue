@@ -82,6 +82,7 @@
                 :isLoading="isLoading"
                 :listaTorneos="usuarioData.InscripcionesIndividualTorneo"
                 :idUsuario="usuarioData.idUsuario"
+                :disputado=false
               />
             </v-window-item>
           </v-window>
