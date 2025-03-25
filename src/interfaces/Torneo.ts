@@ -76,6 +76,7 @@ export interface InscripcionTorneoCreadoDTO {
   idLista?: number | null;
   ejercito?: string | null;
   listaData?: string | null;
+  idTorneo: number;
 }
 
 export interface GuardarResultadosDTO {

@@ -1,5 +1,6 @@
 import {
   CrearInscripcionDTO,
+  CreateMiembroEquipoDTO,
   InscripcionEquipoDTO,
   UpdateEstadoListaDTO,
   UpdateEstadoPagoDTO,
@@ -59,6 +60,16 @@ export const registrarEquipo = async (
   nuevaInscripcion: InscripcionEquipoDTO
 ) => {
   return http.post(`Inscripcion/equipo`, nuevaInscripcion);
+};
+
+export const registrarMiembroEquipoAsync = async (
+  request: CreateMiembroEquipoDTO
+) => {
+  return http.post(`Inscripcion/Registar-miembro-Equipo`, request);
+};
+
+export const eliminarMiembroEquipoAsync = async (idInscripcion: number) => {
+  return http.delete(`Inscripcion/Miembro/${idInscripcion}`);
 };
 
 export const getInscripcionEquipo = async (idInscripcion: number) => {

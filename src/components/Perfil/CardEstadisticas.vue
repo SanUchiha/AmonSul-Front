@@ -98,14 +98,29 @@ const props = defineProps<{ usuario: UsuarioDataDTO }>();
 const defaultUsuario = {
   partidasGanadas: 0,
   partidasPerdidas: 0,
-  partidasEmpatadas: 0
+  partidasEmpatadas: 0,
 };
 const usuarioData = computed(() => props.usuario ?? defaultUsuario);
 console.log("usuario estadisticas", props.usuario);
 
-const winRate = computed(() => ((usuarioData.value.partidasGanadas) / usuarioData.value.numeroPartidasJugadas) * 100);
-const lossRate = computed(() => ((usuarioData.value.partidasPerdidas) / usuarioData.value.numeroPartidasJugadas) * 100);
-const drawRate = computed(() => ((usuarioData.value.partidasEmpatadas) / usuarioData.value.numeroPartidasJugadas) * 100);
+const winRate = computed(
+  () =>
+    (usuarioData.value.partidasGanadas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
+);
+const lossRate = computed(
+  () =>
+    (usuarioData.value.partidasPerdidas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
+);
+const drawRate = computed(
+  () =>
+    (usuarioData.value.partidasEmpatadas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
+);
 
 </script>
 <style scoped>
