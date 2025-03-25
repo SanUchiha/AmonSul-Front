@@ -44,14 +44,14 @@
             </v-col>
             <v-col cols="12" sm="6" class="align-center pt-1 pb-1">
               <v-chip
-              class="mt-1"
-              :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'"
-              variant="tonal"
-              x-small
-            >
-              <v-icon size="16" class="me-1">mdi-cash</v-icon> 
-              Pago: {{ inscripcionData?.esPago }}
-            </v-chip>
+                class="mt-1"
+                :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'"
+                variant="tonal"
+                x-small
+              >
+                <v-icon size="16" class="me-1">mdi-cash</v-icon>
+                Pago: {{ inscripcionData?.esPago }}
+              </v-chip>
             </v-col>
           </v-row>
         </v-card>
@@ -88,11 +88,22 @@
                     </td>
                     <td>
                       <span v-if="miembro.listaData">
-                        <v-icon v-if="miembro.estadoLista === 'OK'" color="green">mdi-check</v-icon><!--LISTA OK-->
-                        <v-icon v-else-if="miembro.estadoLista === 'ENTREGADA'" color="blue">mdi-send</v-icon><!--LISTA ENTREGA-->
-                        <v-icon v-else color="red">mdi-close-circle</v-icon><!--LISTA ILEGAL-->
+                        <v-icon
+                          v-if="miembro.estadoLista === 'OK'"
+                          color="green"
+                          >mdi-check</v-icon
+                        ><!--LISTA OK-->
+                        <v-icon
+                          v-else-if="miembro.estadoLista === 'ENTREGADA'"
+                          color="blue"
+                          >mdi-send</v-icon
+                        ><!--LISTA ENTREGA-->
+                        <v-icon v-else color="red">mdi-close-circle</v-icon
+                        ><!--LISTA ILEGAL-->
                       </span>
-                      <span v-else><v-icon color="yellow">mdi-email-off</v-icon></span><!--LISTA NO ENTREGADA-->
+                      <span v-else
+                        ><v-icon color="yellow">mdi-email-off</v-icon></span
+                      ><!--LISTA NO ENTREGADA-->
                     </td>
                     <td>
                       <v-menu offset-y>
@@ -102,15 +113,35 @@
                           </v-btn>
                         </template>
                         <v-list>
-                          <v-list-item v-if="miembro.listaData" @click.stop="verLista(miembro.listaData,miembro.nick,miembro.ejercito!)">
+                          <v-list-item
+                            v-if="miembro.listaData"
+                            @click.stop="
+                              verLista(
+                                miembro.listaData,
+                                miembro.nick,
+                                miembro.ejercito!
+                              )
+                            "
+                          >
                             <v-list-item-title>
                               <v-icon class="me-2">mdi-eye</v-icon> Ver Lista
                             </v-list-item-title>
                           </v-list-item>
                           <!--TODO  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"-->
-                          <v-list-item v-if="inscripcionData?.idCapitan == idUsuario" @click.stop="enviarCambiarLista(miembro.idInscripcion,miembro.listaData!,miembro.idUsuario,miembro.nick)">
+                          <v-list-item
+                            v-if="inscripcionData?.idCapitan == idUsuario"
+                            @click.stop="
+                              enviarCambiarLista(
+                                miembro.idInscripcion,
+                                miembro.listaData!,
+                                miembro.idUsuario,
+                                miembro.nick
+                              )
+                            "
+                          >
                             <v-list-item-title>
-                              <v-icon class="me-2">mdi-pencil</v-icon> Enviar/Modificar Lista
+                              <v-icon class="me-2">mdi-pencil</v-icon>
+                              Enviar/Modificar Lista
                             </v-list-item-title>
                           </v-list-item>
                         </v-list>
@@ -144,8 +175,17 @@
                 <v-divider></v-divider>
 
                 <v-card-text>
-                  Estado de la lista<br/>
-                  <v-chip :color="miembro.estadoLista === 'OK' ? 'green' : miembro.estadoLista === 'ENTREGADA' ? 'yellow' : 'red'" variant="tonal">
+                  Estado de la lista<br />
+                  <v-chip
+                    :color="
+                      miembro.estadoLista === 'OK'
+                        ? 'green'
+                        : miembro.estadoLista === 'ENTREGADA'
+                        ? 'yellow'
+                        : 'red'
+                    "
+                    variant="tonal"
+                  >
                     {{ miembro.estadoLista }}
                   </v-chip>
                 </v-card-text>
@@ -156,19 +196,39 @@
                   <v-menu offset-y>
                     <template v-slot:activator="{ props }">
                       <v-btn color="primary" variant="tonal" v-bind="props">
-                        <v-icon>mdi-menu	</v-icon> Acciones
+                        <v-icon>mdi-menu </v-icon> Acciones
                       </v-btn>
                     </template>
                     <v-list>
-                      <v-list-item v-if="miembro.listaData" @click.stop="verLista(miembro.listaData,miembro.nick,miembro.ejercito!)">
+                      <v-list-item
+                        v-if="miembro.listaData"
+                        @click.stop="
+                          verLista(
+                            miembro.listaData,
+                            miembro.nick,
+                            miembro.ejercito!
+                          )
+                        "
+                      >
                         <v-list-item-title>
                           <v-icon class="me-2">mdi-eye</v-icon> Ver Lista
                         </v-list-item-title>
                       </v-list-item>
                       <!--TODO  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"-->
-                      <v-list-item v-if="inscripcionData?.idCapitan == idUsuario" @click.stop="enviarCambiarLista(miembro.idInscripcion,miembro.listaData!,miembro.idUsuario,miembro.nick)">
+                      <v-list-item
+                        v-if="inscripcionData?.idCapitan == idUsuario"
+                        @click.stop="
+                          enviarCambiarLista(
+                            miembro.idInscripcion,
+                            miembro.listaData!,
+                            miembro.idUsuario,
+                            miembro.nick
+                          )
+                        "
+                      >
                         <v-list-item-title>
-                          <v-icon class="me-2">mdi-pencil</v-icon> Enviar/Modificar Lista
+                          <v-icon class="me-2">mdi-pencil</v-icon>
+                          Enviar/Modificar Lista
                         </v-list-item-title>
                       </v-list-item>
                     </v-list>
@@ -179,12 +239,18 @@
           </v-row>
         </v-card-text>
 
-        <v-divider class="my-4" v-if="inscripcionData?.idCapitan == idUsuario"></v-divider>
+        <v-divider
+          class="my-4"
+          v-if="inscripcionData?.idCapitan == idUsuario"
+        ></v-divider>
 
         <v-card-actions>
           <v-row>
             <v-col>
-              <div class="text-center" v-if="inscripcionData?.idCapitan == idUsuario">
+              <div
+                class="text-center"
+                v-if="inscripcionData?.idCapitan == idUsuario"
+              >
                 <v-btn
                   color="red-darken-3"
                   variant="tonal"
@@ -194,14 +260,12 @@
                 >
                   Dar de baja al equipo
                 </v-btn>
-              </div>            
+              </div>
             </v-col>
             <v-col v-if="$vuetify.display.xs">
-              <v-btn block @click="close" variant="tonal">
-                Cerrar
-              </v-btn>
+              <v-btn block @click="close" variant="tonal"> Cerrar </v-btn>
             </v-col>
-          </v-row>        
+          </v-row>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -289,12 +353,23 @@ const showSuccessModalEliminar = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const { getidUsuario } = useAuth();
 
-const idUsuarioLogger = ref<string | null>(getidUsuario.value);
-const isLoading = ref(true);
-const isRegistering = ref(false);
-const isCaptain = ref(false);
+const idUsuarioLogger = ref<number>(parseInt(getidUsuario.value));
+const isLoading = ref<boolean>(true);
+const isRegistering = ref<boolean>(false);
+const isCaptain = ref<boolean>(false);
 const idCaptain = ref<number>();
-const inscripcionData = ref<InscripcionEquipoDTO>();
+const inscripcionData = ref<InscripcionEquipoDTO>({
+  idTorneo: 0,
+  idCapitan: 0,
+  nombreEquipo: "",
+  miembros: [],
+  idInscripcion: 0,
+  idUsuario: 0,
+  idEquipo: 0,
+  idOrganizador: 0,
+  emailOrganizador: "",
+  componentesEquipoDTO: [],
+});
 const currentInscripcionId = ref<number>();
 const currentUsuarioId = ref<number>();
 const currentEmailOrganziador = ref<string>();
@@ -365,7 +440,7 @@ const handleEnviarLista = async (newLista: RequesListaDTO) => {
       listaData: newLista.listaData,
       ejercito: newLista.ejercito,
       idUsuario: newLista.idUsuario,
-      idTorneo: inscripcionData.value?.idTorneo,
+      idTorneo: inscripcionData.value.idTorneo,
       emailOrganizador: inscripcionData.value?.emailOrganizador,
       nick: newLista.nick,
       nombreEquipo: inscripcionData.value?.nombreEquipo,
@@ -377,10 +452,10 @@ const handleEnviarLista = async (newLista: RequesListaDTO) => {
 
       for (
         let index = 0;
-        index < inscripcionData.value!.componentesEquipoDTO.length;
+        index < inscripcionData.value.componentesEquipoDTO.length;
         index++
       ) {
-        const element = inscripcionData.value!.componentesEquipoDTO[index];
+        const element = inscripcionData.value.componentesEquipoDTO[index];
         if (currentInscripcionId.value == element.idInscripcion)
           element.estadoLista = "ENTREGADA";
       }
@@ -401,9 +476,11 @@ onMounted(async () => {
 
     inscripcionData.value = response.data;
 
-    if (inscripcionData.value?.idCapitan == parseInt(idUsuarioLogger.value!)) {
+    console.log("ins", inscripcionData.value);
+
+    if (inscripcionData.value?.idCapitan == idUsuarioLogger.value) {
       isCaptain.value = true;
-      idCaptain.value = parseInt(idUsuarioLogger.value!);
+      idCaptain.value = idUsuarioLogger.value;
     }
   } catch (error) {
     console.error("Error al obtener datos de la inscripcion:", error);
