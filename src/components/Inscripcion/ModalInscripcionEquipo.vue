@@ -130,18 +130,12 @@
                             <!--TODO  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"-->
                             <v-list-item
                               v-if="inscripcionData?.idCapitan == idUsuario"
-                              @click.stop="
-                                enviarCambiarLista(
-                                  miembro.idInscripcion,
-                                  miembro.listaData!,
-                                  miembro.idUsuario,
-                                  miembro.nick
-                                )
-                              "
+                              @click.stop="enviarCambiarLista(miembro.idInscripcion,miembro.listaData!,miembro.idUsuario,miembro.nick,miembro.idLista)"
                             >
                               <v-list-item-title>
                                 <v-icon class="me-2">mdi-pencil</v-icon>
-                                Enviar/Modificar Lista
+                                <span v-if="miembro.listaData">Modificar lista</span>
+                                <span v-else>Enviar lista</span>
                               </v-list-item-title>
                             </v-list-item>
                             <v-list-item
@@ -195,7 +189,8 @@
                   <v-divider></v-divider>
 
                   <v-card-text>
-                    Estado de la lista<br />
+                    <p v-if="miembro.ejercito">{{ miembro.ejercito }}</p>
+                    <p v-else>Estado de la lista:</p>
                     <v-chip
                       :color="
                         miembro.estadoLista === 'OK'
@@ -242,19 +237,18 @@
                               miembro.idInscripcion,
                               miembro.listaData!,
                               miembro.idUsuario,
-                              miembro.nick
+                              miembro.nick,
+                              miembro.idLista
                             )
                           "
                         >
                           <v-list-item-title>
                             <v-icon class="me-2">mdi-pencil</v-icon>
-                            Enviar/Modificar Lista
+                            <span v-if="miembro.listaData">Modificar lista</span>
+                            <span v-else>Enviar lista</span>
                           </v-list-item-title>
                         </v-list-item>
-                        <v-list-item
-                          v-if="inscripcionData?.idCapitan == idUsuario"
-                          @click.stop="eliminarMiembro(miembro.idInscripcion)"
-                        >
+                        <v-list-item v-if="inscripcionData?.idCapitan == idUsuario" @click.stop="eliminarMiembro(miembro.idInscripcion)">
                           <v-list-item-title>
                             <v-icon color="red" class="me-2"
                               >mdi-account-remove</v-icon
@@ -371,6 +365,7 @@
     :nick="currentNick!"
     :hasLista="hasLista"
     @enviarLista="handleEnviarLista"
+    @modificarLista="handleModificarLista"
   />
 
   <!-- Modales de respuesta a la subida de la lista -->
@@ -426,10 +421,11 @@ import { convertirFecha } from "@/utils/Fecha";
 
 import {
   CrearListaTorneoRequestDTO,
+  ModificarListaTorneoRequestDTO,
   ListaJugador,
   RequesListaDTO,
 } from "@/interfaces/Lista";
-import { subirListaTorneo } from "@/services/ListasService";
+import { subirListaTorneo, modificarListaTorneo } from "@/services/ListasService";
 import ModalAddMiembroEquipo from "../GestionTorneos/Equipos/ModalAddMiembroEquipo.vue";
 import { UsuarioSinEquipoDTO } from "@/interfaces/Usuario";
 import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
@@ -481,6 +477,7 @@ const inscripcionData = ref<InscripcionEquipoDTO>({
 });
 
 const currentInscripcionId = ref<number>();
+const currentIdLista = ref<number>(0);
 const currentUsuarioId = ref<number>();
 const currentEmailOrganziador = ref<string>();
 const currentNick = ref<string>();
@@ -558,11 +555,13 @@ const enviarCambiarLista = (
   idInscripcion: number | undefined,
   listaData: string,
   idUsuario: number,
-  nick: string
+  nick: string,
+  idLista: number
 ) => {
   currentInscripcionId.value = idInscripcion;
   currentUsuarioId.value = idUsuario;
   currentNick.value = nick;
+  currentIdLista.value = idLista;
   if (!listaData) hasLista.value = false;
   else hasLista.value = true;
 
@@ -595,6 +594,40 @@ const handleEnviarLista = async (newLista: RequesListaDTO) => {
 
     try {
       await subirListaTorneo(requestLista);
+      showSuccessModalLista.value = true;
+
+      for (
+        let index = 0;
+        index < inscripcionData.value.componentesEquipoDTO.length;
+        index++
+      ) {
+        const element = inscripcionData.value.componentesEquipoDTO[index];
+        if (currentInscripcionId.value == element.idInscripcion)
+          element.estadoLista = "ENTREGADA";
+      }
+    } catch {
+      isRegistering.value = false;
+      showErrorModalLista.value = true;
+    } finally {
+      isRegistering.value = false;
+      //showVerListaModal.value = false;
+    }
+  }
+};
+const handleModificarLista = async (newLista: RequesListaDTO) => {
+  if (currentInscripcionId.value != null) {
+    isRegistering.value = true;
+    const requestLista: ModificarListaTorneoRequestDTO = {
+      idInscripcion: currentInscripcionId.value,
+      idLista: currentIdLista.value,
+      listaData: newLista.listaData,
+      ejercito: newLista.ejercito,
+      idUsuario: newLista.idUsuario,
+      idTorneo: inscripcionData.value.idTorneo,
+    };
+
+    try {
+      await modificarListaTorneo(requestLista);
       showSuccessModalLista.value = true;
 
       for (

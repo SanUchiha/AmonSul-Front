@@ -36,6 +36,7 @@
                       v-for="equipo in torneoGestion?.equipos"
                       :key="equipo.idEquipo"
                       :equipo="equipo"
+                      :torneo="torneo"
                     />
                   </div>
                 </div>

@@ -119,7 +119,7 @@ const enviarLista = () => {
     };
 
     if (props.hasLista) {
-      //emit("modificarLista", newLista);
+      emit("modificarLista", newLista);
     } else {
       emit("enviarLista", newLista);
     }
