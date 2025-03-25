@@ -159,7 +159,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import { getInfoTorneoCreado } from "@/services/TorneosService";
 import ModalSorteo from "./ModalSorteo.vue";
 
-const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
+const props = defineProps<{ torneo: TorneoGestionInfoDTO }>();
 const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 const isLoading = ref<boolean>(true);
 const showConfigModal = ref<boolean>(false);
@@ -252,7 +252,37 @@ const emit = defineEmits(["inscripcionEliminada"]);
 
 const search = ref<string>("");
 const showModal = ref(false);
-const selectedInscripcion = ref<InscripcionTorneoCreadoDTO | null>(null);
+const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
+  idInscripcion: 0,
+  idUsuario: 0,
+  torneo: {
+    idTorneo: 0,
+    idUsuario: 0,
+    nombreTorneo: "",
+    descripcionTorneo: "",
+    fechaInicioTorneo: "",
+    fechaFinTorneo: "",
+    precioTorneo: 0,
+    numeroPartidas: 0,
+    puntosTorneo: 0,
+    estadoTorneo: "ESPERANDO",
+    lugarTorneo: "",
+    tipoTorneo: "",
+    esPrivadoTorneo: false,
+    idRangoTorneo: 0,
+    esMatchedPlayTorneo: false,
+    fechaEntregaListas: "",
+    fechaFinInscripcion: "",
+    basesTorneo: "",
+    cartelTorneo: "",
+    metodosPago: [],
+    horaInicioTorneo: "",
+    horaFinTorneo: "",
+    tieneBases: false,
+    inicioInscripciones: "",
+  },
+  idTorneo: 0,
+});
 
 const headers = computed(() => [
   { title: "Nick", key: "nick" },
@@ -326,6 +356,5 @@ const handleEliminarInscripcion = (idInscripcion: number) => {
 
 const closeModal = () => {
   showModal.value = false;
-  selectedInscripcion.value = null;
 };
 </script>

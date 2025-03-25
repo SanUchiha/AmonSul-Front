@@ -58,6 +58,12 @@ export interface InscripcionEquipoDTO {
   miembros: number[];
 }
 
+export interface CreateMiembroEquipoDTO {
+  IdUsuario: number;
+  IdTorneo: number;
+  IdEquipo: number;
+}
+
 export interface InscripcionEquipoDTO {
   idInscripcion: number;
   idTorneo: number;
