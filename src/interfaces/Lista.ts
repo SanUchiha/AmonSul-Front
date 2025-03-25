@@ -3,7 +3,7 @@ import { ArmyDTO } from "./Army";
 export interface CrearListaTorneoRequestDTO {
   idInscripcion: number;
   idUsuario: number;
-  idTorneo?: number;
+  idTorneo: number;
   listaData: string;
   ejercito: ArmyDTO;
   nick: string;

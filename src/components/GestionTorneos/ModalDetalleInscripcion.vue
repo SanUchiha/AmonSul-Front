@@ -187,7 +187,7 @@ import { ArmyDTO } from "@/interfaces/Army";
 
 // Definir las propiedades y eventos
 const props = defineProps<{
-  inscripcion: InscripcionTorneoCreadoDTO | null;
+  inscripcion: InscripcionTorneoCreadoDTO;
 }>();
 
 // ModalDetalleInscripcion.vue
@@ -240,7 +240,7 @@ const logChange = async (
       else if (value == "ILEGAL") estado = "ILEGAL";
       else estado = "OK";
       await updateEstadoLista({
-        idInscripcion: localInscripcion.value.idInscripcion!,
+        idInscripcion: localInscripcion.value.idInscripcion,
         estadoLista: estado,
       });
       showSuccessModalLista.value = true;
@@ -253,7 +253,7 @@ const logChange = async (
       if (value == "NO") estado = "NO";
       else estado = "SI";
       await updateEstadoPago({
-        idInscripcion: localInscripcion.value.idInscripcion!,
+        idInscripcion: localInscripcion.value.idInscripcion,
         esPago: estado,
       });
       showSuccessModalPago.value = true;
@@ -289,19 +289,21 @@ watch(
 
 const toggleLista = async () => {
   showLista.value = !showLista.value;
-  isLoading.value = true;
-  // Traer la lista del back
-  const requestLista: ListaTorneoRequestDTO = {
-    idTorneo: localInscripcion.value.torneo!.idTorneo,
-    idUsuario: localInscripcion.value.idUsuario!,
-  };
-  try {
-    const response = await getlistaTorneo(requestLista);
-    listaBase64.value = response.data;
-  } catch (error) {
-    console.error("Error al recuperar la lista.");
-  } finally {
-    isLoading.value = false;
+
+  if (showLista.value) {
+    isLoading.value = true;
+    const requestLista: ListaTorneoRequestDTO = {
+      idTorneo: localInscripcion.value.idTorneo,
+      idUsuario: localInscripcion.value.idUsuario,
+    };
+    try {
+      const response = await getlistaTorneo(requestLista);
+      listaBase64.value = response.data;
+    } catch (error) {
+      console.error("Error al recuperar la lista.");
+    } finally {
+      isLoading.value = false;
+    }
   }
 };
 
@@ -357,9 +359,9 @@ const enviarLista = async (newLista: RequesListaDTO) => {
     }
   } else {
     const requestLista: CrearListaTorneoRequestDTO = {
-      idInscripcion: localInscripcion.value.idInscripcion!,
-      idUsuario: localInscripcion.value.idUsuario!,
-      idTorneo: localInscripcion.value.torneo?.idTorneo,
+      idInscripcion: localInscripcion.value.idInscripcion,
+      idUsuario: localInscripcion.value.idUsuario,
+      idTorneo: localInscripcion.value.idTorneo,
       listaData: newLista.listaData,
       ejercito: newLista.ejercito,
       nick: "",
