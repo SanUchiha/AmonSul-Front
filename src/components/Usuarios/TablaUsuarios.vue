@@ -30,18 +30,15 @@
               clearable
             ></v-select>
           </v-col>
+          <v-col cols="12" sm="4">
+            <v-select
+              v-model="selectedProvince"
+              :items="provinces"
+              label="Filtrar por provincia"
+              clearable
+            ></v-select>
+          </v-col>
         </v-row>
-        
-        <!--TODO Filtrar por provincia
-        <v-select
-          v-model="selectedProvince"
-          :items="provinces"
-          label="Filtrar por provincia"
-          clearable
-          class="ml-2"
-        ></v-select>
-        -->
-        
       </v-card-title>
       <v-divider></v-divider>
       <v-data-table
@@ -60,12 +57,10 @@
               {{ item.nick }}
             </td>
             <td>
-              <v-icon class="me-2" color="success">mdi-shield-sword</v-icon>
               {{ item.faccion?.nombreFaccion || "N/A" }}
             </td>
             <td>
-              <v-icon class="me-2" color="info">mdi-map-marker</v-icon>
-              {{ item.ciudad }}
+              {{ item.ciudad || "N/A" }}
             </td>
           </tr>
         </template>
@@ -76,19 +71,21 @@
 
 <script setup lang="ts">
 import { UsuarioDTO } from "@/interfaces/Usuario";
-import { onMounted, ref, computed, defineProps } from "vue";
+import { onMounted, ref, computed, defineProps, watch } from "vue";
 import { useRouter } from "vue-router";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 import defaultAvatar from "@/assets/icons/perfil.png";
+import debounce from "lodash/debounce";
 
 const props = defineProps({
   usuarios: {
-    type: Array,
+    type: Array as () => UsuarioDTO[],
     required: true,
   },
 });
 
 const search = ref<string>("");
+const debouncedSearch = ref<string>("");
 const items = ref<UsuarioDTO[]>([]);
 const isLoading = ref<boolean>(true);
 const router = useRouter();
@@ -97,7 +94,7 @@ const selectedFaction = ref<string | null>(null);
 
 const headers = [
   { title: "Nick", key: "nick", align: "start" },
-  { title: "Facción", key: "faccion.nombreFaccion" },
+  { title: "Facción", key: "faccion" },
   { title: "Ciudad", key: "ciudad" },
 ];
 
@@ -106,28 +103,41 @@ const provinces = computed(() => [
 ]);
 
 const factions = computed(() => [
-  ...new Set(items.value.map((user) => user.faccion?.nombreFaccion).filter(Boolean)),
+  ...new Set(
+    items.value.map((user) => user.faccion?.nombreFaccion).filter(Boolean)
+  ),
 ]);
+
+watch(
+  search,
+  debounce((newValue: string) => {
+    debouncedSearch.value = newValue;
+  }, 300)
+);
 
 const filteredItems = computed(() => {
   return items.value.filter((user) => {
     return (
       (!selectedProvince.value || user.ciudad === selectedProvince.value) &&
-      (!selectedFaction.value || user.faccion?.nombreFaccion === selectedFaction.value) &&
-      (search.value === "" || user.nick.toLowerCase().includes(search.value.toLowerCase()))
+      (!selectedFaction.value ||
+        user.faccion?.nombreFaccion?.toLowerCase() ===
+          selectedFaction.value.toLowerCase()) &&
+      (debouncedSearch.value === "" ||
+        user.nick.toLowerCase().includes(debouncedSearch.value.toLowerCase()))
     );
   });
 });
 
 const goToUserDetail = (idUsuario: number) => {
-  router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
+  router.push({ name: "detalle-jugador", params: { idUsuario } });
 };
 
-onMounted(async () => {
+onMounted(() => {
+  isLoading.value = true;
   try {
-    isLoading.value = true;
-    items.value = [...props.usuarios].sort((a, b) => a.nick.localeCompare(b.nick));
-    console.log("items.value:", items.value);
+    items.value = [...props.usuarios].sort((a, b) =>
+      a.nick.localeCompare(b.nick)
+    );
   } catch (error) {
     console.error("Error al obtener la clasificación de Elo:", error);
   } finally {

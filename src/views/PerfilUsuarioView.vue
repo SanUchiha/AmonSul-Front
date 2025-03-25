@@ -22,7 +22,7 @@
         <v-col cols="12" md="8">
           <!-- Sección de Estadísticas
           <CardEstadisticas :usuario="usuarioData"></CardEstadisticas> -->
-          <SparklineElo :email="email ? email : user!.email" />
+          <SparklineElo :idUsuario="user?.idUsuario!" />
 
           <!-- Sección de Rango/Nivel 
           <CardRangoUsuario></CardRangoUsuario>-->
@@ -72,7 +72,7 @@ const usuariosStore = useUsuariosStore();
 
 const isLoading = ref(true);
 const { getUser } = useAuth();
-const correo = ref<string>(await getUser.value!);
+const correo = ref<string>(getUser.value);
 const selectedFaccionName = ref<number>(0);
 const user = ref<UsuarioViewDTO>();
 
@@ -148,7 +148,6 @@ watch(
     }
   }
 );
-
 </script>
 
 <style scoped>

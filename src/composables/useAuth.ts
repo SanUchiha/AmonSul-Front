@@ -46,7 +46,7 @@ const logout = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("idUsuario");
 
-  stateAuth.user = null;
+  stateAuth.user = "";
   stateAuth.token = "";
   stateAuth.error = null;
   stateAuth.idUsuario = "";

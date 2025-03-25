@@ -8,7 +8,7 @@ export interface ResponseLoginDTO {
   token: string;
 }
 export interface AuthState {
-  user: string | null;
+  user: string;
   idUsuario: string;
   token: string;
   error: string | null;

@@ -13,7 +13,7 @@
       <v-tabs-window v-model="tab">
         <!-- TAB 1. -->
         <v-tabs-window-item value="Individual" v-if="tab === 'Individual'">
-          <SparklineElo :email="correo" class="separated" />
+          <SparklineElo :idUsuario="idUsuarioLogger" class="separated" />
           <TablaClasificacionElo class="separated" :items="eloClasificacion" />
         </v-tabs-window-item>
 
@@ -49,10 +49,11 @@ const usuariosStore = useUsuariosStore();
 
 const tab = ref<string>("Individual");
 
-const { getUser } = useAuth();
+const { getidUsuario } = useAuth();
+const idUsuarioLogger = ref<number>(parseInt(getidUsuario.value));
 const error = ref<string | null>(null);
 const router = useRouter();
-const correo = ref<string>(``);
+const idUsuario = ref<number>();
 const isLoading = ref<boolean>(true);
 const eloClasificacion = ref<UsuarioEloTablaClasificacion[]>([]);
 const facciones = ref<FaccionDTO[]>([]);
@@ -64,13 +65,13 @@ onMounted(async () => {
   isLoading.value = true;
   try {
     // Obtener el usuario
-    const email: string | null = getUser.value;
-    if (!email) {
+    const id = idUsuarioLogger.value;
+    if (!id) {
       error.value = "No se pudo obtener el usuario. Por favor, inicie sesión.";
       router.push({ name: "error" });
       return;
     }
-    correo.value = email;
+    idUsuario.value = id;
 
     // Hacer peticiones en paralelo
     const [responseClasificacionElo, faccionesResponse] = await Promise.all([

@@ -1,7 +1,7 @@
 import { http } from "./index";
 
-export const getEloUsuario = async (email: string) => {
-  return http.get(`Elo/Usuario/${email}`);
+export const getEloUsuario = async (idUsuario: number) => {
+  return http.get(`Elo/Usuario/${idUsuario}`);
 };
 
 export const getClasifiacionElo = async () => {

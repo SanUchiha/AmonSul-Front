@@ -7,7 +7,7 @@
       <!-- Titulo -->
       <CardTitleMisTorneos />
       <v-spacer class="my-4"></v-spacer>
-      
+
       <!-- Resumen partidas -->
       <v-row justify="center">
         <v-col cols="12" md="12">
@@ -16,9 +16,7 @@
               <CardInscripcionesUsuarioTorneo :usuario="usuarioData" />
             </v-col>
           </v-row>
-          <v-row dense>
-            
-          </v-row>
+          <v-row dense> </v-row>
           <v-row dense>
             <v-col cols="12" sm="6" class="text-center">
               <!-- Resumen partidas -->
@@ -32,7 +30,7 @@
               </v-card>
             </v-col>
             <v-col cols="12" sm="6" class="text-center">
-              <SparklineElo :email="usuarioData.email" />
+              <SparklineElo :idUsuario="idUsuarioLogger" />
             </v-col>
           </v-row>
         </v-col>
@@ -41,19 +39,30 @@
       <!-- partidas validades -->
       <div v-if="!isLoadingMatches && matches.length > 0">
         <v-card class="section-card stats-section pt-0 mt-0">
-          <v-col cols="12"><p class="text-h5 ringbearer">Partidas de torneo</p></v-col>
+          <v-col cols="12"
+            ><p class="text-h5 ringbearer">Partidas de torneo</p></v-col
+          >
           <v-divider></v-divider>
           <v-row>
-            <v-col cols="12" sm="6" md="6" lg="4" xl="4" class="pb-0" v-for="match in matches" :key="match.idPartidaTorneo">
-            <CardPartidaTorneo              
-              :idUsuario="parseInt(idUsuarioLogger!)"
-              :match="match"
-              class="mb-4"
-            />
+            <v-col
+              cols="12"
+              sm="6"
+              md="6"
+              lg="4"
+              xl="4"
+              class="pb-0"
+              v-for="match in matches"
+              :key="match.idPartidaTorneo"
+            >
+              <CardPartidaTorneo
+                :idUsuario="idUsuarioLogger"
+                :match="match"
+                class="mb-4"
+              />
             </v-col>
-          </v-row>        
+          </v-row>
         </v-card>
-      </div>      
+      </div>
       <div v-else>
         <h3>No tienes partidas en torneos</h3>
       </div>
@@ -72,7 +81,6 @@ import { useAuth } from "@/composables/useAuth";
 import { FaccionDTO } from "@/interfaces/Faccion";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
-import { getRankingEloByIdUser } from "@/services/EloService";
 import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import { ref, onMounted } from "vue";
@@ -83,7 +91,7 @@ import { getUsuarioData } from "@/services/UsuariosService";
 const isLoading = ref(true);
 const { getidUsuario, getUser } = useAuth();
 const router = useRouter();
-const idUsuarioLogger = ref<string | null>(getidUsuario.value);
+const idUsuarioLogger = ref<number>(parseInt(getidUsuario.value));
 const emailOwner = ref<string | null>(getUser.value);
 const matches = ref<ViewPartidaTorneoDTO[]>([]);
 const isLoadingMatches = ref<boolean>(false);
@@ -118,18 +126,16 @@ const initializeComponent = async () => {
     isLoading.value = true;
     isLoadingMatches.value = true;
     try {
-      const response = await getTournamentMatches(
-        parseInt(idUsuarioLogger.value)
-      );
+      const response = await getTournamentMatches(idUsuarioLogger.value);
       matches.value = response.data;
       console.log("matches",matches.value)
 
-      loadComunidad(parseInt(idUsuarioLogger.value));
+      loadComunidad(idUsuarioLogger.value);
       usuarioData.value.email = emailOwner.value;
 
       loadResume(matches.value);
 
-      loadRankingElo(parseInt(idUsuarioLogger.value));
+      loadRankingElo(idUsuarioLogger.value);
     } catch (error) {
       console.error(error);
       router.push({ name: "error" });
@@ -148,10 +154,10 @@ const loadResume = async (matches: ViewPartidaTorneoDTO[]) => {
   let contadorPerdidas = 0;
 
   matches.forEach((element) => {
-    if (element.ganadorPartidaTorneo == parseInt(idUsuarioLogger.value!))
+    if (element.ganadorPartidaTorneo == idUsuarioLogger.value)
       contadorGanadas++;
     else if (
-      element.ganadorPartidaTorneo != parseInt(idUsuarioLogger.value!) &&
+      element.ganadorPartidaTorneo != idUsuarioLogger.value &&
       element.ganadorPartidaTorneo != null
     )
       contadorPerdidas++;
@@ -177,7 +183,7 @@ const loadComunidad = async (idUser: number) => {
 const loadRankingElo = async (idUser: number) => {
   try {
     const response = await getUsuarioData(idUser);
-//TODO Arreglo getRankingEloByIdUser
+    //TODO Arreglo getRankingEloByIdUser
     //const response = await getRankingEloByIdUser(idUser);
     usuarioData.value.rankingElo = response.data.clasificacionElo;
   } catch (error) {
@@ -187,11 +193,11 @@ const loadRankingElo = async (idUser: number) => {
 </script>
 
 <style scoped>
-  .section-card {
-    margin-bottom: 20px;
-    padding: 20px;
-    background: #212121;
-    color: white;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-  }
+.section-card {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #212121;
+  color: white;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+}
 </style>
