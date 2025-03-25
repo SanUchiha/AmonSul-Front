@@ -33,6 +33,7 @@
             label="¿Donde es el torneo?"
             placeholder="Ej: Calle Gran Vía, Madrid"
             @keyup.enter="searchLocation"
+            required
           >
             <template v-slot:append>
               <v-btn color="primary" @click="searchLocation">Buscar</v-btn>

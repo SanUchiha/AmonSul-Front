@@ -130,6 +130,7 @@ const initializeComponent = async () => {
     try {
       const response = await getTournamentMatches(idUsuarioLogger.value);
       matches.value = response.data;
+      console.log("matches",matches.value)
 
       loadComunidad(idUsuarioLogger.value);
       usuarioData.value.email = emailOwner.value;

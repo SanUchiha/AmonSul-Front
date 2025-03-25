@@ -21,6 +21,7 @@
                 :isLoading="isLoading"
                 :listaTorneos="(inscripcionesIndividual ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) >= new Date())"
                 :idUsuario="idUsuario"
+                :disputado=false
               />
             </v-card-text>
             <v-card-text>
@@ -28,6 +29,7 @@
                 :isLoading="isLoading"
                 :listaTorneos="(inscripcionesEquipo ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) >= new Date())"
                 :idUsuario="idUsuario"
+                :disputado=false
               />
             </v-card-text>
           </v-tabs-window-item>
@@ -38,6 +40,7 @@
                 :isLoading="isLoading"
                 :listaTorneos="(inscripcionesIndividual ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) < new Date())"
                 :idUsuario="idUsuario"
+                :disputado=true
               />
             </v-card-text>
             <v-card-text>
@@ -45,6 +48,7 @@
                 :isLoading="isLoading"
                 :listaTorneos="(inscripcionesEquipo ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) < new Date())"
                 :idUsuario="idUsuario"
+                :disputado=true
               />
             </v-card-text>
           </v-tabs-window-item>

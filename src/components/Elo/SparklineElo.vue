@@ -2,8 +2,8 @@
   <div v-if="isLoading" class="center">
     <ProgressCircular />
   </div>
-  <div v-else-if="value.length > 1" class="center">
-    <v-card class="mx-auto text-center">
+  <div v-else-if="value.length > 1" >
+    <v-card class="mb-2 mt-0 px-4 text-center">
       <v-card-text>
         <v-sheet>
           <v-sparkline

@@ -1,117 +1,96 @@
 <template>
-  <!--<v-row class="mt-2 mb-2 text-left">
-        <v-col cols="4">
-            <span class="font-weight-bold">{{ props.usuario.numeroPartidasJugadas }} partidas jugadas</span>
-        </v-col>
-        </v-row>
-
-        <v-progress-linear height="30">
-          <v-progress-linear
-              :model-value="winRate"
-              color="green"
-              height="30"
-              class="position-absolute"
-          ></v-progress-linear>
-          <v-progress-linear
-              :model-value="drawRate"
-              color="yellow"
-              height="30"
-              class="position-absolute"
-              :style="{ left: `${winRate}%` }"
-          ></v-progress-linear>
-          <v-progress-linear
-              :model-value="lossRate"
-              color="red"
-              height="30"
-              class="position-absolute"
-              :style="{ left: `${winRate + drawRate}%` }"
-          ></v-progress-linear>
-        </v-progress-linear>
-
-        <v-row class="mt-2 text-center">
-            <v-col cols="4">
-                <span class="text-green font-weight-bold">{{ props.usuario.partidasGanadas }} Ganadas</span>
-            </v-col>
-            <v-col cols="4">
-                <span class="text-yellow font-weight-bold">{{ props.usuario.partidasEmpatadas }} Empatadas</span>
-            </v-col>
-            <v-col cols="4">
-                <span class="text-red font-weight-bold">{{ props.usuario.partidasPerdidas }} Perdidas</span>
-            </v-col>
-        </v-row>
-
-        -->
-  <v-row>
-    <v-col cols="12">
-      <AgCharts :options="chartOptions"></AgCharts>
-    </v-col>
-  </v-row>
-
-  <v-divider class="mb-3"></v-divider>
-
-  <div class="stats-container">
+  <v-container class="text-center pa-0 mb-0">
     <v-row>
-      <v-col class="stat-item">
-        <img
-          src="@/assets/icons/clasificacionTorneo.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Victorias: {{ winRate.toFixed(2) }}%</p>
+      <v-col cols="12">
+        <!--Leyenda victorias empates derrotas-->
+        <v-row>
+          <v-col cols="4">
+            <span class="font-weight-bold ">Victorias: {{ usuario.partidasGanadas }}</span>
+          </v-col>
+          <v-col cols="4">
+            <span class="font-weight-bold">Empates: {{ usuario.partidasEmpatadas }}</span>
+          </v-col>
+          <v-col cols="4" v-if="usuario.partidasPerdidas > 0">
+            <span class="font-weight-bold">Derrotas: {{ usuario.partidasPerdidas }}</span>
+          </v-col>
+        </v-row>
+        <!--Barra de victorias empates derrotas-->
+        <v-row>
+          <v-col cols="12">
+            <div class="resultado-barra">
+              <div class="victorias" v-if="winRate > 0" :style="{ flex: winRate.toFixed(2) }">{{ winRate.toFixed(2) }}</div>
+              <div class="empates" v-if="drawRate > 0" :style="{ flex: drawRate.toFixed(2) }">{{ drawRate.toFixed(2) }}</div>
+              <div class="derrotas" v-if="lossRate > 0" :style="{ flex: lossRate.toFixed(2) }">{{ lossRate.toFixed(2) }}</div>
+            </div>
+          </v-col>
+        </v-row>
+        
+        <v-divider></v-divider>
+  
+        <!--Icono Victorias-->
+        <!--TODO ver el rankingElo porque no viaja
+        <v-row> 
+          <v-col>
+            <img
+              src="@/assets/icons/clasificacionTorneo.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Victorias: {{ winRate.toFixed(2) }}%</p>
+          </v-col>
+          <v-col v-if="usuario.rankingElo" class="">
+            <img
+              src="@/assets/icons/ELO.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Ranking Elo: {{ usuario.rankingElo.toFixed(2) }}</p>
+          </v-col>
+        </v-row>-->
       </v-col>
-      <v-col v-if="usuario.rankingElo" class="stat-item">
-        <img
-          src="@/assets/icons/ELO.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Ranking Elo: {{ usuario.rankingElo.toFixed(2) }}</p>
+  
+      <v-col cols="12">
+        <v-row>
+          <v-col class="">
+            <img
+              src="@/assets/icons/ejercitoMasUsado.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Ejército más usado: próximamente</p>
+          </v-col>
+    
+          <v-col class="">
+            <img
+              src="@/assets/icons/ejercitoMejorResultado.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Ejército con mejor resultado: próximamente</p>
+          </v-col>
+    
+          <v-col class="">
+            <img
+              src="@/assets/icons/ejercitoPeorResultado.png"
+              alt="Icono personalizado"
+              width="60"
+              height="60"
+            />
+            <p>Ejército con peor resultado: próximamente</p>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
-  </div>
+  </v-container>
 
-  <v-divider class="mb-3 mt-3"></v-divider>
-
-  <div class="stats-container">
-    <v-row>
-      <v-col class="stat-item">
-        <img
-          src="@/assets/icons/ejercitoMasUsado.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Ejército más usado: próximamente</p>
-      </v-col>
-
-      <v-col class="stat-item">
-        <img
-          src="@/assets/icons/ejercitoMejorResultado.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Ejército con mejor resultado: próximamente</p>
-      </v-col>
-
-      <v-col class="stat-item">
-        <img
-          src="@/assets/icons/ejercitoPeorResultado.png"
-          alt="Icono personalizado"
-          width="60"
-          height="60"
-        />
-        <p>Ejército con peor resultado: próximamente</p>
-      </v-col>
-    </v-row>
-  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect, defineProps } from "vue";
-import { AgCharts } from "ag-charts-vue3";
+import { computed, defineProps } from "vue";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 
 const props = defineProps<{ usuario: UsuarioDataDTO }>();
@@ -123,16 +102,6 @@ const defaultUsuario = {
 };
 const usuarioData = computed(() => props.usuario ?? defaultUsuario);
 console.log("usuario estadisticas", props.usuario);
-const player = ref({
-  name: "Aragorn, Rey de Gondor",
-  clan: "Hijos de Númenor",
-  location: "Minas Tirith",
-  gamesPlayed: props.usuario.numeroPartidasJugadas,
-  rank: "Capitán",
-  level: 12,
-  experience: 750,
-  experienceToNextLevel: 1000,
-});
 
 const winRate = computed(
   () =>
@@ -153,111 +122,35 @@ const drawRate = computed(
     100
 );
 
-const onSliceClick = (event: any) => {
-  console.log("Categoría seleccionada:", event.datum.categoria);
-  console.log("Cantidad:", event.datum.cantidad);
-  //alert(`Has hecho clic en ${event.datum.categoria}: ${event.datum.cantidad}`);
-};
-
-const myTheme = {
-  palette: {
-    fills: ["#145c17", "#dbba00", "#751710"],
-    strokes: ["#145c17", "#dbba00", "#751710"],
-  },
-  overrides: {
-    common: {
-      title: {
-        color: "#ffffff", // 🔹 Cambia el color del título del gráfico a blanco
-      },
-    },
-    axis: {
-      category: {
-        label: { color: "#ffffff" }, // 🔹 Cambia el color de las etiquetas del eje X
-        line: { stroke: "#ffffff" }, // 🔹 Color de la línea del eje X
-      },
-      number: {
-        label: { color: "#ffffff" }, // 🔹 Cambia el color de las etiquetas del eje Y
-        line: { stroke: "#ffffff" }, // 🔹 Color de la línea del eje Y
-      },
-    },
-  },
-};
-
-// Configuración básica del gráfico
-const chartOptions = ref({
-  background: { fill: "#212121" }, // Color de fondo personalizado (ejemplo: gris oscuro)
-  data: [
-    {
-      categoria: `Ganadas ${winRate.value.toFixed(2)}%`,
-      cantidad: usuarioData.value.partidasGanadas,
-      color: "green",
-    },
-    {
-      categoria: `Empatadas ${drawRate.value.toFixed(2)}%`,
-      cantidad: usuarioData.value.partidasEmpatadas,
-      color: "yellow",
-    },
-    {
-      categoria: `Perdidas ${lossRate.value.toFixed(2)}%`,
-      cantidad: usuarioData.value.partidasPerdidas,
-      color: "red",
-    },
-  ],
-  theme: myTheme,
-  series: [
-    {
-      type: "donut",
-      calloutLabelKey: "categoria",
-      angleKey: "cantidad",
-      innerRadiusRatio: 0.5,
-      listeners: {
-        nodeClick: onSliceClick, // ⬅️ Detecta la pulsación en cada sector
-      },
-    },
-  ],
-  title: {
-    text: `Partidas Jugadas ${props.usuario.numeroPartidasJugadas}`,
-    fontSize: 18,
-  },
-});
-
-// Asegurar que los datos sean reactivos
-watchEffect(() => {
-  chartOptions.value = {
-    background: { fill: "#212121" }, // Color de fondo personalizado (ejemplo: gris oscuro)
-    data: [
-      {
-        categoria: `Ganadas ${winRate.value.toFixed(2)}%`,
-        cantidad: usuarioData.value.partidasGanadas,
-        color: "green",
-      },
-      {
-        categoria: `Empatadas ${drawRate.value.toFixed(2)}%`,
-        cantidad: usuarioData.value.partidasEmpatadas,
-        color: "yellow",
-      },
-      {
-        categoria: `Perdidas ${lossRate.value.toFixed(2)}%`,
-        cantidad: usuarioData.value.partidasPerdidas,
-        color: "red",
-      },
-    ],
-    theme: myTheme,
-    series: [
-      {
-        type: "donut",
-        calloutLabelKey: "categoria",
-        angleKey: "cantidad",
-        innerRadiusRatio: 0.5,
-        listeners: {
-          nodeClick: onSliceClick, // ⬅️ Detecta la pulsación en cada sector
-        },
-      },
-    ],
-    title: {
-      text: `Partidas Jugadas ${props.usuario.numeroPartidasJugadas}`,
-      fontSize: 18,
-    },
-  };
-});
 </script>
+<style scoped>
+.resultado-barra {
+  display: flex;
+  height: 30px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 2px #ccc;
+  width: 100%;
+}
+
+.resultado-barra > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.victorias {
+  background-color: #145c17; /* azul claro */
+}
+
+.empates {
+  background-color: #dbba00; /* naranja claro */
+}
+
+.derrotas {
+  background-color: #751710; /* verde claro */
+}
+</style>

@@ -21,14 +21,14 @@
         <!-- Columna Derecha (Estadísticas, Rango/Nivel, Logros) -->
         <v-col cols="12" md="8">
           <!-- Sección de Estadísticas
-          <CardEstadisticas :usuario="user"></CardEstadisticas> -->
+          <CardEstadisticas :usuario="usuarioData"></CardEstadisticas> -->
           <SparklineElo :idUsuario="user?.idUsuario!" />
 
           <!-- Sección de Rango/Nivel 
           <CardRangoUsuario></CardRangoUsuario>-->
 
-          <!-- Sección de Logros 
-          <LogrosUsuario></LogrosUsuario>-->
+          <!-- Sección de Logros
+          <LogrosUsuario></LogrosUsuario> -->
         </v-col>
       </v-row>
     </v-container>
@@ -65,6 +65,8 @@ import CardRangoUsuario from "@/components/Perfil/CardRangoUsuario.vue";
 import LogrosUsuario from "@/components/Perfil/LogrosUsuario.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
+import { UsuarioDataDTO } from "@/interfaces/Usuario";
+import { FaccionDTO } from "@/interfaces/Faccion";
 
 const usuariosStore = useUsuariosStore();
 
@@ -73,6 +75,32 @@ const { getUser } = useAuth();
 const correo = ref<string>(getUser.value);
 const selectedFaccionName = ref<number>(0);
 const user = ref<UsuarioViewDTO>();
+
+const faccionDTO = ref<FaccionDTO>({
+  idFaccion: 0,
+  nombreFaccion: "",
+});
+  const usuarioData = ref<UsuarioDataDTO>({
+  idUsuario: 0,
+  nick: "",
+  email: "",
+  faccion: faccionDTO.value,
+  partidasValidadas: [],
+  partidasPendientes: [],
+  elos: [],
+  InscripcionesIndividualTorneo: [],
+  InscripcionesEquipoTorneo: [],
+  clasificacionElo: 0,
+  puntuacionElo: 0,
+  numeroPartidasJugadas: 0,
+  partidasGanadas: 0,
+  partidasEmpatadas: 0,
+  partidasPerdidas: 0,
+  proteccionDatos: null,
+  PartidasTorneo: [],
+  ClasificacionTorneos: [],
+  rankingElo: 0,
+});
 
 // Definimos props opcionales con TypeScript
 const props = withDefaults(

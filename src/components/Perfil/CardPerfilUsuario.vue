@@ -282,7 +282,6 @@ const saveChanges = async () => {
 
   console.log("editusu:", editusu);
 
-  // TODO Enviar al backend
   try {
     await editarUsuario(editusu);
   } catch (error) {

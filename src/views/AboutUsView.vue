@@ -111,8 +111,8 @@ export default {
         },
         {
           date: "Q4 2025",
-          title: "Integración con Discord",
-          description: "Notificaciones y chat en tiempo real.",
+          title: "Sistema de trofeos",
+          description: "Sistema de trofeos y niveles de experiencia por jugador. ",
           color: "red",
         },
       ],

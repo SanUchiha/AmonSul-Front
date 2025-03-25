@@ -60,7 +60,7 @@
           }}</v-list-item-title>
 
           <template v-slot:append>
-            <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
+            <v-btn v-if="disputado" icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
               <img
                 src="@/assets/icons/clasificacionTorneo.png"
                 alt="Icono personalizado"
@@ -143,6 +143,7 @@ const props = defineProps<{
   isLoading: boolean;
   listaTorneos: InscripcionUsuarioEquipoDTO[];
   idUsuario: number;
+  disputado: boolean;
 }>();
 
 const isRegistering = ref<boolean>(false);
