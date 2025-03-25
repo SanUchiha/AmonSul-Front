@@ -226,6 +226,22 @@
                         </v-list-item-title>
                       </v-list-item>
                       <!--TODO  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"-->
+                      <v-list-item
+                        v-if="inscripcionData?.idCapitan == idUsuario"
+                        @click.stop="
+                          enviarCambiarLista(
+                            miembro.idInscripcion,
+                            miembro.listaData!,
+                            miembro.idUsuario,
+                            miembro.nick
+                          )
+                        "
+                      >
+                        <v-list-item-title>
+                          <v-icon class="me-2">mdi-pencil</v-icon>
+                          Enviar/Modificar Lista
+                        </v-list-item-title>
+                      </v-list-item>
                     </v-list>
                   </v-menu>
                 </v-card-actions>

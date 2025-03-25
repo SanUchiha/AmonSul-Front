@@ -42,7 +42,7 @@ import { defineProps, onMounted, ref } from "vue";
 import { getEloUsuario } from "@/services/EloService";
 import ProgressCircular from "../Commons/ProgressCircular.vue";
 
-const props = defineProps<{ email: string }>();
+const props = defineProps<{ idUsuario: number }>();
 
 const isLoading = ref(true);
 
@@ -71,21 +71,29 @@ const peorResultado = ref<number>();
 const resultadoActual = ref<number>();
 
 onMounted(async () => {
-  try {
-    isLoading.value = true;
-    const response = await getEloUsuario(props.email);
-    const elos = response.data.elos.map(
-      (elo: { puntuacionElo: unknown }) => elo.puntuacionElo
-    );
+  console.log(props.idUsuario);
+  if (props.idUsuario != undefined) {
+    try {
+      isLoading.value = true;
+      const response = await getEloUsuario(props.idUsuario);
+      console.log(response);
+      if (response.status != 200) return;
+      const elos = response.data.elos.map(
+        (elo: { puntuacionElo: unknown }) => elo.puntuacionElo
+      );
 
-    value.value = elos;
+      value.value = elos;
 
-    mejorResultado.value = Math.max(...elos);
-    peorResultado.value = Math.min(...elos);
-    resultadoActual.value = await elos[elos.length - 1];
-  } catch (error) {
-    console.error("Error al obtener datos del usuario:", error);
-  } finally {
+      mejorResultado.value = Math.max(...elos);
+      peorResultado.value = Math.min(...elos);
+      resultadoActual.value = await elos[elos.length - 1];
+    } catch (error) {
+      isLoading.value = false;
+      console.error("Error al obtener datos del usuario:", error);
+    } finally {
+      isLoading.value = false;
+    }
+  } else {
     isLoading.value = false;
   }
 });
