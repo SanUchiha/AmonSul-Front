@@ -45,7 +45,6 @@ export const appsettings = {
     { name: "Army of Lake-town", band: "good" },
     { name: "Army of Thrór", band: "good" },
     { name: "Assault on Ravenhill", band: "good" },
-    { name: "Battle of the Five Armies", band: "good" },
     { name: "Defenders of Dale", band: "good" },
     { name: "Erebor & Dale", band: "good" },
     { name: "Erebor Reclaimed", band: "good" },

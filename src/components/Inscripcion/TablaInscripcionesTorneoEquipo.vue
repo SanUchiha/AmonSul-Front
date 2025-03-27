@@ -60,7 +60,7 @@
           }}</v-list-item-title>
 
           <template v-slot:append>
-            <v-btn v-if="disputado" icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
+            <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
               <img
                 src="@/assets/icons/clasificacionTorneo.png"
                 alt="Icono personalizado"

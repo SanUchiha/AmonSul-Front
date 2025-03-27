@@ -14,44 +14,64 @@
       </v-tabs>
 
       <v-tabs-window v-model="tab">
-          <!-- Torneos sin disputar -->
-          <v-tabs-window-item value="sin-disputar" v-if="tab === 'sin-disputar'">
-            <v-card-text>
-              <TablaInscripcionesTorneoIndividual
-                :isLoading="isLoading"
-                :listaTorneos="(inscripcionesIndividual ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) >= new Date())"
-                :idUsuario="idUsuario"
-                :disputado=false
-              />
-            </v-card-text>
-            <v-card-text>
-              <TablaInscripcionesTorneoEquipo
-                :isLoading="isLoading"
-                :listaTorneos="(inscripcionesEquipo ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) >= new Date())"
-                :idUsuario="idUsuario"
-                :disputado=false
-              />
-            </v-card-text>
-          </v-tabs-window-item>
-          <!-- Torneos disputados -->
-          <v-tabs-window-item value="disputados" v-if="tab === 'disputados'">
-            <v-card-text>
-              <TablaInscripcionesTorneoIndividual
-                :isLoading="isLoading"
-                :listaTorneos="(inscripcionesIndividual ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) < new Date())"
-                :idUsuario="idUsuario"
-                :disputado=true
-              />
-            </v-card-text>
-            <v-card-text>
-              <TablaInscripcionesTorneoEquipo
-                :isLoading="isLoading"
-                :listaTorneos="(inscripcionesEquipo ?? []).filter(torneo => new Date(torneo.torneo.fechaFinTorneo) < new Date())"
-                :idUsuario="idUsuario"
-                :disputado=true
-              />
-            </v-card-text>
-          </v-tabs-window-item>
+        <!-- Torneos sin disputar -->
+        <v-tabs-window-item value="sin-disputar" v-if="tab === 'sin-disputar'">
+          <v-card-text>
+            <TablaInscripcionesTorneoIndividual
+              :isLoading="isLoading"
+              :listaTorneos="
+                (inscripcionesIndividual ?? []).filter(
+                  (torneo) =>
+                    new Date(torneo.torneo.fechaFinTorneo) >= new Date()
+                )
+              "
+              :idUsuario="idUsuario"
+              :disputado="false"
+            />
+          </v-card-text>
+          <v-card-text>
+            <TablaInscripcionesTorneoEquipo
+              :isLoading="isLoading"
+              :listaTorneos="
+                (inscripcionesEquipo ?? []).filter(
+                  (torneo) =>
+                    new Date(torneo.torneo.fechaFinTorneo) >= new Date()
+                )
+              "
+              :idUsuario="idUsuario"
+              :disputado="false"
+            />
+          </v-card-text>
+        </v-tabs-window-item>
+        <!-- Torneos disputados -->
+        <v-tabs-window-item value="disputados" v-if="tab === 'disputados'">
+          <v-card-text>
+            <TablaInscripcionesTorneoIndividual
+              :isLoading="isLoading"
+              :listaTorneos="
+                (inscripcionesIndividual ?? []).filter(
+                  (torneo) =>
+                    new Date(torneo.torneo.fechaFinTorneo) < new Date()
+                )
+              "
+              :idUsuario="idUsuario"
+              :disputado="true"
+            />
+          </v-card-text>
+          <v-card-text>
+            <TablaInscripcionesTorneoEquipo
+              :isLoading="isLoading"
+              :listaTorneos="
+                (inscripcionesEquipo ?? []).filter(
+                  (torneo) =>
+                    new Date(torneo.torneo.fechaFinTorneo) < new Date()
+                )
+              "
+              :idUsuario="idUsuario"
+              :disputado="true"
+            />
+          </v-card-text>
+        </v-tabs-window-item>
       </v-tabs-window>
     </v-card>
   </div>
@@ -78,7 +98,7 @@ const idUsuarioLogger = ref<string>(getidUsuario.value || "");
 const inscripcionesIndividual = ref<InscripcionUsuarioIndividualDTO[]>();
 const inscripcionesEquipo = ref<InscripcionUsuarioEquipoDTO[]>();
 const tab = ref("sin-disputar");
-  
+
 const idUsuario = ref<number>(parseInt(idUsuarioLogger.value));
 
 onMounted(async () => {
