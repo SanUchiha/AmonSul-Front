@@ -16,7 +16,7 @@
         <v-divider></v-divider>
         <v-col cols="12" md="12" class="text-center">
           <!--<CardResumenPartidas :usuario="usuarioData" />-->
-          <CardEstadisticas :usuario="usuarioData" />
+          <CardEstadisticas :usuario="usuarioData" @filtroCambiar="filtrarPartidas"/>
         </v-col>
       </v-card>
       <!-- Boton partidas -->
@@ -84,7 +84,7 @@
               lg="4"
               xl="4"
               class="pb-0"
-              v-for="match in validMatches"
+              v-for="match in partidasFiltradas"
               :key="match.idPartidaAmistosa"
             >
               <ValidadasMatchCard
@@ -167,7 +167,7 @@ import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getPartidasAmistosasByIdUser } from "@/services/PartidasAmistosasService";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
 import { getProteccionDatos } from "@/services/UsuariosService";
@@ -213,6 +213,25 @@ const usuarioData = ref<UsuarioDataDTO>({
 const dialog = ref<boolean>(false);
 const isHovering = ref<boolean>(false);
 const showModalProteccionDatos = ref<boolean>(false);
+
+//Variables para filtrar partidas segun el click en la barra de estadisticas
+const filtroActivo = ref<'win' | 'loss' | 'draw' | null>(null);
+
+const partidasFiltradas = computed(() => {
+  if (!filtroActivo.value) return matches.value;
+
+  return matches.value.filter((partida) => {
+    const esVictoria = partida.ganadorPartida === idUsuarioLogger.value;
+    const esEmpate = partida.ganadorPartida === null || partida.ganadorPartida === 0;
+    const esDerrota = partida.ganadorPartida && partida.ganadorPartida !== idUsuarioLogger.value;
+
+    return (
+      (filtroActivo.value === 'win' && esVictoria) ||
+      (filtroActivo.value === 'draw' && esEmpate) ||
+      (filtroActivo.value === 'loss' && esDerrota)
+    );
+  });
+});
 
 const initializeComponent = async () => {
   if (idUsuarioLogger.value) {
@@ -263,14 +282,18 @@ const loadResume = async (matches: ViewPartidaAmistosaDTO[]) => {
   let contadorPerdidas = 0;
 
   matches.forEach((element) => {
-    if (element.ganadorPartida == idUsuarioLogger.value) contadorGanadas++;
-    else if (
-      element.ganadorPartida != idUsuarioLogger.value &&
-      element.ganadorPartida != null
-    )
+    const ganador = element.ganadorPartida;
+
+    if (ganador === idUsuarioLogger.value) {
+      contadorGanadas++;
+    } else if (!ganador) {
+      // Si es null, 0 o undefined, lo tomamos como empate
+      contadorEmpatadas++;
+    } else {
       contadorPerdidas++;
-    else contadorEmpatadas++;
+    }
   });
+
 
   usuarioData.value.partidasGanadas = contadorGanadas;
   usuarioData.value.partidasEmpatadas = contadorEmpatadas;
@@ -314,6 +337,10 @@ const refrescarPartidas = async () => {
   }
   console.log("Termino el refresco de partidas", pendingMatches);
 };
+
+function filtrarPartidas(tipo: 'win' | 'loss' | 'draw' | null) {
+  filtroActivo.value = tipo;
+}
 </script>
 
 <style scoped>

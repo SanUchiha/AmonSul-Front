@@ -111,7 +111,7 @@ const addJugador = async () => {
     showErrorModal.value = true;
   } finally {
     isGenerating.value = false;
-    emit("confirm");
+    emit("confirm", jugadorSelected.value);
 
     closeModal();
   }

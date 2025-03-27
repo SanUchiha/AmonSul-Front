@@ -25,7 +25,7 @@
                 <v-divider></v-divider>
                 <v-col cols="12" md="12" class="text-center">
                   <!--<CardResumenPartidas :usuario="usuarioData" />-->
-                  <CardEstadisticas :usuario="usuarioData" />
+                  <CardEstadisticas :usuario="usuarioData" @filtroCambiar="filtrarPartidas"/>
                 </v-col>
               </v-card>
             </v-col>
@@ -51,7 +51,7 @@
               lg="4"
               xl="4"
               class="pb-0"
-              v-for="match in matches"
+              v-for="match in partidasFiltradas"
               :key="match.idPartidaTorneo"
             >
               <CardPartidaTorneo
@@ -83,7 +83,7 @@ import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
 import { getUsuarioData } from "@/services/UsuariosService";
@@ -119,6 +119,27 @@ const usuarioData = ref<UsuarioDataDTO>({
   PartidasTorneo: [],
   ClasificacionTorneos: [],
   rankingElo: 0,
+});
+
+//Variables para filtrar partidas segun el click en la barra de estadisticas
+const filtroActivo = ref<'win' | 'loss' | 'draw' | null>(null);
+
+const partidasFiltradas = computed(() => {
+  if (!filtroActivo.value) return matches.value;
+
+  return matches.value.filter((partida) => {
+    const esVictoria = partida.ganadorPartidaTorneo === idUsuarioLogger.value;
+    const esEmpate = partida.ganadorPartidaTorneo === null;
+    const esDerrota =
+      partida.ganadorPartidaTorneo &&
+      partida.ganadorPartidaTorneo !== idUsuarioLogger.value;
+
+    return (
+      (filtroActivo.value === 'win' && esVictoria) ||
+      (filtroActivo.value === 'draw' && esEmpate) ||
+      (filtroActivo.value === 'loss' && esDerrota)
+    );
+  });
 });
 
 const initializeComponent = async () => {
@@ -190,6 +211,11 @@ const loadRankingElo = async (idUser: number) => {
     console.error("Error al obtener el ranking del jugador: ", error);
   }
 };
+
+function filtrarPartidas(tipo: 'win' | 'loss' | 'draw' | null) {
+  filtroActivo.value = tipo;
+}
+
 </script>
 
 <style scoped>

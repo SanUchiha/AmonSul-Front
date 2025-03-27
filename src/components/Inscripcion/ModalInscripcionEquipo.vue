@@ -409,7 +409,7 @@ import { defineProps, ref, defineEmits, onMounted, watch, computed } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
-import { InscripcionEquipoDTO } from "@/interfaces/Inscripcion";
+import { ComponentesEquipoDTO, InscripcionEquipoDTO } from "@/interfaces/Inscripcion";
 import {
   eliminarMiembroEquipoAsync,
   getInscripcionEquipo,
@@ -523,15 +523,19 @@ const verLista = (listaData: string, nombre: string, ejercito: string) => {
 const eliminarMiembro = async (idInscripcion: number) => {
   const response = await eliminarMiembroEquipoAsync(idInscripcion);
 
-  if (response.status != 200)
-    return (showErrorModalEliminarMiembroEquipo.value = true);
+  if (response.status !== 200) {
+    showErrorModalEliminarMiembroEquipo.value = true;
+    return;
+  }
 
-  //TODO: reactivo para no recargar la pagina
+  // Filtrar el miembro eliminado de la lista
+  inscripcionData.value.componentesEquipoDTO = inscripcionData.value.componentesEquipoDTO.filter(
+    (miembro) => miembro.idInscripcion !== idInscripcion
+  );
+
   showSuccessModalEliminarMiembroEquipo.value = true;
-
-  //ahora mismo recargamos
-  recargarPagina();
 };
+
 
 const handlerModalRegistrarMiembroEquipo = async () => {
   const responseJugadores = await getUsuariosNoInscritosTorneoAsync(
@@ -547,9 +551,28 @@ const closeModal = () => {
   showModalRegistrarMiembroEquipo.value = false;
 };
 
-const closeConfigModal = () => {
-  recargarPagina();
+const closeConfigModal = (nuevoJugador: UsuarioSinEquipoDTO) => {
+  if (nuevoJugador) {
+    const nuevoMiembro: ComponentesEquipoDTO = {
+      idUsuario: nuevoJugador.idUsuario,
+      nick: nuevoJugador.nick,
+      idInscripcion: Date.now(), // Temporal si no tienes ID real
+      listaData: '',
+      estadoLista: "NO_ENTREGADA",
+      ejercito: '',
+      esCapitan: false,
+      idLista: 0,
+      fechaEntregaLista: undefined,
+    };
+
+    //Comprueba que no exista ya el miembro
+    if (!inscripcionData.value.componentesEquipoDTO.some((m) => m.idUsuario === nuevoJugador.idUsuario)) {
+      inscripcionData.value.componentesEquipoDTO.push(nuevoMiembro);
+    }
+
+  }
 };
+
 
 const enviarCambiarLista = (
   idInscripcion: number | undefined,
@@ -675,7 +698,7 @@ onMounted(async () => {
           Equipos_6: 6,
         };
         numeroMiembrosEquipo.value = miembrosPorTipo[detalleTorneo.value?.tipoTorneo ?? "Individual"] || 1;
-        console.log("equipoConHuecos", equipoConHuecos);
+        
       }catch (error){
         console.error("Error al obtener el detalle del torneo:", error);
       }
