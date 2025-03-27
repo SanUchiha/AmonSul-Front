@@ -16,8 +16,9 @@
         </v-row>
 
         <!--Barra de victorias empates derrotas con interactividad-->
+        <v-row><v-col class="pb-0 pt-1 text-left" cols="12"><v-icon class="ml-2" color="grey-lighten-1" size="20">mdi-filter-variant</v-icon> Pulsa sobre la barra para filtrar partidas</v-col></v-row>
         <v-row>
-          <v-col cols="12">
+          <v-col cols="12" class="pt-0">
             <div class="resultado-barra">
               <div
                 class="victorias"
@@ -49,6 +50,11 @@
             </div>
           </v-col>
         </v-row>
+
+        <!-- Snackbar para informar del filtro -->
+        <v-snackbar v-model="mostrarSnackbar" timeout="1500" color="indigo-darken-4" elevation="3">
+          {{ textoSnackbar }}
+        </v-snackbar>
 
         <v-spacer></v-spacer>
 
@@ -102,6 +108,10 @@ const defaultUsuario = {
   numeroPartidasJugadas: 0
 };
 
+//Para el snackbar
+const mostrarSnackbar = ref(false);
+const textoSnackbar = ref("");
+
 const usuarioData = computed(() => props.usuario ?? defaultUsuario);
 
 const winRate = computed(() =>
@@ -125,6 +135,17 @@ const emit = defineEmits<{
 function toggleFiltro(tipo: 'win' | 'loss' | 'draw') {
   filtroActivo.value = filtroActivo.value === tipo ? null : tipo;
   emit('filtroCambiar', filtroActivo.value);
+
+  // Texto descriptivo para el snackbar
+  const mensajes = {
+    win: "Filtrando por victorias",
+    draw: "Filtrando por empates",
+    loss: "Filtrando por derrotas",
+    null: "Mostrando todas las partidas",
+  };
+
+  textoSnackbar.value = mensajes[filtroActivo.value ?? "null"];
+  mostrarSnackbar.value = true;
 }
 </script>
 
@@ -171,17 +192,16 @@ function toggleFiltro(tipo: 'win' | 'loss' | 'draw') {
 }
 
 .victorias {
-  border-radius: 6px;
+  border-radius: 6px 0 0 6px;
   background-color: #145c17;
 }
 
 .empates {
-  border-radius: 6px;
   background-color: #dbba00;
 }
 
 .derrotas {
-  border-radius: 6px;
+  border-radius: 0 6px 6px 0;
   background-color: #751710;
 }
 

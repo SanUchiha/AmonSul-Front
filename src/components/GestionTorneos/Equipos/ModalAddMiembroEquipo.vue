@@ -91,6 +91,7 @@ const closeModal = () => {
 const addJugador = async () => {
   try {
     isGenerating.value = true;
+
     const idTorneo = props.idTorneo;
     const idUsuario = jugadorSelected.value?.idUsuario;
     const idEquipo = props.idEquipo;
@@ -98,24 +99,39 @@ const addJugador = async () => {
     if (idTorneo === undefined || idUsuario === undefined) {
       throw new Error("El idTorneo o idUsuario no están definidos");
     }
+
     const request: CreateMiembroEquipoDTO = {
       IdUsuario: idUsuario,
       IdTorneo: idTorneo,
       IdEquipo: idEquipo,
     };
 
-    await registrarMiembroEquipoAsync(request);
+    const response = await registrarMiembroEquipoAsync(request);
+
+    const nuevoMiembro = {
+      idUsuario: jugadorSelected.value!.idUsuario,
+      nick: jugadorSelected.value!.nick,
+      idInscripcion: response.idInscripcion,
+      listaData: null,
+      estadoLista: "NO_ENTREGADA",
+      ejercito: null,
+      esCapitan: false,
+      idLista: 0,
+      fechaEntregaLista2: undefined,
+    };
+
+    console.log("nuevoMiembro", nuevoMiembro);
     showSuccessModal.value = true;
+    emit("confirm", nuevoMiembro);
+    closeModal();
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;
   } finally {
     isGenerating.value = false;
-    emit("confirm", jugadorSelected.value);
-
-    closeModal();
   }
 };
+
 
 onMounted(async () => {
   try {

@@ -2,7 +2,7 @@
   <div v-if="isLoading" class="center">
     <LoadingGandalf />
   </div>
-  <div v-else>
+  <div v-else :class="{ 'loading-overlay': isCargandoAccion }">
     <v-container v-model="show" class="d-flex justify-center align-center">
       <v-card elevation="8" class="rounded-modal pa-3 scrollable-modal">
         <v-card-title
@@ -294,22 +294,6 @@
 
         <v-card-actions>
           <v-row>
-            <!--<v-col>
-              <div
-                class="text-center"
-                v-if="inscripcionData?.idCapitan == idUsuario"
-              >
-                <v-btn
-                  color="primary"
-                  variant="tonal"
-                  @click="handlerModalRegistrarMiembroEquipo()"
-                  class="elevated-btn"
-                  block
-                >
-                  Añadir miembro
-                </v-btn>
-              </div>
-            </v-col>-->
             <v-col>
               <div
                 class="text-center"
@@ -402,10 +386,24 @@
     @close="closeModal"
     @confirm="closeConfigModal"
   />
+
+  <v-dialog v-model="isCargandoAccion" persistent width="250" hide-overlay>
+    <v-card class="d-flex flex-column justify-center align-center pa-4" height="180">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="50"
+        class="mb-4"
+      ></v-progress-circular>
+      <div class="text-subtitle-1 text-center">{{ mensajeCarga }}</div>
+    </v-card>
+  </v-dialog>
+
+
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, defineEmits, onMounted, watch, computed } from "vue";
+import { defineProps, ref, defineEmits, onMounted, computed } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
@@ -457,9 +455,10 @@ const showSuccessModalEliminar = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const { getidUsuario } = useAuth();
 
+const isCargandoAccion = ref(false);
+const mensajeCarga = ref("Cargando...");
 const idUsuarioLogger = ref<number>(parseInt(getidUsuario.value));
 const isLoading = ref<boolean>(true);
-const isRegistering = ref<boolean>(false);
 const isCaptain = ref<boolean>(false);
 const idCaptain = ref<number>();
 const detalleTorneo = ref<Torneo>();
@@ -497,19 +496,6 @@ const listaJugador = ref<ListaJugador>();
 const idTorneo = ref<number>();
 const jugadoresSinEquipo = ref<UsuarioSinEquipoDTO[]>([]);
 
-watch(
-  () => showSuccessModalLista.value,
-  (newValue, oldValue) => {
-    if (oldValue && !newValue) {
-      recargarPagina();
-    }
-  }
-);
-
-const recargarPagina = () => {
-  window.location.reload();
-};
-
 const verLista = (listaData: string, nombre: string, ejercito: string) => {
   const listaJugadorDTO: ListaJugador = {
     listaData: listaData,
@@ -521,19 +507,27 @@ const verLista = (listaData: string, nombre: string, ejercito: string) => {
 };
 
 const eliminarMiembro = async (idInscripcion: number) => {
-  const response = await eliminarMiembroEquipoAsync(idInscripcion);
-
-  if (response.status !== 200) {
-    showErrorModalEliminarMiembroEquipo.value = true;
-    return;
+  isCargandoAccion.value = true;
+  mensajeCarga.value = "Eliminando jugador...";
+  try{
+    const response = await eliminarMiembroEquipoAsync(idInscripcion);
+  
+    if (response.status !== 200) {
+      isCargandoAccion.value = false;
+      showErrorModalEliminarMiembroEquipo.value = true;
+      return;
+    }
+  
+    inscripcionData.value.componentesEquipoDTO = inscripcionData.value.componentesEquipoDTO.filter(
+      (miembro) => miembro.idInscripcion !== idInscripcion
+    );
   }
-
-  // Filtrar el miembro eliminado de la lista
-  inscripcionData.value.componentesEquipoDTO = inscripcionData.value.componentesEquipoDTO.filter(
-    (miembro) => miembro.idInscripcion !== idInscripcion
-  );
-
-  showSuccessModalEliminarMiembroEquipo.value = true;
+  catch(error){
+    console.error("Error al borrar un miembro: ", error);
+  }finally{
+    isCargandoAccion.value = false;
+    showSuccessModalEliminarMiembroEquipo.value = true;
+  }
 };
 
 
@@ -551,27 +545,19 @@ const closeModal = () => {
   showModalRegistrarMiembroEquipo.value = false;
 };
 
-const closeConfigModal = (nuevoJugador: UsuarioSinEquipoDTO) => {
-  if (nuevoJugador) {
-    const nuevoMiembro: ComponentesEquipoDTO = {
-      idUsuario: nuevoJugador.idUsuario,
-      nick: nuevoJugador.nick,
-      idInscripcion: Date.now(), // Temporal si no tienes ID real
-      listaData: '',
-      estadoLista: "NO_ENTREGADA",
-      ejercito: '',
-      esCapitan: false,
-      idLista: 0,
-      fechaEntregaLista: undefined,
-    };
-
-    //Comprueba que no exista ya el miembro
-    if (!inscripcionData.value.componentesEquipoDTO.some((m) => m.idUsuario === nuevoJugador.idUsuario)) {
+const closeConfigModal = (nuevoMiembro: ComponentesEquipoDTO) => {
+  if (nuevoMiembro) {
+    // Evitar duplicados por ID
+    if (
+      !inscripcionData.value.componentesEquipoDTO.some(
+        (m) => m.idUsuario === nuevoMiembro.idUsuario
+      )
+    ) {
       inscripcionData.value.componentesEquipoDTO.push(nuevoMiembro);
     }
-
   }
 };
+
 
 
 const enviarCambiarLista = (
@@ -602,8 +588,11 @@ const close = () => {
 };
 
 const handleEnviarLista = async (newLista: RequesListaDTO) => {
+  isCargandoAccion.value = true;
+  mensajeCarga.value = "Enviando lista...";
+
   if (currentInscripcionId.value != null) {
-    isRegistering.value = true;
+    isCargandoAccion.value = true;
     const requestLista: CrearListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       listaData: newLista.listaData,
@@ -619,27 +608,36 @@ const handleEnviarLista = async (newLista: RequesListaDTO) => {
       await subirListaTorneo(requestLista);
       showSuccessModalLista.value = true;
 
-      for (
-        let index = 0;
-        index < inscripcionData.value.componentesEquipoDTO.length;
-        index++
-      ) {
-        const element = inscripcionData.value.componentesEquipoDTO[index];
-        if (currentInscripcionId.value == element.idInscripcion)
-          element.estadoLista = "ENTREGADA";
+      const miembroIndex = inscripcionData.value.componentesEquipoDTO.findIndex(
+        (m) => m.idInscripcion === currentInscripcionId.value
+      );
+
+      if (miembroIndex !== -1) {
+        const antiguoMiembro = inscripcionData.value.componentesEquipoDTO[miembroIndex];
+        inscripcionData.value.componentesEquipoDTO[miembroIndex] = {
+          ...antiguoMiembro,
+          estadoLista: "ENTREGADA",
+          listaData: newLista.listaData,
+          ejercito: newLista.ejercito.name, // O `.nombre` si lo cambias
+        };
       }
+
+
     } catch {
-      isRegistering.value = false;
+      isCargandoAccion.value = false;
       showErrorModalLista.value = true;
     } finally {
-      isRegistering.value = false;
+      isCargandoAccion.value = false;
       //showVerListaModal.value = false;
+      isCargandoAccion.value = false;
     }
   }
 };
 const handleModificarLista = async (newLista: RequesListaDTO) => {
   if (currentInscripcionId.value != null) {
-    isRegistering.value = true;
+    isCargandoAccion.value = true;
+    mensajeCarga.value = "Modificando lista...";
+
     const requestLista: ModificarListaTorneoRequestDTO = {
       idInscripcion: currentInscripcionId.value,
       idLista: currentIdLista.value,
@@ -653,20 +651,24 @@ const handleModificarLista = async (newLista: RequesListaDTO) => {
       await modificarListaTorneo(requestLista);
       showSuccessModalLista.value = true;
 
-      for (
-        let index = 0;
-        index < inscripcionData.value.componentesEquipoDTO.length;
-        index++
-      ) {
-        const element = inscripcionData.value.componentesEquipoDTO[index];
-        if (currentInscripcionId.value == element.idInscripcion)
-          element.estadoLista = "ENTREGADA";
+      const miembroIndex = inscripcionData.value.componentesEquipoDTO.findIndex(
+        (m) => m.idInscripcion === currentInscripcionId.value
+      );
+
+      if (miembroIndex !== -1) {
+        const antiguoMiembro = inscripcionData.value.componentesEquipoDTO[miembroIndex];
+        inscripcionData.value.componentesEquipoDTO[miembroIndex] = {
+          ...antiguoMiembro,
+          estadoLista: "ENTREGADA",
+          listaData: newLista.listaData,
+          ejercito: newLista.ejercito.name,
+        };
       }
     } catch {
-      isRegistering.value = false;
+      isCargandoAccion.value = false;
       showErrorModalLista.value = true;
     } finally {
-      isRegistering.value = false;
+      isCargandoAccion.value = false;
       //showVerListaModal.value = false;
     }
   }
@@ -740,5 +742,10 @@ onMounted(async () => {
   max-width: 800px;
   overflow-y: auto;
   padding-bottom: 24px;
+}
+/** Para evitar la interacción cuando aparece el spiner de carga */
+.loading-overlay {
+  pointer-events: none;
+  opacity: 0.6;
 }
 </style>
