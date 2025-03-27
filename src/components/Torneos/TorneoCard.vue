@@ -57,13 +57,13 @@
             Ver Detalle
           </v-btn>
         </v-col>
-        <v-col v-if="verClasificacion" cols="12" sm="6">
+        <v-col cols="12" sm="6">
           <v-btn
             variant="tonal"
             color="blue lighten-2"
             @click="goToResultadoTorneo"
           >
-            Ver Clasificación
+            Ver Resultados
           </v-btn>
         </v-col>
       </v-row>
