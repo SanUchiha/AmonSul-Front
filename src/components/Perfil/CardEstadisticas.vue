@@ -52,8 +52,19 @@
         </v-row>
 
         <!-- Snackbar para informar del filtro -->
-        <v-snackbar v-model="mostrarSnackbar" timeout="1500" color="indigo-darken-4" elevation="3">
-          {{ textoSnackbar }}
+        <v-snackbar
+          v-model="mostrarSnackbar"
+          timeout="1500"
+          color="indigo-darken-4"
+          elevation="3"
+          location="top"
+          rounded="lg"
+          class="px-4"
+        >
+          <template #default>
+            <v-icon class="mr-2" color="yellow-lighten-2">mdi-filter-check</v-icon>
+            {{ textoSnackbar }}
+          </template>
         </v-snackbar>
 
         <v-spacer></v-spacer>

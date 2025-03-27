@@ -348,8 +348,8 @@
     :emailOrganizador="currentEmailOrganziador!"
     :nick="currentNick!"
     :hasLista="hasLista"
-    @enviarLista="handleEnviarLista"
-    @modificarLista="handleModificarLista"
+    @enviarLista="guardarLista"
+    @modificarLista="guardarLista"
   />
 
   <!-- Modales de respuesta a la subida de la lista -->
@@ -587,92 +587,74 @@ const close = () => {
   emit("close");
 };
 
-const handleEnviarLista = async (newLista: RequesListaDTO) => {
+const guardarLista = async (newLista: RequesListaDTO) => {
   isCargandoAccion.value = true;
-  mensajeCarga.value = "Enviando lista...";
+  const miembroIndex = inscripcionData.value.componentesEquipoDTO.findIndex(
+    (m) => m.idInscripcion === currentInscripcionId.value
+  );
 
-  if (currentInscripcionId.value != null) {
-    isCargandoAccion.value = true;
-    const requestLista: CrearListaTorneoRequestDTO = {
-      idInscripcion: currentInscripcionId.value,
-      listaData: newLista.listaData,
-      ejercito: newLista.ejercito,
-      idUsuario: newLista.idUsuario,
-      idTorneo: inscripcionData.value.idTorneo,
-      emailOrganizador: inscripcionData.value?.emailOrganizador,
-      nick: newLista.nick,
-      nombreEquipo: inscripcionData.value?.nombreEquipo,
-    };
-
-    try {
-      await subirListaTorneo(requestLista);
-      showSuccessModalLista.value = true;
-
-      const miembroIndex = inscripcionData.value.componentesEquipoDTO.findIndex(
-        (m) => m.idInscripcion === currentInscripcionId.value
-      );
-
-      if (miembroIndex !== -1) {
-        const antiguoMiembro = inscripcionData.value.componentesEquipoDTO[miembroIndex];
-        inscripcionData.value.componentesEquipoDTO[miembroIndex] = {
-          ...antiguoMiembro,
-          estadoLista: "ENTREGADA",
-          listaData: newLista.listaData,
-          ejercito: newLista.ejercito.name, // O `.nombre` si lo cambias
-        };
-      }
-
-
-    } catch {
-      isCargandoAccion.value = false;
-      showErrorModalLista.value = true;
-    } finally {
-      isCargandoAccion.value = false;
-      //showVerListaModal.value = false;
-      isCargandoAccion.value = false;
-    }
+  if (miembroIndex === -1) {
+    isCargandoAccion.value = false;
+    showErrorModalLista.value = true;
+    return;
   }
-};
-const handleModificarLista = async (newLista: RequesListaDTO) => {
-  if (currentInscripcionId.value != null) {
-    isCargandoAccion.value = true;
-    mensajeCarga.value = "Modificando lista...";
 
-    const requestLista: ModificarListaTorneoRequestDTO = {
-      idInscripcion: currentInscripcionId.value,
-      idLista: currentIdLista.value,
-      listaData: newLista.listaData,
-      ejercito: newLista.ejercito,
-      idUsuario: newLista.idUsuario,
-      idTorneo: inscripcionData.value.idTorneo,
-    };
+  const miembro = inscripcionData.value.componentesEquipoDTO[miembroIndex];
 
-    try {
+  const esModificacion = !!miembro.idLista;
+
+  try {
+    let nuevoIdLista = miembro.idLista;
+
+    if (esModificacion) {
+      mensajeCarga.value = "Modificando lista...";
+
+      const requestLista: ModificarListaTorneoRequestDTO = {
+        idInscripcion: currentInscripcionId.value!,
+        idLista: miembro.idLista!,
+        listaData: newLista.listaData,
+        ejercito: newLista.ejercito,
+        idUsuario: newLista.idUsuario,
+        idTorneo: inscripcionData.value.idTorneo,
+      };
+
       await modificarListaTorneo(requestLista);
-      showSuccessModalLista.value = true;
+    } else {
+      mensajeCarga.value = "Enviando lista...";
 
-      const miembroIndex = inscripcionData.value.componentesEquipoDTO.findIndex(
-        (m) => m.idInscripcion === currentInscripcionId.value
-      );
+      const requestLista: CrearListaTorneoRequestDTO = {
+        idInscripcion: currentInscripcionId.value!,
+        listaData: newLista.listaData,
+        ejercito: newLista.ejercito,
+        idUsuario: newLista.idUsuario,
+        idTorneo: inscripcionData.value.idTorneo,
+        emailOrganizador: inscripcionData.value.emailOrganizador,
+        nick: newLista.nick,
+        nombreEquipo: inscripcionData.value.nombreEquipo,
+      };
 
-      if (miembroIndex !== -1) {
-        const antiguoMiembro = inscripcionData.value.componentesEquipoDTO[miembroIndex];
-        inscripcionData.value.componentesEquipoDTO[miembroIndex] = {
-          ...antiguoMiembro,
-          estadoLista: "ENTREGADA",
-          listaData: newLista.listaData,
-          ejercito: newLista.ejercito.name,
-        };
-      }
-    } catch {
-      isCargandoAccion.value = false;
-      showErrorModalLista.value = true;
-    } finally {
-      isCargandoAccion.value = false;
-      //showVerListaModal.value = false;
+      const response = await subirListaTorneo(requestLista);
+      nuevoIdLista = response.data?.idLista;
     }
+
+    // Reemplazo reactivo del objeto completo
+    inscripcionData.value.componentesEquipoDTO[miembroIndex] = {
+      ...miembro,
+      estadoLista: "ENTREGADA",
+      listaData: newLista.listaData,
+      ejercito: newLista.ejercito.name,
+      idLista: nuevoIdLista,
+    };
+
+    showSuccessModalLista.value = true;
+  } catch (error) {
+    console.error("Error al guardar/modificar lista:", error);
+    showErrorModalLista.value = true;
+  } finally {
+    isCargandoAccion.value = false;
   }
 };
+
 
 onMounted(async () => {
   try {
