@@ -149,19 +149,6 @@
     emit("close");
   };
     
-  // Watch para detectar cuando se cierra el modal de éxito
-  watch(
-    () => showSuccessModalSubirLista.value,
-    (newValue, oldValue) => {
-      if (oldValue && !newValue) {
-        recargarPagina();
-      }
-    }
-  );
-  
-  const recargarPagina = () => {
-    window.location.reload();
-  };
   </script>
   
   <style scoped>

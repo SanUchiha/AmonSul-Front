@@ -37,6 +37,7 @@
                       :key="equipo.idEquipo"
                       :equipo="equipo"
                       :torneo="torneo"
+                      @delete-team="handleEquipoEliminado(equipo.idEquipo)"
                     />
                   </div>
                 </div>
@@ -958,6 +959,14 @@ const closeModificarPartidaTorneoModal = () => {
   showModificarPartidaTorneoModal.value = false;
 };
 
+const handleEquipoEliminado = (idEquipo: number) => {
+  if (torneoGestion.value) {
+    torneoGestion.value.equipos = torneoGestion.value.equipos.filter(
+      (e) => e.idEquipo !== idEquipo
+    );
+  }
+};
+
 const handleModificarPartidaTorneoConfirm = async (
   partidaEditada: PartidaTorneoDTO
 ) => {
@@ -1318,15 +1327,6 @@ const isRondaValidada = (numeroRonda: number) => {
       partida.partidaValidadaUsuario1 === true &&
       partida.partidaValidadaUsuario2 === true
   );
-};
-
-const handleInscripcionEliminada = (idEquipo: number) => {
-  if (torneoGestion.value) {
-    // Actualiza las inscripciones eliminando la inscripción correspondiente
-    torneoGestion.value.equipos = torneoGestion.value.equipos.filter(
-      (inscripcion) => inscripcion.idEquipo !== idEquipo
-    );
-  }
 };
 
 const getGanador = (partida: PartidaTorneoDTO) => {

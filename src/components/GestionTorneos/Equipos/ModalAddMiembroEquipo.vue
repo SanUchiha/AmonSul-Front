@@ -113,7 +113,7 @@ const addJugador = async () => {
       nick: jugadorSelected.value!.nick,
       idInscripcion: response.idInscripcion,
       listaData: null,
-      estadoLista: "NO_ENTREGADA",
+      estadoLista: "NO ENTREGADA",
       ejercito: null,
       esCapitan: false,
       idLista: 0,
