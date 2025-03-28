@@ -20,9 +20,16 @@ import MisPartidasView from "@/views/MisPartidasView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
 import LigasView from "@/views/LigasView.vue";
 import AboutUsView from "@/views/AboutUsView.vue";
+import HomeView from "@/views/HomeView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
+  {
+    path: "/home",
+    name: "home",
+    component: HomeView,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/detalle-jugador/:idUsuario",
     name: "detalle-jugador",

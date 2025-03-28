@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-if="isAuthenticated" v-model="drawer" app>
+    <v-navigation-drawer v-if="isAuthenticated" v-model="drawer" app permanent>
       <v-btn icon @click.stop="drawer = false" class="close-drawer-btn">
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -14,6 +14,19 @@
       </v-list-item>
       <v-divider></v-divider>
       <v-list class="ringbearer">
+        <v-list-item link to="/home" v-if="isAuthenticated">
+          <v-list-item-content class="d-flex ga-2">
+            <v-list-item-icon>
+              <img
+                src="@/assets/icons/misPartidas.png"
+                alt="Icono personalizado"
+                width="30"
+                height="30"
+              />
+            </v-list-item-icon>
+            <v-list-item-title class="mt-1">Inicio</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item link to="/mis-partidas" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-list-item-icon>
