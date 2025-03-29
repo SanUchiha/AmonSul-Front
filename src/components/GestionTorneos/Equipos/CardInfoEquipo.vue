@@ -203,6 +203,8 @@
   />
   <!-- Modal envair cambiar lista -->
   <ModalEnviarLista
+    v-if="showEnviarCambiarListaModal"
+    :key="currentInscripcionId"
     v-model:isVisible="showEnviarCambiarListaModal"
     :idInscripcion="currentInscripcionId!"
     :idUsuario="currentUsuarioId!"
@@ -213,6 +215,7 @@
     @enviarLista="guardarLista"
     @modificarLista="guardarLista"
   />
+
   <!-- Modales de respuesta a la subida de la lista -->
   <ModalSuccess
     :isVisible="showSuccessModalLista"
@@ -256,7 +259,7 @@
 
   <!-- Modal añadir miembro al equipo -->
   <ModalAddMiembroEquipo
-    :isVisible="showModalRegistrarMiembroEquipo"
+    v-model:isVisible="showModalRegistrarMiembroEquipo"
     :idEquipo="equipo.idEquipo"
     :idTorneo="torneo.idTorneo!"
     :jugadores="jugadoresSinEquipo"

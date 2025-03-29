@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="internalIsVisible" max-width="500">
+  <v-dialog v-model="visible" max-width="500">
     <v-card>
       <v-card-title class="headline">Enviar lista</v-card-title>
 
@@ -65,7 +65,7 @@
 import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
 import { appsettings } from "@/settings/appsettings";
-import { defineProps, defineEmits, ref, watch } from "vue";
+import { defineProps, defineEmits, ref, computed, watch } from "vue";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -74,9 +74,19 @@ const props = defineProps<{
   idUsuario: number;
   nick: string;
 }>();
-const emit = defineEmits(["update:isVisible", "enviarLista", "modificarLista"]);
 
-const internalIsVisible = ref(props.isVisible);
+const emit = defineEmits<{
+  (e: "update:isVisible", value: boolean): void;
+  (e: "enviarLista", newLista: RequesListaDTO): void;
+  (e: "modificarLista", newLista: RequesListaDTO): void;
+}>();
+
+// Computed reactividad con v-model
+const visible = computed({
+  get: () => props.isVisible,
+  set: (val: boolean) => emit("update:isVisible", val),
+});
+
 const isLoading = ref(false);
 const imageBase64 = ref<string | null>(null);
 
@@ -96,7 +106,7 @@ const onImageSelected = (event: Event) => {
 };
 
 const rules = {
-  required: (value: string | null) => !!value || "El ejercito es obligatorio.",
+  required: (value: string | null) => !!value || "El ejército es obligatorio.",
 };
 
 const loadEjercitos = async () => {
@@ -129,16 +139,17 @@ const enviarLista = () => {
 
 const close = () => {
   emit("update:isVisible", false);
-  internalIsVisible.value = false;
 };
 
-watch(
-  () => props.isVisible,
-  (newVal) => {
-    internalIsVisible.value = newVal;
+// Reset de datos al abrir modal (opcional)
+watch(visible, (newVal) => {
+  if (newVal) {
+    ejercitoSelected.value = undefined;
+    imageBase64.value = null;
   }
-);
+});
 </script>
+
 
 <style scoped>
 .uploaded-image {
