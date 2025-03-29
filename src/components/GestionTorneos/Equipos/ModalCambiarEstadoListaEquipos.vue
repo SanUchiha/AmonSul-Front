@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="show" max-width="800px">
+    <v-dialog v-model="visible" max-width="800px">
       <v-card>
         <v-card-title class="modal-title">
           <h3>{{ props.nick }}</h3>
@@ -66,7 +66,7 @@
   import {
     updateEstadoLista,
   } from "@/services/InscripcionesService";
-  import { defineProps, ref, watch, defineEmits } from "vue";
+  import { defineProps, ref, watch, defineEmits, computed } from "vue";
   import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
   import ModalError from "@/components/Commons/ModalError.vue";
   
@@ -74,7 +74,8 @@
   const props = defineProps<{
     idInscripcion: number;
     estadoLista: string;
-    nick: string
+    nick: string;
+    isVisible: boolean;
   }>();
   
   const estadoListaLocal = ref(props.estadoLista);
@@ -82,13 +83,17 @@
   // ModalDetalleInscripcion.vue
   const emit = defineEmits<{
     (e: "close"): void;
+    (e: "update:isVisible", value: boolean): void;
     (
       e: "update-inscripcion",
       payload: { field: keyof InscripcionTorneoCreadoDTO; value: unknown }
     ): void;
   }>();
   
-  const show = ref<boolean>(true);
+  const visible = computed({
+    get: () => props.isVisible,
+    set: (val: boolean) => emit("update:isVisible", val),
+  });
   const isLoading = ref<boolean>(false);
   
   const estadoListaOptions = [
@@ -99,7 +104,6 @@
   ] as const;
   
   const showSuccessModalLista = ref<boolean>(false);
-  const showSuccessModalSubirLista = ref<boolean>(false);
   const showErrorModal = ref<boolean>(false);
   
   // Registrar el cambio y actualizar en la base de datos
@@ -145,9 +149,10 @@
   );
   
   const close = () => {
-    show.value = false;
+    visible.value = false; // <-- Emite hacia el padre
     emit("close");
   };
+
     
   </script>
   

@@ -1,6 +1,6 @@
 <template>
   <div class="card-equipo" @click="toggleExpand">
-    <v-card elevation="15" class="ma-2 pa-3" :class="{ 'border-warning': equipoIncompleto }">
+    <v-card elevation="15" class="ma-2 pa-3" :class="{ 'border-warning': equipoIncompleto, 'border-green': esPago === 'SI' && !equipoIncompleto}">
       <v-row class="align-center">
         <!-- Avatar + Nombre del equipo + Estado de Pago -->
         <v-col cols="12" sm="5" class="d-flex align-center justify-start">
@@ -14,7 +14,7 @@
               </span>              
               <v-spacer class="d-none d-sm-flex" />
               <span class="ms-2 text-caption text-grey-lighten-1">
-                {{ equipo.inscripciones.length }}/{{ numeroMiembrosEquipo }} jugadores <br/>
+                {{ inscripcionesEquipo.length }}/{{ numeroMiembrosEquipo }} jugadores <br/>
                 {{ listasOk }}/{{ numeroMiembrosEquipo }} listas OK
               </span>
             </div>            
@@ -132,7 +132,7 @@
                           <v-icon class="me-2">mdi-eye</v-icon> Ver Lista
                         </v-list-item-title>
                       </v-list-item>
-                      <v-list-item @click.stop="cambiarEstadoLista(item.idInscripcion!, item.estadoLista, item.nick)">
+                      <v-list-item v-if="item.listaData" @click.stop="cambiarEstadoLista(item.idInscripcion!, item.estadoLista, item.nick)">
                         <v-list-item-title>
                           <v-icon class="me-2">mdi-refresh</v-icon> Cambiar Estado
                         </v-list-item-title>
@@ -184,20 +184,23 @@
 
   <!-- Modales de respuesta a la subida de la lista -->
   <ModalCambiarEstadoListaEquipos
-    v-if="currentInscripcionId !== undefined && currentEstadoLista !== undefined && currentNick"
+    v-if="showCambiarEstadoLista"
+    :key="currentInscripcionId"
     v-model:isVisible="showCambiarEstadoLista"
-    :idInscripcion="currentInscripcionId"
-    :estado-lista="currentEstadoLista"
-    :nick="currentNick"
+    :idInscripcion="currentInscripcionId!"
+    :estado-lista="currentEstadoLista!"
+    :nick="currentNick!"
     @updateInscripcion="cambiarEstado"
   />
+
+
+
 
   <!-- Modal ver lista -->
   <ModalVerLista
     v-model:isVisible="showVerListaModal"
     :listaJugador="listaJugador!"
   />
-  <!-- Modal envair cambiar lista -->
   <!-- Modal envair cambiar lista -->
   <ModalEnviarLista
     v-model:isVisible="showEnviarCambiarListaModal"
@@ -514,6 +517,7 @@ const cambiarEstado = (payload: { field: keyof InscripcionTorneoDTO; value: unkn
       [field]: value,
     };
   }
+
 };
 
 
@@ -600,8 +604,7 @@ const eliminarMiembro = async (idInscripcion: number) => {
   mensajeCarga.value = "Eliminando jugador...";
   try{
     const response = await eliminarMiembroEquipoAsync(idInscripcion);
-  
-    if (response.status !== 200) {
+    if ((response.status < 200 && response.status >= 300) || response.data === false) {
       isCargandoAccion.value = false;
       showErrorModalEliminarMiembroEquipo.value = true;
       return;
@@ -610,12 +613,14 @@ const eliminarMiembro = async (idInscripcion: number) => {
     inscripcionesEquipo.value = inscripcionesEquipo.value.filter(
       (miembro) => miembro.idInscripcion !== idInscripcion
     );
+
+    showSuccessModalEliminarMiembroEquipo.value = true;
   }
   catch(error){
     console.error("Error al borrar un miembro: ", error);
+    showErrorModalEliminarMiembroEquipo.value = true;
   }finally{
     isCargandoAccion.value = false;
-    showSuccessModalEliminarMiembroEquipo.value = true;
   }
 };
 </script>
@@ -660,5 +665,8 @@ const eliminarMiembro = async (idInscripcion: number) => {
 /**Estilo de la card cuando faltan listas por enviar OK */
 .border-warning {
   border: 2px solid #ffa726; /* naranja */
+}
+.border-green {
+  border: 2px solid green; /* verde */
 }
 </style>
