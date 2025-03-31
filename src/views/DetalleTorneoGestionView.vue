@@ -89,7 +89,7 @@
                 <div v-else class="mt-3">
                   <!-- boton para cerrar el torneo -->
                   <v-btn
-                    v-if="hasGanador && !wasSave"
+                    v-if="!wasSave"
                     class="mt-2"
                     variant="tonal"
                     color="primary"
@@ -765,7 +765,16 @@ const tabClasificacion = ref<number>();
 const route = useRoute();
 const idTorneo = ref<number>(parseInt(route.params.idTorneo.toString()));
 const isLoading = ref<boolean>(false);
-const torneoGestion = ref<TorneoGestionInfoDTO | null>(null);
+const torneoGestion = ref<TorneoGestionInfoDTO>({
+  torneo: {
+    idTorneo: 0,
+    idUsuario: 0,
+    nombreTorneo: "",
+    numeroPartidas: 0,
+    estadoTorneo: "",
+  },
+  inscripciones: [],
+});
 const clasificacion = ref<Clasificacion[]>([]);
 const jugadoresZona1 = ref<Clasificacion[]>([]);
 const jugadoresZona2 = ref<Clasificacion[]>([]);
@@ -775,7 +784,6 @@ const clasificacionDividida = ref<Clasificacion[]>([]);
 const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
 const ultimaRonda = ref<number>();
-const hasGanador = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const isGenerating = ref<boolean>(false);
@@ -851,8 +859,6 @@ onMounted(async () => {
     calcularClasificacion();
 
     ultimaRonda.value = numeroRondas.value.length;
-    //const ganador: number = clasificacionZona1.value[0].idUsuario;
-    //if (ganador != null) hasGanador.value = true;
 
     const isSave = await isSaveTournament(idTorneo.value);
     wasSave.value = isSave.data;
@@ -1360,22 +1366,22 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
   }
 };
 
-const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalPuntosVisible.value = true;
-};
+// const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
+//   idPartidaSeleccionada.value = idPartida;
+//   usuarioSeleccionado.value = usuario;
+//   isModalPuntosVisible.value = true;
+// };
 
-const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalLiderVisible.value = true;
-};
+// const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
+//   idPartidaSeleccionada.value = idPartida;
+//   usuarioSeleccionado.value = usuario;
+//   isModalLiderVisible.value = true;
+// };
 
-const abrirModalEscenario = (idPartida: number) => {
-  idPartidaSeleccionada.value = idPartida;
-  isModalEscenarioVisible.value = true;
-};
+// const abrirModalEscenario = (idPartida: number) => {
+//   idPartidaSeleccionada.value = idPartida;
+//   isModalEscenarioVisible.value = true;
+// };
 
 const abrirModalValidar = (idPartida: number, usuario: 1 | 2) => {
   idPartidaSeleccionada.value = idPartida;

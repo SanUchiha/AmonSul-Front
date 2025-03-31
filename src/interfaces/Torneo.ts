@@ -13,7 +13,7 @@ export interface Torneo {
   estadoTorneo: "ESPERANDO" | "LIVE" | "TERMINADO" | "CANCELADO"; // Estado del torneo (enum)
   lugarTorneo: string; // Lugar donde se llevará a cabo el torneo
   esLiga?: boolean;
-  tipoTorneo: "Individual" | "Parejas" | "Equipos_4" | "Equipos_6";
+  tipoTorneo?: "Individual" | "Parejas" | "Equipos_4" | "Equipos_6";
   esPrivadoTorneo: boolean; // Indica si el torneo es privado o no
   idRangoTorneo: number; // ID del rango del torneo (FK)
   esMatchedPlayTorneo: boolean; // Indica si el torneo es de tipo Matched Play

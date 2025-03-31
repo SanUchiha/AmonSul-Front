@@ -267,7 +267,6 @@ const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
     puntosTorneo: 0,
     estadoTorneo: "ESPERANDO",
     lugarTorneo: "",
-    tipoTorneo: "",
     esPrivadoTorneo: false,
     idRangoTorneo: 0,
     esMatchedPlayTorneo: false,
