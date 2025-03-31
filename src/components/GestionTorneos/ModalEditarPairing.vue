@@ -4,20 +4,17 @@
       <v-card-title> Editar emparejamiento </v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="isFormValid">
-          <!-- Nick del jugador 1 -->
           <v-combobox
             label="Selecciona el nuevo jugador 1"
-            v-model="pairingEditado.nick1"
+            v-model="pairingEditado.idUsuario1"
             :items="jugadores"
             item-title="nick"
             item-value="idUsuario"
             :rules="[rules.required]"
           ></v-combobox>
-
-          <!-- Nombre del jugador 2 -->
           <v-combobox
             label="Selecciona el nuevo jugador 2"
-            v-model="pairingEditado.nick2"
+            v-model="pairingEditado.idUsuario2"
             :items="jugadores"
             item-title="nick"
             item-value="idUsuario"
