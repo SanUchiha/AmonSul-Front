@@ -31,12 +31,23 @@
                   <CardGestionInfoTorneoEquipo :torneo="torneoGestion" />
                   <CardGestionAccionesTorneoEquipo :torneo="torneoGestion" />
 
+                  <!--Buscador de equipos-->
+                  <v-text-field
+                    v-model="busquedaEquipo"
+                    label="Buscar equipo por nombre"
+                    prepend-inner-icon="mdi-magnify"
+                    variant="outlined"
+                    clearable
+                    class="ma-4"
+                    hide-details
+                  />
+
                   <div class="grid-container">
                     <CardInfoEquipo
-                      v-for="equipo in torneoGestion?.equipos"
+                      v-for="equipo in equiposFiltrados"
                       :key="equipo.idEquipo"
                       :equipo="equipo"
-                      :torneo="torneo"
+                      :torneo="torneo!"
                       @delete-team="handleEquipoEliminado(equipo.idEquipo)"
                     />
                   </div>
@@ -665,7 +676,7 @@
     <!-- Modal cambiar pairing -->
     <ModalAgregarPairing
       :isVisible="showAgregarPairingModal"
-      :idTorneo="idTorneo"
+      :idTorneo="idTorneo!"
       :idRonda="idRondaSelected"
       @cerrar="closeAgregarPairingModal"
     />
@@ -706,7 +717,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import router from "@/router";
 import {
@@ -810,6 +821,18 @@ const partidaActual = ref<PartidaTorneoDTO>({
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
+
+//Variables para el buscador
+const busquedaEquipo = ref("");
+const equiposFiltrados = computed(() => {
+  if (!torneoGestion.value) return [];
+  return torneoGestion.value.equipos.filter((equipo) =>
+    (equipo.nombreEquipo?.toLowerCase() || "").includes(
+      busquedaEquipo.value.toLowerCase()
+    )
+  );
+});
+
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());

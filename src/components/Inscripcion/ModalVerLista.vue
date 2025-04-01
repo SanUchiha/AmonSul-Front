@@ -1,13 +1,10 @@
 <template>
-  <v-dialog v-model="internalIsVisible" max-width="500">
+  <v-dialog v-model="visible" max-width="500">
     <v-card>
-      <v-card-title class="headline">Lista de {{ nick }} </v-card-title>
+      <v-card-title class="headline">Lista de {{ nick }}</v-card-title>
       <v-card-text>
         <div v-if="isLoading" class="loading-container">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
+          <v-progress-circular indeterminate color="primary" />
         </div>
         <div v-else>
           <div v-if="imageBase64">
@@ -19,11 +16,7 @@
               </v-list-item>
             </v-list>
 
-            <img
-              :src="imageBase64"
-              alt="Lista cargada"
-              class="uploaded-image"
-            />
+            <img :src="imageBase64" alt="Lista cargada" class="uploaded-image" />
           </div>
           <div v-else>No se encontró una lista.</div>
         </div>
@@ -37,21 +30,28 @@
 
 <script setup lang="ts">
 import { ListaJugador } from "@/interfaces/Lista";
-import { ref, watch, defineProps, defineEmits, onMounted } from "vue";
+import { ref, defineProps, defineEmits, computed, watch } from "vue";
 
 const props = defineProps<{
   isVisible: boolean;
   listaJugador: ListaJugador;
 }>();
-const emit = defineEmits(["update:isVisible"]);
 
-const internalIsVisible = ref(props.isVisible);
+const emit = defineEmits<{
+  (e: "update:isVisible", value: boolean): void;
+}>();
+
+const visible = computed({
+  get: () => props.isVisible,
+  set: (val: boolean) => emit("update:isVisible", val),
+});
+
 const isLoading = ref(false);
 const imageBase64 = ref<string>();
 const nick = ref<string>();
 const ejercito = ref<string>();
 
-const cargarLista = async () => {
+const cargarLista = () => {
   isLoading.value = true;
   try {
     imageBase64.value = props.listaJugador.listaData;
@@ -64,20 +64,16 @@ const cargarLista = async () => {
   }
 };
 
-watch(
-  () => props.isVisible,
-  (newVal) => {
-    internalIsVisible.value = newVal;
-    if (newVal) cargarLista();
-  }
-);
-
 const close = () => {
   emit("update:isVisible", false);
-  internalIsVisible.value = false;
 };
 
-onMounted(cargarLista);
+// Re-cargar datos cada vez que se abre el modal
+watch(visible, (newVal) => {
+  if (newVal) {
+    cargarLista();
+  }
+});
 </script>
 
 <style scoped>
