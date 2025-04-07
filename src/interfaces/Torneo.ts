@@ -27,6 +27,7 @@ export interface Torneo {
   limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
   tieneBases: boolean;
   inicioInscripciones: string; // Fecha límite de inscripción
+  listasPorJugador: number;
 }
 
 export interface TorneoReducidoDTO {
@@ -44,11 +45,17 @@ export interface TorneoPropioDTO {
   idUsuario: number; // ID del usuario administrador del torneo (FK)
   nombreTorneo: string; // Nombre del torneo
   tipoTorneo: string;
+  listasPorJugador: number;
 }
 
 export interface TorneoGestionInfoDTO {
   torneo: TorneoCreadoDTO;
   inscripciones: InscripcionTorneoCreadoDTO[];
+}
+
+export interface TorneoGestionInfoMasDTO {
+  torneo: TorneoCreadoDTO;
+  inscripciones: InscripcionTorneoCreadoMasDTO[];
 }
 
 export interface TorneoCreadoDTO {
@@ -61,6 +68,7 @@ export interface TorneoCreadoDTO {
   fechaEntregaListas?: string | null;
   fechaFinInscripcion?: string | null;
   inicioInscripciones?: string | null;
+  listasPorJugador: number;
 }
 
 export interface InscripcionTorneoCreadoDTO {
@@ -77,6 +85,18 @@ export interface InscripcionTorneoCreadoDTO {
   ejercito?: string | null;
   listaData?: string | null;
   idTorneo: number;
+}
+
+export interface InscripcionTorneoCreadoMasDTO {
+  idInscripcion: number;
+  idUsuario: number;
+  nick: string;
+  fechaInscripcion: string;
+  bando?: "evil" | "good" | null;
+  fechaUltimaEntrega?: string | null;
+  esPago: string;
+  lista: string[];
+  countListasEntregadas: number;
 }
 
 export interface GuardarResultadosDTO {

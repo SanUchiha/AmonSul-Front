@@ -58,23 +58,16 @@
             </v-chip>
           </td>
 
-          <!-- estado de la lista -->
+          <!-- numero de listas entregadas -->
           <td>
-            <v-chip :color="formattedEstadoLista(item.estadoLista).color" dark>
-              {{ formattedEstadoLista(item.estadoLista).text }}
-            </v-chip>
+            {{ item.countListasEntregadas }}/{{
+              torneo.torneo.listasPorJugador
+            }}
           </td>
 
-          <!-- fecha entrega de la lista -->
+          <!-- fecha ultima entrega de la lista -->
           <td>
-            <v-chip
-              :color="
-                chipColor(item.fechaEntrega, torneo?.torneo.fechaEntregaListas)
-              "
-              dark
-            >
-              {{ formattedDate(item.fechaEntrega) }}
-            </v-chip>
+            {{ formattedDate(item.fechaUltimaEntrega) }}
           </td>
 
           <!-- estado del pago -->
@@ -111,13 +104,13 @@
       </v-btn>
     </v-row>
 
-    <ModalParametrosPrimeraRonda
+    <ModalParametrosPrimeraRondaMas
       :isVisible="showConfigModal"
       :torneo="torneo"
       @close="closeConfigModal"
       @confirm="handleConfigConfirm"
     />
-    <ModalAddJugadorTorneo
+    <ModalAddJugadorTorneoMas
       :isVisible="showAddJugadorModal"
       :torneo="torneo"
       @close="closeAddJugadorModal"
@@ -151,22 +144,23 @@ import { defineProps } from "vue";
 import ModalDetalleInscripcion from "./ModalDetalleInscripcion.vue";
 import {
   InscripcionTorneoCreadoDTO,
-  TorneoGestionInfoDTO,
+  InscripcionTorneoCreadoMasDTO,
+  TorneoGestionInfoMasDTO,
 } from "@/interfaces/Torneo";
-import ModalParametrosPrimeraRonda from "./ModalParametrosPrimeraRonda.vue";
-import ModalAddJugadorTorneo from "./ModalAddJugadorTorneo.vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import { getInfoTorneoCreado } from "@/services/TorneosService";
 import ModalSorteo from "./ModalSorteo.vue";
+import ModalParametrosPrimeraRondaMas from "./Mas/ModalParametrosPrimeraRondaMas.vue";
+import ModalAddJugadorTorneoMas from "./Mas/ModalAddJugadorTorneoMas.vue";
 
-const props = defineProps<{ torneo: TorneoGestionInfoDTO }>();
-const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
+const props = defineProps<{ torneo: TorneoGestionInfoMasDTO }>();
+const localInscripciones = ref<InscripcionTorneoCreadoMasDTO[]>([]);
 const isLoading = ref<boolean>(true);
 const showConfigModal = ref<boolean>(false);
 const showSorteoModal = ref<boolean>(false);
 const showAddJugadorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
-const localTorneo = ref<TorneoGestionInfoDTO>();
+const localTorneo = ref<TorneoGestionInfoMasDTO>();
 const nicks = ref<string[]>();
 
 const openConfigModal = async () => {
@@ -287,8 +281,8 @@ const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
 const headers = computed(() => [
   { title: "Nick", key: "nick" },
   { title: "Fecha Inscripción", key: "fechaInscripcion" },
-  { title: "Estado Lista", key: "estadoLista" },
-  { title: "Fecha Entrega", key: "fechaEntrega" },
+  { title: "Listas entregadas", key: "estadoLista" },
+  { title: "Fecha última entrega", key: "fechaEntrega" },
   { title: "Pagado", key: "esPago" },
 ]);
 
@@ -337,7 +331,7 @@ const handleRowClick = (item: InscripcionTorneoCreadoDTO) => {
 
 const handleUpdateInscripcion = (payload: {
   field: keyof InscripcionTorneoCreadoDTO;
-  value: any;
+  value: unknown;
 }) => {
   if (selectedInscripcion.value) {
     (selectedInscripcion.value[payload.field] as unknown) = payload.value;

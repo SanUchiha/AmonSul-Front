@@ -80,13 +80,11 @@ import { defineProps, defineEmits, ref, watch, onMounted, computed } from "vue";
 
 const props = defineProps<{
   isVisible: boolean;
-  hasLista: boolean;
-  idInscripcion: number;
+  idLista: number;
 }>();
 
 const internalIsVisible = ref(props.isVisible);
 const isLoading = ref<boolean>(false);
-const hasLista = ref<boolean>(false);
 
 const imageBase64 = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -167,17 +165,7 @@ watch(
   }
 );
 
-watch(
-  () => props.hasLista,
-  async (newVal) => {
-    if (newVal) {
-      const response = await getlista(props.idInscripcion);
-      imageBase64.value = response.data.listaData;
-    }
-  }
-);
-
-const emit = defineEmits(["update:isVisible", "enviarLista", "modificarLista"]);
+const emit = defineEmits(["update:isVisible", "modificarListaMasDeUna"]);
 
 const close = () => {
   emit("update:isVisible", false);
@@ -192,23 +180,22 @@ const enviarLista = () => {
     idUsuario: 0,
     nick: "",
   };
-  if (hasLista.value) emit("modificarLista", newLista);
-  else emit("enviarLista", newLista);
+  console.log("dentro del modal");
+  emit("modificarListaMasDeUna", newLista);
 };
 
 onMounted(async () => {
-  isLoading.value = true;
-  try {
-    const response = await getlista(props.idInscripcion);
-
-    imageBase64.value = response.data.listaData;
-    ejercitoSelected.value = response.data.ejercito;
-    if (imageBase64.value != null) hasLista.value = true;
-  } catch {
-    console.error("No se ha podido cargar la lista");
-  } finally {
-    isLoading.value = false;
-  }
+  // isLoading.value = true;
+  // try {
+  //   const response = await getlista(props.idInscripcion);
+  //   imageBase64.value = response.data.listaData;
+  //   ejercitoSelected.value = response.data.ejercito;
+  //   if (imageBase64.value == null) hasLista.value = true;
+  // } catch {
+  //   console.error("No se ha podido cargar la lista");
+  // } finally {
+  //   isLoading.value = false;
+  // }
 });
 </script>
 <style scoped>

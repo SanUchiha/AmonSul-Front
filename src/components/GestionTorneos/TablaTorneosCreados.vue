@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2"
-      >Torneos
+      >Torneos propios
 
       <v-spacer></v-spacer>
 
@@ -44,14 +44,32 @@
               </v-btn>
             </div>
             <div v-else>
-              <v-btn
-                @click="viewDetails(item.idTorneo)"
-                icon="mdi-eye"
-                color="primary"
-                elevation="2"
-                variant="tonal"
+              <div
+                v-if="
+                  item.tipoTorneo == 'Individual' && item.listasPorJugador > 1
+                "
               >
-              </v-btn>
+                <v-btn
+                  @click="
+                    viewDetailsTorneoIndividualMasDeUnaLista(item.idTorneo)
+                  "
+                  icon="mdi-eye"
+                  color="primary"
+                  elevation="2"
+                  variant="tonal"
+                >
+                </v-btn>
+              </div>
+              <div v-else>
+                <v-btn
+                  @click="viewDetails(item.idTorneo)"
+                  icon="mdi-eye"
+                  color="primary"
+                  elevation="2"
+                  variant="tonal"
+                >
+                </v-btn>
+              </div>
             </div>
 
             <v-btn
@@ -94,7 +112,10 @@ import {
   VTextField,
 } from "vuetify/components";
 import { useAuth } from "@/composables/useAuth";
-import { getTorneosCreadosUsuario, deleteTorneo } from "@/services/TorneosService";
+import {
+  getTorneosCreadosUsuario,
+  deleteTorneo,
+} from "@/services/TorneosService";
 
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
@@ -115,6 +136,13 @@ const viewDetails = (idTorneo: number) => {
 
 const viewDetailsTorneoEquipos = (idTorneo: number) => {
   router.push({ name: "detalle-torneo-gestion-equipos", params: { idTorneo } });
+};
+
+const viewDetailsTorneoIndividualMasDeUnaLista = (idTorneo: number) => {
+  router.push({
+    name: "detalle-torneo-gestion-individual-mas",
+    params: { idTorneo },
+  });
 };
 
 const deleteTournament = async (idTorneo: number) => {

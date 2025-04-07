@@ -1,23 +1,38 @@
 <template>
   <div class="card-equipo" @click="toggleExpand">
-    <v-card elevation="15" class="ma-2 pa-3" :class="{ 'border-warning': equipoIncompleto, 'border-green': esPago === 'SI' && !equipoIncompleto}">
+    <v-card
+      elevation="15"
+      class="ma-2 pa-3"
+      :class="{
+        'border-warning': equipoIncompleto,
+        'border-green': esPago === 'SI' && !equipoIncompleto,
+      }"
+    >
       <v-row class="align-center">
         <!-- Avatar + Nombre del equipo + Estado de Pago -->
         <v-col cols="12" sm="5" class="d-flex align-center justify-start">
           <v-avatar size="40">
-            <img src="@/assets/icons/equipos.png" alt="Equipo"  width="40" height="40"/>
+            <img
+              src="@/assets/icons/equipos.png"
+              alt="Equipo"
+              width="40"
+              height="40"
+            />
           </v-avatar>
           <div class="ms-2">
             <div class="d-flex align-center">
               <span class="text-subtitle-1 font-weight-bold ringbearer">
                 {{ equipo.nombreEquipo }}
-              </span>              
+              </span>
               <v-spacer class="d-none d-sm-flex" />
               <span class="ms-2 text-caption text-grey-lighten-1">
-                {{ inscripcionesEquipo.length }}/{{ numeroMiembrosEquipo }} jugadores <br/>
+                {{ inscripcionesEquipo.length }}/{{
+                  numeroMiembrosEquipo
+                }}
+                jugadores <br />
                 {{ listasOk }}/{{ numeroMiembrosEquipo }} listas OK
               </span>
-            </div>            
+            </div>
             <div class="d-flex align-center">
               <v-chip
                 class="mt-1"
@@ -25,11 +40,14 @@
                 variant="tonal"
                 x-small
               >
-                <v-icon size="16" class="me-1">mdi-cash</v-icon> 
+                <v-icon size="16" class="me-1">mdi-cash</v-icon>
                 Pago: {{ equipo.esPago }}
               </v-chip>
             </div>
-            <div v-if="equipoIncompleto" class="text-red text-caption mt-1 d-flex align-center">
+            <div
+              v-if="equipoIncompleto"
+              class="text-red text-caption mt-1 d-flex align-center"
+            >
               <v-icon size="16" class="me-1">mdi-alert-circle</v-icon>
               ATENCIÓN: Faltan listas por validar
             </div>
@@ -44,7 +62,11 @@
           </div>
           <div class="d-flex align-center">
             <v-icon size="18" class="me-1">mdi-email</v-icon>
-            <a :href="`mailto:${equipo.emailCapitan}`" class="text-decoration-none" target="_blank">
+            <a
+              :href="`mailto:${equipo.emailCapitan}`"
+              class="text-decoration-none"
+              target="_blank"
+            >
               {{ equipo.emailCapitan }}
             </a>
           </div>
@@ -55,30 +77,46 @@
         </v-col>
 
         <!-- Botones -->
-        <v-col cols="12" sm="3" class="d-flex flex-column align-end justify-center mt-2 mt-sm-0">
+        <v-col
+          cols="12"
+          sm="3"
+          class="d-flex flex-column align-end justify-center mt-2 mt-sm-0"
+        >
           <v-btn
             v-show="equipo.esPago === 'NO'"
             variant="tonal"
             color="warning"
             size="small"
             class="mb-1"
-            @click.stop="() => abrirModalConfirmacion('Marcar equipo como pagado?','¿Seguro que quieres actualizar el estado de pago a SI?',confirmarActualizarPago)"
+            @click.stop="
+              () =>
+                abrirModalConfirmacion(
+                  'Marcar equipo como pagado?',
+                  '¿Seguro que quieres actualizar el estado de pago a SI?',
+                  confirmarActualizarPago
+                )
+            "
             block
           >
-            <v-icon class="me-1">mdi-credit-card-edit</v-icon> 
+            <v-icon class="me-1">mdi-credit-card-edit</v-icon>
             Modificar Pago
           </v-btn>
           <v-btn
             color="red"
             variant="tonal"
             size="small"
-            @click.stop="abrirModalConfirmacion('¿Deseas borrar el equipo?', 'Esta acción no se puede deshacer.', confirmarEliminarEquipo)"
+            @click.stop="
+              abrirModalConfirmacion(
+                '¿Deseas borrar el equipo?',
+                'Esta acción no se puede deshacer.',
+                confirmarEliminarEquipo
+              )
+            "
             block
           >
             <v-icon class="me-1">mdi-trash-can</v-icon>
             Borrar equipo
           </v-btn>
-
         </v-col>
       </v-row>
 
@@ -90,9 +128,13 @@
             <template v-slot:headers>
               <tr>
                 <th class="compact-header text-center">Nombre</th>
-                <th class="hide-on-mobile compact-header text-center">Ejército</th>
+                <th class="hide-on-mobile compact-header text-center">
+                  Ejército
+                </th>
                 <th class="compact-header text-center">Lista</th>
-                <th class="hide-on-mobile compact-header text-center">Entrega</th>
+                <th class="hide-on-mobile compact-header text-center">
+                  Entrega
+                </th>
                 <th class="compact-header text-center">Acciones</th>
               </tr>
             </template>
@@ -100,25 +142,45 @@
               <tr v-if="item">
                 <td class="compact-cell text-left">
                   <v-avatar size="40" class="hide-on-mobile">
-                    <img src="@/assets/icons/teamLeader.png" v-if="item.idUsuario === equipo.idCapitan" alt="Capitan" width="45" height="45"/>
-                    <img src="@/assets/icons/verdetalle.png" v-else alt="Participante" width="40" height="40"/>
+                    <img
+                      src="@/assets/icons/teamLeader.png"
+                      v-if="item.idUsuario === equipo.idCapitan"
+                      alt="Capitan"
+                      width="45"
+                      height="45"
+                    />
+                    <img
+                      src="@/assets/icons/verdetalle.png"
+                      v-else
+                      alt="Participante"
+                      width="40"
+                      height="40"
+                    />
                   </v-avatar>
                   &nbsp;{{ item.nick || "Desconocido" }}
                 </td>
-                <td class="hide-on-mobile compact-cell">{{ item.ejercito || "No asignado" }}</td>
+                <td class="hide-on-mobile compact-cell">
+                  {{ item.ejercito || "No asignado" }}
+                </td>
                 <td class="compact-cell">
                   <v-chip
-                    :color="item.estadoLista === 'OK'
-                      ? 'green'
-                      : item.estadoLista === 'ENTREGADA'
-                      ? 'yellow'
-                      : 'red'"
+                    :color="
+                      item.estadoLista === 'OK'
+                        ? 'green'
+                        : item.estadoLista === 'ENTREGADA'
+                        ? 'yellow'
+                        : 'red'
+                    "
                     variant="tonal"
                   >
                     {{ item.estadoLista }}
                   </v-chip>
                 </td>
-                <td class="hide-on-mobile compact-cell">{{ formatFechaSpaWhitoutAsync(item.fechaEntregaLista) || "N/A" }}</td>
+                <td class="hide-on-mobile compact-cell">
+                  {{
+                    formatFechaSpaWhitoutAsync(item.fechaEntregaLista) || "N/A"
+                  }}
+                </td>
                 <td class="compact-cell">
                   <v-menu offset-y>
                     <template v-slot:activator="{ props }">
@@ -127,17 +189,42 @@
                       </v-btn>
                     </template>
                     <v-list>
-                      <v-list-item v-if="item.listaData" @click.stop="verLista(item.listaData!, item.nick, item.ejercito)">
+                      <v-list-item
+                        v-if="item.listaData"
+                        @click.stop="
+                          verLista(item.listaData!, item.nick, item.ejercito)
+                        "
+                      >
                         <v-list-item-title>
                           <v-icon class="me-2">mdi-eye</v-icon> Ver Lista
                         </v-list-item-title>
                       </v-list-item>
-                      <v-list-item v-if="item.listaData" @click.stop="cambiarEstadoLista(item.idInscripcion!, item.estadoLista, item.nick)">
+                      <v-list-item
+                        v-if="item.listaData"
+                        @click.stop="
+                          cambiarEstadoLista(
+                            item.idInscripcion!,
+                            item.estadoLista,
+                            item.nick
+                          )
+                        "
+                      >
                         <v-list-item-title>
-                          <v-icon class="me-2">mdi-refresh</v-icon> Cambiar Estado
+                          <v-icon class="me-2">mdi-refresh</v-icon> Cambiar
+                          Estado
                         </v-list-item-title>
                       </v-list-item>
-                      <v-list-item @click.stop="enviarCambiarLista(item.idInscripcion, item.listaData!, item.idUsuario, item.nick, item.idLista)">
+                      <v-list-item
+                        @click.stop="
+                          enviarCambiarLista(
+                            item.idInscripcion,
+                            item.listaData!,
+                            item.idUsuario,
+                            item.nick,
+                            item.idLista
+                          )
+                        "
+                      >
                         <v-list-item-title>
                           <v-icon class="me-2">mdi-pencil</v-icon>
                           <span v-if="item.listaData">Modificar lista</span>
@@ -174,8 +261,6 @@
                 </td>
               </tr>
             </template>
-
-
           </v-data-table>
         </div>
       </v-expand-transition>
@@ -193,15 +278,12 @@
     @updateInscripcion="cambiarEstado"
   />
 
-
-
-
   <!-- Modal ver lista -->
   <ModalVerLista
     v-model:isVisible="showVerListaModal"
     :listaJugador="listaJugador!"
   />
-  <!-- Modal envair cambiar lista -->
+  <!-- Modal enviar cambiar lista -->
   <ModalEnviarLista
     v-if="showEnviarCambiarListaModal"
     :key="currentInscripcionId"
@@ -222,7 +304,7 @@
     message="Lista enviada con éxito."
     @update:isVisible="showSuccessModalLista = $event"
   />
-  
+
   <!-- Modal response estado pago -->
   <ModalSuccess
     :isVisible="showSuccessModalPago"
@@ -245,7 +327,7 @@
   />
 
   <!-- Modales de respuesta a la eliminarcion de un miembro del equipo -->
-    <ModalSuccess
+  <ModalSuccess
     :isVisible="showSuccessModalEliminarMiembroEquipo"
     message="Miembro eliminado con éxito."
     @update:isVisible="showSuccessModalLista = $event"
@@ -279,7 +361,10 @@
   </v-dialog>
 
   <v-dialog v-model="isCargandoAccion" persistent width="250" hide-overlay>
-    <v-card class="d-flex flex-column justify-center align-center pa-4" height="180">
+    <v-card
+      class="d-flex flex-column justify-center align-center pa-4"
+      height="180"
+    >
       <v-progress-circular
         indeterminate
         color="primary"
@@ -305,15 +390,17 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-
-
 </template>
 
 <script setup lang="ts">
 import { computed, ref, defineEmits, toRef } from "vue";
 import { defineProps } from "vue";
 import type { EquipoDTO, InscripcionTorneoDTO } from "@/interfaces/Inscripcion";
-import { convertirFecha, obtenerFechaActual, formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
+import {
+  convertirFecha,
+  obtenerFechaActual,
+  formatFechaSpaWhitoutAsync,
+} from "@/utils/Fecha";
 import {
   eliminarEquipoAsync,
   eliminarMiembroEquipoAsync,
@@ -321,17 +408,25 @@ import {
 } from "@/services/InscripcionesService";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
-import { CrearListaTorneoRequestDTO, ListaJugador, ModificarListaTorneoRequestDTO, RequesListaDTO } from "@/interfaces/Lista";
+import {
+  CrearListaTorneoRequestDTO,
+  ListaJugador,
+  ModificarListaTorneoRequestDTO,
+  RequesListaDTO,
+} from "@/interfaces/Lista";
 import ModalVerLista from "@/components/Inscripcion/ModalVerLista.vue";
 import ModalEnviarLista from "@/components/Inscripcion/ModalEnviarLista.vue";
-import { modificarListaTorneo, subirListaTorneo } from "@/services/ListasService";
+import {
+  modificarListaTorneo,
+  subirListaTorneo,
+} from "@/services/ListasService";
 import { Torneo } from "@/interfaces/Torneo";
 import ModalCambiarEstadoListaEquipos from "./ModalCambiarEstadoListaEquipos.vue";
 import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { UsuarioSinEquipoDTO } from "@/interfaces/Usuario";
 import ModalAddMiembroEquipo from "@/components/GestionTorneos/Equipos/ModalAddMiembroEquipo.vue";
 
-const props = defineProps<{ equipo: EquipoDTO, torneo: Torneo }>();
+const props = defineProps<{ equipo: EquipoDTO; torneo: Torneo }>();
 
 const isExpanded = ref(false);
 const isLoading = ref<boolean>(false);
@@ -361,12 +456,13 @@ const hasLista = ref<boolean>(false);
 
 const listaJugador = ref<ListaJugador>();
 const jugadoresSinEquipo = ref<UsuarioSinEquipoDTO[]>([]);
-const inscripcionesEquipo = ref<InscripcionTorneoDTO[]>([...props.equipo.inscripciones]);
-const esPago = toRef(props.equipo, 'esPago');
-
+const inscripcionesEquipo = ref<InscripcionTorneoDTO[]>([
+  ...props.equipo.inscripciones,
+]);
+const esPago = toRef(props.equipo, "esPago");
 
 const emit = defineEmits<{
-  (e: 'delete-team'): void,
+  (e: "delete-team"): void;
 }>();
 
 //Spiner
@@ -381,18 +477,18 @@ const toggleExpand = () => {
 const numeroMiembrosEquipo = ref<number>();
 const equipoConHuecos = computed(() => {
   const miembros = inscripcionesEquipo.value ?? [];
-  const faltantes = Math.max(0, (numeroMiembrosEquipo.value ?? 0) - miembros.length);
+  const faltantes = Math.max(
+    0,
+    (numeroMiembrosEquipo.value ?? 0) - miembros.length
+  );
   return [...miembros, ...Array(faltantes).fill(null)];
 });
 const listasOk = computed(() => {
-  return inscripcionesEquipo.value.filter(
-    (i) => i.estadoLista === "OK"
-  ).length;
+  return inscripcionesEquipo.value.filter((i) => i.estadoLista === "OK").length;
 });
 const equipoIncompleto = computed(() => {
   return listasOk.value < numeroMiembrosEquipo.value!;
 });
-
 
 const miembrosPorTipo: Record<string, number> = {
   Individual: 1,
@@ -400,7 +496,8 @@ const miembrosPorTipo: Record<string, number> = {
   Equipos_4: 4,
   Equipos_6: 6,
 };
-numeroMiembrosEquipo.value = miembrosPorTipo[props.torneo.tipoTorneo ?? "Individual"] || 1;
+numeroMiembrosEquipo.value =
+  miembrosPorTipo[props.torneo.tipoTorneo ?? "Individual"] || 1;
 
 const verLista = (listaData: string, nombre: string, ejercito: string) => {
   const listaJugadorDTO: ListaJugador = {
@@ -412,7 +509,7 @@ const verLista = (listaData: string, nombre: string, ejercito: string) => {
   showVerListaModal.value = true;
 };
 
-const enviarCambiarLista = (  
+const enviarCambiarLista = (
   idInscripcion: number | undefined,
   listaData: string,
   idUsuario: number,
@@ -428,9 +525,6 @@ const enviarCambiarLista = (
 
   showEnviarCambiarListaModal.value = true;
 };
-
-
-
 
 const guardarLista = async (newLista: RequesListaDTO) => {
   isCargandoAccion.value = true;
@@ -500,13 +594,20 @@ const guardarLista = async (newLista: RequesListaDTO) => {
   }
 };
 
-const cambiarEstadoLista = (idInscripcion: number, estadoLista: string, nick: string) => {
+const cambiarEstadoLista = (
+  idInscripcion: number,
+  estadoLista: string,
+  nick: string
+) => {
   currentInscripcionId.value = idInscripcion;
   currentNick.value = nick;
   currentEstadoLista.value = estadoLista;
   showCambiarEstadoLista.value = true;
 };
-const cambiarEstado = (payload: { field: keyof InscripcionTorneoDTO; value: unknown }) => {
+const cambiarEstado = (payload: {
+  field: keyof InscripcionTorneoDTO;
+  value: unknown;
+}) => {
   const { field, value } = payload;
 
   const index = inscripcionesEquipo.value.findIndex(
@@ -520,11 +621,13 @@ const cambiarEstado = (payload: { field: keyof InscripcionTorneoDTO; value: unkn
       [field]: value,
     };
   }
-
 };
 
-
-const abrirModalConfirmacion = ( titulo: string, texto: string, accion: () => void ) => {
+const abrirModalConfirmacion = (
+  titulo: string,
+  texto: string,
+  accion: () => void
+) => {
   confirmTitle.value = titulo;
   confirmText.value = texto;
   confirmAction.value = () => {
@@ -533,7 +636,6 @@ const abrirModalConfirmacion = ( titulo: string, texto: string, accion: () => vo
   };
   showConfirmModal.value = true;
 };
-
 
 const confirmarActualizarPago = async () => {
   isLoading.value = true;
@@ -596,7 +698,11 @@ const closeModal = () => {
 };
 const closeConfigModal = (nuevoMiembro: InscripcionTorneoDTO) => {
   if (nuevoMiembro) {
-    if (!inscripcionesEquipo.value.some(m => m.idUsuario === nuevoMiembro.idUsuario)) {
+    if (
+      !inscripcionesEquipo.value.some(
+        (m) => m.idUsuario === nuevoMiembro.idUsuario
+      )
+    ) {
       inscripcionesEquipo.value.push(nuevoMiembro);
     }
   }
@@ -605,24 +711,26 @@ const closeConfigModal = (nuevoMiembro: InscripcionTorneoDTO) => {
 const eliminarMiembro = async (idInscripcion: number) => {
   isCargandoAccion.value = true;
   mensajeCarga.value = "Eliminando jugador...";
-  try{
+  try {
     const response = await eliminarMiembroEquipoAsync(idInscripcion);
-    if ((response.status < 200 && response.status >= 300) || response.data === false) {
+    if (
+      (response.status < 200 && response.status >= 300) ||
+      response.data === false
+    ) {
       isCargandoAccion.value = false;
       showErrorModalEliminarMiembroEquipo.value = true;
       return;
     }
-  
+
     inscripcionesEquipo.value = inscripcionesEquipo.value.filter(
       (miembro) => miembro.idInscripcion !== idInscripcion
     );
 
     showSuccessModalEliminarMiembroEquipo.value = true;
-  }
-  catch(error){
+  } catch (error) {
     console.error("Error al borrar un miembro: ", error);
     showErrorModalEliminarMiembroEquipo.value = true;
-  }finally{
+  } finally {
     isCargandoAccion.value = false;
   }
 };
@@ -642,7 +750,9 @@ const eliminarMiembro = async (idInscripcion: number) => {
 }
 
 /* Reducir padding y espacio en las celdas */
-.compact-header, .compact-cell, .compact-actions {
+.compact-header,
+.compact-cell,
+.compact-actions {
   padding: 4px !important;
   font-size: 12px;
 }

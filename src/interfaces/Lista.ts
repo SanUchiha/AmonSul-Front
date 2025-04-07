@@ -6,7 +6,7 @@ export interface CrearListaTorneoRequestDTO {
   idTorneo: number;
   listaData: string;
   ejercito: ArmyDTO;
-  nick: string;
+  nick?: string;
   emailOrganizador?: string;
   nombreEquipo?: string;
   idOrganizador?: number;
