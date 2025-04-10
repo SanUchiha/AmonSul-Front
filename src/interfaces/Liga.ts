@@ -9,3 +9,8 @@ export interface LigaDTO {
   idLiga: number;
   nombreLiga: string;
 }
+
+export interface AddLigaTorneoDTO {
+  idLiga: number;
+  idTorneo: number;
+}
