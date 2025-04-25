@@ -169,4 +169,6 @@ export interface ListaDTO {
   listaData?: string;
   bando?: string;
   ejercito?: string;
+  estadoLista: string;
+  fechaEntrega: string;
 }

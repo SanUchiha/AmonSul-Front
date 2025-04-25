@@ -1,226 +1,207 @@
 <!-- eslint-disable vue/no-unused-vars -->
 <template>
   <v-sheet class="pa-4">
-    <div v-if="isLoading" >
+    <div v-if="isLoading">
       <LoadingGandalf />
     </div>
-    <div v-else >
-      
-        <!-- TABS -->
-        <v-tabs v-model="activeTab" fixed-tabs>
-          <v-tab
-            v-for="n in numeroRondas"
-            :key="n"
-            :text="`Ronda ${n}`"
-            :value="n"
-          >
-          </v-tab>
-          <v-tab
-            :key="tabClasificacion"
-            :text="`Clasificación`"
-            :value="tabClasificacion"
-          ></v-tab>
-        </v-tabs>
-        <!-- Contenido de las Tabs -->
-        <v-window v-model="activeTab">
-          <div v-if="partidas.length === 0">
-            <p>Aún no se ha generado ninguna ronda</p>
-          </div>
+    <div v-else>
+      <!-- TABS -->
+      <v-tabs v-model="activeTab" fixed-tabs>
+        <v-tab
+          v-for="n in numeroRondas"
+          :key="n"
+          :text="`Ronda ${n}`"
+          :value="n"
+        >
+        </v-tab>
+        <v-tab
+          :key="tabClasificacion"
+          :text="`Clasificación`"
+          :value="tabClasificacion"
+        ></v-tab>
+      </v-tabs>
+      <!-- Contenido de las Tabs -->
+      <v-window v-model="activeTab">
+        <div v-if="partidas.length === 0">
+          <p>Aún no se ha generado ninguna ronda</p>
+        </div>
 
-          <!-- tab dinamicas -->
-          <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
-                <v-row>
-                  <v-col cols="12" sm="12" md="6" lg="6" xl="4" class="pb-0"
-                    v-for="(partida, index) in partidasPorRonda[activeTab!]"
-                    :key="partida.idPartidaTorneo"
-                    :value="activeTab"
-                  >
-                    <!-- Partida completada -->
-                    <div
-                      v-if="
-                        partida.partidaValidadaUsuario1 === true &&
-                        partida.partidaValidadaUsuario2 === true
-                      "
-                    >
-                      <CardPartidaTorneoLive
-                        :idUsuario="parseInt(idUsuarioLogger!)"
-                        :match="partida"
-                        :mesa="`Mesa ${index + 1}`" 
-                        :completa=true  
-                        :editarPartidaPJ=false
-                        :soloValidarPJ=false
-                      /> 
-                    </div>
-                    <!-- Partida sin completar -->
-                    <div v-else>
-                      <CardPartidaTorneoLive
-                        :idUsuario="parseInt(idUsuarioLogger!)"
-                        :match="partida"
-                        :mesa="`Mesa ${index + 1}`" 
-                        :completa=false  
-                        :editarPartidaPJ="editarPartidaPJ(partida)"
-                        :soloValidarPJ="soloValidarPJ(partida)"
-                      />            
-                    </div>
-                  </v-col>                       
-                </v-row>
-          </v-window-item>
-
-
-
-          <!-- Tab clasificacion -->
-          <v-window-item
-            :value="tabClasificacion"
-            :key="tabClasificacion"
-          >
-            <!-- División en dos zonas a a partir de la ronda 3 -->
-            <div v-if="idTorneo === 7">
+        <!-- tab dinamicas -->
+        <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
+          <v-row>
+            <v-col
+              cols="12"
+              sm="12"
+              md="6"
+              lg="6"
+              xl="4"
+              class="pb-0"
+              v-for="(partida, index) in partidasPorRonda[activeTab!]"
+              :key="partida.idPartidaTorneo"
+              :value="activeTab"
+            >
+              <!-- Partida completada -->
               <div
                 v-if="
-                  clasificacionZona1.length > 0 &&
-                  clasificacionZona2.length > 0
+                  partida.partidaValidadaUsuario1 === true &&
+                  partida.partidaValidadaUsuario2 === true
                 "
               >
-                <!-- Valinor -->
-                <h3>Válinor</h3>
-                <v-table
-                  v-if="activeTab == tabClasificacion"
-                  density="compact"
-                >
-                  <thead>
-                    <tr>
-                      <th class="text-center">Posición</th>
-                      <th class="text-center">Jugador</th>
-                      <th class="text-center">Puntos</th>
-                      <th class="text-center">Puntos a favor</th>
-                      <th class="text-center">Puntos en contra</th>
-                      <th class="text-center">Diferencia de puntos</th>
-                      <th class="tect-center">General</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(jugador, index) in clasificacionZona1"
-                      :key="jugador.nick"
-                    >
-                      <td>{{ index + 1 }}</td>
-                      <td>{{ jugador.nick }}</td>
-                      <td>
-                        {{ jugador.victorias }}
-                      </td>
-                      <td>{{ jugador.puntosFavor }}</td>
-                      <td>
-                        {{ jugador.puntosContra }}
-                      </td>
-                      <td>{{ jugador.diferenciaPuntos }}</td>
-                      <td>
-                        {{ jugador.lider }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </v-table>
-
-                <v-divider class="my-5"></v-divider>
-
-                <!-- Arda -->
-                <h3>Arda</h3>
-                <v-table
-                  v-if="activeTab == tabClasificacion"
-                  density="compact"
-                >
-                  <thead>
-                    <tr>
-                      <th class="text-center">Posición</th>
-                      <th class="text-center">Jugador</th>
-                      <th class="text-center">Puntos</th>
-                      <th class="text-center">Puntos a favor</th>
-                      <th class="text-center">Puntos en contra</th>
-                      <th class="text-center">Diferencia de puntos</th>
-                      <th class="tect-center">General</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(jugador, index) in clasificacionZona2"
-                      :key="jugador.nick"
-                    >
-                      <td>{{ index + 1 }}</td>
-                      <td>{{ jugador.nick }}</td>
-                      <td>
-                        {{ jugador.victorias }}
-                      </td>
-                      <td>{{ jugador.puntosFavor }}</td>
-                      <td>
-                        {{ jugador.puntosContra }}
-                      </td>
-                      <td>{{ jugador.diferenciaPuntos }}</td>
-                      <td>
-                        {{ jugador.lider }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </v-table>
+                <CardPartidaTorneoLive
+                  :idUsuario="parseInt(idUsuarioLogger!)"
+                  :match="partida"
+                  :mesa="`Mesa ${index + 1}`"
+                  :completa="true"
+                  :editarPartidaPJ="false"
+                  :soloValidarPJ="false"
+                />
               </div>
-              <div v-else><p>Esperando resultados...</p></div>
-            </div>
-            <!-- Para todo lo demás -->
-            <div v-else>
-              <div v-if="clasificacion.length > 0">
-                <v-table
-                  v-if="activeTab == tabClasificacion"
-                  density="compact"
-                >
-                  <thead>
-                    <tr>
-                      <th class="text-center">Posición</th>
-                      <th class="text-center">Jugador</th>
-                      <th class="text-center">P</th>
-                      <th class="text-center">PV</th>
-                      <th class="text-center">PD</th>
-                      <th class="text-center">+-</th>
-                      <th class="tect-center">L</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(jugador, index) in clasificacion"
-                      :key="jugador.nick"
-                      :class="{
-                        'good-bando': jugador.bando === 'good',
-                        'evil-bando': jugador.bando === 'evil',
-                      }"
-                    >
-                      <td>{{ index + 1 }}</td>
-                      <td>{{ jugador.nick }}</td>
-                      <td>
-                        {{ jugador.victorias }}
-                      </td>
-                      <td>{{ jugador.puntosFavor }}</td>
-                      <td>
-                        {{ jugador.puntosContra }}
-                      </td>
-                      <td>{{ jugador.diferenciaPuntos }}</td>
-                      <td>
-                        {{ jugador.lider }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </v-table>
+              <!-- Partida sin completar -->
+              <div v-else>
+                <CardPartidaTorneoLive
+                  :idUsuario="parseInt(idUsuarioLogger!)"
+                  :match="partida"
+                  :mesa="`Mesa ${index + 1}`"
+                  :completa="false"
+                  :editarPartidaPJ="editarPartidaPJ(partida)"
+                  :soloValidarPJ="soloValidarPJ(partida)"
+                />
               </div>
-              <div v-else><p>Esperando resultados...</p></div>
+            </v-col>
+          </v-row>
+        </v-window-item>
+
+        <!-- Tab clasificacion -->
+        <v-window-item :value="tabClasificacion" :key="tabClasificacion">
+          <!-- División en dos zonas a a partir de la ronda 3 -->
+          <div v-if="idTorneo === 7">
+            <div
+              v-if="
+                clasificacionZona1.length > 0 && clasificacionZona2.length > 0
+              "
+            >
+              <!-- Valinor -->
+              <h3>Válinor</h3>
+              <v-table v-if="activeTab == tabClasificacion" density="compact">
+                <thead>
+                  <tr>
+                    <th class="text-center">Posición</th>
+                    <th class="text-center">Jugador</th>
+                    <th class="text-center">Puntos</th>
+                    <th class="text-center">Puntos a favor</th>
+                    <th class="text-center">Puntos en contra</th>
+                    <th class="text-center">Diferencia de puntos</th>
+                    <th class="tect-center">General</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(jugador, index) in clasificacionZona1"
+                    :key="jugador.nick"
+                  >
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ jugador.nick }}</td>
+                    <td>
+                      {{ jugador.victorias }}
+                    </td>
+                    <td>{{ jugador.puntosFavor }}</td>
+                    <td>
+                      {{ jugador.puntosContra }}
+                    </td>
+                    <td>{{ jugador.diferenciaPuntos }}</td>
+                    <td>
+                      {{ jugador.lider }}
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+
+              <v-divider class="my-5"></v-divider>
+
+              <!-- Arda -->
+              <h3>Arda</h3>
+              <v-table v-if="activeTab == tabClasificacion" density="compact">
+                <thead>
+                  <tr>
+                    <th class="text-center">Posición</th>
+                    <th class="text-center">Jugador</th>
+                    <th class="text-center">Puntos</th>
+                    <th class="text-center">Puntos a favor</th>
+                    <th class="text-center">Puntos en contra</th>
+                    <th class="text-center">Diferencia de puntos</th>
+                    <th class="tect-center">General</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(jugador, index) in clasificacionZona2"
+                    :key="jugador.nick"
+                  >
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ jugador.nick }}</td>
+                    <td>
+                      {{ jugador.victorias }}
+                    </td>
+                    <td>{{ jugador.puntosFavor }}</td>
+                    <td>
+                      {{ jugador.puntosContra }}
+                    </td>
+                    <td>{{ jugador.diferenciaPuntos }}</td>
+                    <td>
+                      {{ jugador.lider }}
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
             </div>
-          </v-window-item>
-        </v-window>
+            <div v-else><p>Esperando resultados...</p></div>
+          </div>
+          <!-- Para todo lo demás -->
+          <div v-else>
+            <div v-if="clasificacion.length > 0">
+              <v-table v-if="activeTab == tabClasificacion" density="compact">
+                <thead>
+                  <tr>
+                    <th class="text-center">Posición</th>
+                    <th class="text-center">Jugador</th>
+                    <th class="text-center">P</th>
+                    <th class="text-center">PV</th>
+                    <th class="text-center">PD</th>
+                    <th class="text-center">+-</th>
+                    <th class="tect-center">L</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(jugador, index) in clasificacion"
+                    :key="jugador.nick"
+                    :class="{
+                      'good-bando': jugador.bando === 'good',
+                      'evil-bando': jugador.bando === 'evil',
+                    }"
+                  >
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ jugador.nick }}</td>
+                    <td>
+                      {{ jugador.victorias }}
+                    </td>
+                    <td>{{ jugador.puntosFavor }}</td>
+                    <td>
+                      {{ jugador.puntosContra }}
+                    </td>
+                    <td>{{ jugador.diferenciaPuntos }}</td>
+                    <td>
+                      {{ jugador.lider }}
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </div>
+            <div v-else><p>Esperando resultados...</p></div>
+          </div>
+        </v-window-item>
+      </v-window>
     </div>
-
-
-    <!-- Modal Lista -->
-    <ModalListaResultadoTorneo
-      v-if="isModalListaVisible"
-      :listaData="listaData"
-      :nickJugador="nickJugador"
-      @close="isModalListaVisible = false"
-    />
 
     <!-- Spinner Modal -->
     <v-dialog v-model="isLoadingImage" persistent width="300">
@@ -237,13 +218,11 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-
   </v-sheet>
 </template>
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import { useAuth } from "@/composables/useAuth";
 import { Clasificacion } from "@/interfaces/Live";
@@ -266,10 +245,6 @@ const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const idUsuario = ref<number>();
-const isModalListaVisible = ref<boolean>(false);
-const listaData = ref<string>("");
-const nickJugador = ref<string>("");
-
 const tabClasificacion = ref<number>(1);
 const clasificacion = ref<Clasificacion[]>([]);
 const jugadoresZona1 = ref<Clasificacion[]>([]);
@@ -309,7 +284,7 @@ onMounted(async () => {
 
     calcularClasificacion();
   } catch (error) {
-    console.error("calcularClasificacion",error);
+    console.error("calcularClasificacion", error);
   } finally {
     isLoading.value = false;
   }
@@ -566,32 +541,45 @@ const dividirClasificacionEnZonas = () => {
   jugadoresZona2.value = clasificacionDividida.value.slice(zona1Size);
 };
 
-
 //Este método determina si el jugador actual ha validado ya la partida o no.
-const editarPartidaPJ = (partida:PartidaTorneoDTO) => {
-  if (partida.idUsuario1 === idUsuario.value && (partida.partidaValidadaUsuario1 === false || partida.partidaValidadaUsuario1 === null)){
-    return true
-  }else if(partida.idUsuario2 === idUsuario.value && (partida.partidaValidadaUsuario2 === false || partida.partidaValidadaUsuario2 === null)){
-    return true
-  }else{
-    return false
-  }
-};
-
-const soloValidarPJ = (partida:PartidaTorneoDTO) => {
-  //Si somos el PJ1 y no hemos validado partida, y el PJ2 si ha validado, tenemos que validar
-  if (partida.idUsuario1 === idUsuario.value && (partida.partidaValidadaUsuario1 === false || partida.partidaValidadaUsuario1 === null) && partida.partidaValidadaUsuario2 === true){
+const editarPartidaPJ = (partida: PartidaTorneoDTO) => {
+  if (
+    partida.idUsuario1 === idUsuario.value &&
+    (partida.partidaValidadaUsuario1 === false ||
+      partida.partidaValidadaUsuario1 === null)
+  ) {
     return true;
-  }
-  else if(partida.idUsuario2 === idUsuario.value && (partida.partidaValidadaUsuario2 === false || partida.partidaValidadaUsuario2 === null) && partida.partidaValidadaUsuario1 === true){
+  } else if (
+    partida.idUsuario2 === idUsuario.value &&
+    (partida.partidaValidadaUsuario2 === false ||
+      partida.partidaValidadaUsuario2 === null)
+  ) {
     return true;
-  }
-  else{
+  } else {
     return false;
   }
-  
 };
 
+const soloValidarPJ = (partida: PartidaTorneoDTO) => {
+  //Si somos el PJ1 y no hemos validado partida, y el PJ2 si ha validado, tenemos que validar
+  if (
+    partida.idUsuario1 === idUsuario.value &&
+    (partida.partidaValidadaUsuario1 === false ||
+      partida.partidaValidadaUsuario1 === null) &&
+    partida.partidaValidadaUsuario2 === true
+  ) {
+    return true;
+  } else if (
+    partida.idUsuario2 === idUsuario.value &&
+    (partida.partidaValidadaUsuario2 === false ||
+      partida.partidaValidadaUsuario2 === null) &&
+    partida.partidaValidadaUsuario1 === true
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 const formatDate = (date: string | null | undefined) => {
   if (!date) return "N/A";

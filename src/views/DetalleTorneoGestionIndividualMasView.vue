@@ -2,9 +2,11 @@
   <v-container class="text-center">
     <v-row dense>
       <v-col cols="12" md="12" class="text-center">
+        <!-- loading gandalf -->
         <div v-if="isLoading" class="center">
           <LoadingGandalf />
         </div>
+        <!-- tab -->
         <div v-else class="center">
           <v-card class="mx-auto" max-width="800">
             <v-tabs v-model="activeTab" grow center-active fixed-tabs>
@@ -24,35 +26,19 @@
             </v-tabs>
 
             <!-- Contenido de las Tabs -->
-            <v-window v-model="activeTab">
+            <v-tabs-window v-model="activeTab">
               <!-- tab Gestion -->
-              <v-window-item :value="0" :key="0">
+              <v-tabs-window-item :value="0" :key="0">
                 <div>
-                  <CardGestionInfoTorneoEquipo :torneo="torneoGestion" />
-                  <CardGestionAccionesTorneoEquipo :torneo="torneoGestion" />
+                  <CardGestionTorneoMas :torneo="torneoGestion" />
 
-                  <!--Buscador de equipos-->
-                  <v-text-field
-                    v-model="busquedaEquipo"
-                    label="Buscar equipo por nombre"
-                    prepend-inner-icon="mdi-magnify"
-                    variant="tonal"
-                    clearable
-                    class="ma-4"
-                    hide-details
+                  <TablaInscritosMas
+                    :torneo="torneoGestion"
+                    @inscripcionEliminada="handleInscripcionEliminada"
+                    @cambios="refreshTorneo"
                   />
-
-                  <div class="grid-container">
-                    <CardInfoEquipo
-                      v-for="equipo in equiposFiltrados"
-                      :key="equipo.idEquipo"
-                      :equipo="equipo"
-                      :torneo="torneo!"
-                      @delete-team="handleEquipoEliminado(equipo.idEquipo)"
-                    />
-                  </div>
                 </div>
-              </v-window-item>
+              </v-tabs-window-item>
 
               <div
                 v-if="isRondaValidada(activeTab)"
@@ -106,7 +92,7 @@
                 <div v-else class="mt-3">
                   <!-- boton para cerrar el torneo -->
                   <v-btn
-                    v-if="hasGanador && !wasSave"
+                    v-if="!wasSave"
                     class="mt-2"
                     variant="tonal"
                     color="primary"
@@ -436,7 +422,10 @@
               </v-tabs-item>
 
               <!-- Tab clasificacion -->
-              <v-window-item :value="tabClasificacion" :key="tabClasificacion">
+              <v-tabs-window-item
+                :value="tabClasificacion"
+                :key="tabClasificacion"
+              >
                 <!-- División en dos zonas a a partir de la ronda 3 -->
                 <div v-if="(torneo!.idTorneo === 7)">
                   <div
@@ -573,8 +562,8 @@
                   </div>
                   <div v-else><p>Esperando resultados...</p></div>
                 </div>
-              </v-window-item>
-            </v-window>
+              </v-tabs-window-item>
+            </v-tabs-window>
           </v-card>
         </div>
       </v-col>
@@ -645,7 +634,7 @@
     />
 
     <!-- Modal generar siguiente ronda -->
-    <ModalParametrosRondasEquipo
+    <ModalParametrosRondasMas
       :isVisible="showConfigModal"
       :torneo="torneoGestion"
       :clasificacion="clasificacion"
@@ -667,14 +656,14 @@
     <ModalEditarPairing
       :isVisible="showModificarPairingModal"
       :partida="partidaActual"
-      :idTorneo="idTorneo!"
+      :idTorneo="idTorneoComputed"
       @cerrar="closeModificarPairingModal"
       @confirm="handleModificarPairingTorneoConfirm"
     />
     <!-- Modal cambiar pairing -->
     <ModalAgregarPairing
       :isVisible="showAgregarPairingModal"
-      :idTorneo="idTorneo!"
+      :idTorneo="idTorneo"
       :idRonda="idRondaSelected"
       @cerrar="closeAgregarPairingModal"
     />
@@ -715,14 +704,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import router from "@/router";
 import {
-  getInfoTorneoEquipoCreado,
+  getInfoTorneoCreadoMasAsync,
   guardarResultados,
 } from "@/services/TorneosService";
-import { GuardarResultadosDTO, ResultadoJugador } from "@/interfaces/Torneo";
+import {
+  GuardarResultadosDTO,
+  ResultadoJugador,
+  TorneoGestionInfoMasDTO,
+} from "@/interfaces/Torneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEscenarioPartida.vue";
 import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
@@ -751,11 +744,9 @@ import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.v
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
-import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
-import ModalParametrosRondasEquipo from "@/components/GestionTorneos/Equipos/ModalParametrosRondasEquipo.vue";
-import CardGestionInfoTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionInfoTorneoEquipo.vue";
-import CardGestionAccionesTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionAccionesTorneoEquipo.vue";
-import CardInfoEquipo from "@/components/GestionTorneos/Equipos/CardInfoEquipo.vue";
+import ModalParametrosRondasMas from "@/components/GestionTorneos/Mas/ModalParametrosRondasMas.vue";
+import CardGestionTorneoMas from "@/components/GestionTorneos/Mas/CardGestionTorneoMas.vue";
+import TablaInscritosMas from "@/components/GestionTorneos/Mas/TablaInscritosMas.vue";
 import { ListaDTO } from "@/interfaces/Usuario";
 
 const isLoadingImage = ref<boolean>(false);
@@ -766,8 +757,10 @@ const activeTab = ref<number>(2);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const idUsuario = ref<number>();
 const isModalListaVisible = ref<boolean>(false);
+const listaDTO = ref<ListaDTO>();
 const listaData = ref<string>("");
 const nickJugador = ref<string>("");
+const currentEjercito = ref<string>();
 const idPartidaSeleccionada = ref<number>();
 const usuarioSeleccionado = ref<1 | 2>();
 const isModalPuntosVisible = ref<boolean>(false);
@@ -776,9 +769,19 @@ const isModalEscenarioVisible = ref<boolean>(false);
 const isModalValidarVisible = ref<boolean>(false);
 const tabClasificacion = ref<number>();
 const route = useRoute();
-const idTorneo = ref<number>();
+const idTorneo = ref<number>(parseInt(route.params.idTorneo.toString()));
 const isLoading = ref<boolean>(false);
-const torneoGestion = ref<TorneoEquipoGestionInfoDTO | null>(null);
+const torneoGestion = ref<TorneoGestionInfoMasDTO>({
+  torneo: {
+    idTorneo: 0,
+    idUsuario: 0,
+    nombreTorneo: "",
+    numeroPartidas: 0,
+    estadoTorneo: "",
+    listasPorJugador: 0,
+  },
+  inscripciones: [],
+});
 const clasificacion = ref<Clasificacion[]>([]);
 const jugadoresZona1 = ref<Clasificacion[]>([]);
 const jugadoresZona2 = ref<Clasificacion[]>([]);
@@ -788,7 +791,6 @@ const clasificacionDividida = ref<Clasificacion[]>([]);
 const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
 const ultimaRonda = ref<number>();
-const hasGanador = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const isGenerating = ref<boolean>(false);
@@ -818,27 +820,13 @@ const partidaActual = ref<PartidaTorneoDTO>({
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
-const currentEjercito = ref<string>();
-const listaDTO = ref<ListaDTO>();
-
-//Variables para el buscador
-const busquedaEquipo = ref("");
-const equiposFiltrados = computed(() => {
-  if (!torneoGestion.value) return [];
-  return torneoGestion.value.equipos.filter((equipo) =>
-    (equipo.nombreEquipo?.toLowerCase() || "").includes(
-      busquedaEquipo.value.toLowerCase()
-    )
-  );
-});
+const idTorneoComputed = computed(() => idTorneo.value ?? 0);
 
 onMounted(async () => {
-  idTorneo.value = parseInt(route.params.idTorneo.toString());
-
   isLoading.value = true;
 
   try {
-    const responseTorneo = await getInfoTorneoEquipoCreado(idTorneo.value);
+    const responseTorneo = await getInfoTorneoCreadoMasAsync(idTorneo.value);
     torneoGestion.value = responseTorneo.data;
   } catch (error) {
     console.error(error);
@@ -878,17 +866,21 @@ onMounted(async () => {
     calcularClasificacion();
 
     ultimaRonda.value = numeroRondas.value.length;
-    const ganador: number = clasificacionZona1.value[0].idUsuario;
-    if (ganador != null) hasGanador.value = true;
 
     const isSave = await isSaveTournament(idTorneo.value);
     wasSave.value = isSave.data;
+
+    //const responseJugadoresInscritosTorneo = await getUsuariosByTorneo(idTorneo.value);
   } catch (error) {
-    console.error(error);
+    console.error("error onMounted", error);
   } finally {
     isLoading.value = false;
   }
 });
+
+const refreshTorneo = (torneoActualizado: TorneoGestionInfoMasDTO) => {
+  torneoGestion.value = { ...torneoActualizado };
+};
 
 const resultados = async (ronda: number) => {
   // //TODO  domadores
@@ -978,14 +970,6 @@ const handleConfigConfirm = () => {
 
 const closeModificarPartidaTorneoModal = () => {
   showModificarPartidaTorneoModal.value = false;
-};
-
-const handleEquipoEliminado = (idEquipo: number) => {
-  if (torneoGestion.value) {
-    torneoGestion.value.equipos = torneoGestion.value.equipos.filter(
-      (e) => e.idEquipo !== idEquipo
-    );
-  }
 };
 
 const handleModificarPartidaTorneoConfirm = async (
@@ -1350,6 +1334,16 @@ const isRondaValidada = (numeroRonda: number) => {
   );
 };
 
+const handleInscripcionEliminada = (idInscripcion: number) => {
+  if (torneoGestion.value) {
+    // Actualiza las inscripciones eliminando la inscripción correspondiente
+    torneoGestion.value.inscripciones =
+      torneoGestion.value.inscripciones.filter(
+        (inscripcion) => inscripcion.idInscripcion !== idInscripcion
+      );
+  }
+};
+
 const getGanador = (partida: PartidaTorneoDTO) => {
   if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
     return partida.nick1;
@@ -1375,7 +1369,6 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
         listaData.value = listaDTO.value.listaData ?? "";
       nickJugador.value = nick;
       currentEjercito.value = listaDTO.value?.ejercito;
-      isModalListaVisible.value = true;
     } catch (error) {
       console.error(error);
       isModalListaVisible.value = false;
@@ -1386,22 +1379,22 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
   }
 };
 
-const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalPuntosVisible.value = true;
-};
+// const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
+//   idPartidaSeleccionada.value = idPartida;
+//   usuarioSeleccionado.value = usuario;
+//   isModalPuntosVisible.value = true;
+// };
 
-const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalLiderVisible.value = true;
-};
+// const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
+//   idPartidaSeleccionada.value = idPartida;
+//   usuarioSeleccionado.value = usuario;
+//   isModalLiderVisible.value = true;
+// };
 
-const abrirModalEscenario = (idPartida: number) => {
-  idPartidaSeleccionada.value = idPartida;
-  isModalEscenarioVisible.value = true;
-};
+// const abrirModalEscenario = (idPartida: number) => {
+//   idPartidaSeleccionada.value = idPartida;
+//   isModalEscenarioVisible.value = true;
+// };
 
 const abrirModalValidar = (idPartida: number, usuario: 1 | 2) => {
   idPartidaSeleccionada.value = idPartida;

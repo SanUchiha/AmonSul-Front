@@ -6,7 +6,7 @@ export interface CrearListaTorneoRequestDTO {
   idTorneo: number;
   listaData: string;
   ejercito: ArmyDTO;
-  nick: string;
+  nick?: string;
   emailOrganizador?: string;
   nombreEquipo?: string;
   idOrganizador?: number;
@@ -42,4 +42,11 @@ export interface ListaJugador {
   listaData: string;
   nombreEjercito: string;
   nick: string;
+}
+
+export interface UpdateEstadoListaMasDTO {
+  idLista: number;
+  estado: string;
+  idTorneo: number;
+  idUsuario: number;
 }

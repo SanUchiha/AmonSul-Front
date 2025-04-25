@@ -99,10 +99,10 @@
 
   <ModalInscripcion
     v-if="showModalInscripcion"
-    :idInscripcion="currentInscripcionId"
+    :idInscripcion="currentInscripcionId!"
     :idUsuario="parseInt(idUsuarioLogger!)"
-    :idTorneo="currentTorneoId"
-    :idOrganizador="currentTorneoId"
+    :idTorneo="currentTorneoId!"
+    :idOrganizador="currentIdOrganizador!"
     @eliminar-inscripcion="eliminarInscripcion"
     @close="closeModal"
   />

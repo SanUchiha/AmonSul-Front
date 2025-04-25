@@ -155,6 +155,8 @@ const enviarLista = () => {
   const newLista: RequesListaDTO = {
     listaData: imageBase64.value!,
     ejercito: ejercitoSelected.value!,
+    idUsuario: 0,
+    nick: "",
   };
   emit("enviarLista", newLista);
 };

@@ -279,6 +279,8 @@ const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
     horaFinTorneo: "",
     tieneBases: false,
     inicioInscripciones: "",
+    listasPorJugador: 0,
+    tipoTorneo: "Individual",
   },
   idTorneo: 0,
 });

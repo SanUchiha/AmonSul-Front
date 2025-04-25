@@ -13,7 +13,7 @@
         <v-text-field
           v-model="teamName"
           label="Nombre del equipo"
-          outlined
+          tonal
           required
         ></v-text-field>
 
@@ -24,7 +24,7 @@
             item-title="nick"
             item-value="idUsuario"
             label="Selecciona un jugador"
-            outlined
+            tonal
             required
             @update:modelValue="addPlayer"
             :return-object="true"

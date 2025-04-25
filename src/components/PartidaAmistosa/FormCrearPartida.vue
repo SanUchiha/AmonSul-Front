@@ -4,7 +4,9 @@
 
     <v-row justify="center">
       <v-col cols="12" md="6">
-        <v-card class="pa-4 rounded-lg elevation-3 dark-form-card scrollable-modal">
+        <v-card
+          class="pa-4 rounded-lg elevation-3 dark-form-card scrollable-modal"
+        >
           <v-card-title class="text-h6 font-weight-bold text-center text-white">
             <v-icon class="me-2" color="deep-orange">mdi-sword-cross</v-icon>
             Registrar partida
@@ -22,7 +24,7 @@
                 @click="loadNicks"
                 :rules="[rules.required]"
                 required
-                variant="outlined"
+                variant="tonal"
                 color="primary"
                 hide-details="auto"
               />
@@ -43,7 +45,7 @@
                 @click="loadEjercitos"
                 :rules="[rules.required]"
                 required
-                variant="outlined"
+                variant="tonal"
                 color="primary"
                 hide-details="auto"
               />
@@ -55,7 +57,7 @@
                 @click="loadEjercitos"
                 :rules="[rules.required]"
                 required
-                variant="outlined"
+                variant="tonal"
                 color="primary"
                 hide-details="auto"
               />
@@ -74,7 +76,7 @@
                 type="number"
                 :rules="[rules.required]"
                 required
-                variant="outlined"
+                variant="tonal"
                 color="primary"
                 hide-details="auto"
               />
@@ -84,7 +86,7 @@
                 type="number"
                 :rules="[rules.required]"
                 required
-                variant="outlined"
+                variant="tonal"
                 color="primary"
                 hide-details="auto"
               />
@@ -103,7 +105,7 @@
                 :items="listaEscenarios"
                 @click="loadEscenarios"
                 label="Escenario"
-                variant="outlined"
+                variant="tonal"
                 color="primary"
                 hide-details="auto"
               />
@@ -122,7 +124,7 @@
                 type="number"
                 :rules="[rules.required]"
                 required
-                variant="outlined"
+                variant="tonal"
                 color="primary"
                 hide-details="auto"
               />
@@ -165,8 +167,6 @@
                   </v-btn>
                 </v-col>
               </v-row>
-
-              
             </v-form>
           </v-card-text>
         </v-card>

@@ -5,13 +5,13 @@
         <div v-if="isLoading">
           <LoadingGandalf />
         </div>
-        <div v-else>          
+        <div v-else>
           <v-tabs v-model="tab" color="primary" grow>
             <v-tab value="proximos"> Próximos </v-tab>
             <v-tab value="pasados"> Pasados </v-tab>
           </v-tabs>
-          <v-window v-model="tab" >
-            <v-window-item value="proximos" >
+          <v-window v-model="tab">
+            <v-window-item value="proximos">
               <div v-if="torneosFuturos.length < 1">
                 No hay torneos próximos...
               </div>
@@ -23,10 +23,7 @@
                   sm="6"
                   md="4"
                 >
-                  <TorneoCard 
-                    :torneo="torneo" 
-                    :verClasificacion=false
-                  />
+                  <TorneoCard :torneo="torneo" :verClasificacion="false" />
                 </v-col>
               </v-row>
             </v-window-item>
@@ -38,12 +35,12 @@
                 <!-- Barra de herramientas con búsqueda -->
                 <v-container>
                   <v-row>
-                    <v-col cols="12" sm="8" offset-sm="2" >
+                    <v-col cols="12" sm="8" offset-sm="2">
                       <v-text-field
                         v-model="searchQuery"
                         label="Buscar torneo"
                         clearable
-                        outlined
+                        tonal
                         dense
                         append-icon="mdi-magnify"
                         class="elevated-search"
@@ -56,14 +53,11 @@
                   v-for="torneo in paginatedTorneos"
                   :key="torneo.idTorneo"
                   cols="12"
-                  sm="8" 
+                  sm="8"
                   md="6"
                   lg="4"
                 >
-                  <TorneoCard 
-                    :torneo="torneo" 
-                    :verClasificacion=true
-                  />
+                  <TorneoCard :torneo="torneo" :verClasificacion="true" />
                 </v-col>
               </v-row>
 
@@ -92,7 +86,6 @@
       </v-col>
     </v-row>
   </v-container>
-
 </template>
 
 <script setup lang="ts">
@@ -127,11 +120,11 @@ onMounted(async () => {
         new Date(b.fechaInicioTorneo).getTime()
     );
 
-  torneosPasados.value = listaTorneos.value.filter(
-    (torneo) => new Date(torneo.fechaInicioTorneo).getTime() <= now
-  ).toSorted((a,b)=>{
-    return b.fechaInicioTorneo.localeCompare(a.fechaInicioTorneo);
-  });
+  torneosPasados.value = listaTorneos.value
+    .filter((torneo) => new Date(torneo.fechaInicioTorneo).getTime() <= now)
+    .toSorted((a, b) => {
+      return b.fechaInicioTorneo.localeCompare(a.fechaInicioTorneo);
+    });
 
   isLoading.value = false;
 });

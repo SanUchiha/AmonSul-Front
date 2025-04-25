@@ -76,17 +76,15 @@ import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
 import { getlista } from "@/services/ListasService";
 import { appsettings } from "@/settings/appsettings";
-import { defineProps, defineEmits, ref, watch, onMounted, computed } from "vue";
+import { defineProps, defineEmits, ref, watch, computed } from "vue";
 
 const props = defineProps<{
   isVisible: boolean;
-  hasLista: boolean;
   idInscripcion: number;
 }>();
 
 const internalIsVisible = ref(props.isVisible);
 const isLoading = ref<boolean>(false);
-const hasLista = ref<boolean>(false);
 
 const imageBase64 = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -167,16 +165,6 @@ watch(
   }
 );
 
-watch(
-  () => props.hasLista,
-  async (newVal) => {
-    if (newVal) {
-      const response = await getlista(props.idInscripcion);
-      imageBase64.value = response.data.listaData;
-    }
-  }
-);
-
 const emit = defineEmits(["update:isVisible", "enviarLista", "modificarLista"]);
 
 const close = () => {
@@ -192,27 +180,11 @@ const enviarLista = () => {
     idUsuario: 0,
     nick: "",
   };
-  if (hasLista.value) emit("modificarLista", newLista);
-  else emit("enviarLista", newLista);
+  emit("enviarLista", newLista);
 
   imageBase64.value = "";
   ejercitoSelected.value = undefined;
 };
-
-onMounted(async () => {
-  isLoading.value = true;
-  try {
-    const response = await getlista(props.idInscripcion);
-
-    imageBase64.value = response.data.listaData;
-    ejercitoSelected.value = response.data.ejercito;
-    if (imageBase64.value != null) hasLista.value = true;
-  } catch {
-    console.error("No se ha podido cargar la lista");
-  } finally {
-    isLoading.value = false;
-  }
-});
 </script>
 <style scoped>
 .uploaded-image {

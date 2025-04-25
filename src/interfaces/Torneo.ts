@@ -1,4 +1,5 @@
 import { GenerarRonda } from "./Live";
+import { ListaDTO } from "./Usuario";
 
 export interface Torneo {
   idTorneo: number; // Identificador único del torneo (PK)
@@ -13,7 +14,7 @@ export interface Torneo {
   estadoTorneo: "ESPERANDO" | "LIVE" | "TERMINADO" | "CANCELADO"; // Estado del torneo (enum)
   lugarTorneo: string; // Lugar donde se llevará a cabo el torneo
   esLiga?: boolean;
-  tipoTorneo?: "Individual" | "Parejas" | "Equipos_4" | "Equipos_6";
+  tipoTorneo: "Individual" | "Parejas" | "Equipos_4" | "Equipos_6";
   esPrivadoTorneo: boolean; // Indica si el torneo es privado o no
   idRangoTorneo: number; // ID del rango del torneo (FK)
   esMatchedPlayTorneo: boolean; // Indica si el torneo es de tipo Matched Play
@@ -27,6 +28,7 @@ export interface Torneo {
   limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
   tieneBases: boolean;
   inicioInscripciones: string; // Fecha límite de inscripción
+  listasPorJugador: number;
 }
 
 export interface TorneoReducidoDTO {
@@ -44,11 +46,17 @@ export interface TorneoPropioDTO {
   idUsuario: number; // ID del usuario administrador del torneo (FK)
   nombreTorneo: string; // Nombre del torneo
   tipoTorneo: string;
+  listasPorJugador: number;
 }
 
 export interface TorneoGestionInfoDTO {
   torneo: TorneoCreadoDTO;
   inscripciones: InscripcionTorneoCreadoDTO[];
+}
+
+export interface TorneoGestionInfoMasDTO {
+  torneo: TorneoCreadoDTO;
+  inscripciones: InscripcionTorneoCreadoMasDTO[];
 }
 
 export interface TorneoCreadoDTO {
@@ -61,6 +69,7 @@ export interface TorneoCreadoDTO {
   fechaEntregaListas?: string | null;
   fechaFinInscripcion?: string | null;
   inicioInscripciones?: string | null;
+  listasPorJugador: number;
 }
 
 export interface InscripcionTorneoCreadoDTO {
@@ -77,6 +86,18 @@ export interface InscripcionTorneoCreadoDTO {
   ejercito?: string | null;
   listaData?: string | null;
   idTorneo: number;
+}
+
+export interface InscripcionTorneoCreadoMasDTO {
+  idInscripcion: number;
+  idUsuario: number;
+  nick: string;
+  fechaInscripcion: string;
+  bando?: "evil" | "good" | null;
+  fechaUltimaEntrega?: string | null;
+  esPago: string;
+  lista: ListaDTO[];
+  countListasEntregadas: number;
 }
 
 export interface GuardarResultadosDTO {
