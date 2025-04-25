@@ -36,7 +36,7 @@
                     v-model="busquedaEquipo"
                     label="Buscar equipo por nombre"
                     prepend-inner-icon="mdi-magnify"
-                    variant="outlined"
+                    variant="tonal"
                     clearable
                     class="ma-4"
                     hide-details
@@ -436,10 +436,7 @@
               </v-tabs-item>
 
               <!-- Tab clasificacion -->
-              <v-window-item
-                :value="tabClasificacion"
-                :key="tabClasificacion"
-              >
+              <v-window-item :value="tabClasificacion" :key="tabClasificacion">
                 <!-- División en dos zonas a a partir de la ronda 3 -->
                 <div v-if="(torneo!.idTorneo === 7)">
                   <div
@@ -588,6 +585,7 @@
       v-if="isModalListaVisible"
       :listaData="listaData"
       :nickJugador="nickJugador"
+      :ejercito="currentEjercito"
       @close="isModalListaVisible = false"
     />
 
@@ -753,13 +751,12 @@ import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.v
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
-import TablaInscritosEquipo from "@/components/GestionTorneos/Equipos/TablaInscritosEquipo.vue";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import ModalParametrosRondasEquipo from "@/components/GestionTorneos/Equipos/ModalParametrosRondasEquipo.vue";
 import CardGestionInfoTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionInfoTorneoEquipo.vue";
 import CardGestionAccionesTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionAccionesTorneoEquipo.vue";
 import CardInfoEquipo from "@/components/GestionTorneos/Equipos/CardInfoEquipo.vue";
-import { getUsuariosByTorneo } from "@/services/UsuariosService";
+import { ListaDTO } from "@/interfaces/Usuario";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -821,6 +818,8 @@ const partidaActual = ref<PartidaTorneoDTO>({
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
+const currentEjercito = ref<string>();
+const listaDTO = ref<ListaDTO>();
 
 //Variables para el buscador
 const busquedaEquipo = ref("");
@@ -832,7 +831,6 @@ const equiposFiltrados = computed(() => {
     )
   );
 });
-
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
@@ -1372,8 +1370,11 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
 
     try {
       const listaResponse = await getlistaTorneo(body);
-      listaData.value = listaResponse.data;
+      listaDTO.value = listaResponse.data;
+      if (listaDTO.value != undefined)
+        listaData.value = listaDTO.value.listaData ?? "";
       nickJugador.value = nick;
+      currentEjercito.value = listaDTO.value?.ejercito;
       isModalListaVisible.value = true;
     } catch (error) {
       console.error(error);

@@ -2,6 +2,7 @@ import {
   ModificarListaTorneoRequestDTO,
   CrearListaTorneoRequestDTO,
   ListaTorneoRequestDTO,
+  UpdateEstadoListaMasDTO,
 } from "@/interfaces/Lista";
 import { http } from "./index";
 
@@ -13,6 +14,12 @@ export const modificarListaTorneo = async (
   request: ModificarListaTorneoRequestDTO
 ) => {
   return http.put(`Lista/${request.idLista}`, request);
+};
+
+export const updateEstadoListaMasAsync = async (
+  request: UpdateEstadoListaMasDTO
+) => {
+  return http.put(`lista/estado`, request);
 };
 
 export const getlista = async (idInscripcion: number) => {

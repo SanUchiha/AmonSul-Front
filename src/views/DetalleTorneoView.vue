@@ -255,7 +255,7 @@
                   v-model="search"
                   label="Buscar"
                   prepend-inner-icon="mdi-magnify"
-                  variant="outlined"
+                  variant="tonal"
                   dense
                 ></v-text-field>
               </v-card-title>

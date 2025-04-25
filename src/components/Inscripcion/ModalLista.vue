@@ -194,6 +194,9 @@ const enviarLista = () => {
   };
   if (hasLista.value) emit("modificarLista", newLista);
   else emit("enviarLista", newLista);
+
+  imageBase64.value = "";
+  ejercitoSelected.value = undefined;
 };
 
 onMounted(async () => {

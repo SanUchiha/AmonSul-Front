@@ -65,7 +65,10 @@ export const registrarEquipo = async (
 export const registrarMiembroEquipoAsync = async (
   request: CreateMiembroEquipoDTO
 ): Promise<{ idInscripcion: number }> => {
-  const response = await http.post(`Inscripcion/Registar-miembro-Equipo`, request);
+  const response = await http.post(
+    `Inscripcion/Registar-miembro-Equipo`,
+    request
+  );
   return response.data;
 };
 

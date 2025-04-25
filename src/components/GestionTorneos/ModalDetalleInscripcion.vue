@@ -263,7 +263,6 @@ const logChange = async (
   } catch (error) {
     console.error(`Error actualizando ${field}:`, error);
     showErrorModal.value = true;
-    isLoading.value = false;
   } finally {
     isLoading.value = false;
   }
@@ -298,7 +297,7 @@ const toggleLista = async () => {
     };
     try {
       const response = await getlistaTorneo(requestLista);
-      listaBase64.value = response.data;
+      listaBase64.value = response.data.listaData;
     } catch (error) {
       console.error("Error al recuperar la lista.");
     } finally {

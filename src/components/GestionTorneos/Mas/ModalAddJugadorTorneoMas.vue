@@ -106,6 +106,14 @@ const addJugador = async () => {
 
     await registrarInscripcion(addInscripcion);
     showSuccessModal.value = true;
+
+    const responseJugadores = await getUsuariosNoInscritosTorneoAsync(
+      props.torneo.torneo.idTorneo
+    );
+    jugadores.value = (responseJugadores?.data ?? []).sort(
+      (a: { nick: string }, b: { nick: string }) => a.nick.localeCompare(b.nick)
+    );
+    jugadorSelected.value = undefined;
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;

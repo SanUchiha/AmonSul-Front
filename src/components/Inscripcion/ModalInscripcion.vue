@@ -257,16 +257,15 @@
 
   <!-- Modal lista -->
   <ModalLista
-    v-if="currentInscripcionId !== null"
+    v-if="currentInscripcionId != undefined && currentInscripcionId != null"
     :isVisible="showVerListaModal"
     :hasLista="hasLista"
-    :idInscripcion="currentInscripcionId!"
+    :idInscripcion="currentInscripcionId"
     @update:isVisible="showVerListaModal = $event"
     @enviarLista="handleEnviarLista"
     @modificarLista="handleModificarLista"
   />
 
-  <!-- Modal enviar lista -->
   <!-- Modal enviar lista -->
   <ModalEnviarLista
     v-if="showEnviarListaModal"
@@ -374,6 +373,7 @@ const inscripcionData = ref<InscripcionTorneoCreadoDTO>({
     tieneBases: false,
     inicioInscripciones: "",
     listasPorJugador: 0,
+    tipoTorneo: "Individual",
   },
   idTorneo: 0,
 });
@@ -402,6 +402,7 @@ const torneo = ref<Torneo>({
   tieneBases: false,
   inicioInscripciones: "",
   listasPorJugador: 0,
+  tipoTorneo: "Individual",
 });
 const currentInscripcionId = ref<number>();
 const currentIdLista = ref<number>();
@@ -588,6 +589,8 @@ const close = () => {
 onMounted(async () => {
   try {
     isLoading.value = true;
+    console.log(props.idInscripcion);
+
     const response = await getIncripcionById(props.idInscripcion);
     inscripcionData.value = response.data;
     if (inscripcionData.value) torneo.value = inscripcionData.value.torneo;

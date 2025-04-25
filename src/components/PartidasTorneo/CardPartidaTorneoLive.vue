@@ -178,6 +178,7 @@
     v-if="isModalListaVisible"
     :listaData="listaData"
     :nickJugador="nickJugador"
+    :ejercito="currentEjercito"
     @close="isModalListaVisible = false"
   />
 
@@ -229,13 +230,16 @@ import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPart
 import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
 import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
 import ModalEditarPartida from "@/components/ResultadosTorneos/ModalEditarPartida.vue";
+import { ListaDTO } from "@/interfaces/Usuario";
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);
 const router = useRouter();
 const listaData = ref<string>("");
+const listaDTO = ref<ListaDTO>();
 const nickJugador = ref<string>("");
 const isModalListaVisible = ref<boolean>(false);
+const currentEjercito = ref<string>();
 
 const fechaPartidaFormateada = ref<string>("");
 
@@ -302,8 +306,11 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
 
     try {
       const listaResponse = await getlistaTorneo(body);
-      listaData.value = listaResponse.data;
+      listaDTO.value = listaResponse.data;
+      if (listaDTO.value != undefined)
+        listaData.value = listaDTO.value.listaData ?? "";
       nickJugador.value = nick;
+      currentEjercito.value = listaDTO.value?.ejercito;
       isModalListaVisible.value = true;
     } catch (error) {
       console.error(error);

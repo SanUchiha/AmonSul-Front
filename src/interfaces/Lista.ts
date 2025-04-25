@@ -43,3 +43,10 @@ export interface ListaJugador {
   nombreEjercito: string;
   nick: string;
 }
+
+export interface UpdateEstadoListaMasDTO {
+  idLista: number;
+  estado: string;
+  idTorneo: number;
+  idUsuario: number;
+}

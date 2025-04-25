@@ -156,16 +156,16 @@ import {
 } from "@/interfaces/Live";
 import {
   InscripcionTorneoCreadoDTO,
+  InscripcionTorneoCreadoMasDTO,
   TorneoGestionInfoDTO,
   TorneoGestionInfoMasDTO,
 } from "@/interfaces/Torneo";
 import { generarRonda } from "@/services/PartidaTorneoService";
 import { ref, defineProps, defineEmits, watch, onMounted, computed } from "vue";
 import {
-  getInfoTorneoCreado,
+  getInfoTorneoCreadoMasAsync,
   getPartidasTorneoByRonda,
 } from "@/services/TorneosService";
-import { UsuarioFastDTO } from "@/interfaces/Usuario";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
@@ -198,14 +198,13 @@ const esRepetirRivalCheck = ref<string>("SI");
 const opcionImpares = ref<string | null>(null);
 const isImpares = ref<boolean>(false);
 const numeroRonda = ref<number>();
-const jugadoresObj = ref<InscripcionTorneoCreadoDTO[]>();
+const jugadoresObj = ref<InscripcionTorneoCreadoMasDTO[]>();
 const jugadoresNick = ref<JugadorParaEmparejamiento[]>();
 const jugador1 = ref<JugadorParaEmparejamiento>();
 const jugador2 = ref<JugadorParaEmparejamiento>();
 const rondas = ref<number[]>();
 const isGenerating = ref<boolean>(false);
-const torneoSelected = ref<TorneoGestionInfoDTO>();
-const jugadores = ref<UsuarioFastDTO[]>();
+const torneoSelected = ref<TorneoGestionInfoMasDTO>();
 const clasificacionDividida = ref<Clasificacion[]>([]);
 const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
@@ -231,38 +230,26 @@ watch(numeroRonda, (newValue) => {
 });
 
 onMounted(async () => {
-  try {
-    if (!props.torneo?.torneo.idTorneo) {
-      console.error("El idTorneo no está definido");
-      return;
-    }
-    // Obtener información del torneo creado
-    const responseTorneo = await getInfoTorneoCreado(
-      props.torneo?.torneo.idTorneo
+  torneoSelected.value = props.torneo;
+
+  // Si hay inscripciones, procesar jugadores
+  if (torneoSelected.value?.inscripciones) {
+    jugadoresObj.value = torneoSelected.value.inscripciones;
+    isImpares.value = jugadoresObj.value?.length % 2 !== 0;
+
+    // Usamos `for...of` para manejar promesas de manera secuencial o `map` con `Promise.all`
+    jugadoresNick.value = torneoSelected.value?.inscripciones.map(
+      (element) => ({
+        idUsuario: element.idUsuario,
+        nick: element.nick,
+      })
     );
-    torneoSelected.value = responseTorneo.data;
+  }
 
-    // Si hay inscripciones, procesar jugadores
-    if (torneoSelected.value?.inscripciones) {
-      jugadoresObj.value = torneoSelected.value.inscripciones;
-      isImpares.value = jugadoresObj.value?.length % 2 !== 0;
-
-      // Usamos `for...of` para manejar promesas de manera secuencial o `map` con `Promise.all`
-      jugadoresNick.value = torneoSelected.value?.inscripciones.map(
-        (element) => ({
-          idUsuario: element.idUsuario!,
-          nick: element.nick!,
-        })
-      );
-    }
-
-    // Procesar rondas si existe el número de partidas
-    if (torneoSelected.value?.torneo?.numeroPartidas) {
-      const totalRondas = torneoSelected.value.torneo.numeroPartidas;
-      rondas.value = Array.from({ length: totalRondas }, (_, i) => i + 1);
-    }
-  } catch (error) {
-    console.error("Error al obtener la información del torneo:", error);
+  // Procesar rondas si existe el número de partidas
+  if (torneoSelected.value?.torneo?.numeroPartidas) {
+    const totalRondas = torneoSelected.value.torneo.numeroPartidas;
+    rondas.value = Array.from({ length: totalRondas }, (_, i) => i + 1);
   }
 });
 

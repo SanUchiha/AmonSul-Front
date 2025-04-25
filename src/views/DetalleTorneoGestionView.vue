@@ -571,6 +571,7 @@
       v-if="isModalListaVisible"
       :listaData="listaData"
       :nickJugador="nickJugador"
+      :ejercito="currentEjercito"
       @close="isModalListaVisible = false"
     />
 
@@ -743,6 +744,7 @@ import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.v
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
+import { ListaDTO } from "@/interfaces/Usuario";
 //import { getUsuariosByTorneo } from "@/services/UsuariosService";
 
 const isLoadingImage = ref<boolean>(false);
@@ -754,6 +756,8 @@ const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const idUsuario = ref<number>();
 const isModalListaVisible = ref<boolean>(false);
 const listaData = ref<string>("");
+const listaDTO = ref<ListaDTO>();
+const currentEjercito = ref<string>();
 const nickJugador = ref<string>("");
 const idPartidaSeleccionada = ref<number>();
 const usuarioSeleccionado = ref<1 | 2>();
@@ -772,6 +776,7 @@ const torneoGestion = ref<TorneoGestionInfoDTO>({
     nombreTorneo: "",
     numeroPartidas: 0,
     estadoTorneo: "",
+    listasPorJugador: 0,
   },
   inscripciones: [],
 });
@@ -1353,8 +1358,11 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
 
     try {
       const listaResponse = await getlistaTorneo(body);
-      listaData.value = listaResponse.data;
+      listaDTO.value = listaResponse.data;
+      if (listaDTO.value != undefined)
+        listaData.value = listaDTO.value.listaData ?? "";
       nickJugador.value = nick;
+      currentEjercito.value = listaDTO.value?.ejercito;
       isModalListaVisible.value = true;
     } catch (error) {
       console.error(error);

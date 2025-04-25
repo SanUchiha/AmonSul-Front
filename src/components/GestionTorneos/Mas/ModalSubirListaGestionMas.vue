@@ -74,12 +74,13 @@
 <script setup lang="ts">
 import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
+import { getlista } from "@/services/ListasService";
 import { appsettings } from "@/settings/appsettings";
 import { defineProps, defineEmits, ref, watch, computed } from "vue";
 
 const props = defineProps<{
   isVisible: boolean;
-  idLista: number;
+  idInscripcion: number;
 }>();
 
 const internalIsVisible = ref(props.isVisible);
@@ -164,7 +165,7 @@ watch(
   }
 );
 
-const emit = defineEmits(["update:isVisible", "modificarListaMasDeUna"]);
+const emit = defineEmits(["update:isVisible", "enviarLista", "modificarLista"]);
 
 const close = () => {
   emit("update:isVisible", false);
@@ -179,7 +180,7 @@ const enviarLista = () => {
     idUsuario: 0,
     nick: "",
   };
-  emit("modificarListaMasDeUna", newLista);
+  emit("enviarLista", newLista);
 
   imageBase64.value = "";
   ejercitoSelected.value = undefined;

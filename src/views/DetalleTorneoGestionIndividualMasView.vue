@@ -35,6 +35,7 @@
                   <TablaInscritosMas
                     :torneo="torneoGestion"
                     @inscripcionEliminada="handleInscripcionEliminada"
+                    @cambios="refreshTorneo"
                   />
                 </div>
               </v-tabs-window-item>
@@ -573,6 +574,7 @@
       v-if="isModalListaVisible"
       :listaData="listaData"
       :nickJugador="nickJugador"
+      :ejercito="currentEjercito"
       @close="isModalListaVisible = false"
     />
 
@@ -743,8 +745,9 @@ import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalElimina
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
 import ModalParametrosRondasMas from "@/components/GestionTorneos/Mas/ModalParametrosRondasMas.vue";
-import TablaInscritosMas from "@/components/GestionTorneos/TablaInscritosMas.vue";
 import CardGestionTorneoMas from "@/components/GestionTorneos/Mas/CardGestionTorneoMas.vue";
+import TablaInscritosMas from "@/components/GestionTorneos/Mas/TablaInscritosMas.vue";
+import { ListaDTO } from "@/interfaces/Usuario";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -754,8 +757,10 @@ const activeTab = ref<number>(2);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const idUsuario = ref<number>();
 const isModalListaVisible = ref<boolean>(false);
+const listaDTO = ref<ListaDTO>();
 const listaData = ref<string>("");
 const nickJugador = ref<string>("");
+const currentEjercito = ref<string>();
 const idPartidaSeleccionada = ref<number>();
 const usuarioSeleccionado = ref<1 | 2>();
 const isModalPuntosVisible = ref<boolean>(false);
@@ -823,7 +828,6 @@ onMounted(async () => {
   try {
     const responseTorneo = await getInfoTorneoCreadoMasAsync(idTorneo.value);
     torneoGestion.value = responseTorneo.data;
-    console.log("torneoGestion", torneoGestion.value);
   } catch (error) {
     console.error(error);
     router.push({ name: "error" });
@@ -873,6 +877,10 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+const refreshTorneo = (torneoActualizado: TorneoGestionInfoMasDTO) => {
+  torneoGestion.value = { ...torneoActualizado };
+};
 
 const resultados = async (ronda: number) => {
   // //TODO  domadores
@@ -1356,9 +1364,11 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
 
     try {
       const listaResponse = await getlistaTorneo(body);
-      listaData.value = listaResponse.data;
+      listaDTO.value = listaResponse.data;
+      if (listaDTO.value != undefined)
+        listaData.value = listaDTO.value.listaData ?? "";
       nickJugador.value = nick;
-      isModalListaVisible.value = true;
+      currentEjercito.value = listaDTO.value?.ejercito;
     } catch (error) {
       console.error(error);
       isModalListaVisible.value = false;
