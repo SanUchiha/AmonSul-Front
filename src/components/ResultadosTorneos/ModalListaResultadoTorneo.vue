@@ -1,9 +1,11 @@
-<!-- ListaModal.vue -->
 <template>
   <v-dialog v-model="isVisible" persistent max-width="600">
     <v-card>
       <v-card-title class="d-flex align-center">
-        Lista de {{ nickJugador }}
+        <div>
+          <div class="text-h6">{{ nickJugador }}</div>
+          <div class="text-subtitle-2 text-grey">{{ ejercito }}</div>
+        </div>
         <v-spacer></v-spacer>
         <v-btn icon @click="closeModal">
           <v-icon>mdi-close</v-icon>
@@ -32,6 +34,9 @@ const props = defineProps({
   nickJugador: {
     type: String,
     required: true,
+  },
+  ejercito: {
+    type: String,
   },
 });
 

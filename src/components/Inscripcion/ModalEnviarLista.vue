@@ -72,7 +72,7 @@ const props = defineProps<{
   hasLista: boolean;
   idInscripcion: number;
   idUsuario: number;
-  nick: string;
+  nick?: string;
 }>();
 
 const emit = defineEmits<{
@@ -120,12 +120,12 @@ const loadEjercitos = async () => {
 };
 
 const enviarLista = () => {
-  if (imageBase64.value) {
+  if (imageBase64.value && ejercitoSelected.value) {
     const newLista: RequesListaDTO = {
       listaData: imageBase64.value,
-      ejercito: ejercitoSelected.value!,
+      ejercito: ejercitoSelected.value,
       idUsuario: props.idUsuario,
-      nick: props.nick,
+      nick: "",
     };
 
     if (props.hasLista) {
@@ -149,7 +149,6 @@ watch(visible, (newVal) => {
   }
 });
 </script>
-
 
 <style scoped>
 .uploaded-image {

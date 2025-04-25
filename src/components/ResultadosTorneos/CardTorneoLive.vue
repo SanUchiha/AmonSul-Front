@@ -11,7 +11,7 @@
             v-model="searchQuery"
             label="Buscar torneo"
             clearable
-            outlined
+            tonal
             dense
             append-icon="mdi-magnify"
             class="elevated-search"
@@ -33,7 +33,7 @@
         >
           <v-card
             class="hover-card"
-            outlined
+            tonal
             @click="verTorneo(torneo.idTorneo)"
             role="button"
             tabindex="0"

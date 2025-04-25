@@ -20,6 +20,7 @@ import MisPartidasView from "@/views/MisPartidasView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
 import LigasView from "@/views/LigasView.vue";
 import AboutUsView from "@/views/AboutUsView.vue";
+import DetalleTorneoGestionIndividualMasView from "@/views/DetalleTorneoGestionIndividualMasView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -39,6 +40,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/detalle-torneo-gestion-equipos/:idTorneo",
     name: "detalle-torneo-gestion-equipos",
     component: DetalleTorneoGestionEquiposView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/detalle-torneo-gestion-individual-mas/:idTorneo",
+    name: "detalle-torneo-gestion-individual-mas",
+    component: DetalleTorneoGestionIndividualMasView,
     meta: { requiresAuth: true },
   },
   {
