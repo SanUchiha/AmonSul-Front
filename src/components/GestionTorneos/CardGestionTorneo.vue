@@ -59,6 +59,10 @@
                 Modificar bases
               </v-btn>
             </div>
+
+            <v-spacer class="my-4"></v-spacer>
+
+            <CardAddTorneoLiga :idTorneo="props.torneo?.torneo.idTorneo!" />
           </div>
         </v-list-item-title>
       </v-list-item-content>
@@ -98,6 +102,7 @@ import { computed, defineProps, ref } from "vue";
 import ModalModificarTorneo from "./ModalModificarTorneo.vue";
 import { getTorneo } from "@/services/TorneosService";
 import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
+import CardAddTorneoLiga from "./CardAddTorneoLiga.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 const showErrorModal = ref<boolean>(false);
