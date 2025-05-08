@@ -7,6 +7,7 @@ export interface GenerarRonda {
   opcionImpares: string | null;
   idTorneo: number;
   idRonda: number;
+  isTorneoNarsil: boolean;
 }
 
 export interface Emparejamiento {

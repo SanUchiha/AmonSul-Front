@@ -7,46 +7,41 @@
 
       <v-card-text>
         <v-form>
-          <v-radio-group
-            inline
-            v-model="goodVsEvilCheckString"
-            label="¿Prevalece luz vs oscuridad?"
-          >
-            <v-radio label="SI" value="SI"></v-radio>
-            <v-radio label="NO" value="NO"></v-radio>
+          <v-radio-group v-model="isTorneoNarsil" class="text-wrap">
+            <template #label>
+              <div style="white-space: normal">¿Eres el mítico Narsil?</div>
+            </template>
+            <v-radio label="Sí" value="SI" />
+            <v-radio label="No" value="NO" />
           </v-radio-group>
 
-          <v-radio-group
-            inline
-            v-model="esRepetirRivalCheck"
-            label="¿Se puede repetir rival de la ronda anterior?"
-          >
-            <v-radio label="SI" value="SI"></v-radio>
-            <v-radio label="NO" value="NO"></v-radio>
-          </v-radio-group>
+          <div v-if="isTorneoNarsil === 'NO'">
+            <v-radio-group
+              inline
+              v-model="goodVsEvilCheckString"
+              label="¿Prevalece luz vs oscuridad?"
+            >
+              <v-radio label="SI" value="SI"></v-radio>
+              <v-radio label="NO" value="NO"></v-radio>
+            </v-radio-group>
+
+            <v-radio-group
+              inline
+              v-model="esRepetirRivalCheck"
+              label="¿Se puede repetir rival de la ronda anterior?"
+            >
+              <v-radio label="SI" value="SI"></v-radio>
+              <v-radio label="NO" value="NO"></v-radio>
+            </v-radio-group>
+          </div>
 
           <v-radio-group
             v-if="isImpares"
             v-model="opcionImpares"
             label="Los jugadores son impares. ¿Cómo quieres gestionarlo?"
           >
-            <!-- <v-radio label="Añadir un jugador" value="añadirJugador"></v-radio> -->
             <v-radio label="Hacer un bye" value="bye"></v-radio>
           </v-radio-group>
-
-          <!-- <v-combobox
-            v-if="opcionImpares === 'añadirJugador'"
-            v-model="jugadorSelected"
-            :items="jugadores"
-            item-title="nick"
-            item-value="idUsuario"
-            label="Selecciona el jugador a añadir"
-          ></v-combobox> -->
-
-          <!-- <v-checkbox
-            v-model="retosCheck"
-            label="¿Tenemos algún reto para esta ronda?"
-          ></v-checkbox> -->
 
           <div v-if="retosCheck">
             <v-combobox
@@ -64,9 +59,7 @@
               item-value="idUsuario"
               label="Jugador 2"
             ></v-combobox>
-            <!-- <v-btn icon @click="removeEmparejamiento(index)" color="red">
-              <v-icon>mdi-delete</v-icon>
-            </v-btn> -->
+
             <v-btn
               :disabled="!isAddEmparejamientoEnabled"
               variant="tonal"
@@ -75,32 +68,6 @@
               >Agregar Emparejamiento</v-btn
             >
           </div>
-
-          <!-- <v-divider class="my-3"></v-divider> -->
-
-          <!-- <div
-            v-if="emparejamientos.length > 0"
-            class="emparejamientos-container"
-          >
-            <h4>Emparejamientos:</h4>
-            <div
-              v-for="(emparejamiento, index) in emparejamientos"
-              :key="index"
-              class="emparejamiento-item"
-            >
-              <span class="emparejamiento-text">
-                Mesa {{ index + 1 }}: {{ emparejamiento.jugador1.nick }} vs
-                {{ emparejamiento.jugador2.nick }}
-              </span>
-              <v-btn
-                class="remove-btn"
-                @click="removeEmparejamiento(index)"
-                icon
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </div>
-          </div> -->
         </v-form>
       </v-card-text>
 
@@ -191,6 +158,8 @@ watch(
 
 const mismaComunidadCheck = ref<boolean>(false);
 const goodVsEvilCheck = ref<boolean>(false);
+const isTorneoNarsil = ref<string>("NO");
+
 const goodVsEvilCheckString = ref<string>("NO");
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
@@ -729,6 +698,13 @@ const confirmarConfiguracion = async () => {
     return;
   }
 
+  let isNarsil = false;
+  if (isTorneoNarsil.value === "SI") {
+    isNarsil = true;
+    mismaComunidadCheck.value = false;
+    goodVsEvilCheck.value = false;
+  }
+
   if (goodVsEvilCheckString.value === "SI") goodVsEvilCheck.value = true;
   else goodVsEvilCheck.value = false;
 
@@ -756,6 +732,7 @@ const confirmarConfiguracion = async () => {
         opcionImpares: opcionImpares.value,
         idTorneo: props.torneo?.torneo.idTorneo,
         idRonda: numeroRonda.value,
+        isTorneoNarsil: isNarsil,
       };
 
       try {
@@ -789,6 +766,7 @@ const confirmarConfiguracion = async () => {
         opcionImpares: opcionImpares.value,
         idTorneo: props.torneo?.torneo.idTorneo,
         idRonda: numeroRonda.value,
+        isTorneoNarsil: isNarsil,
       };
 
       try {
@@ -835,6 +813,7 @@ const confirmarConfiguracion = async () => {
         opcionImpares: opcionImpares.value,
         idTorneo: props.torneo?.torneo.idTorneo,
         idRonda: numeroRonda.value,
+        isTorneoNarsil: isNarsil,
       };
 
       try {
@@ -867,6 +846,7 @@ const confirmarConfiguracion = async () => {
         opcionImpares: opcionImpares.value,
         idTorneo: props.torneo?.torneo.idTorneo,
         idRonda: numeroRonda.value,
+        isTorneoNarsil: isNarsil,
       };
 
       try {

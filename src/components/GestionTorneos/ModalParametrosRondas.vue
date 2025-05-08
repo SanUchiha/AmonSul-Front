@@ -768,6 +768,7 @@ const confirmarConfiguracion = async () => {
         opcionImpares: opcionImpares.value,
         idTorneo: props.torneo?.torneo.idTorneo,
         idRonda: numeroRonda.value,
+        isTorneoNarsil: false,
       };
 
       try {
@@ -801,6 +802,7 @@ const confirmarConfiguracion = async () => {
         opcionImpares: opcionImpares.value,
         idTorneo: props.torneo?.torneo.idTorneo,
         idRonda: numeroRonda.value,
+        isTorneoNarsil: false,
       };
 
       try {
@@ -847,6 +849,7 @@ const confirmarConfiguracion = async () => {
         opcionImpares: opcionImpares.value,
         idTorneo: props.torneo?.torneo.idTorneo,
         idRonda: numeroRonda.value,
+        isTorneoNarsil: false,
       };
 
       try {
@@ -879,6 +882,7 @@ const confirmarConfiguracion = async () => {
         opcionImpares: opcionImpares.value,
         idTorneo: props.torneo?.torneo.idTorneo,
         idRonda: numeroRonda.value,
+        isTorneoNarsil: false,
       };
 
       try {

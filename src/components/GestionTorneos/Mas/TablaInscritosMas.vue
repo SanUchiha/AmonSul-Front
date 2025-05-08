@@ -244,7 +244,7 @@
       </v-btn>
       <v-btn
         variant="tonal"
-        @click="openConfigModal"
+        @click="handlerModalGenerarRonda1"
         color="primary"
         size="large"
       >
@@ -257,10 +257,11 @@
     </v-row>
 
     <ModalParametrosPrimeraRondaMas
-      :isVisible="showConfigModal"
+      v-if="torneo.torneo.idTorneo"
+      :isVisible="showModalGenerarRonda1"
       :torneo="torneo"
-      @close="closeConfigModal"
-      @confirm="handleConfigConfirm"
+      @close="closeModalGenerarRonda1"
+      @confirm="handleConfirmGenerarRonda1"
     />
     <ModalAddJugadorTorneoMas
       :isVisible="showAddJugadorModal"
@@ -420,11 +421,11 @@ import ModalSorteo from "../ModalSorteo.vue";
 import ModalSubirListaGestionMas from "./ModalSubirListaGestionMas.vue";
 import ModalModificarLista from "@/components/Inscripcion/ModalModificarLista.vue";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
+import ModalParametrosPrimeraRondaMas from "./ModalParametrosPrimeraRondaMas.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoMasDTO }>();
 const localInscripciones = ref<InscripcionTorneoCreadoMasDTO[]>([]);
 const isLoading = ref<boolean>(true);
-const showConfigModal = ref<boolean>(false);
 const showSorteoModal = ref<boolean>(false);
 const showAddJugadorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
@@ -460,6 +461,7 @@ const estadoListaOptions = [
   { text: "ILEGAL", color: "red" },
   { text: "OK", color: "green" },
 ];
+const showModalGenerarRonda1 = ref<boolean>(false);
 
 const updateEstado = async (
   idLista: number,
@@ -588,9 +590,8 @@ const modificarLista = async (newLista: RequesListaDTO) => {
   }
 };
 
-const openConfigModal = async () => {
-  refreshTorneo();
-  showConfigModal.value = true;
+const handlerModalGenerarRonda1 = async () => {
+  showModalGenerarRonda1.value = true;
 };
 
 const refreshTorneo = async () => {
@@ -637,17 +638,21 @@ const openAddJugadorModal = async () => {
   showAddJugadorModal.value = true;
 };
 
-const closeConfigModal = () => {
-  showConfigModal.value = false;
-  window.location.reload();
+const closeModalGenerarRonda1 = () => {
+  showModalGenerarRonda1.value = false;
 };
 
 const closeAddJugadorModal = () => {
   showAddJugadorModal.value = false;
 };
 
-const handleConfigConfirm = () => {
-  closeConfigModal();
+const handleConfirmGenerarRonda1 = () => {
+  closeModalGenerarRonda1();
+  recargarPagina();
+};
+
+const recargarPagina = () => {
+  window.location.reload();
 };
 
 const handleAddJugadorConfirm = () => {
@@ -710,21 +715,6 @@ const chipNumeroListasColor = (
 
 const toggleExpand = (id: number) => {
   expandedRows.value[id] = !expandedRows.value[id];
-};
-
-const formattedEstadoLista = (estado: string) => {
-  switch (estado) {
-    case "NO ENTREGADA":
-      return { text: "NO ENTREGADA", color: "red" };
-    case "ENTREGADA":
-      return { text: "ENTREGADA", color: "blue" };
-    case "ILEGAL":
-      return { text: "ILEGAL", color: "red" };
-    case "OK":
-      return { text: "OK", color: "blue" };
-    default:
-      return { text: "Desconocido", color: "gray" };
-  }
 };
 
 const handleUpdatePago = (idInscripcion: number, estado: string) => {

@@ -1,51 +1,65 @@
 <template>
   <v-dialog v-model="internalIsVisible" max-width="600px">
     <v-card>
-      <v-card-title>Configurar Ronda</v-card-title>
+      <v-card-title style="white-space: normal">
+        Configurar Ronda
+      </v-card-title>
 
       <v-divider></v-divider>
 
       <v-card-text>
         <v-form>
-          <v-radio-group
-            inline
-            v-model="mismaComunidadCheckString"
-            label="¿Se permiten emparejamientos de la misma comunidad de juego?"
-          >
-            <v-radio label="SI" value="SI"></v-radio>
-            <v-radio label="NO" value="NO"></v-radio>
+          <v-radio-group v-model="isTorneoNarsil" class="text-wrap">
+            <template #label>
+              <div style="white-space: normal">¿Eres el mítico Narsil?</div>
+            </template>
+            <v-radio label="Sí" value="SI" />
+            <v-radio label="No" value="NO" />
           </v-radio-group>
 
-          <v-radio-group
-            inline
-            v-model="goodVsEvilCheckString"
-            label="¿Prevalece luz vs oscuridad?"
-          >
-            <v-radio label="SI" value="SI"></v-radio>
-            <v-radio label="NO" value="NO"></v-radio>
-          </v-radio-group>
+          <div v-if="isTorneoNarsil === 'NO'">
+            <v-radio-group
+              v-model="mismaComunidadCheckString"
+              class="text-wrap"
+            >
+              <template #label>
+                <div style="white-space: normal">
+                  ¿Se permiten emparejamientos de la misma comunidad de juego?
+                </div>
+              </template>
+              <v-radio label="Sí" value="SI" />
+              <v-radio label="No" value="NO" />
+            </v-radio-group>
+
+            <v-radio-group v-model="goodVsEvilCheckString" class="text-wrap">
+              <template #label>
+                <div style="white-space: normal">
+                  ¿Prevalece luz vs oscuridad?
+                </div>
+              </template>
+              <v-radio label="Sí" value="SI" />
+              <v-radio label="No" value="NO" />
+            </v-radio-group>
+          </div>
 
           <v-radio-group
             v-if="isImpares"
             v-model="opcionImpares"
-            label="Los jugadores son impares. ¿Cómo quieres gestionarlo?"
+            class="text-wrap"
           >
-            <!-- <v-radio label="Añadir un jugador" value="añadirJugador"></v-radio> -->
-            <v-radio label="Hacer un bye" value="bye"></v-radio>
+            <template #label>
+              <div style="white-space: normal">
+                Los jugadores son impares. ¿Cómo quieres gestionarlo?
+              </div>
+            </template>
+            <v-radio label="Hacer un bye" value="bye" />
           </v-radio-group>
-
-          <!-- <v-combobox
-            v-if="opcionImpares === 'añadirJugador'"
-            v-model="jugadorSelected"
-            :items="jugadores"
-            item-title="nick"
-            item-value="idUsuario"
-            label="Selecciona el jugador a añadir"
-          ></v-combobox> -->
 
           <v-checkbox
             v-model="retosCheck"
             label="¿Tenemos algún reto para esta ronda?"
+            class="text-wrap"
+            style="white-space: normal"
           ></v-checkbox>
 
           <div v-if="retosCheck">
@@ -55,6 +69,7 @@
               item-title="nick"
               item-value="idUsuario"
               label="Jugador 1"
+              class="mb-2"
             ></v-combobox>
 
             <v-combobox
@@ -63,17 +78,19 @@
               item-title="nick"
               item-value="idUsuario"
               label="Jugador 2"
+              class="mb-2"
             ></v-combobox>
-            <!-- <v-btn icon @click="removeEmparejamiento(index)" color="red">
-              <v-icon>mdi-delete</v-icon>
-            </v-btn> -->
+
             <v-btn
               :disabled="!isAddEmparejamientoEnabled"
               variant="tonal"
               color="blue"
               @click="addEmparejamiento"
-              >Agregar Emparejamiento</v-btn
+              block
+              class="mt-2"
             >
+              Agregar Emparejamiento
+            </v-btn>
           </div>
 
           <v-divider class="my-3"></v-divider>
@@ -82,13 +99,13 @@
             v-if="emparejamientos.length > 0"
             class="emparejamientos-container"
           >
-            <h4>Emparejamientos:</h4>
+            <h4 style="white-space: normal">Emparejamientos:</h4>
             <div
               v-for="(emparejamiento, index) in emparejamientos"
               :key="index"
-              class="emparejamiento-item"
+              class="emparejamiento-item d-flex align-center justify-space-between my-2"
             >
-              <span class="emparejamiento-text">
+              <span style="white-space: normal">
                 Mesa {{ index + 1 }}: {{ emparejamiento.jugador1.nick }} vs
                 {{ emparejamiento.jugador2.nick }}
               </span>
@@ -105,17 +122,23 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-row justify="center" class="my-4 ga-5">
-          <v-btn
-            :disabled="isGenerating"
-            @click="confirmarConfiguracion"
-            color="primary"
-            variant="tonal"
-            >Generar ronda</v-btn
-          >
-          <v-btn variant="tonal" color="secondary" @click="closeModal" large
-            >Cancelar</v-btn
-          >
+        <v-row justify="center" class="my-4" no-gutters>
+          <v-col cols="12" sm="auto" class="mb-2 mb-sm-0">
+            <v-btn
+              :disabled="isGenerating"
+              @click="confirmarConfiguracion"
+              color="primary"
+              variant="tonal"
+              block
+            >
+              Generar ronda
+            </v-btn>
+          </v-col>
+          <v-col cols="12" sm="auto">
+            <v-btn variant="tonal" color="secondary" @click="closeModal" block>
+              Cancelar
+            </v-btn>
+          </v-col>
         </v-row>
       </v-card-actions>
     </v-card>
@@ -123,7 +146,7 @@
 
   <!-- Modal de progreso circular -->
   <v-dialog v-model="isGenerating" hide-overlay persistent>
-    <v-card class="progress-card">
+    <v-card class="progress-card d-flex justify-center pa-5">
       <v-progress-circular
         indeterminate
         color="primary"
@@ -132,17 +155,17 @@
     </v-card>
   </v-dialog>
 
-  <!-- Modal response eliminar inscripcion -->
+  <!-- Modal success -->
   <ModalSuccess
     :isVisible="showSuccessModal"
     message="Ronda generada correctamente."
     @update:isVisible="showSuccessModal = $event"
   />
 
-  <!-- Modal response si error -->
+  <!-- Modal error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido generarla ronda. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    message="No se ha podido generarla ronda. Inténtalo de nuevo y si el error persiste, contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
 </template>
@@ -154,13 +177,12 @@ import {
   JugadorParaEmparejamiento,
 } from "@/interfaces/Live";
 import {
-  InscripcionTorneoCreadoDTO,
-  TorneoGestionInfoDTO,
+  InscripcionTorneoCreadoMasDTO,
   TorneoGestionInfoMasDTO,
 } from "@/interfaces/Torneo";
 import { generarRonda } from "@/services/PartidaTorneoService";
 import { ref, defineProps, defineEmits, watch, onMounted, computed } from "vue";
-import { getInfoTorneoCreado } from "@/services/TorneosService";
+import { getInfoTorneoCreadoMasAsync } from "@/services/TorneosService";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 
@@ -181,6 +203,7 @@ watch(
 
 const mismaComunidadCheck = ref<boolean>(false);
 const mismaComunidadCheckString = ref<string>("SI");
+const isTorneoNarsil = ref<string>("NO");
 const goodVsEvilCheck = ref<boolean>(false);
 const goodVsEvilCheckString = ref<string>("SI");
 const retosCheck = ref<boolean>(false);
@@ -189,14 +212,14 @@ const opcionImpares = ref<string | null>(null);
 const isImpares = ref<boolean>(false);
 const numeroRonda = ref<number>(1);
 
-const jugadoresObj = ref<InscripcionTorneoCreadoDTO[]>();
+const inscripciones = ref<InscripcionTorneoCreadoMasDTO[]>();
 const jugadoresNick = ref<JugadorParaEmparejamiento[]>();
 const jugador1 = ref<JugadorParaEmparejamiento>();
 const jugador2 = ref<JugadorParaEmparejamiento>();
 
 const rondas = ref<number[]>();
 const isGenerating = ref<boolean>(false);
-const torneoSelected = ref<TorneoGestionInfoDTO>();
+const torneoSelected = ref<TorneoGestionInfoMasDTO>();
 
 const errorRonda = ref<string | null>(null);
 const showErrorModal = ref<boolean>(false);
@@ -227,21 +250,21 @@ onMounted(async () => {
       return;
     }
     // Obtener información del torneo creado
-    const responseTorneo = await getInfoTorneoCreado(
+    const responseTorneo = await getInfoTorneoCreadoMasAsync(
       props.torneo?.torneo.idTorneo
     );
     torneoSelected.value = responseTorneo.data;
 
     // Si hay inscripciones, procesar jugadores
     if (torneoSelected.value?.inscripciones) {
-      jugadoresObj.value = torneoSelected.value.inscripciones;
-      isImpares.value = jugadoresObj.value?.length % 2 !== 0;
+      inscripciones.value = torneoSelected.value.inscripciones;
+      isImpares.value = inscripciones.value?.length % 2 !== 0;
 
       // Usamos `for...of` para manejar promesas de manera secuencial o `map` con `Promise.all`
       jugadoresNick.value = torneoSelected.value?.inscripciones.map(
         (element) => ({
-          idUsuario: element.idUsuario!,
-          nick: element.nick!,
+          idUsuario: element.idUsuario,
+          nick: element.nick,
         })
       );
     }
@@ -251,6 +274,9 @@ onMounted(async () => {
       const totalRondas = torneoSelected.value.torneo.numeroPartidas;
       rondas.value = Array.from({ length: totalRondas }, (_, i) => i + 1);
     }
+
+    console.log("jugadores", jugadoresNick.value);
+    console.log("inscripciones", inscripciones.value);
   } catch (error) {
     console.error("Error al obtener la información del torneo:", error);
   }
@@ -317,6 +343,9 @@ const confirmarConfiguracion = async () => {
   if (goodVsEvilCheckString.value === "SI") goodVsEvilCheck.value = true;
   else goodVsEvilCheck.value = false;
 
+  let isNarsil = false;
+  if (isTorneoNarsil.value === "SI") isNarsil = true;
+
   const configuracion: GenerarRonda = {
     mismaComunidadCheck: mismaComunidadCheck.value,
     luzVsOscCheck: goodVsEvilCheck.value,
@@ -325,7 +354,8 @@ const confirmarConfiguracion = async () => {
     esEloCheck: esEloCheck.value,
     opcionImpares: opcionImpares.value,
     idTorneo: props.torneo?.torneo.idTorneo,
-    idRonda: numeroRonda.value!,
+    idRonda: numeroRonda.value,
+    isTorneoNarsil: isNarsil,
   };
 
   try {
