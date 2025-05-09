@@ -39,6 +39,7 @@ export interface TorneoReducidoDTO {
   numeroPartidas: number; // Número de partidas del torneo
   puntosTorneo: number; // Puntos asignados al torneo
   tipoTorneo: string; // Tipo de torneo
+  listasPorJugador: number;
 }
 
 export interface TorneoPropioDTO {

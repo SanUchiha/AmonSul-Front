@@ -1,4 +1,5 @@
 import { ArmyDTO } from "./Army";
+import { ListaDTO } from "./Usuario";
 
 export interface ViewPartidaAmistosaDTO {
   idPartidaAmistosa: number;
@@ -61,6 +62,27 @@ export interface PartidaTorneoDTO {
   partidaValidadaUsuario2: boolean | null;
   resultadoUsuario1: number | null;
   resultadoUsuario2: number | null;
+}
+
+export interface PartidaTorneoMasDTO {
+  escenarioPartida: string | null;
+  fechaPartida: string;
+  ganadorPartidaTorneo: number | null;
+  idPartidaTorneo: number;
+  idTorneo: number;
+  idUsuario1: number;
+  idUsuario2: number;
+  liderMuertoUsuario1: boolean | null;
+  liderMuertoUsuario2: boolean | null;
+  nick1: string;
+  nick2: string;
+  numeroRonda: number;
+  partidaValidadaUsuario1: boolean | null;
+  partidaValidadaUsuario2: boolean | null;
+  resultadoUsuario1: number | null;
+  resultadoUsuario2: number | null;
+  listasJugador1: ListaDTO[];
+  listasJugador2: ListaDTO[];
 }
 
 export interface ViewPartidaTorneoDTO {

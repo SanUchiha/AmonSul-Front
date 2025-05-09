@@ -41,6 +41,9 @@ export const getInfoTorneoEquipoCreado = async (idTorneo: number) => {
 export const getPartidasTorneo = async (idTorneo: number) => {
   return http.get(`Torneo/Gestion/Partidas/${idTorneo}`);
 };
+export const getPartidasTorneoMas = async (idTorneo: number) => {
+  return http.get(`Torneo/Gestion/Mas/Partidas/${idTorneo}`);
+};
 
 export const getPartidasTorneoByRonda = async (
   idTorneo: number,

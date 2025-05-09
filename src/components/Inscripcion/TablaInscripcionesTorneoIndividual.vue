@@ -58,7 +58,15 @@
           }}</v-list-item-title>
 
           <template v-slot:append>
-            <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
+            <v-btn
+              icon
+              @click.stop="
+                torneo.torneo.tipoTorneo == 'Individual' &&
+                torneo.torneo.listasPorJugador > 1
+                  ? VerResultadoTorneoMas(torneo.idTorneo)
+                  : VerResultadoTorneo(torneo.idTorneo)
+              "
+            >
               <img
                 src="@/assets/icons/clasificacionTorneo.png"
                 alt="Icono personalizado"
@@ -179,6 +187,9 @@ const verDetalleTorneo = (idTorneo: number) => {
 };
 const VerResultadoTorneo = (idTorneo: number) => {
   router.push({ name: "detalle-torneo-live", params: { idTorneo } });
+};
+const VerResultadoTorneoMas = (idTorneo: number) => {
+  router.push({ name: "detalle-torneo-live-mas", params: { idTorneo } });
 };
 
 const eliminarInscripcion = async (idInscripcion: number) => {

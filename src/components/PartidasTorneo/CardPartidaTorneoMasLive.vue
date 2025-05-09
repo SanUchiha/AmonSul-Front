@@ -45,28 +45,36 @@
       <v-card-text class="match-content">
         <v-row align="center" justify="center" class="army-buttons">
           <v-col cols="6" class="text-left">
-            <div>
+            <div
+              v-for="(lista, index) in match.listasJugador1 ?? []"
+              :key="lista?.idLista ?? index"
+            >
               <v-btn
                 block
                 class="army-btn"
-                @click="verLista(match.idUsuario1, match.idTorneo, match.nick1)"
+                v-if="lista.idLista !== undefined"
+                @click="verLista(lista.idLista, match.nick1)"
                 style="font-size: 10px"
                 variant="tonal"
               >
-                <span class="text-wrap">{{ match.ejercitoUsuario1 }}</span>
+                <span class="text-wrap">{{ lista.ejercito }}</span>
               </v-btn>
             </div>
           </v-col>
           <v-col cols="6" class="text-right">
-            <div>
+            <div
+              v-for="(lista, index) in match.listasJugador2 ?? []"
+              :key="lista?.idLista ?? index"
+            >
               <v-btn
                 block
                 class="army-btn"
-                @click="verLista(match.idUsuario2, match.idTorneo, match.nick2)"
+                v-if="lista.idLista !== undefined"
+                @click="verLista(lista.idLista, match.nick2)"
                 style="font-size: 10px"
                 variant="tonal"
               >
-                <span class="text-wrap">{{ match.ejercitoUsuario2 }}</span>
+                <span class="text-wrap">{{ lista.ejercito }}</span>
               </v-btn>
             </div>
           </v-col>
@@ -227,11 +235,10 @@
 
 <script setup lang="ts">
 import { defineProps, ref, onMounted } from "vue";
-import { PartidaTorneoDTO } from "@/interfaces/Partidas";
+import { PartidaTorneoMasDTO } from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
-import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
-import { getlistaTorneo } from "@/services/ListasService";
+import { getListaById } from "@/services/ListasService";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
 import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
@@ -258,9 +265,7 @@ const usuarioSeleccionado = ref<1 | 2>();
 //Variables para el modal de editar partida para validar (ModalEditarPartida)
 const isModalEditarPartidaVisible = ref<boolean>(false);
 const idUsuarioSelected = ref<number>(0);
-const partidaSelected = ref<PartidaTorneoDTO>({
-  ejercitoUsuario1: null,
-  ejercitoUsuario2: null,
+const partidaSelected = ref<PartidaTorneoMasDTO>({
   escenarioPartida: null,
   fechaPartida: "",
   ganadorPartidaTorneo: null,
@@ -277,10 +282,12 @@ const partidaSelected = ref<PartidaTorneoDTO>({
   partidaValidadaUsuario2: null,
   resultadoUsuario1: null,
   resultadoUsuario2: null,
+  listasJugador1: [],
+  listasJugador2: [],
 });
 
 const props = defineProps<{
-  match: PartidaTorneoDTO;
+  match: PartidaTorneoMasDTO;
   idUsuario: number;
   mesa: string;
   completa: boolean;
@@ -303,16 +310,12 @@ const initializeComponent = async () => {
   }
 };
 
-const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
+const verLista = async (idLista: number, nick: string) => {
   isLoading.value = true;
-  if (idTorneo && idUsuario && nick) {
-    const body: ListaTorneoRequestDTO = {
-      idTorneo: idTorneo,
-      idUsuario: idUsuario,
-    };
-
+  if (idLista) {
     try {
-      const listaResponse = await getlistaTorneo(body);
+      const listaResponse = await getListaById(idLista);
+      console.log(listaResponse.data);
       listaDTO.value = listaResponse.data;
       if (listaDTO.value != undefined)
         listaData.value = listaDTO.value.listaData ?? "";
@@ -329,7 +332,7 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
   }
 };
 
-const getGanador = (partida: PartidaTorneoDTO) => {
+const getGanador = (partida: PartidaTorneoMasDTO) => {
   if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
     return partida.nick1;
   } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
@@ -338,7 +341,7 @@ const getGanador = (partida: PartidaTorneoDTO) => {
     return "Empate";
   }
 };
-const getColorGanador = (partida: PartidaTorneoDTO, idUsuario: number) => {
+const getColorGanador = (partida: PartidaTorneoMasDTO, idUsuario: number) => {
   if (partida.ganadorPartidaTorneo === idUsuario) {
     return "green";
   } else if (partida.ganadorPartidaTorneo != null) {
@@ -348,7 +351,7 @@ const getColorGanador = (partida: PartidaTorneoDTO, idUsuario: number) => {
   }
 };
 
-const abrirModalValidar = (match: PartidaTorneoDTO) => {
+const abrirModalValidar = (match: PartidaTorneoMasDTO) => {
   idPartidaSeleccionada.value = match.idPartidaTorneo;
   isModalValidarVisible.value = true;
   props.idUsuario === match.idUsuario1
@@ -381,7 +384,7 @@ const cerrarModalValidar = () => {
 };
 
 //Metodo que recoje el click del botón Validar Resultado y prepara los datos para enviar al backend
-const editPartida = (partida: PartidaTorneoDTO, idUsuario: number) => {
+const editPartida = (partida: PartidaTorneoMasDTO, idUsuario: number) => {
   partidaSelected.value = partida;
 
   if (idUsuario === partida.idUsuario1) idUsuarioSelected.value = 1;
@@ -390,7 +393,7 @@ const editPartida = (partida: PartidaTorneoDTO, idUsuario: number) => {
   isModalEditarPartidaVisible.value = true;
 };
 
-const confirmarEditarPartida = async (partida: PartidaTorneoDTO) => {
+const confirmarEditarPartida = async (partida: PartidaTorneoMasDTO) => {
   if (partida) {
     const body: UpdatePartidaTorneoDTO = {
       idPartidaTorneo: partida.idPartidaTorneo,

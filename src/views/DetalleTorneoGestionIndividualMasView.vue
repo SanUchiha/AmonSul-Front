@@ -943,6 +943,7 @@ const resultados = async (ronda: number) => {
       opcionImpares: null,
       idTorneo: idTorneo,
       idRonda: ronda,
+      isTorneoNarsil: false,
     };
 
     const guardarResultadosDTO: GuardarResultadosDTO = {

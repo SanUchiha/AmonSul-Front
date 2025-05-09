@@ -15,6 +15,7 @@ import GestionTorneosView from "@/views/GestionTorneosView.vue";
 import DetalleTorneoGestionView from "@/views/DetalleTorneoGestionView.vue";
 import DetalleTorneoGestionEquiposView from "@/views/DetalleTorneoGestionEquiposView.vue";
 import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
+import DetalleTorneoLiveMasView from "@/views/DetalleTorneoLiveMasView.vue";
 import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
 import MisPartidasView from "@/views/MisPartidasView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
@@ -70,6 +71,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/detalle-torneo-live/:idTorneo",
     name: "detalle-torneo-live",
     component: DetalleTorneoLiveView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/detalle-torneo-live-mas/:idTorneo",
+    name: "detalle-torneo-live-mas",
+    component: DetalleTorneoLiveMasView,
     meta: { requiresAuth: true },
   },
   {

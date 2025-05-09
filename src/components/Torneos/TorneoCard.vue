@@ -147,7 +147,12 @@ const goToDetalle = () => {
   router.push(`/detalle-torneo/${props.torneo.idTorneo}`);
 };
 const goToResultadoTorneo = () => {
-  router.push(`/detalle-torneo-live/${props.torneo.idTorneo}`);
+  if (
+    props.torneo.tipoTorneo == "Individual" &&
+    props.torneo.listasPorJugador > 1
+  )
+    router.push(`/detalle-torneo-live-mas/${props.torneo.idTorneo}`);
+  else router.push(`/detalle-torneo-live/${props.torneo.idTorneo}`);
 };
 </script>
 

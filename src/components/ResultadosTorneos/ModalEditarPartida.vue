@@ -66,13 +66,13 @@
 <script setup lang="ts">
 import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
 import { ref, defineEmits, watch, defineProps } from "vue";
-import { PartidaTorneoDTO } from "@/interfaces/Partidas";
+import { PartidaTorneoDTO, PartidaTorneoMasDTO } from "@/interfaces/Partidas";
 import { appsettings } from "@/settings/appsettings";
 
 // Tipamos las props correctamente
 const props = defineProps<{
   isVisible: boolean;
-  partida: PartidaTorneoDTO;
+  partida: PartidaTorneoDTO | PartidaTorneoMasDTO;
   idUsuario: number;
 }>();
 
@@ -141,7 +141,7 @@ const loadEscenarios = async () => {
 
 // Reglas de validación
 const rules = {
-  required: (value: any) => !!value || "Este campo es obligatorio",
+  required: (value: unknown) => !!value || "Este campo es obligatorio",
   isNumber: (value: number) => !isNaN(value) || "Debe ser un número",
   isBool: (value: boolean) =>
     value == true || value == false || "Este campo es obligatorio",

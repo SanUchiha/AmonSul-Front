@@ -129,9 +129,7 @@ import { defineProps, onMounted, ref } from "vue";
 import { InscripcionUsuarioEquipoDTO } from "@/interfaces/Inscripcion";
 import router from "@/router";
 import {
-  cancelarInscripcion,
   getInscripcionesEquipoByUser,
-  getInscripcionesIndividualByUser,
   eliminarEquipoAsync,
 } from "@/services/InscripcionesService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
