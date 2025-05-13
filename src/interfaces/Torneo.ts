@@ -136,6 +136,7 @@ export interface CrearTorneoDTO {
   metodosPago?: string;
   horaInicioTorneo: string; // formato de hora "HH:mm:ss"
   horaFinTorneo: string; // formato de hora "HH:mm:ss"
+  listasPorJugador: number;
 }
 
 export interface ModificarTorneoDTO {
@@ -162,6 +163,7 @@ export interface ModificarTorneoDTO {
   horaInicioTorneo?: string; // formato de hora "HH:mm:ss"
   horaFinTorneo?: string; // formato de hora "HH:mm:ss"
   inicioInscripciones?: string; // Fecha límite de inscripción
+  listasPorJugador: number;
 }
 
 export interface ModificarBasesTorneoDTO {

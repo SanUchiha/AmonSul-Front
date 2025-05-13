@@ -23,7 +23,7 @@
             @click="confirmarConfiguracion"
             color="primary"
             variant="tonal"
-            >Modificar</v-btn
+            >Subir</v-btn
           >
           <v-btn variant="tonal" color="secondary" @click="closeModal" large
             >Cancelar</v-btn
@@ -68,7 +68,7 @@ import { ModificarBasesTorneoAsync } from "@/services/TorneosService";
 
 const props = defineProps<{
   isVisible: boolean;
-  torneo: Torneo | undefined;
+  torneo: Torneo;
 }>();
 const emit = defineEmits(["close", "confirm"]);
 
@@ -117,10 +117,10 @@ const confirmarConfiguracion = async () => {
           ""
         )
       )
-    : null;
+    : "";
 
   const modificarBaess: ModificarBasesTorneoDTO = {
-    basesTorneo: basesTorneoBase64!,
+    basesTorneo: basesTorneoBase64,
     idTorneo: props.torneo?.idTorneo,
   };
   try {

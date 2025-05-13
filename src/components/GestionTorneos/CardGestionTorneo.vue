@@ -112,14 +112,44 @@ const showModificarBasesTorneoModal = ref<boolean>(false);
 
 const idTorneo = ref<number>(0);
 const isLoading = ref<boolean>(false);
-const torneoMod = ref<Torneo>();
+const torneoMod = ref<Torneo>({
+  idTorneo: 0,
+  idUsuario: 0,
+  nombreTorneo: "",
+  descripcionTorneo: "",
+  fechaInicioTorneo: "",
+  fechaFinTorneo: "",
+  precioTorneo: 0,
+  numeroPartidas: 0,
+  puntosTorneo: 0,
+  estadoTorneo: "ESPERANDO",
+  lugarTorneo: "",
+  tipoTorneo: "Individual",
+  esPrivadoTorneo: false,
+  idRangoTorneo: 0,
+  esMatchedPlayTorneo: false,
+  fechaEntregaListas: "",
+  fechaFinInscripcion: "",
+  basesTorneo: "",
+  cartelTorneo: "",
+  metodosPago: [],
+  horaInicioTorneo: "",
+  horaFinTorneo: "",
+  tieneBases: false,
+  inicioInscripciones: "",
+  listasPorJugador: 0,
+});
 
 const plazasRestantes = computed(() => {
-  if (!props.torneo || props.torneo.inscripciones.length === null) {
+  if (
+    !props.torneo ||
+    props.torneo.inscripciones.length == undefined ||
+    props.torneo.torneo.limiteParticipantes == null
+  ) {
     return "Sin límite";
   }
   return (
-    props.torneo.torneo.limiteParticipantes! - props.torneo.inscripciones.length
+    props.torneo.torneo.limiteParticipantes - props.torneo.inscripciones.length
   );
 });
 
