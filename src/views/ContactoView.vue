@@ -19,6 +19,7 @@
                     v-model="consulta.email"
                     label="Correo Electrónico"
                     required
+                    type="email"
                     :rules="[rules.required, rules.email]"
                   ></v-text-field>
                 </v-col>
@@ -27,6 +28,7 @@
                     v-model="consulta.message"
                     label="Mensaje"
                     required
+                    type="text"
                     :rules="[rules.required]"
                   ></v-textarea>
                 </v-col>
@@ -37,6 +39,8 @@
                     size="large"
                     class="login-form__button"
                     type="submit"
+                    :loading="isSubmitting"
+                    :disabled="isSubmitting"
                   >
                     Enviar consulta
                   </v-btn>
@@ -74,18 +78,16 @@ const consulta = ref<ContactForm>({
   email: "",
   message: "",
 });
-
 const router = useRouter();
-
 const showSuccessModal = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
+const isSubmitting = ref<boolean>(false);
 
 const rules = {
-  required: (value: string) => !!value || "Requerido.",
-  email: (value: string) => {
-    const pattern = /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/; // Ajuste en la expresión regular
-    return pattern.test(value) || "Correo electrónico inválido.";
-  },
+  required: (value: string) => !!value || "Este campo es obligatorio.",
+  email: (value: string) =>
+    /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) ||
+    "Introduce un correo válido.",
 };
 
 const isFormValid = computed(() => {
@@ -97,42 +99,31 @@ const isFormValid = computed(() => {
 
 const submitForm = async () => {
   if (isFormValid.value) {
+    isSubmitting.value = true;
     try {
       await sendEmailContacto(consulta.value);
       showSuccessModal.value = true;
-      consulta.value;
-
-      router.push({ name: "inicio-sesion" });
     } catch (error) {
       showErrorModal.value = true;
+    } finally {
+      isSubmitting.value = false;
     }
   }
 };
 
 watch(showSuccessModal, (newValue) => {
   if (!newValue) {
-    router.push("inicio-sesion");
+    router.push("mis-partidas");
+  }
+});
+
+watch(showSuccessModal, (newValue) => {
+  if (newValue) {
+    setTimeout(() => {
+      showSuccessModal.value = false;
+    }, 4000);
   }
 });
 </script>
 
-<style scoped lang="scss">
-.contact-form {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.contact-form {
-  position: relative;
-
-  @media screen and (max-width: 720px) {
-    height: 100%;
-  }
-
-  &__button {
-    @media screen and (max-width: 720px) {
-      width: calc(100% - 24px);
-    }
-  }
-}
-</style>
+<style scoped></style>
