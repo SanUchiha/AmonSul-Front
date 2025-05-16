@@ -141,6 +141,7 @@
             <template v-slot:item="{ item }">
               <tr v-if="item">
                 <td class="compact-cell text-left">
+                  <!-- Avatar -->
                   <v-avatar size="40" class="hide-on-mobile">
                     <img
                       src="@/assets/icons/teamLeader.png"
@@ -157,11 +158,14 @@
                       height="40"
                     />
                   </v-avatar>
+                  <!-- Nick -->
                   &nbsp;{{ item.nick || "Desconocido" }}
                 </td>
+                <!-- ejercito -->
                 <td class="hide-on-mobile compact-cell">
                   {{ item.ejercito || "No asignado" }}
                 </td>
+                <!-- estado lista -->
                 <td class="compact-cell">
                   <v-chip
                     :color="
@@ -176,23 +180,30 @@
                     {{ item.estadoLista }}
                   </v-chip>
                 </td>
+                <!-- fecha entrega -->
                 <td class="hide-on-mobile compact-cell">
                   {{
                     formatFechaSpaWhitoutAsync(item.fechaEntregaLista) || "N/A"
                   }}
                 </td>
+                <!-- menu acciones -->
                 <td class="compact-cell">
-                  <v-menu offset-y>
+                  <v-menu
+                    v-model="isOpenMenuAcciones[item.idInscripcion]"
+                    offset-y
+                  >
                     <template v-slot:activator="{ props }">
                       <v-btn color="primary" variant="tonal" v-bind="props">
                         <v-icon>mdi-dots-vertical</v-icon>
                       </v-btn>
                     </template>
+                    <!-- lista acciones -->
                     <v-list>
                       <v-list-item
-                        v-if="item.listaData"
+                        v-if="item.idLista"
                         @click.stop="
-                          verLista(item.listaData!, item.nick, item.ejercito)
+                          verLista(item.idLista, item.nick, item.ejercito);
+                          isOpenMenuAcciones[item.idInscripcion] = false;
                         "
                       >
                         <v-list-item-title>
@@ -200,13 +211,14 @@
                         </v-list-item-title>
                       </v-list-item>
                       <v-list-item
-                        v-if="item.listaData"
+                        v-if="item.idLista"
                         @click.stop="
                           cambiarEstadoLista(
                             item.idInscripcion!,
                             item.estadoLista,
                             item.nick
-                          )
+                          );
+                          isOpenMenuAcciones[item.idInscripcion] = false;
                         "
                       >
                         <v-list-item-title>
@@ -222,7 +234,8 @@
                             item.idUsuario,
                             item.nick,
                             item.idLista
-                          )
+                          );
+                          isOpenMenuAcciones[item.idInscripcion] = false;
                         "
                       >
                         <v-list-item-title>
@@ -231,8 +244,12 @@
                           <span v-else>Enviar lista</span>
                         </v-list-item-title>
                       </v-list-item>
+                      <v-divider class="my-2" />
                       <v-list-item
-                        @click.stop="eliminarMiembro(item.idInscripcion)"
+                        @click.stop="
+                          eliminarMiembro(item.idInscripcion);
+                          isOpenMenuAcciones[item.idInscripcion] = false;
+                        "
                       >
                         <v-list-item-title>
                           <v-icon color="red" class="me-2"
@@ -417,6 +434,7 @@ import {
 import ModalVerLista from "@/components/Inscripcion/ModalVerLista.vue";
 import ModalEnviarLista from "@/components/Inscripcion/ModalEnviarLista.vue";
 import {
+  getListaById,
   modificarListaTorneo,
   subirListaTorneo,
 } from "@/services/ListasService";
@@ -428,7 +446,8 @@ import ModalAddMiembroEquipo from "@/components/GestionTorneos/Equipos/ModalAddM
 
 const props = defineProps<{ equipo: EquipoDTO; torneo: Torneo }>();
 
-const isExpanded = ref(false);
+const isOpenMenuAcciones = ref<{ [id: number]: boolean }>({});
+const isExpanded = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
 const showSuccessModalPago = ref<boolean>(false);
 const showSuccessModalEliminarEquipo = ref<boolean>(false);
@@ -444,7 +463,6 @@ const showConfirmModal = ref(false);
 const confirmAction = ref<() => void>();
 const confirmTitle = ref("¿Estás seguro?");
 const confirmText = ref("Esta acción no se puede deshacer.");
-
 const currentInscripcionId = ref<number>();
 const currentIdLista = ref<number>(0);
 const currentUsuarioId = ref<number>();
@@ -453,7 +471,6 @@ const currentNick = ref<string>();
 const currentTorneoId = ref<number>();
 const currentEstadoLista = ref<string>();
 const hasLista = ref<boolean>(false);
-
 const listaJugador = ref<ListaJugador>();
 const jugadoresSinEquipo = ref<UsuarioSinEquipoDTO[]>([]);
 const inscripcionesEquipo = ref<InscripcionTorneoDTO[]>([
@@ -499,9 +516,11 @@ const miembrosPorTipo: Record<string, number> = {
 numeroMiembrosEquipo.value =
   miembrosPorTipo[props.torneo.tipoTorneo ?? "Individual"] || 1;
 
-const verLista = (listaData: string, nombre: string, ejercito: string) => {
+const verLista = async (idLista: number, nombre: string, ejercito: string) => {
+  const responseLista = await getListaById(idLista);
+  console.log(responseLista.data);
   const listaJugadorDTO: ListaJugador = {
-    listaData: listaData,
+    listaData: responseLista.data.listaData,
     nick: nombre,
     nombreEjercito: ejercito,
   };

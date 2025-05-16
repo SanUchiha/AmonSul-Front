@@ -5,25 +5,34 @@
     </v-card-title>
 
     <v-divider class="mt-3"></v-divider>
-    
+
     <v-card-text class="text-body-2">
       <v-row dense>
         <!-- Fecha de entrega de listas -->
         <v-col cols="12" sm="6" class="d-flex align-center">
           <v-icon class="me-2" color="blue">mdi-calendar-clock</v-icon>
-          <span><strong>Fin entrega de listas:</strong> {{ formatDate(torneo.torneo.fechaEntregaListas) }}</span>
+          <span
+            ><strong>Fin entrega de listas:</strong>
+            {{ formatDate(torneo.torneo.fechaEntregaListas) }}</span
+          >
         </v-col>
 
         <!-- Inicio inscripción -->
         <v-col cols="12" sm="6" class="d-flex align-center">
           <v-icon class="me-2" color="green">mdi-calendar-plus</v-icon>
-          <span><strong>Inicio de inscripción:</strong> {{ formatDate(torneo.torneo.inicioInscripciones) }}</span>
+          <span
+            ><strong>Inicio de inscripción:</strong>
+            {{ formatDate(torneo.torneo.inicioInscripciones) }}</span
+          >
         </v-col>
 
         <!-- Fin de inscripción -->
         <v-col cols="12" sm="6" class="d-flex align-center">
           <v-icon class="me-2" color="red">mdi-calendar-remove</v-icon>
-          <span><strong>Fin de inscripción:</strong> {{ formatDate(torneo.torneo.fechaFinInscripcion) }}</span>
+          <span
+            ><strong>Fin de inscripción:</strong>
+            {{ formatDate(torneo.torneo.fechaFinInscripcion) }}</span
+          >
         </v-col>
 
         <!-- Equipos inscritos -->
@@ -41,31 +50,55 @@
         <!-- Pagos realizados -->
         <v-col cols="12" sm="6" class="d-flex align-center">
           <v-icon class="me-2" color="green">mdi-cash-multiple</v-icon>
-          <span><strong>Pagos:</strong> {{ pagosRealizados }}/{{ totalEquipos }}</span>
+          <span
+            ><strong>Pagos:</strong> {{ pagosRealizados }}/{{
+              totalEquipos
+            }}</span
+          >
         </v-col>
 
         <!-- Listas entregadas -->
         <v-col cols="12" sm="6" class="d-flex align-center">
           <v-icon class="me-2" color="blue">mdi-file-document</v-icon>
-          <span><strong>Listas entregadas:</strong> {{ listasEntregadas }}/{{ totalJugadores }}</span>
+          <span
+            ><strong>Listas entregadas:</strong> {{ listasEntregadas }}/{{
+              totalJugadores
+            }}</span
+          >
         </v-col>
 
         <!-- Listas legales -->
         <v-col cols="12" sm="6" class="d-flex align-center">
           <v-icon class="me-2" color="purple">mdi-file-check</v-icon>
-          <span><strong>Listas legales:</strong> {{ listasLegales }}/{{ totalJugadores }}</span>
+          <span
+            ><strong>Listas legales:</strong> {{ listasLegales }}/{{
+              totalJugadores
+            }}</span
+          >
         </v-col>
       </v-row>
     </v-card-text>
     <v-divider class="my-2" />
 
-    <v-card-actions >
+    <v-card-actions>
       <v-row>
         <v-col>
-          <v-btn variant="tonal" color="secondary" @click="modificarTorneo" block>Modificar torneo</v-btn>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            @click="modificarTorneo"
+            block
+            >Modificar torneo</v-btn
+          >
         </v-col>
         <v-col>
-          <v-btn variant="tonal" color="secondary" @click="modificarBasesTorneo" block>Modificar bases</v-btn>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            @click="modificarBasesTorneo"
+            block
+            >Modificar bases</v-btn
+          >
         </v-col>
       </v-row>
     </v-card-actions>
@@ -114,7 +147,33 @@ const showModificarBasesTorneoModal = ref<boolean>(false);
 
 const idTorneo = ref<number>(0);
 const isLoading = ref<boolean>(false);
-const torneoMod = ref<Torneo>();
+const torneoMod = ref<Torneo>({
+  idTorneo: 0,
+  idUsuario: 0,
+  nombreTorneo: "",
+  descripcionTorneo: "",
+  fechaInicioTorneo: "",
+  fechaFinTorneo: "",
+  precioTorneo: 0,
+  numeroPartidas: 0,
+  puntosTorneo: 0,
+  estadoTorneo: "ESPERANDO",
+  lugarTorneo: "",
+  tipoTorneo: "Individual",
+  esPrivadoTorneo: false,
+  idRangoTorneo: 0,
+  esMatchedPlayTorneo: false,
+  fechaEntregaListas: "",
+  fechaFinInscripcion: "",
+  basesTorneo: "",
+  cartelTorneo: "",
+  metodosPago: [],
+  horaInicioTorneo: "",
+  horaFinTorneo: "",
+  tieneBases: false,
+  inicioInscripciones: "",
+  listasPorJugador: 0,
+});
 
 const plazasRestantes = computed(() => {
   if (!props.torneo || props.torneo.torneo.limiteParticipantes === null) {

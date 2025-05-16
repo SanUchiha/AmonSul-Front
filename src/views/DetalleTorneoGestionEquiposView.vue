@@ -822,7 +822,7 @@ const currentEjercito = ref<string>();
 const listaDTO = ref<ListaDTO>();
 
 //Variables para el buscador
-const busquedaEquipo = ref("");
+const busquedaEquipo = ref<string>("");
 const equiposFiltrados = computed(() => {
   if (!torneoGestion.value) return [];
   return torneoGestion.value.equipos.filter((equipo) =>
@@ -856,9 +856,9 @@ onMounted(async () => {
     const responsePartidas = await getPartidasTorneo(idTorneo.value);
     partidas.value = responsePartidas.data;
 
-    if (torneo.value) {
+    if (torneoGestion.value) {
       numeroRondas.value = Array.from(
-        { length: torneo.value.numeroPartidas },
+        { length: torneoGestion.value.torneo.numeroPartidas },
         (_, index) => index + 1
       );
     }
@@ -951,6 +951,7 @@ const resultados = async (ronda: number) => {
       opcionImpares: null,
       idTorneo: idTorneo,
       idRonda: ronda,
+      isTorneoNarsil: false,
     };
 
     const guardarResultadosDTO: GuardarResultadosDTO = {
@@ -1384,23 +1385,6 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
       isLoadingImage.value = false;
     }
   }
-};
-
-const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalPuntosVisible.value = true;
-};
-
-const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalLiderVisible.value = true;
-};
-
-const abrirModalEscenario = (idPartida: number) => {
-  idPartidaSeleccionada.value = idPartida;
-  isModalEscenarioVisible.value = true;
 };
 
 const abrirModalValidar = (idPartida: number, usuario: 1 | 2) => {

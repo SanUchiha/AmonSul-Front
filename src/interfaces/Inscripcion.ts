@@ -100,7 +100,6 @@ export interface TorneoCreadoDTO {
   nombreTorneo: string;
   limiteParticipantes?: number | null;
   numeroPartidas: number;
-  estadoTorneo: string;
   fechaEntregaListas?: string | null;
   fechaFinInscripcion?: string | null;
   inicioInscripciones?: string | null;

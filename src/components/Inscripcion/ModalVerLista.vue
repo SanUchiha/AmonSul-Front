@@ -1,7 +1,12 @@
 <template>
   <v-dialog v-model="visible" max-width="500">
     <v-card>
-      <v-card-title class="headline">Lista de {{ nick }}</v-card-title>
+      <v-card-title class="headline d-flex justify-space-between align-center">
+        <span>Lista de {{ nick }}</span>
+        <v-btn icon @click="close" size="small">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
       <v-card-text>
         <div v-if="isLoading" class="loading-container">
           <v-progress-circular indeterminate color="primary" />
@@ -16,7 +21,11 @@
               </v-list-item>
             </v-list>
 
-            <img :src="imageBase64" alt="Lista cargada" class="uploaded-image" />
+            <img
+              :src="imageBase64"
+              alt="Lista cargada"
+              class="uploaded-image"
+            />
           </div>
           <div v-else>No se encontró una lista.</div>
         </div>
