@@ -315,7 +315,6 @@ const verLista = async (idLista: number, nick: string) => {
   if (idLista) {
     try {
       const listaResponse = await getListaById(idLista);
-      console.log(listaResponse.data);
       listaDTO.value = listaResponse.data;
       if (listaDTO.value != undefined)
         listaData.value = listaDTO.value.listaData ?? "";

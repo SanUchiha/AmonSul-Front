@@ -518,7 +518,6 @@ numeroMiembrosEquipo.value =
 
 const verLista = async (idLista: number, nombre: string, ejercito: string) => {
   const responseLista = await getListaById(idLista);
-  console.log(responseLista.data);
   const listaJugadorDTO: ListaJugador = {
     listaData: responseLista.data.listaData,
     nick: nombre,
@@ -667,14 +666,14 @@ const confirmarActualizarPago = async () => {
       showSuccessModalPago.value = true;
       esPago.value = "SI";
     } else {
-      console.log("error:", response);
+      console.error("error:", response);
       showErrorModal.value = true;
     }
 
     showSuccessModalPago.value = true;
     isLoading.value = false;
   } catch (error) {
-    console.log("error:", error);
+    console.error("error:", error);
     showErrorModal.value = true;
     isLoading.value = false;
   } finally {

@@ -476,16 +476,8 @@ const expanded = ref<string[]>([]); // Guardará los equipos expandidos
 
 const toggleExpand = (nombreEquipo: string) => {
   if (expanded.value.includes(nombreEquipo)) {
-    console.log(
-      "expanded.value.includes(nombreEquipo)",
-      expanded.value.includes(nombreEquipo)
-    );
     expanded.value = expanded.value.filter((item) => item !== nombreEquipo);
   } else {
-    console.log(
-      "expanded.value.push(nombreEquipo)",
-      expanded.value.push(nombreEquipo)
-    );
     expanded.value.push(nombreEquipo);
   }
 };
@@ -512,7 +504,6 @@ const isCapitan = computed(() => {
       equipo.idCapitan ===
       (idUsuario.value ? parseInt(idUsuario.value) : undefined)
   );
-  console.log("equipoCapitan", equipoCapitan);
   return equipoCapitan !== undefined;
 });
 
@@ -550,8 +541,6 @@ const getAddress = async (lat: number, lon: number) => {
     const data = await response.json();
 
     if (data.address) {
-      console.log(" data.address", data);
-
       const { road, house_number, city, town, village, state, postcode } =
         data.address;
 

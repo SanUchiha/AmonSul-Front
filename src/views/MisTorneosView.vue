@@ -19,18 +19,23 @@
           <v-row dense> </v-row>
           <v-row dense>
             <v-col cols="12" sm="6" class="text-center">
+              <SparklineElo :idUsuario="idUsuarioLogger" />
+            </v-col>
+            <v-col cols="12" sm="6" class="text-center">
               <!-- Resumen partidas -->
               <v-card class="section-card stats-section pt-0 mt-0 mb-2">
-                <v-col cols="12"><p class="text-h5 ringbearer">Estadísticas</p></v-col>
+                <v-col cols="12"
+                  ><p class="text-h5 ringbearer">Estadísticas</p></v-col
+                >
                 <v-divider></v-divider>
                 <v-col cols="12" md="12" class="text-center">
                   <!--<CardResumenPartidas :usuario="usuarioData" />-->
-                  <CardEstadisticas :usuario="usuarioData" @filtroCambiar="filtrarPartidas"/>
+                  <CardEstadisticas
+                    :usuario="usuarioData"
+                    @filtroCambiar="filtrarPartidas"
+                  />
                 </v-col>
               </v-card>
-            </v-col>
-            <v-col cols="12" sm="6" class="text-center">
-              <SparklineElo :idUsuario="idUsuarioLogger" />
             </v-col>
           </v-row>
         </v-col>
@@ -122,7 +127,7 @@ const usuarioData = ref<UsuarioDataDTO>({
 });
 
 //Variables para filtrar partidas segun el click en la barra de estadisticas
-const filtroActivo = ref<'win' | 'loss' | 'draw' | null>(null);
+const filtroActivo = ref<"win" | "loss" | "draw" | null>(null);
 
 const partidasFiltradas = computed(() => {
   if (!filtroActivo.value) return matches.value;
@@ -135,9 +140,9 @@ const partidasFiltradas = computed(() => {
       partida.ganadorPartidaTorneo !== idUsuarioLogger.value;
 
     return (
-      (filtroActivo.value === 'win' && esVictoria) ||
-      (filtroActivo.value === 'draw' && esEmpate) ||
-      (filtroActivo.value === 'loss' && esDerrota)
+      (filtroActivo.value === "win" && esVictoria) ||
+      (filtroActivo.value === "draw" && esEmpate) ||
+      (filtroActivo.value === "loss" && esDerrota)
     );
   });
 });
@@ -149,7 +154,6 @@ const initializeComponent = async () => {
     try {
       const response = await getTournamentMatches(idUsuarioLogger.value);
       matches.value = response.data;
-      console.log("matches",matches.value)
 
       loadComunidad(idUsuarioLogger.value);
       usuarioData.value.email = emailOwner.value;
@@ -202,20 +206,22 @@ const loadComunidad = async (idUser: number) => {
 };
 
 const loadRankingElo = async (idUser: number) => {
-  try {
-    const response = await getUsuarioData(idUser);
-    //TODO Arreglo getRankingEloByIdUser
-    //const response = await getRankingEloByIdUser(idUser);
-    usuarioData.value.rankingElo = response.data.clasificacionElo;
-  } catch (error) {
-    console.error("Error al obtener el ranking del jugador: ", error);
-  }
+  // TODO MOSTRAR RANKING INDIVIDUAL ELO
+  // try {
+  //   console.log(idUser);
+  //   const response = await getUsuarioData(idUser);
+  //   //TODO Arreglo getRankingEloByIdUser
+  //   //const response = await getRankingEloByIdUser(idUser);
+  //   console.log(response.data);
+  //   usuarioData.value.rankingElo = response.data.clasificacionElo;
+  // } catch (error) {
+  //   console.error("Error al obtener el ranking del jugador: ", error);
+  // }
 };
 
-function filtrarPartidas(tipo: 'win' | 'loss' | 'draw' | null) {
+function filtrarPartidas(tipo: "win" | "loss" | "draw" | null) {
   filtroActivo.value = tipo;
 }
-
 </script>
 
 <style scoped>

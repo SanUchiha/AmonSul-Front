@@ -2,7 +2,7 @@
   <div v-if="isLoading" class="center">
     <ProgressCircular />
   </div>
-  <div v-else-if="value.length > 1" >
+  <div v-else-if="value.length > 1">
     <v-card class="mb-2 mt-0 px-4 text-center">
       <v-card-text>
         <v-sheet>
@@ -71,12 +71,10 @@ const peorResultado = ref<number>();
 const resultadoActual = ref<number>();
 
 onMounted(async () => {
-  console.log(props.idUsuario);
   if (props.idUsuario != undefined) {
     try {
       isLoading.value = true;
       const response = await getEloUsuario(props.idUsuario);
-      console.log(response);
       if (response.status != 200) return;
       const elos = response.data.elos.map(
         (elo: { puntuacionElo: unknown }) => elo.puntuacionElo

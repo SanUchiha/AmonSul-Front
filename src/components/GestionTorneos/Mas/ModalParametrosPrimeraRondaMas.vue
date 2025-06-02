@@ -274,9 +274,6 @@ onMounted(async () => {
       const totalRondas = torneoSelected.value.torneo.numeroPartidas;
       rondas.value = Array.from({ length: totalRondas }, (_, i) => i + 1);
     }
-
-    console.log("jugadores", jugadoresNick.value);
-    console.log("inscripciones", inscripciones.value);
   } catch (error) {
     console.error("Error al obtener la información del torneo:", error);
   }

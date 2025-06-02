@@ -145,15 +145,16 @@
       <v-btn icon to="contacto">
         <v-icon>mdi-email</v-icon>
       </v-btn>
-      <v-btn icon @click="() => router.push({ name: 'perfil-usuario' })" v-if="isAuthenticated">
+      <v-btn
+        icon
+        @click="() => router.push({ name: 'perfil-usuario' })"
+        v-if="isAuthenticated"
+      >
         <v-avatar size="30" class="avatar">
           <v-img :src="user.imagen || defaultAvatar" alt="Avatar"></v-img>
         </v-avatar>
       </v-btn>
-      <v-btn v-if="isAuthenticated"
-        icon
-        @click="mostrarDialogoLogout = true"
-      >
+      <v-btn v-if="isAuthenticated" icon @click="mostrarDialogoLogout = true">
         <v-icon>mdi-logout</v-icon>
       </v-btn>
     </v-app-bar>
@@ -173,10 +174,9 @@
       @cancelar="mostrarDialogoLogout = false"
     />
 
-
     <!-- Modal de registrar partida -->
-    <v-dialog v-model="dialog" >
-      <FormCrearPartida @close="dialog = false;" :isVisible="dialog"/>
+    <v-dialog v-model="dialog">
+      <FormCrearPartida @close="dialog = false" :isVisible="dialog" />
     </v-dialog>
 
     <FooterComponent absolute="true" />
@@ -190,8 +190,8 @@ import { useRouter } from "vue-router";
 import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
 import LogoAmonSulPNG from "@/assets/icons/Logo2.png";
 import LogoAmonSulSVG from "@/assets/icons/logo_horizontal3.png";
-import FooterComponent from '@/components/Commons/FooterComponent.vue';
-import FormCrearPartida from '@/components/PartidaAmistosa/FormCrearPartida.vue';
+import FooterComponent from "@/components/Commons/FooterComponent.vue";
+import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import defaultAvatar from "@/assets/icons/perfil.png";
@@ -205,9 +205,9 @@ const drawer = ref(false);
 const mostrarDialogoLogout = ref(false);
 const { isAuthenticated } = useAuth();
 
-const dialog = ref(false)
+const dialog = ref(false);
 
-const isLoggedIn = computed(() => !!getUser.value)
+const isLoggedIn = computed(() => !!getUser.value);
 
 const handleLogout = async () => {
   usuariosStore.usuario = {} as UsuarioViewDTO; // Limpia los datos del usuario anterior
@@ -218,10 +218,9 @@ const handleLogout = async () => {
 // Función para cargar los datos del usuario
 const cargarUsuario = async () => {
   try {
-    console.log("getUser:", getUser.value);
-      await usuariosStore.requestUsuario(getUser.value!);
-    
-      user.value = usuariosStore.usuario; // ✅ Asegura que user tiene datos antes de renderizar
+    await usuariosStore.requestUsuario(getUser.value);
+
+    user.value = usuariosStore.usuario;
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   }
@@ -239,7 +238,6 @@ watch(
   { immediate: true }
 );
 
-// Ejecutar cuando el componente se monta
 onMounted(() => {
   if (isLoggedIn.value) {
     cargarUsuario();

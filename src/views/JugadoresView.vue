@@ -38,7 +38,6 @@ onMounted(async () => {
   // users.value = data.data;
   if (!users.value.length) {
     await usuariosStore.requestUsuarios();
-    console.log("users", users);
   }
 });
 </script>

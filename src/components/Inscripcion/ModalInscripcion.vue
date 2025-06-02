@@ -410,10 +410,12 @@ const currentIdLista = ref<number>();
 const showVerListaModal = ref<boolean>(false);
 const showModificarListaModal = ref<boolean>(false);
 const showEnviarListaModal = ref<boolean>(false);
-
 const hasLista = ref<boolean>(false);
 const listaText = ref<string>("");
-const ejercito = ref<ArmyDTO>();
+const ejercito = ref<ArmyDTO>({
+  name: "",
+  band: "",
+});
 const showSuccessModalLista = ref<boolean>(false);
 const showErrorModalLista = ref<boolean>(false);
 const idLista = ref<number | null>();
@@ -478,10 +480,9 @@ const toggleLista = async () => {
   };
   try {
     const response = await getlistaTorneo(requestLista);
-    listaBase64.value = response.data;
-
-    if (response.data != null && inscripcionData.value)
-      inscripcionData.value.listaData = response.data;
+    listaBase64.value = response.data.listaData;
+    ejercito.value.name = response.data.ejercito;
+    ejercito.value.band = response.data.bando;
   } catch (error) {
     console.error("Error al recuperar la lista.");
   } finally {
@@ -589,7 +590,6 @@ const close = () => {
 onMounted(async () => {
   try {
     isLoading.value = true;
-    console.log(props.idInscripcion);
 
     const response = await getIncripcionById(props.idInscripcion);
     inscripcionData.value = response.data;

@@ -16,7 +16,10 @@
         <v-divider></v-divider>
         <v-col cols="12" md="12" class="text-center">
           <!--<CardResumenPartidas :usuario="usuarioData" />-->
-          <CardEstadisticas :usuario="usuarioData" @filtroCambiar="filtrarPartidas"/>
+          <CardEstadisticas
+            :usuario="usuarioData"
+            @filtroCambiar="filtrarPartidas"
+          />
         </v-col>
       </v-card>
       <!-- Boton partidas -->
@@ -113,7 +116,12 @@
     >
       <!-- Botón 1: Modal registrar partida -->
       <v-btn icon @click="openRegistroPartida" class="animated-btn">
-        <img src="@/assets/icons/nuevaPartida.png" alt="Icono personalizado" width="50" height="50">
+        <img
+          src="@/assets/icons/nuevaPartida.png"
+          alt="Icono personalizado"
+          width="50"
+          height="50"
+        />
         Nueva Partida
       </v-btn>
 
@@ -127,7 +135,7 @@
         <img src="@/assets/icons/misPartidas.png" alt="Icono personalizado" width="50" height="50">
         Mis Partidas
       </v-btn>-->
-      
+
       <!-- Botón 3: Ruta (cuando definas) 
       <v-btn
         icon
@@ -187,8 +195,8 @@ const faccionDTO = ref<FaccionDTO>({
   nombreFaccion: "",
 });
 const openRegistroPartida = () => {
-  dialog.value = true
-}
+  dialog.value = true;
+};
 const usuarioData = ref<UsuarioDataDTO>({
   idUsuario: 0,
   nick: "",
@@ -215,20 +223,23 @@ const isHovering = ref<boolean>(false);
 const showModalProteccionDatos = ref<boolean>(false);
 
 //Variables para filtrar partidas segun el click en la barra de estadisticas
-const filtroActivo = ref<'win' | 'loss' | 'draw' | null>(null);
+const filtroActivo = ref<"win" | "loss" | "draw" | null>(null);
 
 const partidasFiltradas = computed(() => {
   if (!filtroActivo.value) return matches.value;
 
   return matches.value.filter((partida) => {
     const esVictoria = partida.ganadorPartida === idUsuarioLogger.value;
-    const esEmpate = partida.ganadorPartida === null || partida.ganadorPartida === 0;
-    const esDerrota = partida.ganadorPartida && partida.ganadorPartida !== idUsuarioLogger.value;
+    const esEmpate =
+      partida.ganadorPartida === null || partida.ganadorPartida === 0;
+    const esDerrota =
+      partida.ganadorPartida &&
+      partida.ganadorPartida !== idUsuarioLogger.value;
 
     return (
-      (filtroActivo.value === 'win' && esVictoria) ||
-      (filtroActivo.value === 'draw' && esEmpate) ||
-      (filtroActivo.value === 'loss' && esDerrota)
+      (filtroActivo.value === "win" && esVictoria) ||
+      (filtroActivo.value === "draw" && esEmpate) ||
+      (filtroActivo.value === "loss" && esDerrota)
     );
   });
 });
@@ -264,8 +275,6 @@ const initializeComponent = async () => {
       const response = await getProteccionDatos(idUsuarioLogger.value);
 
       if (!response.data) showModalProteccionDatos.value = true;
-
-      console.log("aceptado: ", showModalProteccionDatos.value);
     }
   }
 };
@@ -294,7 +303,6 @@ const loadResume = async (matches: ViewPartidaAmistosaDTO[]) => {
     }
   });
 
-
   usuarioData.value.partidasGanadas = contadorGanadas;
   usuarioData.value.partidasEmpatadas = contadorEmpatadas;
   usuarioData.value.partidasPerdidas = contadorPerdidas;
@@ -312,7 +320,6 @@ const loadComunidad = async (idUser: number) => {
 };
 
 const refrescarPartidas = async () => {
-  console.log("Refresco partida...");
   pendingMatches.value = [];
   if (idUsuarioLogger.value) {
     // Aquí llamas a la API para obtener las partidas actualizadas
@@ -335,10 +342,9 @@ const refrescarPartidas = async () => {
       isLoadingPending.value = false;
     }
   }
-  console.log("Termino el refresco de partidas", pendingMatches);
 };
 
-function filtrarPartidas(tipo: 'win' | 'loss' | 'draw' | null) {
+function filtrarPartidas(tipo: "win" | "loss" | "draw" | null) {
   filtroActivo.value = tipo;
 }
 </script>

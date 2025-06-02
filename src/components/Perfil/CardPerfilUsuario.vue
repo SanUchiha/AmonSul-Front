@@ -247,8 +247,6 @@ const closeModalCambiarPass = () => {
 };
 
 const logFaccionSelection = (value: FaccionDTO) => {
-  console.log("value (ID):", value.idFaccion);
-
   // Buscar la facción seleccionada en el array de facciones
   const foundFaccion = faccionesCombo.value.find(
     (f) => f.idFaccion === value.idFaccion
@@ -258,8 +256,6 @@ const logFaccionSelection = (value: FaccionDTO) => {
     editableFaccionName.value = foundFaccion.nombreFaccion; // ✅ Solo guarda el nombre
     faccionSelected.value = foundFaccion.idFaccion; // ✅ Guarda el ID
   }
-
-  console.log("Facción seleccionada (ID):", faccionSelected.value);
 };
 
 const saveChanges = async () => {
@@ -279,8 +275,6 @@ const saveChanges = async () => {
     imagen: editableUser.imagen, // Se envía la imagen en base64
     nick: editableUser.nick,
   };
-
-  console.log("editusu:", editusu);
 
   try {
     await editarUsuario(editusu);

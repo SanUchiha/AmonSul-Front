@@ -100,8 +100,6 @@ const getAddress = async (lat: number, lon: number) => {
     const data = await response.json();
 
     if (data.address) {
-      console.log(" data.address", data);
-
       const { road, house_number, city, town, village, state, postcode } =
         data.address;
 

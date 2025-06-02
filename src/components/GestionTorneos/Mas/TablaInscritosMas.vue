@@ -612,7 +612,6 @@ const refreshTorneo = async () => {
     console.error(error);
   } finally {
     isLoading.value = false;
-    console.log(localTorneo.value);
   }
 };
 
