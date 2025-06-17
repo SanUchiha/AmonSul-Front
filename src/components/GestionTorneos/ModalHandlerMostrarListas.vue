@@ -1,20 +1,16 @@
 <template>
   <v-dialog v-model="internalIsVisible" max-width="600px">
     <v-card>
-      <v-card-title>Modificar bases</v-card-title>
+      <v-card-title>
+        {{ torneo?.mostrarListas ? "Ocultar listas" : "Mostrar listas" }}
+      </v-card-title>
 
       <v-divider></v-divider>
 
-      <v-card-text>
-        <v-form ref="form" v-model="isValid" lazy-validation>
-          <v-file-input
-            clearable
-            label="Bases del torneo"
-            required
-            accept="application/pdf"
-            @change="onFileChange"
-          ></v-file-input>
-        </v-form>
+      <v-card-text class="text-center my-4">
+        ¿Estás seguro de que quieres
+        {{ torneo?.mostrarListas ? "ocultar" : "mostrar" }} las listas de los
+        jugadores?
       </v-card-text>
       <v-card-actions>
         <v-row justify="center" class="my-4 ga-5">
@@ -23,7 +19,8 @@
             @click="confirmarConfiguracion"
             color="primary"
             variant="tonal"
-            >Subir</v-btn
+          >
+            {{ torneo?.mostrarListas ? "Ocultar" : "Mostrar" }}</v-btn
           >
           <v-btn variant="tonal" color="secondary" @click="closeModal" large
             >Cancelar</v-btn
@@ -47,14 +44,14 @@
   <!-- Modal response eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Bases subidas correctamente."
+    :message="successMessage"
     @update:isVisible="showSuccessModal = $event"
   />
 
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se han podido subir las bases. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    :message="errorMessage"
     @update:isVisible="showErrorModal = $event"
   />
 </template>
@@ -63,8 +60,8 @@
 import { ref, defineProps, defineEmits, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
-import { ModificarBasesTorneoDTO, Torneo } from "@/interfaces/Torneo";
-import { ModificarBasesTorneoAsync } from "@/services/TorneosService";
+import { HandlerMostarListasDTO, Torneo } from "@/interfaces/Torneo";
+import { HandlerMostarListasAsync } from "@/services/TorneosService";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -73,7 +70,6 @@ const props = defineProps<{
 const emit = defineEmits(["close", "confirm"]);
 
 const internalIsVisible = ref(props.isVisible);
-const isValid = ref(true);
 
 watch(
   () => props.isVisible,
@@ -82,92 +78,46 @@ watch(
   }
 );
 
-const byteArrayBases = ref<Uint8Array | null>(null);
 const isGenerating = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
+
+const successMessage = ref<string>("");
+const errorMessage = ref<string>("");
 
 const closeModal = () => {
   internalIsVisible.value = false;
   emit("close");
 };
 
-const onFileChange = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0];
-
-  if (file) {
-    const reader = new FileReader();
-
-    reader.onload = async (event) => {
-      if (event.target?.result) {
-        const arrayBuffer = event.target.result as ArrayBuffer;
-        byteArrayBases.value = new Uint8Array(arrayBuffer);
-      }
-    };
-
-    reader.readAsArrayBuffer(file);
-  }
-};
-
 const confirmarConfiguracion = async () => {
-  const basesTorneoBase64 = byteArrayBases.value
-    ? btoa(
-        new Uint8Array(byteArrayBases.value).reduce(
-          (data, byte) => data + String.fromCharCode(byte),
-          ""
-        )
-      )
-    : "";
-
-  const modificarBaess: ModificarBasesTorneoDTO = {
-    basesTorneo: basesTorneoBase64,
+  const mostrar = !props.torneo?.mostrarListas;
+  const request: HandlerMostarListasDTO = {
+    mostrarListas: mostrar,
     idTorneo: props.torneo?.idTorneo,
   };
   try {
     isGenerating.value = true;
-    await ModificarBasesTorneoAsync(modificarBaess);
+    await HandlerMostarListasAsync(request);
+    successMessage.value = mostrar
+      ? "Las listas son visibles."
+      : "Las listas se han ocultado.";
     showSuccessModal.value = true;
+    emit("confirm", mostrar);
   } catch (error) {
+    errorMessage.value = mostrar
+      ? "Hubo un error al intentar mostrar las listas."
+      : "Hubo un error al intentar ocultar las listas.";
     showErrorModal.value = true;
     console.error(error);
   } finally {
     isGenerating.value = false;
   }
 
-  emit("confirm");
   closeModal();
 };
 </script>
 <style scoped>
-.remove-btn {
-  background-color: transparent;
-  color: red;
-  margin-left: 16px; /* Espacio entre el texto y el botón */
-  padding: 0;
-  min-width: auto;
-  display: flex;
-  align-items: center;
-}
-
-.remove-btn .v-icon {
-  font-size: 18px; /* Tamaño del ícono */
-}
-
-.emparejamientos-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.emparejamiento-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.emparejamiento-text {
-  flex-grow: 1;
-}
-
 .progress-card {
   width: 200px;
   height: 200px;

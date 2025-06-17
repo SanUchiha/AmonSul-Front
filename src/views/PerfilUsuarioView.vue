@@ -61,12 +61,7 @@ import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import CardPerfilUsuario from "@/components/Perfil/CardPerfilUsuario.vue";
-import CardRangoUsuario from "@/components/Perfil/CardRangoUsuario.vue";
-import LogrosUsuario from "@/components/Perfil/LogrosUsuario.vue";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
-import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
-import { UsuarioDataDTO } from "@/interfaces/Usuario";
-import { FaccionDTO } from "@/interfaces/Faccion";
 
 const usuariosStore = useUsuariosStore();
 
@@ -76,33 +71,6 @@ const correo = ref<string>(getUser.value);
 const selectedFaccionName = ref<number>(0);
 const user = ref<UsuarioViewDTO>();
 
-const faccionDTO = ref<FaccionDTO>({
-  idFaccion: 0,
-  nombreFaccion: "",
-});
-  const usuarioData = ref<UsuarioDataDTO>({
-  idUsuario: 0,
-  nick: "",
-  email: "",
-  faccion: faccionDTO.value,
-  partidasValidadas: [],
-  partidasPendientes: [],
-  elos: [],
-  InscripcionesIndividualTorneo: [],
-  InscripcionesEquipoTorneo: [],
-  clasificacionElo: 0,
-  puntuacionElo: 0,
-  numeroPartidasJugadas: 0,
-  partidasGanadas: 0,
-  partidasEmpatadas: 0,
-  partidasPerdidas: 0,
-  proteccionDatos: null,
-  PartidasTorneo: [],
-  ClasificacionTorneos: [],
-  rankingElo: 0,
-});
-
-// Definimos props opcionales con TypeScript
 const props = withDefaults(
   defineProps<{
     editable?: boolean;

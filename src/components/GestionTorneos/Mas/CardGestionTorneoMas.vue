@@ -51,6 +51,16 @@
                 Modificar bases
               </v-btn>
             </div>
+
+            <div class="text-wrap text-sm">
+              <v-btn
+                variant="tonal"
+                color="secondary"
+                @click="handlerMostrarListas"
+                block
+                >{{ mostrarListas ? "Ocultar" : "Mostrar" }} Listas</v-btn
+              >
+            </div>
           </div>
         </v-list-item-title>
       </v-list-item-content>
@@ -61,21 +71,31 @@
   <ModalModificarTorneo
     :isVisible="showModificarTorneoModal"
     :torneo="torneoMod"
-    @close="cerrarModalModificarTorneo()"
+    @close="cerrarModal()"
   />
 
   <!-- modal para modificar el torneo -->
   <ModalModificarBasesTorneo
     :isVisible="showModificarBasesTorneoModal"
     :torneo="torneoMod"
-    @close="cerrarModalModificarBasesTorneo()"
+    @close="cerrarModal()"
   />
+
+  <!-- modal para manejar mostrar listas del torneo -->
+  <ModalHandlerMostrarListas
+    :isVisible="showModalHandlerMostrarListas"
+    :torneo="torneoMod"
+    @close="cerrarModal()"
+    @confirm="onCambioMostrarListas"
+  />
+
   <!-- modal torneo modificado con exito -->
   <ModalSuccess
     :isVisible="showSuccessModal"
     message="Torneo modificado con exito."
     @update:isVisible="showSuccessModal = $event"
   />
+
   <!-- modal Error al modificar el torneo -->
   <ModalError
     :isVisible="showErrorModal"
@@ -92,6 +112,7 @@ import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalModificarBasesTorneo from "../ModalModificarBasesTorneo.vue";
 import ModalModificarTorneo from "../ModalModificarTorneo.vue";
+import ModalHandlerMostrarListas from "../ModalHandlerMostrarListas.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoMasDTO }>();
 const showErrorModal = ref<boolean>(false);
@@ -101,8 +122,10 @@ const showModificarBasesTorneoModal = ref<boolean>(false);
 
 const idTorneo = ref<number>(0);
 const torneoMod = ref<Torneo>(); // Define adecuadamente el tipo de `torneoMod`
+const showModalHandlerMostrarListas = ref<boolean>(false);
+const mostrarListas = ref(props.torneo?.torneo.mostrarListas);
+const isLoading = ref<boolean>(false);
 
-// Calculando plazas restantes
 const plazasRestantes = computed(() => {
   if (!props.torneo || props.torneo.inscripciones.length === null) {
     return "Sin límite";
@@ -113,14 +136,12 @@ const plazasRestantes = computed(() => {
   );
 });
 
-// array con todas las listas
 const todasLasListas = computed(() => {
   if (!props.torneo || !props.torneo.inscripciones) return [];
 
   return props.torneo.inscripciones.flatMap((inscripcion) => inscripcion.lista);
 });
 
-// Listas por jugador
 const listasTotales = computed(() => {
   if (!props.torneo) return 0;
   return (
@@ -128,24 +149,20 @@ const listasTotales = computed(() => {
   );
 });
 
-// Listas de luz
 const listasLuz = computed(() => {
   if (!props.torneo) return 0;
   return todasLasListas.value.filter((l) => l.bando === "good").length;
 });
 
-// Listas de oscuridad
 const listasOscuridad = computed(() => {
   if (!props.torneo) return 0;
   return todasLasListas.value.filter((l) => l.bando === "evil").length;
 });
 
-// Total de inscripciones
 const totalInscripciones = computed(() => {
   return props.torneo ? props.torneo.inscripciones.length : 0;
 });
 
-// Pagos realizados
 const pagosRealizados = computed(() => {
   if (!props.torneo) return 0;
   return props.torneo.inscripciones.filter(
@@ -153,13 +170,11 @@ const pagosRealizados = computed(() => {
   ).length;
 });
 
-// Listas legales
 const listasLegales = computed(() => {
   if (!props.torneo) return 0;
   return todasLasListas.value.filter((l) => l.estadoLista == "OK").length;
 });
 
-// Listas entregadas
 const listasEntregadas = computed(() => {
   if (!props.torneo) return 0;
   return todasLasListas.value.filter(
@@ -170,13 +185,11 @@ const listasEntregadas = computed(() => {
   ).length;
 });
 
-// Función para formatear fechas
 const formatDate = (date: string | null | undefined) => {
   if (!date) return "N/A";
   return new Date(date).toLocaleDateString();
 };
 
-// Modificar torneo
 const modificarTorneo = async () => {
   if (props.torneo?.torneo.idTorneo != undefined) {
     idTorneo.value = props.torneo?.torneo.idTorneo;
@@ -192,7 +205,6 @@ const modificarTorneo = async () => {
   }
 };
 
-// Modificar bases del torneo
 const modificarBasesTorneo = async () => {
   if (props.torneo?.torneo.idTorneo != undefined) {
     idTorneo.value = props.torneo?.torneo.idTorneo;
@@ -208,14 +220,36 @@ const modificarBasesTorneo = async () => {
   }
 };
 
-// Cerrar modal modificar torneo
-const cerrarModalModificarTorneo = () => {
+const cerrarModal = () => {
+  showModificarBasesTorneoModal.value = false;
+  showModalHandlerMostrarListas.value = false;
   showModificarTorneoModal.value = false;
 };
 
-// Cerrar modal modificar bases
-const cerrarModalModificarBasesTorneo = () => {
-  showModificarBasesTorneoModal.value = false;
+const handlerMostrarListas = async () => {
+  if (
+    props.torneo?.torneo.idTorneo != undefined &&
+    props.torneo?.torneo.idTorneo != 0 &&
+    props.torneo?.torneo.idTorneo != null
+  )
+    idTorneo.value = props.torneo?.torneo.idTorneo;
+
+  try {
+    const responseTorneo = await getTorneo(idTorneo.value);
+    torneoMod.value = responseTorneo.data;
+    showModalHandlerMostrarListas.value = true;
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isLoading.value = false;
+    showErrorModal.value = false;
+  }
+};
+
+const onCambioMostrarListas = (nuevoValor: boolean) => {
+  mostrarListas.value = nuevoValor;
+  showModalHandlerMostrarListas.value = false;
 };
 </script>
 

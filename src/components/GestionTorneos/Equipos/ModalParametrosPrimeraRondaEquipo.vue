@@ -1,121 +1,91 @@
 <template>
   <v-dialog v-model="internalIsVisible" max-width="600px">
     <v-card>
-      <v-card-title>Configurar Ronda</v-card-title>
+      <v-card-title>Configurar Ronda {{ numeroRonda }}</v-card-title>
 
-      <v-divider></v-divider>
+      <v-divider class="my-2" />
+
+      <v-card-subtitle class="text-subtitle-1 font-weight-medium">
+        Opciones de configuración
+      </v-card-subtitle>
 
       <v-card-text>
         <v-form>
-          <v-radio-group
-            inline
-            v-model="mismaComunidadCheckString"
-            label="¿Se permiten emparejamientos de la misma comunidad de juego?"
-          >
-            <v-radio label="SI" value="SI"></v-radio>
-            <v-radio label="NO" value="NO"></v-radio>
-          </v-radio-group>
+          <v-row>
+            <v-col cols="12">
+              <v-switch
+                v-model="configuracionManual"
+                color="primary"
+                inset
+                label="¿Configurar la ronda manualmente?"
+                disabled
+              />
+            </v-col>
+          </v-row>
 
-          <v-radio-group
-            inline
-            v-model="goodVsEvilCheckString"
-            label="¿Prevalece luz vs oscuridad?"
-          >
-            <v-radio label="SI" value="SI"></v-radio>
-            <v-radio label="NO" value="NO"></v-radio>
-          </v-radio-group>
-
-          <v-radio-group
-            v-if="isImpares"
-            v-model="opcionImpares"
-            label="Los jugadores son impares. ¿Cómo quieres gestionarlo?"
-          >
-            <!-- <v-radio label="Añadir un jugador" value="añadirJugador"></v-radio> -->
-            <v-radio label="Hacer un bye" value="bye"></v-radio>
-          </v-radio-group>
-
-          <!-- <v-combobox
-            v-if="opcionImpares === 'añadirJugador'"
-            v-model="jugadorSelected"
-            :items="jugadores"
-            item-title="nick"
-            item-value="idUsuario"
-            label="Selecciona el jugador a añadir"
-          ></v-combobox> -->
-
-          <v-checkbox
-            v-model="retosCheck"
-            label="¿Tenemos algún reto para esta ronda?"
-          ></v-checkbox>
-
-          <div v-if="retosCheck">
-            <v-combobox
-              v-model="jugador1"
-              :items="jugadoresNick"
-              item-title="nick"
-              item-value="idUsuario"
-              label="Jugador 1"
-            ></v-combobox>
-
-            <v-combobox
-              v-model="jugador2"
-              :items="jugadoresNick"
-              item-title="nick"
-              item-value="idUsuario"
-              label="Jugador 2"
-            ></v-combobox>
-            <!-- <v-btn icon @click="removeEmparejamiento(index)" color="red">
-              <v-icon>mdi-delete</v-icon>
-            </v-btn> -->
-            <v-btn
-              :disabled="!isAddEmparejamientoEnabled"
-              variant="tonal"
-              color="blue"
-              @click="addEmparejamiento"
-              >Agregar Emparejamiento</v-btn
+          <v-row v-if="configuracionManual">
+            <v-col
+              v-for="(mesa, mesaIndex) in numeroMesas"
+              :key="mesaIndex"
+              cols="12"
             >
-          </div>
-
-          <v-divider class="my-3"></v-divider>
-
-          <div
-            v-if="emparejamientos.length > 0"
-            class="emparejamientos-container"
-          >
-            <h4>Emparejamientos:</h4>
-            <div
-              v-for="(emparejamiento, index) in emparejamientos"
-              :key="index"
-              class="emparejamiento-item"
-            >
-              <span class="emparejamiento-text">
-                Mesa {{ index + 1 }}: {{ emparejamiento.jugador1.nick }} vs
-                {{ emparejamiento.jugador2.nick }}
-              </span>
-              <v-btn
-                class="remove-btn"
-                @click="removeEmparejamiento(index)"
-                icon
+              <v-sheet
+                class="pa-4 mb-4 rounded-lg"
+                elevation="1"
+                style="border: 1px solid #e0e0e0"
               >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </div>
-          </div>
+                <h3 class="text-subtitle-1 font-weight-bold mb-4">
+                  Mesa {{ mesaIndex + 1 }}
+                </h3>
+
+                <v-row>
+                  <v-col cols="12" md="6">
+                    <v-select
+                      label="Equipo 1"
+                      :items="equiposDisponiblesParaSlot(mesaIndex, 0)"
+                      v-model="emparejamientos[mesaIndex][0]"
+                      item-title="nombreEquipo"
+                      item-value="idEquipo"
+                      return-object
+                      variant="outlined"
+                      clearable
+                      dense
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="6">
+                    <v-select
+                      label="Equipo 2"
+                      :items="equiposDisponiblesParaSlot(mesaIndex, 1)"
+                      v-model="emparejamientos[mesaIndex][1]"
+                      item-title="nombreEquipo"
+                      item-value="idEquipo"
+                      return-object
+                      variant="outlined"
+                      clearable
+                      dense
+                    />
+                  </v-col>
+                </v-row>
+              </v-sheet>
+            </v-col>
+          </v-row>
         </v-form>
       </v-card-text>
 
       <v-card-actions>
-        <v-row justify="center" class="my-4 ga-5">
+        <v-row justify="center" class="my-4 gap-3">
           <v-btn
             :disabled="isGenerating"
-            @click="confirmarConfiguracion"
+            @click="handlerGenerarRonda"
             color="primary"
             variant="tonal"
-            >Generar ronda</v-btn
           >
-          <v-btn variant="tonal" color="secondary" @click="closeModal" large
-            >Cancelar</v-btn
-          >
+            Generar ronda
+          </v-btn>
+          <v-btn variant="tonal" color="secondary" @click="closeModal" large>
+            Cancelar
+          </v-btn>
         </v-row>
       </v-card-actions>
     </v-card>
@@ -124,11 +94,7 @@
   <!-- Modal de progreso circular -->
   <v-dialog v-model="isGenerating" hide-overlay persistent>
     <v-card class="progress-card">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="70"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="70" />
     </v-card>
   </v-dialog>
 
@@ -142,29 +108,73 @@
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido generarla ronda. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    message="No se ha podido generarla ronda. Inténtalo de nuevo y si el error persiste contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
+
+  <v-snackbar
+    v-model="snackBarShow"
+    :color="snackbarColor"
+    :timeout="snackBarTimeOut"
+    location="top"
+    vertical
+    rounded
+    elevation="6"
+  >
+    {{ snackBarMessage }}
+    <template #actions>
+      <v-btn text icon @click="snackBarShow = false" aria-label="Close">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </template>
+  </v-snackbar>
+
+  <v-dialog v-model="showByeConfirmDialog" max-width="400" persistent>
+    <v-card>
+      <v-card-title class="text-h6">Confirmar Bye</v-card-title>
+      <v-card-text>
+        Los equipos son impares. ¿Quieres proceder con un bye?
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          text
+          color="primary"
+          variant="tonal"
+          @click="showByeConfirmDialog = false"
+        >
+          Cancelar
+        </v-btn>
+        <v-btn
+          color="primary"
+          variant="tonal"
+          @click="
+            () => {
+              showByeConfirmDialog = false;
+              generaRonda();
+            }
+          "
+        >
+          Confirmar
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
+import { ref, defineProps, defineEmits, watch, onMounted } from "vue";
 import {
-  Emparejamiento,
-  GenerarRonda,
-  JugadorParaEmparejamiento,
-} from "@/interfaces/Live";
-import {
-  InscripcionTorneoCreadoDTO,
-  TorneoGestionInfoDTO,
-} from "@/interfaces/Torneo";
-import { generarRonda } from "@/services/PartidaTorneoService";
-import { ref, defineProps, defineEmits, watch, onMounted, computed } from "vue";
-import { getInfoTorneoCreado } from "@/services/TorneosService";
-import { getUsuariosFast } from "@/services/UsuariosService";
-import { UsuarioFastDTO } from "@/interfaces/Usuario";
-import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
+  EquipoDTO,
+  TorneoEquipoGestionInfoDTO,
+} from "@/interfaces/Inscripcion";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
+import { generarRondaTorneoEquipos } from "@/services/TorneosService";
+import {
+  EmparejamientoEquiposDTO,
+  GenerarRondaEquiposRequestDTO,
+} from "@/interfaces/Torneo";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -178,214 +188,146 @@ watch(
   () => props.isVisible,
   (newValue) => {
     internalIsVisible.value = newValue;
+    if (newValue) initEmparejamientos();
   }
 );
 
-const mismaComunidadCheck = ref<boolean>(false);
-const mismaComunidadCheckString = ref<string>("SI");
-const goodVsEvilCheck = ref<boolean>(false);
-const goodVsEvilCheckString = ref<string>("SI");
-const retosCheck = ref<boolean>(false);
-const esEloCheck = ref<boolean>(false);
-const opcionImpares = ref<string | null>(null);
-const isImpares = ref<boolean>(false);
 const numeroRonda = ref<number>(1);
-
-const jugadoresObj = ref<InscripcionTorneoCreadoDTO[]>();
-const jugadoresNick = ref<JugadorParaEmparejamiento[]>();
-const jugador1 = ref<JugadorParaEmparejamiento>();
-const jugador2 = ref<JugadorParaEmparejamiento>();
-
-const rondas = ref<number[]>();
 const isGenerating = ref<boolean>(false);
-const torneoSelected = ref<TorneoGestionInfoDTO>();
-const jugadores = ref<UsuarioFastDTO[]>();
-
-const errorRonda = ref<string | null>(null);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
+const configuracionManual = ref<boolean>(false);
+const necesitaBye = ref<boolean>(false);
+const showByeConfirmDialog = ref(false);
+
+const numeroMesas = ref<number>(0);
+
+const equiposDisponibles = ref<EquipoDTO[]>([]);
+const emparejamientos = ref<(EquipoDTO | null)[][]>([]);
+
+const snackBarShow = ref<boolean>(false);
+const snackBarMessage = ref<string>("");
+const snackBarTimeOut = ref<number>(3000);
+const snackbarColor = ref<string>("error"); // puede ser 'error', 'success', 'info', etc.
 
 const closeModal = () => {
   internalIsVisible.value = false;
   emit("close");
 };
 
-const emparejamientos = ref<
-  { jugador1: JugadorParaEmparejamiento; jugador2: JugadorParaEmparejamiento }[]
->([]);
-const isAddEmparejamientoEnabled = computed(() => {
-  return jugador1.value && jugador2.value && jugador1.value !== jugador2.value;
-});
+function initEmparejamientos() {
+  if (!props.torneo) return;
+  equiposDisponibles.value = [...props.torneo.equipos];
 
-watch(numeroRonda, (newValue) => {
-  if (newValue) {
-    errorRonda.value = null;
-  }
-});
+  numeroMesas.value = Math.ceil(equiposDisponibles.value.length / 2);
+  necesitaBye.value = equiposDisponibles.value.length % 2 != 0;
 
-onMounted(async () => {
-  try {
-    if (!props.torneo?.torneo.idTorneo) {
-      console.error("El idTorneo no está definido");
+  // Inicializar emparejamientos con null
+  emparejamientos.value = Array(numeroMesas.value)
+    .fill(null)
+    .map(() => [null, null]);
+}
+
+function equiposDisponiblesParaSlot(mesaIndex: number, slotIndex: number) {
+  const seleccionados = new Set<number>();
+
+  emparejamientos.value.forEach((mesa, mIndex) => {
+    mesa.forEach((equipo, sIndex) => {
+      if (equipo !== null && !(mIndex === mesaIndex && sIndex === slotIndex)) {
+        seleccionados.add(equipo.idEquipo);
+      }
+    });
+  });
+
+  return equiposDisponibles.value.filter(
+    (equipo) => !seleccionados.has(equipo.idEquipo)
+  );
+}
+
+const handlerGenerarRonda = () => {
+  if (configuracionManual.value) {
+    if (emparejamientos.value.length === 0) {
+      snackBarMessage.value = "Añade al menos un emparejamiento";
+      snackbarColor.value = "error";
+      snackBarShow.value = true;
       return;
     }
-    // Obtener información del torneo creado
-    const responseTorneo = await getInfoTorneoCreado(
-      props.torneo?.torneo.idTorneo
+    const allPairsValid = emparejamientos.value.every(
+      (pair) => pair[0] !== null && pair[1] !== null
     );
-    torneoSelected.value = responseTorneo.data;
-
-    // Si hay inscripciones, procesar jugadores
-    if (torneoSelected.value?.inscripciones) {
-      jugadoresObj.value = torneoSelected.value.inscripciones;
-      isImpares.value = jugadoresObj.value?.length % 2 !== 0;
-
-      // Usamos `for...of` para manejar promesas de manera secuencial o `map` con `Promise.all`
-      jugadoresNick.value = torneoSelected.value?.inscripciones.map(
-        (element) => ({
-          idUsuario: element.idUsuario!,
-          nick: element.nick!,
-        })
-      );
+    if (!allPairsValid) {
+      if (necesitaBye.value) {
+        showByeConfirmDialog.value = true;
+        return;
+      } else {
+        snackBarMessage.value =
+          "Completa todos los emparejamientos antes de generar la ronda";
+        snackbarColor.value = "error";
+        snackBarShow.value = true;
+        return;
+      }
     }
-
-    // Procesar rondas si existe el número de partidas
-    if (torneoSelected.value?.torneo?.numeroPartidas) {
-      const totalRondas = torneoSelected.value.torneo.numeroPartidas;
-      rondas.value = Array.from({ length: totalRondas }, (_, i) => i + 1);
-    }
-
-    const responseJugadores = await getUsuariosFast();
-    jugadores.value = responseJugadores.data;
-  } catch (error) {
-    console.error("Error al obtener la información del torneo:", error);
   }
-});
 
-const addEmparejamiento = () => {
-  //Validaciones
-
-  if (!jugador1.value || !jugador2.value) {
-    alert("No puedes dejar a los jugadores en blanco");
+  if (necesitaBye.value) {
+    showByeConfirmDialog.value = true;
     return;
   }
 
-  if (jugador1.value.idUsuario === jugador2.value.idUsuario) {
-    alert("No puedes emparejar al mismo jugador.");
-    return;
-  }
-
-  const isJugador1InEmparejamientos: boolean = emparejamientos.value.some(
-    (emparejamiento) =>
-      emparejamiento.jugador1.idUsuario === jugador1.value!.idUsuario ||
-      emparejamiento.jugador2.idUsuario === jugador1.value!.idUsuario
-  );
-  const isJugador2InEmparejamientos: boolean = emparejamientos.value.some(
-    (emparejamiento) =>
-      emparejamiento.jugador1.idUsuario === jugador2.value!.idUsuario ||
-      emparejamiento.jugador2.idUsuario === jugador2.value!.idUsuario
-  );
-
-  if (isJugador1InEmparejamientos || isJugador2InEmparejamientos) {
-    alert("Uno o ambos jugadores ya están emparejados.");
-    return;
-  }
-
-  const emparejamientoTerminado: Emparejamiento = {
-    jugador1: jugador1.value,
-    jugador2: jugador2.value,
-  };
-  emparejamientos.value.push(emparejamientoTerminado);
-
-  jugador1.value = undefined;
-  jugador2.value = undefined;
+  generaRonda();
 };
 
-const removeEmparejamiento = (index: number) => {
-  emparejamientos.value.splice(index, 1);
-};
-
-const confirmarConfiguracion = async () => {
-  if (!numeroRonda.value) {
-    errorRonda.value = "El número de ronda es obligatorio.";
-    return;
-  }
-  if (!props.torneo?.torneo.idTorneo) {
-    console.error("El idTorneo no está definido");
-    return;
-  }
-
-  errorRonda.value = null;
-  if (mismaComunidadCheckString.value === "SI")
-    mismaComunidadCheck.value = true;
-  else mismaComunidadCheck.value = false;
-
-  if (goodVsEvilCheckString.value === "SI") goodVsEvilCheck.value = true;
-  else goodVsEvilCheck.value = false;
-
-  const configuracion: GenerarRonda = {
-    mismaComunidadCheck: mismaComunidadCheck.value,
-    luzVsOscCheck: goodVsEvilCheck.value,
-    retosCheck: retosCheck.value,
-    emparejamientos: emparejamientos.value,
-    esEloCheck: esEloCheck.value,
-    opcionImpares: opcionImpares.value,
-    idTorneo: props.torneo?.torneo.idTorneo,
-    idRonda: numeroRonda.value!,
-  };
-
-  try {
+const generaRonda = async () => {
+  if (props.torneo?.torneo.idTorneo) {
     isGenerating.value = true;
 
-    await generarRonda(configuracion);
-    showSuccessModal.value = true;
-  } catch (error) {
-    showErrorModal.value = true;
-    console.error(error);
-  } finally {
-    isGenerating.value = false;
+    let emparejamientosDTO: EmparejamientoEquiposDTO[] = [];
+
+    if (configuracionManual.value && emparejamientos.value.length > 0) {
+      emparejamientosDTO = emparejamientos.value.map((par) => {
+        return {
+          equipo1: par[0] as EquipoDTO,
+          equipo2: par[1] as EquipoDTO,
+        };
+      });
+    }
+    const request: GenerarRondaEquiposRequestDTO = {
+      idTorneo: props.torneo?.torneo.idTorneo,
+      idRonda: numeroRonda.value,
+      isTorneoNarsil: false,
+      necesitaBye: necesitaBye.value,
+      emparejamientosEquipos: emparejamientosDTO,
+    };
+    try {
+      await generarRondaTorneoEquipos(request);
+      showSuccessModal.value = true;
+      emit("confirm");
+      closeModal();
+    } catch (error) {
+      console.error(error);
+      showErrorModal.value = true;
+    } finally {
+      isGenerating.value = false;
+    }
   }
-
-  emit("confirm", configuracion);
-  closeModal();
 };
+
+onMounted(() => {
+  if (internalIsVisible.value) initEmparejamientos();
+  necesitaBye.value = equiposDisponibles.value.length % 2 != 0;
+
+  if (necesitaBye.value)
+    equiposDisponibles.value.push({
+      idEquipo: 0,
+      idCapitan: 0,
+      inscripciones: [],
+      nombreEquipo: "Equipo BYE",
+    });
+});
 </script>
+
 <style scoped>
-.remove-btn {
-  background-color: transparent;
-  color: red;
-  margin-left: 16px; /* Espacio entre el texto y el botón */
-  padding: 0;
-  min-width: auto;
-  display: flex;
-  align-items: center;
-}
-
-.remove-btn .v-icon {
-  font-size: 18px; /* Tamaño del ícono */
-}
-
-.emparejamientos-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.emparejamiento-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.emparejamiento-text {
-  flex-grow: 1;
-}
-
-.progress-card {
-  width: 200px;
-  height: 200px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: auto;
+.gap-3 {
+  gap: 12px;
 }
 </style>

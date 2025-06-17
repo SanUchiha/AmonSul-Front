@@ -753,7 +753,7 @@ const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
-const activeTab = ref<number>(2);
+const activeTab = ref<number>(1);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const idUsuario = ref<number>();
 const isModalListaVisible = ref<boolean>(false);
@@ -779,6 +779,7 @@ const torneoGestion = ref<TorneoGestionInfoMasDTO>({
     numeroPartidas: 0,
     estadoTorneo: "",
     listasPorJugador: 0,
+    mostrarListas: false,
   },
   inscripciones: [],
 });
@@ -817,6 +818,10 @@ const partidaActual = ref<PartidaTorneoDTO>({
   partidaValidadaUsuario2: null,
   resultadoUsuario1: null,
   resultadoUsuario2: null,
+  idEquipo1: null,
+  idEquipo2: null,
+  nombreEquipo1: null,
+  nombreEquipo2: null,
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);

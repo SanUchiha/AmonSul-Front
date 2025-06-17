@@ -104,6 +104,7 @@ export interface TorneoCreadoDTO {
   fechaFinInscripcion?: string | null;
   inicioInscripciones?: string | null;
   jugadoresXEquipo: number;
+  mostrarListas: boolean;
 }
 
 export interface EquipoDTO {

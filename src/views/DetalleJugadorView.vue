@@ -14,7 +14,9 @@
             <v-tab value="1">Perfil</v-tab>
             <v-tab value="2"> Amistosas </v-tab>
             <v-tab value="3"> Torneos </v-tab>
-            <v-tab value="4"><v-icon icon="mdi-calendar-account-outline"></v-icon></v-tab>
+            <v-tab value="4"
+              ><v-icon icon="mdi-calendar-account-outline"></v-icon
+            ></v-tab>
           </v-tabs>
 
           <v-window v-model="tab">
@@ -22,7 +24,10 @@
              spark
            Jugador card -->
             <v-window-item value="1">
-              <PerfilUsuarioView :email="usuarioData.email" :editable=false></PerfilUsuarioView>
+              <PerfilUsuarioView
+                :email="usuarioData.email"
+                :editable="false"
+              ></PerfilUsuarioView>
             </v-window-item>
 
             <!-- tab 2. (partidas)
@@ -32,17 +37,28 @@
 
               <div v-if="!isLoading && validMatches.length > 0">
                 <v-card class="section-card stats-section pt-0 mt-0">
-                  <v-col cols="12"><p class="text-h5 ringbearer">Partidas validadas</p></v-col>
+                  <v-col cols="12"
+                    ><p class="text-h5 ringbearer">Partidas validadas</p></v-col
+                  >
                   <v-divider></v-divider>
                   <v-row>
-                    <v-col cols="12" sm="6" md="6" lg="4" xl="4" class="pb-0" v-for="match in validMatches" :key="match.idPartidaAmistosa">
-                    <ValidadasMatchCard
-                      :idUsuario="usuarioData.idUsuario"
-                      :match="match"
-                      class="mb-4"
-                    />
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="6"
+                      lg="4"
+                      xl="4"
+                      class="pb-0"
+                      v-for="match in validMatches"
+                      :key="match.idPartidaAmistosa"
+                    >
+                      <ValidadasMatchCard
+                        :idUsuario="usuarioData.idUsuario"
+                        :match="match"
+                        class="mb-4"
+                      />
                     </v-col>
-                  </v-row>        
+                  </v-row>
                 </v-card>
               </div>
               <div v-else>
@@ -55,19 +71,30 @@
             <v-window-item value="3">
               <div v-if="!isLoading && tournamentMatches.length > 0">
                 <v-card class="section-card stats-section pt-0 mt-0">
-                  <v-col cols="12"><p class="text-h5 ringbearer">Partidas de torneo</p></v-col>
+                  <v-col cols="12"
+                    ><p class="text-h5 ringbearer">Partidas de torneo</p></v-col
+                  >
                   <v-divider></v-divider>
                   <v-row>
-                    <v-col cols="12" sm="6" md="6" lg="4" xl="4" class="pb-0" v-for="match in tournamentMatches" :key="match.idPartidaTorneo">
-                    <CardPartidaTorneo              
-                      :idUsuario="usuarioData.idUsuario"
-                      :match="match"
-                      class="mb-4"
-                    />
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="6"
+                      lg="4"
+                      xl="4"
+                      class="pb-0"
+                      v-for="match in tournamentMatches"
+                      :key="match.idPartidaTorneo"
+                    >
+                      <CardPartidaTorneo
+                        :idUsuario="usuarioData.idUsuario"
+                        :match="match"
+                        class="mb-4"
+                      />
                     </v-col>
-                  </v-row>        
+                  </v-row>
                 </v-card>
-              </div>      
+              </div>
               <div v-else>
                 <h3>No tiene partidas de torneo</h3>
               </div>
@@ -82,7 +109,7 @@
                 :isLoading="isLoading"
                 :listaTorneos="usuarioData.InscripcionesIndividualTorneo"
                 :idUsuario="usuarioData.idUsuario"
-                :disputado=false
+                :disputado="false"
               />
             </v-window-item>
           </v-window>
@@ -108,7 +135,6 @@
 import { ref, onMounted, computed, ComputedRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
-import { getPartidasValidadas } from "@/services/PartidasAmistosasService";
 import {
   ViewPartidaAmistosaDTO,
   ViewPartidaTorneoDTO,
@@ -137,24 +163,6 @@ const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const tournamentMatches = ref<ViewPartidaTorneoDTO[]>([]);
 
-const ultimaPartida = ref<ViewPartidaAmistosaDTO | null>(null);
-
-const cargarPartidasValidadas = async () => {
-  try {
-    isLoading.value = true;
-    const responseValidadas = await getPartidasValidadas(
-      usuarioData.value.email
-    );
-
-    ultimaPartida.value =
-      responseValidadas.data[responseValidadas.data.length - 1];
-  } catch (error) {
-    console.error("Error al obtener las partidas validadas:", error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
 const cargarPartidasTorneos = async () => {
   try {
     isLoadingTournamentMatches.value = true;
@@ -178,7 +186,7 @@ const initializeComponent = async () => {
   try {
     const idRecibido = String(route.params.idUsuario);
     await usuariosStore.requestUsuarioData(parseInt(idRecibido));
-    
+
     // Verifica la estructura de usuarioResponse
     if (usuarioData.value.idUsuario) {
       validMatches.value = usuarioData.value.partidasValidadas.sort((a, b) => {

@@ -777,6 +777,7 @@ const torneoGestion = ref<TorneoGestionInfoDTO>({
     numeroPartidas: 0,
     estadoTorneo: "",
     listasPorJugador: 0,
+    mostrarListas: false,
   },
   inscripciones: [],
 });
@@ -815,6 +816,10 @@ const partidaActual = ref<PartidaTorneoDTO>({
   partidaValidadaUsuario2: null,
   resultadoUsuario1: null,
   resultadoUsuario2: null,
+  idEquipo1: null,
+  idEquipo2: null,
+  nombreEquipo1: null,
+  nombreEquipo2: null,
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
@@ -867,8 +872,6 @@ onMounted(async () => {
 
     const isSave = await isSaveTournament(idTorneo.value);
     wasSave.value = isSave.data;
-
-    //const responseJugadoresInscritosTorneo = await getUsuariosByTorneo(idTorneo.value);
   } catch (error) {
     console.error("error onMounted", error);
   } finally {
@@ -937,6 +940,7 @@ const resultados = async (ronda: number) => {
       opcionImpares: null,
       idTorneo: idTorneo,
       idRonda: ronda,
+      isTorneoNarsil: false,
     };
 
     const guardarResultadosDTO: GuardarResultadosDTO = {
@@ -1373,23 +1377,6 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
     }
   }
 };
-
-// const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
-//   idPartidaSeleccionada.value = idPartida;
-//   usuarioSeleccionado.value = usuario;
-//   isModalPuntosVisible.value = true;
-// };
-
-// const abrirModalLider = (idPartida: number, usuario: 1 | 2) => {
-//   idPartidaSeleccionada.value = idPartida;
-//   usuarioSeleccionado.value = usuario;
-//   isModalLiderVisible.value = true;
-// };
-
-// const abrirModalEscenario = (idPartida: number) => {
-//   idPartidaSeleccionada.value = idPartida;
-//   isModalEscenarioVisible.value = true;
-// };
 
 const abrirModalValidar = (idPartida: number, usuario: 1 | 2) => {
   idPartidaSeleccionada.value = idPartida;

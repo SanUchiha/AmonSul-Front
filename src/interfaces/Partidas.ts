@@ -62,6 +62,10 @@ export interface PartidaTorneoDTO {
   partidaValidadaUsuario2: boolean | null;
   resultadoUsuario1: number | null;
   resultadoUsuario2: number | null;
+  idEquipo1: number | null;
+  idEquipo2: number | null;
+  nombreEquipo1: string | null;
+  nombreEquipo2: string | null;
 }
 
 export interface PartidaTorneoMasDTO {

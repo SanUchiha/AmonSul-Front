@@ -1,3 +1,4 @@
+import { EquipoDTO } from "./Inscripcion";
 import { GenerarRonda } from "./Live";
 import { ListaDTO } from "./Usuario";
 
@@ -29,6 +30,7 @@ export interface Torneo {
   tieneBases: boolean;
   inicioInscripciones: string; // Fecha límite de inscripción
   listasPorJugador: number;
+  mostrarListas: boolean;
 }
 
 export interface TorneoReducidoDTO {
@@ -71,6 +73,7 @@ export interface TorneoCreadoDTO {
   fechaFinInscripcion?: string | null;
   inicioInscripciones?: string | null;
   listasPorJugador: number;
+  mostrarListas: boolean;
 }
 
 export interface InscripcionTorneoCreadoDTO {
@@ -169,4 +172,47 @@ export interface ModificarTorneoDTO {
 export interface ModificarBasesTorneoDTO {
   idTorneo?: number;
   basesTorneo?: string;
+}
+
+export interface HandlerMostarListasDTO {
+  idTorneo?: number;
+  mostrarListas?: boolean;
+}
+
+export interface GenerarRondaEquiposRequestDTO {
+  idTorneo: number;
+  idRonda: number;
+  isTorneoNarsil: boolean;
+  necesitaBye: boolean;
+  emparejamientosEquipos?: EmparejamientoEquiposDTO[];
+}
+
+export interface EmparejamientoEquiposDTO {
+  equipo1: EquipoDTO;
+  equipo2: EquipoDTO;
+}
+
+export interface ClasificacionEquipo {
+  idEquipo: number;
+  nombreEquipo: string;
+  puntos: number;
+  puntosFavor: number;
+  puntosContra: number;
+  diferencia: number;
+  lideresMatados: number;
+}
+
+export interface GenerarOtraRondaEquiposRequestDTO {
+  clasificacion: EquipoDTO[];
+  permiteRepetirRival: boolean;
+  necesitaBye: boolean;
+  pairingRondaAnterior: PairingDTO[];
+}
+export interface PairingDTO {
+  idEquipo1: number;
+  idEquipo2?: number;
+}
+
+export interface ClasificacionDTO {
+  equipos: EquipoDTO[];
 }

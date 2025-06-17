@@ -168,6 +168,7 @@ const changeJugador = async () => {
 };
 
 onMounted(async () => {
+  if (!props.idTorneo) return;
   try {
     const responseJugadores = await getUsuariosByTorneo(props.idTorneo);
     jugadores.value = responseJugadores.data;

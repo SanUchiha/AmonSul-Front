@@ -91,7 +91,6 @@ import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
-import { getUsuarioData } from "@/services/UsuariosService";
 
 const isLoading = ref(true);
 const { getidUsuario, getUser } = useAuth();
@@ -207,6 +206,7 @@ const loadComunidad = async (idUser: number) => {
 
 const loadRankingElo = async (idUser: number) => {
   // TODO MOSTRAR RANKING INDIVIDUAL ELO
+  idUser;
   // try {
   //   console.log(idUser);
   //   const response = await getUsuarioData(idUser);

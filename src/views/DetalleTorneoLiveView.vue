@@ -8,6 +8,12 @@
       <!-- TABS -->
       <v-tabs v-model="activeTab" fixed-tabs>
         <v-tab
+          v-if="torneo?.mostrarListas"
+          :key="tabListas"
+          :text="`Listas`"
+          :value="tabListas"
+        ></v-tab>
+        <v-tab
           v-for="n in numeroRondas"
           :key="n"
           :text="`Ronda ${n}`"
@@ -25,6 +31,11 @@
         <div v-if="partidas.length === 0">
           <p>Aún no se ha generado ninguna ronda</p>
         </div>
+
+        <!-- Tab Listas -->
+        <v-window-item :value="tabListas" :key="tabListas">
+          <TabMostarListas :torneo="torneo" />
+        </v-window-item>
 
         <!-- tab dinamicas -->
         <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
@@ -223,6 +234,7 @@
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import TabMostarListas from "@/components/GestionTorneos/TabMostarListas.vue";
 import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import { useAuth } from "@/composables/useAuth";
 import { Clasificacion } from "@/interfaces/Live";
@@ -240,12 +252,13 @@ const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
-const activeTab = ref(1);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const idUsuario = ref<number>();
-const tabClasificacion = ref<number>(1);
+const activeTab = ref();
+const tabClasificacion = ref<number>();
+const tabListas = ref<number>();
 const clasificacion = ref<Clasificacion[]>([]);
 const jugadoresZona1 = ref<Clasificacion[]>([]);
 const jugadoresZona2 = ref<Clasificacion[]>([]);
@@ -280,9 +293,16 @@ onMounted(async () => {
         return acc;
       }, {} as Record<number, PartidaTorneoDTO[]>);
     }
-    tabClasificacion.value = numeroRondas.value.length + 1;
 
     calcularClasificacion();
+
+    tabClasificacion.value = numeroRondas.value.length + 1;
+
+    if (torneo.value?.mostrarListas) {
+      activeTab.value = tabListas.value;
+    } else {
+      activeTab.value = numeroRondas.value[0] ?? 1;
+    }
   } catch (error) {
     console.error("calcularClasificacion", error);
   } finally {
@@ -579,11 +599,6 @@ const soloValidarPJ = (partida: PartidaTorneoDTO) => {
   } else {
     return false;
   }
-};
-
-const formatDate = (date: string | null | undefined) => {
-  if (!date) return "N/A";
-  return new Date(date).toLocaleDateString();
 };
 </script>
 <style>

@@ -29,7 +29,10 @@
               <v-window-item :value="0" :key="0">
                 <div>
                   <CardGestionInfoTorneoEquipo :torneo="torneoGestion" />
-                  <CardGestionAccionesTorneoEquipo :torneo="torneoGestion" />
+                  <CardGestionAccionesTorneoEquipo
+                    :torneo="torneoGestion"
+                    :rondaGenerada="estaRondaUnoGenerada"
+                  />
 
                   <!--Buscador de equipos-->
                   <v-text-field
@@ -187,6 +190,8 @@
                       <div class="player-container">
                         <!-- jugador 1 -->
                         <div class="player-details">
+                          <div>{{ partida.nombreEquipo1 }}</div>
+
                           <!-- Validar 1 -->
                           <div class="player-info">
                             <span>
@@ -275,6 +280,8 @@
 
                         <!-- jugador 2 -->
                         <div class="player-details">
+                          <div>{{ partida.nombreEquipo2 }}</div>
+
                           <!-- validar 2 -->
                           <div class="player-info">
                             <span>
@@ -436,144 +443,14 @@
               </v-tabs-item>
 
               <!-- Tab clasificacion -->
-              <v-window-item :value="tabClasificacion" :key="tabClasificacion">
-                <!-- División en dos zonas a a partir de la ronda 3 -->
-                <div v-if="(torneo!.idTorneo === 7)">
-                  <div
-                    v-if="
-                      clasificacionZona1.length > 0 &&
-                      clasificacionZona2.length > 0
-                    "
-                  >
-                    <!-- Valinor -->
-                    <h3>Válinor</h3>
-                    <v-table
-                      v-if="activeTab == tabClasificacion"
-                      density="compact"
-                    >
-                      <thead>
-                        <tr>
-                          <th class="text-center">Posición</th>
-                          <th class="text-center">Jugador</th>
-                          <th class="text-center">Puntos</th>
-                          <th class="text-center">Puntos a favor</th>
-                          <th class="text-center">Puntos en contra</th>
-                          <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">General</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="(jugador, index) in clasificacionZona1"
-                          :key="jugador.nick"
-                        >
-                          <td>{{ index + 1 }}</td>
-                          <td>{{ jugador.nick }}</td>
-                          <td>
-                            {{ jugador.victorias }}
-                          </td>
-                          <td>{{ jugador.puntosFavor }}</td>
-                          <td>
-                            {{ jugador.puntosContra }}
-                          </td>
-                          <td>{{ jugador.diferenciaPuntos }}</td>
-                          <td>
-                            {{ jugador.lider }}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </v-table>
-
-                    <v-divider class="my-5"></v-divider>
-
-                    <!-- Arda -->
-                    <h3>Arda</h3>
-                    <v-table
-                      v-if="activeTab == tabClasificacion"
-                      density="compact"
-                    >
-                      <thead>
-                        <tr>
-                          <th class="text-center">Posición</th>
-                          <th class="text-center">Jugador</th>
-                          <th class="text-center">Puntos</th>
-                          <th class="text-center">Puntos a favor</th>
-                          <th class="text-center">Puntos en contra</th>
-                          <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">General</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="(jugador, index) in clasificacionZona2"
-                          :key="jugador.nick"
-                        >
-                          <td>{{ index + 1 }}</td>
-                          <td>{{ jugador.nick }}</td>
-                          <td>
-                            {{ jugador.victorias }}
-                          </td>
-                          <td>{{ jugador.puntosFavor }}</td>
-                          <td>
-                            {{ jugador.puntosContra }}
-                          </td>
-                          <td>{{ jugador.diferenciaPuntos }}</td>
-                          <td>
-                            {{ jugador.lider }}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </v-table>
-                  </div>
-                  <div v-else><p>Esperando resultados...</p></div>
-                </div>
-                <!-- Para todo lo demás -->
-                <div v-else>
-                  <div v-if="clasificacion.length > 0">
-                    <v-table
-                      v-if="activeTab == tabClasificacion"
-                      density="compact"
-                    >
-                      <thead>
-                        <tr>
-                          <th class="text-center">Posición</th>
-                          <th class="text-center">Jugador</th>
-                          <th class="text-center">Puntos</th>
-                          <th class="text-center">Puntos a favor</th>
-                          <th class="text-center">Puntos en contra</th>
-                          <th class="text-center">Diferencia de puntos</th>
-                          <th class="tect-center">General</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="(jugador, index) in clasificacion"
-                          :key="jugador.nick"
-                          :class="{
-                            'good-bando': jugador.bando === 'good',
-                            'evil-bando': jugador.bando === 'evil',
-                          }"
-                        >
-                          <td>{{ index + 1 }}</td>
-                          <td>{{ jugador.nick }}</td>
-                          <td>
-                            {{ jugador.victorias }}
-                          </td>
-                          <td>{{ jugador.puntosFavor }}</td>
-                          <td>
-                            {{ jugador.puntosContra }}
-                          </td>
-                          <td>{{ jugador.diferenciaPuntos }}</td>
-                          <td>
-                            {{ jugador.lider }}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </v-table>
-                  </div>
-                  <div v-else><p>Esperando resultados...</p></div>
-                </div>
-              </v-window-item>
+              <TabClasificacionEquipos
+                :tabClasificacion="tabClasificacion"
+                :activeTab="activeTab"
+                :torneo="torneo"
+                :partidas="partidas"
+                :equipos="torneoGestion?.equipos"
+                @enviarClasificacion="manejarClasificacion"
+              />
             </v-window>
           </v-card>
         </div>
@@ -648,9 +525,9 @@
     <ModalParametrosRondasEquipo
       :isVisible="showConfigModal"
       :torneo="torneoGestion"
-      :clasificacion="clasificacion"
-      :clasificacionDividida="clasificacionDividida"
+      :clasificacion="clasificacionEquipos"
       :ronda="rondaAGenerar"
+      :partidas="partidas"
       @close="closeConfigModal"
       @confirm="handleConfigConfirm"
     />
@@ -722,7 +599,11 @@ import {
   getInfoTorneoEquipoCreado,
   guardarResultados,
 } from "@/services/TorneosService";
-import { GuardarResultadosDTO, ResultadoJugador } from "@/interfaces/Torneo";
+import {
+  ClasificacionEquipo,
+  GuardarResultadosDTO,
+  ResultadoJugador,
+} from "@/interfaces/Torneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEscenarioPartida.vue";
 import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
@@ -757,12 +638,13 @@ import CardGestionInfoTorneoEquipo from "@/components/GestionTorneos/Equipos/Car
 import CardGestionAccionesTorneoEquipo from "@/components/GestionTorneos/Equipos/CardGestionAccionesTorneoEquipo.vue";
 import CardInfoEquipo from "@/components/GestionTorneos/Equipos/CardInfoEquipo.vue";
 import { ListaDTO } from "@/interfaces/Usuario";
+import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
-const activeTab = ref<number>(2);
+const activeTab = ref<number>(0);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const idUsuario = ref<number>();
 const isModalListaVisible = ref<boolean>(false);
@@ -796,6 +678,7 @@ const showModificarPartidaTorneoModal = ref<boolean>(false);
 const showModificarPairingModal = ref<boolean>(false);
 const showAgregarPairingModal = ref<boolean>(false);
 const showEliminarPartidaModal = ref<boolean>(false);
+const estaRondaUnoGenerada = ref<boolean>(false);
 const partidaActual = ref<PartidaTorneoDTO>({
   ejercitoUsuario1: null,
   ejercitoUsuario2: null,
@@ -815,11 +698,16 @@ const partidaActual = ref<PartidaTorneoDTO>({
   partidaValidadaUsuario2: null,
   resultadoUsuario1: null,
   resultadoUsuario2: null,
+  idEquipo1: null,
+  idEquipo2: null,
+  nombreEquipo1: null,
+  nombreEquipo2: null,
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
 const currentEjercito = ref<string>();
 const listaDTO = ref<ListaDTO>();
+const clasificacionEquipos = ref<ClasificacionEquipo[]>([]);
 
 //Variables para el buscador
 const busquedaEquipo = ref<string>("");
@@ -831,6 +719,10 @@ const equiposFiltrados = computed(() => {
     )
   );
 });
+
+function manejarClasificacion(clasificacion: ClasificacionEquipo[]) {
+  clasificacionEquipos.value = clasificacion;
+}
 
 onMounted(async () => {
   idTorneo.value = parseInt(route.params.idTorneo.toString());
@@ -873,12 +765,23 @@ onMounted(async () => {
       }, {} as Record<number, PartidaTorneoDTO[]>);
     }
 
+    if (partidas.value.length > 0) estaRondaUnoGenerada.value = true;
+
     tabClasificacion.value = numeroRondas.value.length + 1;
 
     calcularClasificacion();
 
+    let ganador: number | null = null;
     ultimaRonda.value = numeroRondas.value.length;
-    const ganador: number = clasificacionZona1.value[0].idUsuario;
+    if (clasificacionZona1.value && clasificacionZona1.value.length > 0) {
+      ganador = clasificacionZona1.value[0].idUsuario;
+    }
+    hasGanador.value = ganador !== null;
+
+    ultimaRonda.value = numeroRondas.value.length;
+    if (clasificacionZona1.value[0] != undefined) {
+      ganador = clasificacionZona1.value[0].idUsuario;
+    }
     if (ganador != null) hasGanador.value = true;
 
     const isSave = await isSaveTournament(idTorneo.value);
@@ -970,11 +873,11 @@ const resultados = async (ronda: number) => {
 
 const closeConfigModal = () => {
   showConfigModal.value = false;
-  window.location.reload();
 };
 
 const handleConfigConfirm = () => {
   closeConfigModal();
+  window.location.reload();
 };
 
 const closeModificarPartidaTorneoModal = () => {

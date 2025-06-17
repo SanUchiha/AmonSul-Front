@@ -1,6 +1,9 @@
 import {
   CrearTorneoDTO,
+  GenerarOtraRondaEquiposRequestDTO,
+  GenerarRondaEquiposRequestDTO,
   GuardarResultadosDTO,
+  HandlerMostarListasDTO,
   ModificarBasesTorneoDTO,
   ModificarTorneoDTO,
 } from "@/interfaces/Torneo";
@@ -72,9 +75,28 @@ export const ModificarBasesTorneoAsync = async (
   return http.patch(`Torneo/Gestion/subir-bases`, torneoData);
 };
 
+export const HandlerMostarListasAsync = async (
+  request: HandlerMostarListasDTO
+) => {
+  return http.patch(`Torneo/Gestion/Hanlder-Listas`, request);
+};
+
 export const deleteTorneo = async (idTorneo: number) => {
   return http.delete(`Torneo/Gestion/${idTorneo}`);
 };
+
 export const getEquiposByTorneoAsync = async (idTorneo: number) => {
   return http.get(`Torneo/equipos/${idTorneo}`);
+};
+
+export const generarRondaTorneoEquipos = async (
+  request: GenerarRondaEquiposRequestDTO
+) => {
+  return http.post(`Torneo/Gestion/Generar-Ronda-Equipos`, request);
+};
+
+export const generarOtraRondaTorneoEquipos = async (
+  request: GenerarOtraRondaEquiposRequestDTO
+) => {
+  return http.post(`Torneo/Gestion/Generar-Otra-Ronda-Equipos`, request);
 };

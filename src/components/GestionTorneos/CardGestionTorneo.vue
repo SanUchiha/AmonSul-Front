@@ -60,6 +60,17 @@
               </v-btn>
             </div>
 
+            <div class="text-wrap text-sm">
+              <v-btn
+                class="mt-2"
+                variant="tonal"
+                color="secondary"
+                @click="handlerMostrarListas"
+              >
+                {{ mostrarListas ? "Ocultar" : "Mostrar" }} Listas
+              </v-btn>
+            </div>
+
             <v-spacer class="my-4"></v-spacer>
 
             <CardAddTorneoLiga :idTorneo="props.torneo?.torneo.idTorneo!" />
@@ -73,15 +84,24 @@
   <ModalModificarTorneo
     :isVisible="showModificarTorneoModal"
     :torneo="torneoMod"
-    @close="cerrarModalModificarTorneo()"
+    @close="cerrarModal()"
   />
 
   <!-- modal para modificar el torneo -->
   <ModalModificarBasesTorneo
     :isVisible="showModificarBasesTorneoModal"
     :torneo="torneoMod"
-    @close="cerrarModalModificarBasesTorneo()"
+    @close="cerrarModal()"
   />
+
+  <!-- modal para manejar mostrar listas del torneo -->
+  <ModalHandlerMostrarListas
+    :isVisible="showModalHandlerMostrarListas"
+    :torneo="torneoMod"
+    @close="cerrarModal()"
+    @confirm="onCambioMostrarListas"
+  />
+
   <!-- modal torneo modificado con exito -->
   <ModalSuccess
     :isVisible="showSuccessModal"
@@ -103,12 +123,15 @@ import ModalModificarTorneo from "./ModalModificarTorneo.vue";
 import { getTorneo } from "@/services/TorneosService";
 import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
 import CardAddTorneoLiga from "./CardAddTorneoLiga.vue";
+import ModalHandlerMostrarListas from "./ModalHandlerMostrarListas.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const showModificarTorneoModal = ref<boolean>(false);
 const showModificarBasesTorneoModal = ref<boolean>(false);
+const showModalHandlerMostrarListas = ref<boolean>(false);
+const mostrarListas = ref(props.torneo?.torneo.mostrarListas);
 
 const idTorneo = ref<number>(0);
 const isLoading = ref<boolean>(false);
@@ -138,6 +161,7 @@ const torneoMod = ref<Torneo>({
   tieneBases: false,
   inicioInscripciones: "",
   listasPorJugador: 0,
+  mostrarListas: false,
 });
 
 const plazasRestantes = computed(() => {
@@ -238,12 +262,36 @@ const modificarBasesTorneo = async () => {
   }
 };
 
-const cerrarModalModificarTorneo = async () => {
+const cerrarModal = async () => {
+  showModificarBasesTorneoModal.value = false;
   showModificarTorneoModal.value = false;
+  showModalHandlerMostrarListas.value = false;
 };
 
-const cerrarModalModificarBasesTorneo = async () => {
-  showModificarBasesTorneoModal.value = false;
+const onCambioMostrarListas = (nuevoValor: boolean) => {
+  mostrarListas.value = nuevoValor;
+  showModalHandlerMostrarListas.value = false;
+};
+
+const handlerMostrarListas = async () => {
+  if (
+    props.torneo?.torneo.idTorneo != undefined &&
+    props.torneo?.torneo.idTorneo != 0 &&
+    props.torneo?.torneo.idTorneo != null
+  )
+    idTorneo.value = props.torneo?.torneo.idTorneo;
+
+  try {
+    const responseTorneo = await getTorneo(idTorneo.value);
+    torneoMod.value = responseTorneo.data;
+    showModalHandlerMostrarListas.value = true;
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isLoading.value = false;
+    showErrorModal.value = false;
+  }
 };
 </script>
 <style scoped>

@@ -529,8 +529,8 @@ const formattedAddress = ref<string>("");
 const googleMapsUrl = computed(() => {
   if (!torneo.value?.lugarTorneo) return "#";
   return `https://www.google.com/maps?q=${parseFloat(
-    torneo.value!.lugarTorneo.split(", ")[0]
-  )},${parseFloat(torneo.value!.lugarTorneo.split(", ")[1])}`;
+    torneo.value.lugarTorneo.split(", ")[0]
+  )},${parseFloat(torneo.value.lugarTorneo.split(", ")[1])}`;
 });
 
 // Función para obtener dirección inversa desde coordenadas
@@ -599,9 +599,9 @@ const isInscripcionCerrada = computed(() => {
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
 };
-const goToEquipoDetail = (idEquipo: number) => {
-  //TODO: modal con la info (nick) de los jugadores que se pueda pulsar en ellos y te lleven a su perfil
-};
+// const goToEquipoDetail = (idEquipo: number) => {
+//   //TODO: modal con la info (nick) de los jugadores que se pueda pulsar en ellos y te lleven a su perfil
+// };
 
 const eliminarInscripcion = async (idInscripcion: number) => {
   isRegistering.value = true;
@@ -694,12 +694,13 @@ onMounted(async () => {
     infoEquipos.value = responseEquipos.data;
   }
   try {
-    if (isValidCoordinates(torneo.value!.lugarTorneo)) {
-      getAddress(
-        parseFloat(torneo.value!.lugarTorneo.split(", ")[0]),
-        parseFloat(torneo.value!.lugarTorneo.split(", ")[1])
-      );
-    }
+    if (torneo.value)
+      if (isValidCoordinates(torneo.value.lugarTorneo)) {
+        getAddress(
+          parseFloat(torneo.value.lugarTorneo.split(", ")[0]),
+          parseFloat(torneo.value.lugarTorneo.split(", ")[1])
+        );
+      }
   } catch (err) {
     console.error("Error al obtener coordenadas del torneo:", err);
   }
@@ -726,8 +727,6 @@ watch(
 
 const formatDate = (date: string | number | Date | undefined) =>
   date ? new Date(date).toLocaleDateString() : "Fecha no disponible";
-
-const goBack = () => router.go(-1);
 
 const descargarBases = async () => {
   try {
@@ -758,7 +757,7 @@ const inscripcionIndividual = async () => {
   ) {
     const inscripcion: CrearInscripcionDTO = {
       idUsuario: parseInt(idUsuario.value),
-      idTorneo: idTorneo.value!,
+      idTorneo: idTorneo.value,
     };
     try {
       await registrarInscripcion(inscripcion);

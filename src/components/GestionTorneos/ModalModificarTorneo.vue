@@ -327,7 +327,7 @@ import { torneoType, TorneoType } from "@/Constant/TiposTorneo";
 
 const props = defineProps<{
   isVisible: boolean;
-  torneo: Torneo;
+  torneo: Torneo | undefined;
 }>();
 const emit = defineEmits(["close", "confirm"]);
 

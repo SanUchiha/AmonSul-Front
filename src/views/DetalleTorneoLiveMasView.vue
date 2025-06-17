@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-unused-vars -->
 <template>
   <v-sheet class="pa-4">
     <div v-if="isLoading">
@@ -7,6 +6,12 @@
     <div v-else>
       <!-- TABS -->
       <v-tabs v-model="activeTab" fixed-tabs>
+        <v-tab
+          v-if="torneo?.mostrarListas"
+          :key="tabListas"
+          :text="`Listas`"
+          :value="tabListas"
+        ></v-tab>
         <v-tab
           v-for="n in numeroRondas"
           :key="n"
@@ -239,12 +244,13 @@ const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoMasDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
-const activeTab = ref(1);
 const partidasPorRonda = ref<Record<number, PartidaTorneoMasDTO[]>>({});
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const idUsuario = ref<number>();
+const activeTab = ref(1);
 const tabClasificacion = ref<number>(1);
+const tabListas = ref<number>(0);
 const clasificacion = ref<Clasificacion[]>([]);
 const jugadoresZona1 = ref<Clasificacion[]>([]);
 const jugadoresZona2 = ref<Clasificacion[]>([]);
