@@ -64,7 +64,6 @@ export const appsettings = {
     { name: "Army of Erebor", band: "good" },
     { name: "Battle of Bywater", band: "good" },
     { name: "Battle of Fornost", band: "good" },
-    { name: "Battle of Fornost", band: "good" },
     { name: "Defenders of Erebor", band: "good" },
     { name: "Fords of Isen", band: "good" },
     { name: "Kingdom of Khazad-dûm", band: "good" },
@@ -73,6 +72,11 @@ export const appsettings = {
     { name: "The Fiefdoms", band: "good" },
     { name: "The Grief of Èomer", band: "good" },
     { name: "The Grey Company", band: "good" },
+
+    { name: "Battle of Grrenfields (legacy)", band: "good" },
+    { name: "Fields of Celebrant (legacy)", band: "good" },
+    { name: "Reclamation of Moria (legacy)", band: "good" },
+    { name: "Expedition to the East (legacy)", band: "good" },
 
     // Facciones de Oscuridad (Evil), ordenadas alfabéticamente
     { name: "Army of the White Hand", band: "evil" },
@@ -118,5 +122,13 @@ export const appsettings = {
     { name: "The Serpent Horde", band: "evil" },
     { name: "Umbar", band: "evil" },
     { name: "Grand Army of the South", band: "evil" },
+
+    { name: "Fell Beings of Mirkwood (legacy)", band: "evil" },
+    { name: "Assault on Lothlórien (legacy)", band: "evil" },
+    { name: "Army of Dunland (legacy)", band: "evil" },
+    { name: "Variangs of Khand (legacy)", band: "evil" },
+    { name: "Far Harad (legacy)", band: "evil" },
+    { name: "Ravagers of the Shire (legacy)", band: "evil" },
+    { name: "The Spider Queen´s Brood (legacy)", band: "evil" },
   ],
 };
