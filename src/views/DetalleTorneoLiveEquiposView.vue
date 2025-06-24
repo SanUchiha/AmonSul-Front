@@ -65,8 +65,7 @@
                   :completa="true"
                   :editarPartidaPJ="false"
                   :soloValidarPJ="false"
-                  :idInscripcion1="1"
-                  :idInscripcion2="2"
+                  :idEquipo="idEquipo"
                 />
               </div>
               <!-- Partida sin completar -->
@@ -78,8 +77,7 @@
                   :completa="false"
                   :editarPartidaPJ="editarPartidaCapitan(partida)"
                   :soloValidarPJ="soloValidarCapitan(partida)"
-                  :idInscripcion1="1"
-                  :idInscripcion2="2"
+                  :idEquipo="idEquipo"
                 />
               </div>
             </v-col>
@@ -146,6 +144,7 @@ const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const idUsuario = ref<number>();
+const idEquipo = ref<number | null>(null);
 const activeTab = ref();
 const tabClasificacion = ref<number>();
 const tabListas = ref<number>();
@@ -173,6 +172,15 @@ onMounted(async () => {
     console.error(error);
   } finally {
     isLoading.value = false;
+  }
+  if (torneoGestion.value) {
+    for (const equipo of torneoGestion.value.equipos) {
+      if (
+        equipo.inscripciones.some((ins) => ins.idUsuario === idUsuario.value)
+      ) {
+        idEquipo.value = equipo.idEquipo;
+      }
+    }
   }
 
   try {

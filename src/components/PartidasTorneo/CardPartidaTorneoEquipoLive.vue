@@ -60,12 +60,12 @@
           >
             <span
               class="text-wrap"
-              :class="{ highlight: localMatch.idCapitan1 === idUsuario }"
+              :class="{ highlight: localMatch.idEquipo1 === idEquipo }"
               >{{ localMatch.nombreEquipo1 }}</span
             >
             <span
               class="text-wrap"
-              :class="{ highlight: localMatch.idCapitan1 === idUsuario }"
+              :class="{ highlight: localMatch.idEquipo1 === idEquipo }"
             >
               ({{ localMatch.nick1 }})</span
             >
@@ -87,12 +87,12 @@
           >
             <span
               class="text-wrap"
-              :class="{ highlight: localMatch.idCapitan2 === idUsuario }"
+              :class="{ highlight: localMatch.idEquipo2 === idEquipo }"
               >{{ localMatch.nombreEquipo2 }}
             </span>
             <span
               class="text-wrap"
-              :class="{ highlight: localMatch.idCapitan2 === idUsuario }"
+              :class="{ highlight: localMatch.idEquipo2 === idEquipo }"
             >
               ({{ localMatch.nick2 }})</span
             >
@@ -373,6 +373,7 @@ const props = defineProps<{
   completa: boolean;
   editarPartidaPJ: boolean;
   soloValidarPJ: boolean;
+  idEquipo: number | null;
 }>();
 
 const localMatch = reactive({ ...props.match });
