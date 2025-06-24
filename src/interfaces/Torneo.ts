@@ -203,6 +203,8 @@ export interface ClasificacionEquipo {
 }
 
 export interface GenerarOtraRondaEquiposRequestDTO {
+  idTorneo: number;
+  idRonda: number;
   clasificacion: EquipoDTO[];
   permiteRepetirRival: boolean;
   necesitaBye: boolean;

@@ -203,20 +203,26 @@ const confirmarConfiguracion = async () => {
 
   const pairingsPrevios = getPairingsRondaAnterior();
 
-  if (clasififacionEquipo.value != undefined && props.partidas.length > 0) {
+  if (
+    clasififacionEquipo.value != undefined &&
+    props.partidas.length > 0 &&
+    props.torneo
+  ) {
     const request: GenerarOtraRondaEquiposRequestDTO = {
       clasificacion: clasififacionEquipo.value,
       permiteRepetirRival: repetirRival,
       necesitaBye: necesitaBye,
       pairingRondaAnterior: pairingsPrevios,
+      idTorneo: props.torneo.torneo.idTorneo,
+      idRonda: props.ronda,
     };
 
     try {
-      //await generarOtraRondaTorneoEquipos(request);
+      await generarOtraRondaTorneoEquipos(request);
 
       isGenerating.value = false;
       showSuccessModal.value = true;
-      //confirmGenerate();
+      confirmGenerate();
     } catch (error) {
       console.error(error);
       showErrorModal.value = true;

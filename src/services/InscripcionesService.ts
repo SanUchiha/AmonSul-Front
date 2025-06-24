@@ -80,6 +80,13 @@ export const getInscripcionEquipo = async (idInscripcion: number) => {
   return http.get(`Inscripcion/Equipo/${idInscripcion}`);
 };
 
+export const getJugadoresEquipos = async (
+  idInscripcion1: number,
+  idInscripcion2: number
+) => {
+  return http.get(`Inscripcion/Equipo/${idInscripcion1}/${idInscripcion2}`);
+};
+
 export const estaApuntadoTorneoAsync = async (
   idTorneo: number,
   idUsuario: number

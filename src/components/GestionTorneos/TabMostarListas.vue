@@ -182,11 +182,9 @@ watch(
     try {
       if (nuevoTorneo.tipoTorneo === "Individual") {
         const response = await getInfoTorneoCreado(nuevoTorneo.idTorneo);
-        console.log("participantes:", response.data);
         torneoIndividual.value = response.data;
       } else {
         const response = await getInfoTorneoEquipoCreado(nuevoTorneo.idTorneo);
-        console.log("equipos:", response.data);
         torneoEquipos.value = response.data;
       }
     } catch (error) {
@@ -207,7 +205,6 @@ function toggleExpand(nombreEquipo: string) {
 }
 
 const verLista = async (idLista: number, nombre: string, ejercito: string) => {
-  console.log(idLista);
   const responseLista = await getListaById(idLista);
   const listaJugadorDTO: ListaJugador = {
     listaData: responseLista.data.listaData,

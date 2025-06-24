@@ -168,7 +168,7 @@ const verDetalleTorneo = (idTorneo: number) => {
   router.push({ name: "detalle-torneo", params: { idTorneo } });
 };
 const VerResultadoTorneo = (idTorneo: number) => {
-  router.push({ name: "detalle-torneo-live", params: { idTorneo } });
+  router.push({ name: "detalle-torneo-live-equipos", params: { idTorneo } });
 };
 
 const eliminarInscripcionEquipo = async (idEquipo: number) => {

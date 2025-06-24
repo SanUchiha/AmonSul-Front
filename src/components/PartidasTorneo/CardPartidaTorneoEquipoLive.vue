@@ -3,9 +3,51 @@
     <v-card v-bind="props" class="match-card mt-3">
       <v-card-title
         class="text-center text-h5 text-wrap"
-        style="font-family: 'Roboto', sans-serif; color: #ffcc00"
+        style="
+          position: relative;
+          font-family: 'Roboto', sans-serif;
+          color: #ffcc00;
+          text-align: center;
+        "
       >
-        {{ mesa }}
+        <!-- Botón a la izquierda si es Capitán1 -->
+        <v-btn
+          v-if="localMatch.idCapitan1 === idUsuario && !partidaCompleta"
+          size="small"
+          color="primary"
+          variant="tonal"
+          style="
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 8px;
+          "
+          @click="cambiarPairing"
+        >
+          Cambiar
+        </v-btn>
+
+        <!-- Título centrado -->
+        <span class="text-h5">{{ mesa }}</span>
+
+        <!-- Botón a la derecha si es Capitán2 -->
+        <v-btn
+          v-if="localMatch.idCapitan2 === idUsuario && !partidaCompleta"
+          size="small"
+          color="primary"
+          variant="tonal"
+          style="
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-right: 8px;
+          "
+          @click="cambiarPairing"
+        >
+          Cambiar
+        </v-btn>
       </v-card-title>
 
       <v-divider></v-divider>
@@ -13,30 +55,46 @@
         <v-row align="center" justify="center" no-gutters>
           <v-col
             cols="5"
-            @click.prevent="verProfileUser(match.idUsuario1)"
+            @click.prevent="verProfileUser(localMatch.idUsuario1)"
             class="player text-left"
           >
             <span
               class="text-wrap"
-              :class="{ highlight: match.idUsuario1 === idUsuario }"
-              >{{ match.nick1 }}</span
+              :class="{ highlight: localMatch.idCapitan1 === idUsuario }"
+              >{{ localMatch.nombreEquipo1 }}</span
+            >
+            <span
+              class="text-wrap"
+              :class="{ highlight: localMatch.idCapitan1 === idUsuario }"
+            >
+              ({{ localMatch.nick1 }})</span
             >
           </v-col>
 
           <v-col cols="2" class="score text-center marcador">
             <p>vs</p>
-            <p>{{ match.resultadoUsuario1 }}-{{ match.resultadoUsuario2 }}</p>
+            <p>
+              {{ localMatch.resultadoUsuario1 }}-{{
+                localMatch.resultadoUsuario2
+              }}
+            </p>
           </v-col>
 
           <v-col
             cols="5"
-            @click.prevent="verProfileUser(match.idUsuario2)"
+            @click.prevent="verProfileUser(localMatch.idUsuario2)"
             class="player text-right"
           >
             <span
               class="text-wrap"
-              :class="{ highlight: match.idUsuario2 === idUsuario }"
-              >{{ match.nick2 }}</span
+              :class="{ highlight: localMatch.idCapitan2 === idUsuario }"
+              >{{ localMatch.nombreEquipo2 }}
+            </span>
+            <span
+              class="text-wrap"
+              :class="{ highlight: localMatch.idCapitan2 === idUsuario }"
+            >
+              ({{ localMatch.nick2 }})</span
             >
           </v-col>
         </v-row>
@@ -49,11 +107,19 @@
               <v-btn
                 block
                 class="army-btn"
-                @click="verLista(match.idUsuario1, match.idTorneo, match.nick1)"
+                @click="
+                  verLista(
+                    localMatch.idUsuario1,
+                    localMatch.idTorneo,
+                    localMatch.nick1
+                  )
+                "
                 style="font-size: 10px"
                 variant="tonal"
               >
-                <span class="text-wrap">{{ match.ejercitoUsuario1 }}</span>
+                <span class="text-wrap">{{
+                  localMatch.ejercitoUsuario1 ?? "Sin lista"
+                }}</span>
               </v-btn>
             </div>
           </v-col>
@@ -62,11 +128,19 @@
               <v-btn
                 block
                 class="army-btn"
-                @click="verLista(match.idUsuario2, match.idTorneo, match.nick2)"
+                @click="
+                  verLista(
+                    localMatch.idUsuario2,
+                    localMatch.idTorneo,
+                    localMatch.nick2
+                  )
+                "
                 style="font-size: 10px"
                 variant="tonal"
               >
-                <span class="text-wrap">{{ match.ejercitoUsuario2 }}</span>
+                <span class="text-wrap">{{
+                  localMatch.ejercitoUsuario2 ?? "Sin lista"
+                }}</span>
               </v-btn>
             </div>
           </v-col>
@@ -77,7 +151,9 @@
           <v-col cols="12" class="text-center">
             <v-icon left class="location-icon">mdi-map-marker</v-icon>
             Escenario:
-            <strong>{{ match.escenarioPartida || "No disponible" }}</strong>
+            <strong>{{
+              localMatch.escenarioPartida || "No disponible"
+            }}</strong>
           </v-col>
         </v-row>
 
@@ -87,12 +163,14 @@
             <v-card-subtitle class="text-wrap">
               <p>General enemigo matado</p>
               <p class="text-center">
-                <v-icon color="green" v-if="match.liderMuertoUsuario1 === true"
+                <v-icon
+                  color="green"
+                  v-if="localMatch.liderMuertoUsuario1 === true"
                   >mdi-check-circle</v-icon
                 >
                 <v-icon
                   color="red"
-                  v-else-if="match.liderMuertoUsuario1 === false"
+                  v-else-if="localMatch.liderMuertoUsuario1 === false"
                   >mdi-close-circle</v-icon
                 >
                 <v-icon v-else>mdi-dots-horizontal</v-icon>
@@ -104,12 +182,14 @@
             <v-card-subtitle class="text-wrap">
               <p>General enemigo matado</p>
               <p class="text-center">
-                <v-icon color="green" v-if="match.liderMuertoUsuario2 === true"
+                <v-icon
+                  color="green"
+                  v-if="localMatch.liderMuertoUsuario2 === true"
                   >mdi-check-circle</v-icon
                 >
                 <v-icon
                   color="red"
-                  v-else-if="match.liderMuertoUsuario2 === false"
+                  v-else-if="localMatch.liderMuertoUsuario2 === false"
                   >mdi-close-circle</v-icon
                 >
                 <v-icon v-else>mdi-dots-horizontal</v-icon>
@@ -126,11 +206,13 @@
         <v-row align="center" v-if="completa" class="match-outcome">
           <v-col cols="5" class="text-center">
             <v-chip
-              :color="getColorGanador(match, match.idUsuario1)"
+              :color="getColorGanador(localMatch, localMatch.idUsuario1)"
               class="outcome-chip"
             >
-              <p v-if="match.nick1 === getGanador(match)">Victoria</p>
-              <p v-else-if="match.nick2 === getGanador(match)">Derrota</p>
+              <p v-if="localMatch.nick1 === getGanador(localMatch)">Victoria</p>
+              <p v-else-if="localMatch.nick2 === getGanador(localMatch)">
+                Derrota
+              </p>
               <p v-else>Empate</p>
             </v-chip>
           </v-col>
@@ -139,11 +221,13 @@
 
           <v-col cols="5" class="text-center">
             <v-chip
-              :color="getColorGanador(match, match.idUsuario2)"
+              :color="getColorGanador(localMatch, localMatch.idUsuario2)"
               class="outcome-chip"
             >
-              <p v-if="match.nick2 === getGanador(match)">Victoria</p>
-              <p v-else-if="match.nick1 === getGanador(match)">Derrota</p>
+              <p v-if="localMatch.nick2 === getGanador(localMatch)">Victoria</p>
+              <p v-else-if="localMatch.nick1 === getGanador(localMatch)">
+                Derrota
+              </p>
               <p v-else>Empate</p>
             </v-chip>
           </v-col>
@@ -155,20 +239,20 @@
             >
           </v-col>
         </v-row>
-
         <!-- Botón de validación 
            Si la partida no está completa, miramos si solo tiene que validar 
            o validar y meter datos de la partida -->
-        <v-row v-if="!completa && editarPartidaPJ && !soloValidarPJ">
+        <v-row v-if="!partidaCompleta && editarPartidaPJ && esCapitan">
           <v-col cols="12" class="text-center">
-            <v-btn color="success" @click="editPartida(match, idUsuario)">
+            <v-btn color="success" @click="editPartida(localMatch, idUsuario)">
               Validar Resultado
             </v-btn>
           </v-col>
         </v-row>
-        <v-row v-else-if="!completa && soloValidarPJ">
+
+        <v-row v-else-if="!partidaCompleta && soloValidarPJ && esCapitan">
           <v-col cols="12" class="text-center">
-            <v-btn color="success" @click="abrirModalValidar(match)">
+            <v-btn color="success" @click="abrirModalValidar(localMatch)">
               Validar Resultado
             </v-btn>
           </v-col>
@@ -208,6 +292,37 @@
     @cerrar="cerrarModalValidar"
   />
 
+  <!-- Modal éxito -->
+  <ModalSuccess
+    :isVisible="showSuccessModal"
+    message="Partida validada con éxito."
+    @update:isVisible="showSuccessModal = $event"
+  />
+
+  <!-- Modal error -->
+  <ModalError
+    :isVisible="showErrorModal"
+    message="Ha ocurrido un error al validar la partida. Inténtalo de nuevo o contacta al administrador del torneo."
+    @update:isVisible="showErrorModal = $event"
+  />
+
+  <!-- Modal error -->
+  <ModalError
+    :isVisible="showErrorCambiarPairingModal"
+    message="Ha ocurrido un error al cambiar el emparejamiento . Inténtalo de nuevo o contacta al administrador del torneo."
+    @update:isVisible="showErrorCambiarPairingModal = $event"
+  />
+
+  <!-- Modal cambiar pairing entre equipos -->
+  <ModalCambiarPairingEquipo
+    :isVisible="showModalCambiarPairing"
+    :idEquipo1="idEquipo1!"
+    :idEquipo2="idEquipo2!"
+    :nombreEquipo1="nombreEquipo1!"
+    :nombreEquipo2="nombreEquipo2!"
+    @actualizar="actualizarPairing"
+    @cerrar="showModalCambiarPairing = false"
+  />
   <!-- Spinner Modal -->
   <v-dialog v-model="isLoading" persistent width="300">
     <v-card>
@@ -226,18 +341,41 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted } from "vue";
-import { PartidaTorneoDTO } from "@/interfaces/Partidas";
+import { defineProps, ref, onMounted, computed, watch, reactive } from "vue";
+import {
+  ActualizarPairingEquiposDTO,
+  PartidaTorneoDTO,
+} from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
 import { getlistaTorneo } from "@/services/ListasService";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
-import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
-import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
+import {
+  updatePairingTorneo,
+  updatePartidaTorneo,
+} from "@/services/PartidaTorneoService";
+import {
+  RequestUpdatePairingTorneoDTO,
+  UpdatePartidaTorneoDTO,
+} from "@/interfaces/Live";
 import ModalEditarPartida from "@/components/ResultadosTorneos/ModalEditarPartida.vue";
 import { ListaDTO } from "@/interfaces/Usuario";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import ModalError from "../Commons/ModalError.vue";
+import ModalCambiarPairingEquipo from "./ModalCambiarPairingEquipo.vue";
+
+const props = defineProps<{
+  match: PartidaTorneoDTO;
+  idUsuario: number;
+  mesa: string;
+  completa: boolean;
+  editarPartidaPJ: boolean;
+  soloValidarPJ: boolean;
+}>();
+
+const localMatch = reactive({ ...props.match });
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);
@@ -247,8 +385,10 @@ const listaDTO = ref<ListaDTO>();
 const nickJugador = ref<string>("");
 const isModalListaVisible = ref<boolean>(false);
 const currentEjercito = ref<string>();
-
 const fechaPartidaFormateada = ref<string>("");
+const showErrorModal = ref<boolean>(false);
+const showErrorCambiarPairingModal = ref<boolean>(false);
+const showSuccessModal = ref<boolean>(false);
 
 //Variables para el modal validar partida
 const isModalValidarVisible = ref<boolean>(false);
@@ -281,22 +421,85 @@ const partidaSelected = ref<PartidaTorneoDTO>({
   idEquipo2: null,
   nombreEquipo1: null,
   nombreEquipo2: null,
+  idCapitan1: null,
+  idCapitan2: null,
 });
 
-const props = defineProps<{
-  match: PartidaTorneoDTO;
-  idUsuario: number;
-  mesa: string;
-  completa: boolean;
-  editarPartidaPJ: boolean;
-  soloValidarPJ: boolean;
-}>();
+//Variables para cambiar pairing entre equipos
+const showModalCambiarPairing = ref<boolean>(false);
+const idEquipo1 = ref<number | null>(localMatch.idEquipo1);
+const idEquipo2 = ref<number | null>(localMatch.idEquipo2);
+const nombreEquipo1 = ref<string | null>(localMatch.nombreEquipo1);
+const nombreEquipo2 = ref<string | null>(localMatch.nombreEquipo2);
+
+const partidaCompleta = ref<boolean>(props.completa);
+watch(
+  () => props.completa,
+  (nuevoValor) => {
+    partidaCompleta.value = nuevoValor;
+  }
+);
+
+const cambiarPairing = () => {
+  showModalCambiarPairing.value = true;
+};
+
+const actualizarPairing = async (payload: ActualizarPairingEquiposDTO) => {
+  // enviar al backend
+  const isUpdate: boolean = await sendUpdateBack(
+    payload.idJugador1,
+    payload.idJugador2
+  );
+
+  if (isUpdate) {
+    // Actualizas localMatch según el nuevo pairing
+    localMatch.idUsuario1 = payload.idJugador1;
+    localMatch.idUsuario2 = payload.idJugador2;
+    localMatch.ejercitoUsuario1 = payload.ejercitoEquipo1;
+    localMatch.ejercitoUsuario2 = payload.ejercitoEquipo2;
+    localMatch.nick1 = payload.nick1;
+    localMatch.nick2 = payload.nick2;
+
+    // Si necesitas actualizar también nombres o algo más, hazlo aquí
+  } else {
+    // manejar error
+  }
+  showModalCambiarPairing.value = false;
+};
+
+const sendUpdateBack = async (idJugador1: number, idJugador2: number) => {
+  try {
+    isLoading.value = true;
+
+    const body: RequestUpdatePairingTorneoDTO = {
+      idPartidaTorneo: localMatch.idPartidaTorneo,
+      idUsuario1: idJugador1,
+      idUsuario2: idJugador2,
+    };
+
+    await updatePairingTorneo(body);
+    return true;
+  } catch (error) {
+    console.error(error);
+    showErrorCambiarPairingModal.value = true;
+    return false;
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const esCapitan = computed(() => {
+  return (
+    localMatch.idCapitan1 === props.idUsuario ||
+    localMatch.idCapitan2 === props.idUsuario
+  );
+});
 
 const initializeComponent = async () => {
   try {
     isLoading.value = true;
     fechaPartidaFormateada.value = await formatFechaSpa(
-      props.match.fechaPartida
+      localMatch.fechaPartida
     );
   } catch (err) {
     console.error(error);
@@ -342,6 +545,7 @@ const getGanador = (partida: PartidaTorneoDTO) => {
     return "Empate";
   }
 };
+
 const getColorGanador = (partida: PartidaTorneoDTO, idUsuario: number) => {
   if (partida.ganadorPartidaTorneo === idUsuario) {
     return "green";
@@ -388,13 +592,14 @@ const cerrarModalValidar = () => {
 const editPartida = (partida: PartidaTorneoDTO, idUsuario: number) => {
   partidaSelected.value = partida;
 
-  if (idUsuario === partida.idUsuario1) idUsuarioSelected.value = 1;
+  if (idUsuario === partida.idCapitan1) idUsuarioSelected.value = 1;
   else idUsuarioSelected.value = 2;
 
   isModalEditarPartidaVisible.value = true;
 };
 
 const confirmarEditarPartida = async (partida: PartidaTorneoDTO) => {
+  isLoading.value = true;
   if (partida) {
     const body: UpdatePartidaTorneoDTO = {
       idPartidaTorneo: partida.idPartidaTorneo,
@@ -409,12 +614,18 @@ const confirmarEditarPartida = async (partida: PartidaTorneoDTO) => {
     else body.partidaValidadaUsuario2 = true;
 
     try {
-      await updatePartidaTorneo(body);
+      const response = await updatePartidaTorneo(body);
+
+      if (response.data) {
+        showSuccessModal.value = true;
+        partidaCompleta.value = true;
+      }
     } catch (error) {
       console.error(error);
+      showErrorModal.value = true;
     } finally {
       isModalEditarPartidaVisible.value = false;
-      window.location.reload();
+      isLoading.value = false;
     }
   }
 };

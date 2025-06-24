@@ -85,7 +85,7 @@ export interface ComponentesEquipoDTO {
   estadoLista?: string;
   fechaEntregaLista?: string;
   listaData?: string;
-  ejercito?: string;
+  ejercito: string | null;
   idLista: number;
 }
 
@@ -130,4 +130,10 @@ export interface InscripcionTorneoDTO {
   ejercito?: string | null;
   idLista: number;
   nick: string;
+}
+
+export interface JugadoresEquipoParaCambioDTO {
+  idEquipo: number;
+  nombreEquipo: string;
+  componentesEquipoDTO: ComponentesEquipoDTO[];
 }
