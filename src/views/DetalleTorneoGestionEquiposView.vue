@@ -540,14 +540,18 @@
       @confirm="handleModificarPartidaTorneoConfirm"
     />
 
-    <!-- Modal cambiar pairing -->
-    <ModalEditarPairing
+    <!-- Modal cambiar pairing entre equipos -->
+    <ModalCambiarPairingEquipoGestion
       :isVisible="showModificarPairingModal"
+      :idEquipo1="partidaActual.idEquipo1!"
+      :idEquipo2="partidaActual.idEquipo2!"
+      :nombreEquipo1="partidaActual.nombreEquipo1!"
+      :nombreEquipo2="partidaActual.nombreEquipo2!"
       :partida="partidaActual"
-      :idTorneo="idTorneo!"
-      @cerrar="closeModificarPairingModal"
-      @confirm="handleModificarPairingTorneoConfirm"
+      @actualizar="actualizarPairing"
+      @cerrar="showModificarPairingModal = false"
     />
+
     <!-- Modal cambiar pairing -->
     <ModalAgregarPairing
       :isVisible="showAgregarPairingModal"
@@ -576,6 +580,13 @@
       :isVisible="showErrorModal"
       message="No se han podido guardar los resultados. Intentalo de nuevo y si el error persiste contacta con el administrador."
       @update:isVisible="showErrorModal = $event"
+    />
+
+    <!-- Modal error -->
+    <ModalError
+      :isVisible="showErrorCambiarPairingModal"
+      message="Ha ocurrido un error al cambiar el emparejamiento. Inténtalo de nuevo o contacta al administrador del torneo."
+      @update:isVisible="showErrorCambiarPairingModal = $event"
     />
 
     <!-- Modal de progreso circular -->
@@ -614,12 +625,19 @@ import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
 import {
   Clasificacion,
   GenerarRonda,
+  RequestUpdatePairingTorneoDTO,
   UpdatePartidaTorneoDTO,
 } from "@/interfaces/Live";
-import { PartidaTorneoDTO } from "@/interfaces/Partidas";
+import {
+  ActualizarPairingEquiposDTO,
+  PartidaTorneoDTO,
+} from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
 import { getlistaTorneo } from "@/services/ListasService";
-import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
+import {
+  updatePairingTorneo,
+  updatePartidaTorneo,
+} from "@/services/PartidaTorneoService";
 import {
   getPartidasTorneo,
   getTorneo,
@@ -628,7 +646,6 @@ import {
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPartidaGestion.vue";
-import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.vue";
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
@@ -639,6 +656,7 @@ import CardGestionAccionesTorneoEquipo from "@/components/GestionTorneos/Equipos
 import CardInfoEquipo from "@/components/GestionTorneos/Equipos/CardInfoEquipo.vue";
 import { ListaDTO } from "@/interfaces/Usuario";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
+import ModalCambiarPairingEquipoGestion from "@/components/PartidasTorneo/ModalCambiarPairingEquipoGestion.vue";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -656,6 +674,7 @@ const isModalPuntosVisible = ref<boolean>(false);
 const isModalLiderVisible = ref<boolean>(false);
 const isModalEscenarioVisible = ref<boolean>(false);
 const isModalValidarVisible = ref<boolean>(false);
+const showErrorCambiarPairingModal = ref<boolean>(false);
 const tabClasificacion = ref<number>();
 const route = useRoute();
 const idTorneo = ref<number>();
@@ -702,6 +721,8 @@ const partidaActual = ref<PartidaTorneoDTO>({
   idEquipo2: null,
   nombreEquipo1: null,
   nombreEquipo2: null,
+  idCapitan1: null,
+  idCapitan2: null,
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
@@ -930,28 +951,12 @@ const recargarPagina = () => {
   window.location.reload();
 };
 
-const closeModificarPairingModal = () => {
-  showModificarPairingModal.value = false;
-};
-
 const closeAgregarPairingModal = () => {
   showAgregarPairingModal.value = false;
 };
 
 const closeEliminarPartidaModal = () => {
   showEliminarPartidaModal.value = false;
-};
-
-const handleModificarPairingTorneoConfirm = () => {
-  try {
-    showSuccessModal.value = true;
-  } catch (error) {
-    console.error(error);
-    showErrorModal.value = true;
-  } finally {
-    isGenerating.value = false;
-    closeModificarPairingModal();
-  }
 };
 
 const handleEliminarPartidaConfirm = () => {
@@ -1394,6 +1399,42 @@ const cerrarModalValidar = () => {
 const formatDate = (date: string | null | undefined) => {
   if (!date) return "N/A";
   return new Date(date).toLocaleDateString();
+};
+
+const sendUpdateBack = async (idJugador1: number, idJugador2: number) => {
+  try {
+    const body: RequestUpdatePairingTorneoDTO = {
+      idPartidaTorneo: partidaActual.value.idPartidaTorneo,
+      idUsuario1: idJugador1,
+      idUsuario2: idJugador2,
+    };
+
+    await updatePairingTorneo(body);
+    return true;
+  } catch (error) {
+    console.error(error);
+    showErrorCambiarPairingModal.value = true;
+    return false;
+  }
+};
+
+const actualizarPairing = async (payload: ActualizarPairingEquiposDTO) => {
+  isGenerating.value = true;
+  const isUpdate: boolean = await sendUpdateBack(
+    payload.idJugador1,
+    payload.idJugador2
+  );
+
+  if (isUpdate) {
+    partidaActual.value.idUsuario1 = payload.idJugador1;
+    partidaActual.value.idUsuario2 = payload.idJugador2;
+    partidaActual.value.ejercitoUsuario1 = payload.ejercitoEquipo1;
+    partidaActual.value.ejercitoUsuario2 = payload.ejercitoEquipo2;
+    partidaActual.value.nick1 = payload.nick1;
+    partidaActual.value.nick2 = payload.nick2;
+  }
+  showModificarPairingModal.value = false;
+  isGenerating.value = false;
 };
 </script>
 <style scoped>

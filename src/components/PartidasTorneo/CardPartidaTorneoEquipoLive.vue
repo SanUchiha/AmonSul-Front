@@ -118,7 +118,7 @@
                 variant="tonal"
               >
                 <span class="text-wrap">{{
-                  localMatch.ejercitoUsuario1 ?? "Sin lista"
+                  localMatch.ejercitoUsuario1 ?? "Lista"
                 }}</span>
               </v-btn>
             </div>
@@ -139,7 +139,7 @@
                 variant="tonal"
               >
                 <span class="text-wrap">{{
-                  localMatch.ejercitoUsuario2 ?? "Sin lista"
+                  localMatch.ejercitoUsuario2 ?? "Lista"
                 }}</span>
               </v-btn>
             </div>
@@ -245,7 +245,7 @@
         <v-row v-if="!partidaCompleta && editarPartidaPJ && esCapitan">
           <v-col cols="12" class="text-center">
             <v-btn color="success" @click="editPartida(localMatch, idUsuario)">
-              Validar Resultado
+              Validar Resultadoo
             </v-btn>
           </v-col>
         </v-row>
@@ -309,7 +309,7 @@
   <!-- Modal error -->
   <ModalError
     :isVisible="showErrorCambiarPairingModal"
-    message="Ha ocurrido un error al cambiar el emparejamiento . Inténtalo de nuevo o contacta al administrador del torneo."
+    message="Ha ocurrido un error al cambiar el emparejamiento. Inténtalo de nuevo o contacta al administrador del torneo."
     @update:isVisible="showErrorCambiarPairingModal = $event"
   />
 
@@ -571,7 +571,7 @@ const confirmarValidar = async () => {
       idPartidaTorneo: idPartidaSeleccionada.value,
     };
 
-    if (usuarioSeleccionado.value === 1) body.partidaValidadaUsuario1 = true;
+    if (usuarioSeleccionado.value == 1) body.partidaValidadaUsuario1 = true;
     else body.partidaValidadaUsuario2 = true;
 
     try {
@@ -593,7 +593,7 @@ const cerrarModalValidar = () => {
 const editPartida = (partida: PartidaTorneoDTO, idUsuario: number) => {
   partidaSelected.value = partida;
 
-  if (idUsuario === partida.idCapitan1) idUsuarioSelected.value = 1;
+  if (idUsuario == partida.idCapitan1) idUsuarioSelected.value = 1;
   else idUsuarioSelected.value = 2;
 
   isModalEditarPartidaVisible.value = true;
@@ -609,10 +609,9 @@ const confirmarEditarPartida = async (partida: PartidaTorneoDTO) => {
       escenarioPartida: partida.escenarioPartida,
       liderMuertoUsuario1: partida.liderMuertoUsuario1,
       liderMuertoUsuario2: partida.liderMuertoUsuario2,
+      partidaValidadaUsuario1: partida.partidaValidadaUsuario1,
+      partidaValidadaUsuario2: partida.partidaValidadaUsuario2,
     };
-
-    if (partida.partidaValidadaUsuario1) body.partidaValidadaUsuario1 = true;
-    else body.partidaValidadaUsuario2 = true;
 
     try {
       const response = await updatePartidaTorneo(body);

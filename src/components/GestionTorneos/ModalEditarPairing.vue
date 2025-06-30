@@ -81,6 +81,7 @@ import {
 import { updatePairingTorneo } from "@/services/PartidaTorneoService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
+import { useRoute } from "vue-router";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -104,6 +105,8 @@ const jugadores = ref<UsuarioInscripcionTorneoDTO[]>();
 const isGenerating = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
+const route = useRoute();
+const idTorneo = ref<number>(parseInt(route.params.idTorneo.toString()));
 
 // Función para cerrar el modal
 const cerrarModal = () => {
@@ -168,12 +171,11 @@ const changeJugador = async () => {
 };
 
 onMounted(async () => {
-  if (!props.idTorneo) return;
+  if (!idTorneo.value) return;
   try {
-    const responseJugadores = await getUsuariosByTorneo(props.idTorneo);
+    const responseJugadores = await getUsuariosByTorneo(idTorneo.value);
     jugadores.value = responseJugadores.data;
 
-    // Mapeamos el array de jugadores para obtener solo el idUsuario y el nick
     jugadores.value = responseJugadores.data.map((jugador: UsuarioFastDTO) => ({
       idUsuario: jugador.idUsuario,
       nick: jugador.nick,

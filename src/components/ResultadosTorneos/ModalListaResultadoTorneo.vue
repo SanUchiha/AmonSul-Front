@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isVisible" persistent max-width="600">
+  <v-dialog v-model="isVisible" persistent width="100%" max-width="none">
     <v-card>
       <v-card-title class="d-flex align-center">
         <div>
@@ -22,9 +22,10 @@
           v-else
           :src="listaData"
           alt="Lista de {{ nickJugador }}"
-          max-height="500"
           class="rounded-lg"
-          cover
+          width="100%"
+          aspect-ratio="1"
+          contain
         ></v-img>
       </v-card-text>
     </v-card>

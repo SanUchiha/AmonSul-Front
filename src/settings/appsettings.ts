@@ -3,12 +3,12 @@ export const appsettings = {
   apiUrl: "https://sanuchiha-001-site1.ctempurl.com/api/",
 
   escenarios: [
-    "1. Domination",
-    "2. To the Death!",
-    "3. Hold Ground",
-    "4. Destroy the Supplies",
-    "5. Reconnoitre",
-    "6. Fog of War",
+    "Domination",
+    "To the Death!",
+    "Hold Ground",
+    "Destroy the Supplies",
+    "Reconnoitre",
+    "Fog of War",
   ],
 
   armies: [

@@ -106,9 +106,12 @@ const cerrarModal = () => {
 
 // Confirmar los puntos y cerrar el modal
 const confirmarEditarPartida = () => {
-  if (props.idUsuario === 1)
+  if (props.idUsuario == 1) {
     partidaEditada.value.partidaValidadaUsuario1 = true;
-  else partidaEditada.value.partidaValidadaUsuario2 = true;
+  } else {
+    partidaEditada.value.partidaValidadaUsuario2 = true;
+  }
+
   emit("confirmar", partidaEditada.value);
   cerrarModal();
 };

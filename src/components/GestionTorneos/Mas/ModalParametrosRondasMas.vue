@@ -122,17 +122,12 @@ import {
   JugadorParaEmparejamiento,
 } from "@/interfaces/Live";
 import {
-  InscripcionTorneoCreadoDTO,
   InscripcionTorneoCreadoMasDTO,
-  TorneoGestionInfoDTO,
   TorneoGestionInfoMasDTO,
 } from "@/interfaces/Torneo";
 import { generarRonda } from "@/services/PartidaTorneoService";
 import { ref, defineProps, defineEmits, watch, onMounted, computed } from "vue";
-import {
-  getInfoTorneoCreadoMasAsync,
-  getPartidasTorneoByRonda,
-} from "@/services/TorneosService";
+import { getPartidasTorneoByRonda } from "@/services/TorneosService";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
