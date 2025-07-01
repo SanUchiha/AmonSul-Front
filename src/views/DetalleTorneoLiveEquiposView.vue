@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-unused-vars -->
 <template>
   <v-sheet class="pa-4">
     <div v-if="isLoading">
@@ -8,10 +7,10 @@
       <!-- TABS -->
       <v-tabs v-model="activeTab" fixed-tabs>
         <v-tab
-          v-if="torneo?.mostrarListas"
-          :key="tabListas"
-          :text="`Listas`"
-          :value="tabListas"
+          v-if="misPartidas.length > 0"
+          :key="tabMisPartidas"
+          :text="`Mis partidas`"
+          :value="tabMisPartidas"
         ></v-tab>
         <v-tab
           v-for="n in numeroRondas"
@@ -20,6 +19,12 @@
           :value="n"
         >
         </v-tab>
+        <v-tab
+          v-if="torneo?.mostrarListas"
+          :key="tabListas"
+          :text="`Listas`"
+          :value="tabListas"
+        ></v-tab>
         <v-tab
           v-if="torneo?.mostrarClasificacion"
           :key="tabClasificacion"
@@ -38,8 +43,8 @@
           <TabMostarListas :torneo="torneo" />
         </v-window-item>
 
-        <!-- tab dinamicas -->
-        <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
+        <!-- tab mis partidas -->
+        <v-window-item :value="tabMisPartidas" :key="tabMisPartidas">
           <v-row>
             <v-col
               cols="12"
@@ -48,7 +53,7 @@
               lg="6"
               xl="4"
               class="pb-0"
-              v-for="(partida, index) in partidasPorRonda[activeTab!]"
+              v-for="(partida, index) in misPartidas"
               :key="partida.idPartidaTorneo"
               :value="activeTab"
             >
@@ -67,6 +72,7 @@
                   :editarPartidaPJ="false"
                   :soloValidarPJ="false"
                   :idEquipo="idEquipo"
+                  :misPartidas="true"
                 />
               </div>
               <!-- Partida sin completar -->
@@ -79,6 +85,56 @@
                   :editarPartidaPJ="editarPartidaCapitan(partida)"
                   :soloValidarPJ="soloValidarCapitan(partida)"
                   :idEquipo="idEquipo"
+                  :misPartidas="true"
+                />
+              </div>
+            </v-col>
+          </v-row>
+        </v-window-item>
+
+        <!-- tab dinamicas -->
+        <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
+          <v-row>
+            <v-col
+              cols="12"
+              sm="12"
+              md="6"
+              lg="6"
+              xl="4"
+              class="pb-0"
+              v-for="(partida, index) in partidasPorRonda[n]"
+              :key="partida.idPartidaTorneo"
+              :value="activeTab"
+            >
+              <!-- Partida completada -->
+              <div
+                v-if="
+                  partida.partidaValidadaUsuario1 === true &&
+                  partida.partidaValidadaUsuario2 === true
+                "
+              >
+                <CardPartidaTorneoEquipoLive
+                  :idUsuario="parseInt(idUsuarioLogger!)"
+                  :match="partida"
+                  :mesa="`Mesa ${index + 1}`"
+                  :completa="true"
+                  :editarPartidaPJ="false"
+                  :soloValidarPJ="false"
+                  :idEquipo="idEquipo"
+                  :misPartidas="false"
+                />
+              </div>
+              <!-- Partida sin completar -->
+              <div v-else>
+                <CardPartidaTorneoEquipoLive
+                  :idUsuario="parseInt(idUsuarioLogger!)"
+                  :match="partida"
+                  :mesa="`Mesa ${index + 1}`"
+                  :completa="false"
+                  :editarPartidaPJ="editarPartidaCapitan(partida)"
+                  :soloValidarPJ="soloValidarCapitan(partida)"
+                  :idEquipo="idEquipo"
+                  :misPartidas="false"
                 />
               </div>
             </v-col>
@@ -140,15 +196,18 @@ const isLoading = ref<boolean>(false);
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
+const misPartidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const idUsuario = ref<number>();
 const idEquipo = ref<number | null>(null);
-const activeTab = ref();
-const tabClasificacion = ref<number>();
-const tabListas = ref<number>();
+const activeTab = ref<number>(0);
+const tabClasificacion = ref<number>(2);
+const tabListas = ref<number>(0);
+const tabMisPartidas = ref<number>(1);
+const tabRondas = ref<number>(4);
 const clasificacion = ref<Clasificacion[]>([]);
 const jugadoresZona1 = ref<Clasificacion[]>([]);
 const jugadoresZona2 = ref<Clasificacion[]>([]);
@@ -211,12 +270,21 @@ onMounted(async () => {
     calcularClasificacion();
 
     tabClasificacion.value = numeroRondas.value.length + 1;
+    tabListas.value = numeroRondas.value.length + 2;
+    tabMisPartidas.value = 0;
 
-    if (torneo.value?.mostrarListas) {
-      activeTab.value = tabListas.value;
+    //Mis partidas
+    misPartidas.value = partidas.value.filter(
+      (p) => p.idEquipo1 == idEquipo.value || p.idEquipo2 == idEquipo.value
+    );
+
+    if (misPartidas.value.length > 0) {
+      activeTab.value = tabMisPartidas.value;
     } else {
       activeTab.value = numeroRondas.value[0] ?? 1;
     }
+
+    //Ajustamos tab
   } catch (error) {
     console.error("calcularClasificacion", error);
   } finally {

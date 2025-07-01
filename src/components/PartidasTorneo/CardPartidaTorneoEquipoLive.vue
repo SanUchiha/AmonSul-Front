@@ -29,7 +29,8 @@
         </v-btn>
 
         <!-- Título centrado -->
-        <span class="text-h5">{{ mesa }}</span>
+        <span v-if="misPartidas" class="text-h5">Partida</span>
+        <span v-else class="text-h5">{{ mesa }}</span>
 
         <!-- Botón a la derecha si es Capitán2 -->
         <v-btn
@@ -374,6 +375,7 @@ const props = defineProps<{
   editarPartidaPJ: boolean;
   soloValidarPJ: boolean;
   idEquipo: number | null;
+  misPartidas?: boolean;
 }>();
 
 const localMatch = reactive({ ...props.match });
