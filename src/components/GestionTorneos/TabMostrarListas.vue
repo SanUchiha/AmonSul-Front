@@ -26,9 +26,14 @@
         :headers="headers"
       >
         <template v-slot:item="{ item }">
-          <tr @click="emit('goToUserDetail', item.idUsuario)">
+          <tr>
             <td>
-              <v-chip color="orange" dark>{{ item.nick }}</v-chip>
+              <v-chip
+                @click="goToUserDetail(item.idUsuario)"
+                color="orange"
+                dark
+                >{{ item.nick }}</v-chip
+              >
               <v-btn
                 v-if="item.idLista != 0"
                 icon
@@ -41,6 +46,9 @@
                   height="50"
                 />
               </v-btn>
+              <v-chip v-if="item.idLista" color="orange" dark>{{
+                item.ejercito
+              }}</v-chip>
             </td>
           </tr>
         </template>
@@ -98,10 +106,24 @@
                     v-for="participante in item.inscripciones"
                     :key="participante.idUsuario"
                   >
-                    <template v-slot:prepend>
+                    <v-list-item-title>
+                      <v-chip
+                        @click="goToUserDetail(participante.idUsuario)"
+                        :color="
+                          item.idCapitan === participante.idUsuario
+                            ? 'purple'
+                            : 'orange'
+                        "
+                        dark
+                      >
+                        {{ participante.nick }}
+                      </v-chip>
+                      / {{ participante.ejercito }}
+
                       <v-btn
                         v-if="participante.idLista != 0"
                         icon
+                        class="ml-2"
                         @click.stop="
                           verLista(
                             participante.idLista,
@@ -113,17 +135,11 @@
                         <img
                           src="@/assets/icons/verdetalle.png"
                           alt="Detalle"
-                          width="50"
-                          height="50"
+                          width="30"
+                          height="30"
                         />
                       </v-btn>
-                    </template>
-                    <v-list-item-title
-                      >&nbsp;
-                      {{
-                        participante.nick || "Desconocido"
-                      }}</v-list-item-title
-                    >
+                    </v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-card>
@@ -150,15 +166,12 @@ import {
   getInfoTorneoCreado,
   getInfoTorneoEquipoCreado,
 } from "@/services/TorneosService";
-import { ref, defineProps, defineEmits, watch } from "vue";
+import { ref, defineProps, watch } from "vue";
 import ModalVerLista from "../Inscripcion/ModalVerLista.vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps<{
   torneo: Torneo | undefined;
-}>();
-
-const emit = defineEmits<{
-  (e: "goToUserDetail", idUsuario: number): void;
 }>();
 
 const torneoIndividual = ref<TorneoGestionInfoDTO>();
@@ -171,6 +184,7 @@ const headersEquipos = [{ title: "Nombre del equipo", key: "nombreEquipo" }];
 const expanded = ref<string[]>([]);
 const listaJugador = ref<ListaJugador>();
 const showVerListaModal = ref<boolean>(false);
+const router = useRouter();
 
 watch(
   () => props.torneo,
@@ -213,6 +227,10 @@ const verLista = async (idLista: number, nombre: string, ejercito: string) => {
   };
   listaJugador.value = listaJugadorDTO;
   showVerListaModal.value = true;
+};
+
+const goToUserDetail = (idUsuario: number) => {
+  router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
 };
 </script>
 

@@ -38,11 +38,6 @@
           <p>Aún no se ha generado ninguna ronda</p>
         </div>
 
-        <!-- Tab Listas -->
-        <v-window-item :value="tabListas" :key="tabListas">
-          <TabMostarListas :torneo="torneo" />
-        </v-window-item>
-
         <!-- tab mis partidas -->
         <v-window-item :value="tabMisPartidas" :key="tabMisPartidas">
           <v-row>
@@ -141,10 +136,15 @@
           </v-row>
         </v-window-item>
 
+        <!-- Tab Listas -->
+        <v-window-item :value="tabListas" :key="tabListas">
+          <TabMostrarListas :torneo="torneo" />
+        </v-window-item>
+
         <!-- Tab clasificacion -->
         <TabClasificacionEquipos
           :tabClasificacion="tabClasificacion"
-          :activeTab="activeTab"
+          :activeTab="activeTab!"
           :torneo="torneo"
           :partidas="partidas"
           :equipos="torneoGestion?.equipos"
@@ -174,7 +174,7 @@
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
-import TabMostarListas from "@/components/GestionTorneos/TabMostarListas.vue";
+import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import CardPartidaTorneoEquipoLive from "@/components/PartidasTorneo/CardPartidaTorneoEquipoLive.vue";
 import { useAuth } from "@/composables/useAuth";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";

@@ -35,7 +35,7 @@
 
         <!-- Tab Listas -->
         <v-window-item :value="tabListas" :key="tabListas">
-          <TabMostarListas :torneo="torneo" />
+          <TabMostrarListas :torneo="torneo" />
         </v-window-item>
 
         <!-- tab dinamicas -->
@@ -235,7 +235,7 @@
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import TabMostarListas from "@/components/GestionTorneos/TabMostarListas.vue";
+import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import { useAuth } from "@/composables/useAuth";
 import { Clasificacion } from "@/interfaces/Live";
