@@ -111,14 +111,24 @@
                         @click="goToUserDetail(participante.idUsuario)"
                         :color="
                           item.idCapitan === participante.idUsuario
-                            ? 'purple'
+                            ? 'teal'
                             : 'orange'
                         "
                         dark
                       >
                         {{ participante.nick }}
                       </v-chip>
-                      / {{ participante.ejercito }}
+                      <span
+                        dark
+                        outlined
+                        small
+                        class="ml-2"
+                        :style="{
+                          color: getColorPorEjercito(participante.ejercito),
+                        }"
+                      >
+                        {{ participante.ejercito }}
+                      </span>
 
                       <v-btn
                         v-if="participante.idLista != 0"
@@ -169,6 +179,8 @@ import {
 import { ref, defineProps, watch } from "vue";
 import ModalVerLista from "../Inscripcion/ModalVerLista.vue";
 import { useRouter } from "vue-router";
+import { ArmyDTO } from "@/interfaces/Army";
+import { appsettings } from "@/settings/appsettings";
 
 const props = defineProps<{
   torneo: Torneo | undefined;
@@ -185,6 +197,7 @@ const expanded = ref<string[]>([]);
 const listaJugador = ref<ListaJugador>();
 const showVerListaModal = ref<boolean>(false);
 const router = useRouter();
+const listadoEjercitos = ref<ArmyDTO[]>(appsettings.armies);
 
 watch(
   () => props.torneo,
@@ -232,6 +245,14 @@ const verLista = async (idLista: number, nombre: string, ejercito: string) => {
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
 };
+
+function getColorPorEjercito(nombreEjercito: string): string {
+  const ejercito = listadoEjercitos.value.find(
+    (e) => e.name === nombreEjercito
+  );
+  if (!ejercito) return "grey";
+  return ejercito.band === "good" ? "green" : "purple";
+}
 </script>
 
 <style scoped>
