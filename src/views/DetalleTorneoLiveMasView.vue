@@ -20,6 +20,7 @@
         >
         </v-tab>
         <v-tab
+          v-if="torneo?.mostrarClasificacion"
           :key="tabClasificacion"
           :text="`Clasificación`"
           :value="tabClasificacion"

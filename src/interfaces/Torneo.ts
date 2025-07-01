@@ -31,6 +31,7 @@ export interface Torneo {
   inicioInscripciones: string; // Fecha límite de inscripción
   listasPorJugador: number;
   mostrarListas: boolean;
+  mostrarClasificacion: boolean;
 }
 
 export interface TorneoReducidoDTO {
@@ -74,6 +75,7 @@ export interface TorneoCreadoDTO {
   inicioInscripciones?: string | null;
   listasPorJugador: number;
   mostrarListas: boolean;
+  mostrarClasificacion: boolean;
 }
 
 export interface InscripcionTorneoCreadoDTO {
@@ -177,6 +179,11 @@ export interface ModificarBasesTorneoDTO {
 export interface HandlerMostarListasDTO {
   idTorneo?: number;
   mostrarListas?: boolean;
+}
+
+export interface HandlerMostarClasificacionDTO {
+  idTorneo?: number;
+  mostrarClasificacion?: boolean;
 }
 
 export interface GenerarRondaEquiposRequestDTO {

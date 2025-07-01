@@ -61,6 +61,19 @@
                 >{{ mostrarListas ? "Ocultar" : "Mostrar" }} Listas</v-btn
               >
             </div>
+
+            <div class="text-wrap text-sm">
+              <v-btn
+                variant="tonal"
+                color="secondary"
+                @click="handlerMostrarClasificacion"
+                block
+                >{{
+                  mostrarClasificacion ? "Ocultar" : "Mostrar"
+                }}
+                Clasificación</v-btn
+              >
+            </div>
           </div>
         </v-list-item-title>
       </v-list-item-content>
@@ -89,6 +102,14 @@
     @confirm="onCambioMostrarListas"
   />
 
+  <!-- modal para manejar mostrar listas del torneo -->
+  <ModalHandlerMostrarClasificacion
+    :isVisible="showModalHandlerMostrarClasificacion"
+    :torneo="torneoMod"
+    @close="cerrarModal()"
+    @confirm="onCambioMostrarClasificacion"
+  />
+
   <!-- modal torneo modificado con exito -->
   <ModalSuccess
     :isVisible="showSuccessModal"
@@ -113,6 +134,7 @@ import ModalError from "@/components/Commons/ModalError.vue";
 import ModalModificarBasesTorneo from "../ModalModificarBasesTorneo.vue";
 import ModalModificarTorneo from "../ModalModificarTorneo.vue";
 import ModalHandlerMostrarListas from "../ModalHandlerMostrarListas.vue";
+import ModalHandlerMostrarClasificacion from "../ModalHandlerMostrarClasificacion.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoMasDTO }>();
 const showErrorModal = ref<boolean>(false);
@@ -123,7 +145,10 @@ const showModificarBasesTorneoModal = ref<boolean>(false);
 const idTorneo = ref<number>(0);
 const torneoMod = ref<Torneo>(); // Define adecuadamente el tipo de `torneoMod`
 const showModalHandlerMostrarListas = ref<boolean>(false);
+const showModalHandlerMostrarClasificacion = ref<boolean>(false);
+
 const mostrarListas = ref(props.torneo?.torneo.mostrarListas);
+const mostrarClasificacion = ref(props.torneo?.torneo.mostrarClasificacion);
 const isLoading = ref<boolean>(false);
 
 const plazasRestantes = computed(() => {
@@ -223,6 +248,8 @@ const modificarBasesTorneo = async () => {
 const cerrarModal = () => {
   showModificarBasesTorneoModal.value = false;
   showModalHandlerMostrarListas.value = false;
+  showModalHandlerMostrarClasificacion.value = false;
+
   showModificarTorneoModal.value = false;
 };
 
@@ -250,6 +277,32 @@ const handlerMostrarListas = async () => {
 const onCambioMostrarListas = (nuevoValor: boolean) => {
   mostrarListas.value = nuevoValor;
   showModalHandlerMostrarListas.value = false;
+};
+
+const handlerMostrarClasificacion = async () => {
+  if (
+    props.torneo?.torneo.idTorneo != undefined &&
+    props.torneo?.torneo.idTorneo != 0 &&
+    props.torneo?.torneo.idTorneo != null
+  )
+    idTorneo.value = props.torneo?.torneo.idTorneo;
+
+  try {
+    const responseTorneo = await getTorneo(idTorneo.value);
+    torneoMod.value = responseTorneo.data;
+    showModalHandlerMostrarClasificacion.value = true;
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isLoading.value = false;
+    showErrorModal.value = false;
+  }
+};
+
+const onCambioMostrarClasificacion = (nuevoValor: boolean) => {
+  mostrarClasificacion.value = nuevoValor;
+  showModalHandlerMostrarClasificacion.value = false;
 };
 </script>
 

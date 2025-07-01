@@ -778,6 +778,7 @@ const torneoGestion = ref<TorneoGestionInfoDTO>({
     estadoTorneo: "",
     listasPorJugador: 0,
     mostrarListas: false,
+    mostrarClasificacion: false,
   },
   inscripciones: [],
 });

@@ -3,6 +3,7 @@ import {
   GenerarOtraRondaEquiposRequestDTO,
   GenerarRondaEquiposRequestDTO,
   GuardarResultadosDTO,
+  HandlerMostarClasificacionDTO,
   HandlerMostarListasDTO,
   ModificarBasesTorneoDTO,
   ModificarTorneoDTO,
@@ -79,6 +80,12 @@ export const HandlerMostarListasAsync = async (
   request: HandlerMostarListasDTO
 ) => {
   return http.patch(`Torneo/Gestion/Hanlder-Listas`, request);
+};
+
+export const HandlerMostarClasificacionAsync = async (
+  request: HandlerMostarClasificacionDTO
+) => {
+  return http.patch(`Torneo/Gestion/Hanlder-Clasificacion`, request);
 };
 
 export const deleteTorneo = async (idTorneo: number) => {
