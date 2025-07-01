@@ -203,11 +203,10 @@ const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const idUsuario = ref<number>();
 const idEquipo = ref<number | null>(null);
-const activeTab = ref<number>(0);
-const tabClasificacion = ref<number>(2);
-const tabListas = ref<number>(0);
-const tabMisPartidas = ref<number>(1);
-const tabRondas = ref<number>(4);
+const activeTab = ref<number>();
+const tabClasificacion = ref<number>();
+const tabListas = ref<number>();
+const tabMisPartidas = ref<number>();
 const clasificacion = ref<Clasificacion[]>([]);
 const jugadoresZona1 = ref<Clasificacion[]>([]);
 const jugadoresZona2 = ref<Clasificacion[]>([]);
@@ -269,8 +268,8 @@ onMounted(async () => {
 
     calcularClasificacion();
 
-    tabClasificacion.value = numeroRondas.value.length + 1;
-    tabListas.value = numeroRondas.value.length + 2;
+    tabClasificacion.value = numeroRondas.value.length + 2;
+    tabListas.value = numeroRondas.value.length + 1;
     tabMisPartidas.value = 0;
 
     //Mis partidas
