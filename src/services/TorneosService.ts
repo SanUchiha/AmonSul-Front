@@ -71,21 +71,27 @@ export const modificarTorneo = async (torneoData: ModificarTorneoDTO) => {
 };
 
 export const ModificarBasesTorneoAsync = async (
-  torneoData: ModificarBasesTorneoDTO
+  request: ModificarBasesTorneoDTO
 ) => {
-  return http.patch(`Torneo/Gestion/subir-bases`, torneoData);
+  return http.patch(`Torneo/Gestion/subir-bases/${request.idTorneo}`, request);
 };
 
 export const HandlerMostarListasAsync = async (
   request: HandlerMostarListasDTO
 ) => {
-  return http.patch(`Torneo/Gestion/Hanlder-Listas`, request);
+  return http.patch(
+    `Torneo/Gestion/Handler-Listas/${request.idTorneo}`,
+    request
+  );
 };
 
 export const HandlerMostarClasificacionAsync = async (
   request: HandlerMostarClasificacionDTO
 ) => {
-  return http.patch(`Torneo/Gestion/Hanlder-Clasificacion`, request);
+  return http.patch(
+    `Torneo/Gestion/Handler-Clasificacion/${request.idTorneo}`,
+    request
+  );
 };
 
 export const deleteTorneo = async (idTorneo: number) => {
