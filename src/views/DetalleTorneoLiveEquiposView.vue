@@ -31,6 +31,12 @@
           :text="`Clasificación`"
           :value="tabClasificacion"
         ></v-tab>
+        <v-tab
+          v-if="torneo?.mostrarClasificacion"
+          :key="tabClasificacionIndividual"
+          :text="`Individual`"
+          :value="tabClasificacionIndividual"
+        ></v-tab>
       </v-tabs>
       <!-- Contenido de las Tabs -->
       <v-window v-model="activeTab">
@@ -150,6 +156,14 @@
           :equipos="torneoGestion?.equipos"
           @enviarClasificacion="manejarClasificacion"
         />
+
+        <!-- Tab clasificacion individual -->
+        <TabClasificacionEquiposIndividual
+          :tabClasificacion="tabClasificacionIndividual"
+          :activeTab="activeTab!"
+          :clasificacion="clasificacion"
+          @enviarClasificacion="manejarClasificacion"
+        />
       </v-window>
     </div>
 
@@ -174,6 +188,7 @@
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
+import TabClasificacionEquiposIndividual from "@/components/GestionTorneos/Equipos/TabClasificacionEquiposIndividual.vue";
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import CardPartidaTorneoEquipoLive from "@/components/PartidasTorneo/CardPartidaTorneoEquipoLive.vue";
 import { useAuth } from "@/composables/useAuth";
@@ -205,6 +220,7 @@ const idUsuario = ref<number>();
 const idEquipo = ref<number | null>(null);
 const activeTab = ref<number>();
 const tabClasificacion = ref<number>();
+const tabClasificacionIndividual = ref<number>();
 const tabListas = ref<number>();
 const tabMisPartidas = ref<number>();
 const clasificacion = ref<Clasificacion[]>([]);
@@ -269,6 +285,7 @@ onMounted(async () => {
     calcularClasificacion();
 
     tabClasificacion.value = numeroRondas.value.length + 2;
+    tabClasificacionIndividual.value = numeroRondas.value.length + 3;
     tabListas.value = numeroRondas.value.length + 1;
     tabMisPartidas.value = 0;
 

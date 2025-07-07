@@ -54,7 +54,7 @@
       <v-row>
         <v-col cols="12" sm="6">
           <v-btn variant="tonal" color="orange lighten-2" @click="goToDetalle">
-            Ver Detalle
+            Detalle
           </v-btn>
         </v-col>
         <v-col cols="12" sm="6">
@@ -63,7 +63,7 @@
             color="blue lighten-2"
             @click="goToResultadoTorneo"
           >
-            Ver Resultados
+            Resultados
           </v-btn>
         </v-col>
       </v-row>
