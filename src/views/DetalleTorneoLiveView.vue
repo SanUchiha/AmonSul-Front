@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-unused-vars -->
 <template>
   <v-sheet class="pa-4">
     <div v-if="isLoading">
@@ -50,6 +49,11 @@
         <!-- tab dinamicas -->
         <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
           <v-row>
+            <CardEmparejamientos
+              v-if="torneo?.tipoTorneo !== 'Individual'"
+              :partidas="partidas"
+              :numeroRonda="n"
+            />
             <v-col
               cols="12"
               sm="12"
@@ -132,6 +136,7 @@
 
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import CardEmparejamientos from "@/components/GestionTorneos/Equipos/CardEmparejamientos.vue";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
 import TabClasificacionEquiposIndividual from "@/components/GestionTorneos/Equipos/TabClasificacionEquiposIndividual.vue";
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";

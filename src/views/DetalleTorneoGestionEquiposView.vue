@@ -172,6 +172,13 @@
                 </div>
               </div>
 
+              <CardEmparejamientosGestion
+                v-if="torneo?.tipoTorneo !== 'Individual'"
+                :partidas="partidas"
+                :numeroRonda="activeTab"
+                :idTorneo="parseInt(route.params.idTorneo.toString())"
+              />
+
               <!-- tab rondas dinamicas -->
               <v-tabs-item
                 v-for="(partida, index) in partidasPorRonda[activeTab!]"
@@ -657,6 +664,7 @@ import CardInfoEquipo from "@/components/GestionTorneos/Equipos/CardInfoEquipo.v
 import { ListaDTO } from "@/interfaces/Usuario";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
 import ModalCambiarPairingEquipoGestion from "@/components/PartidasTorneo/ModalCambiarPairingEquipoGestion.vue";
+import CardEmparejamientosGestion from "@/components/GestionTorneos/Equipos/CardEmparejamientosGestion.vue";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();

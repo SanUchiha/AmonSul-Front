@@ -6,6 +6,7 @@ import {
   HandlerMostarClasificacionDTO,
   HandlerMostarListasDTO,
   ModificarBasesTorneoDTO,
+  ModificarPairingTorneoEquiposDTO,
   ModificarTorneoDTO,
 } from "@/interfaces/Torneo";
 import { http } from "./index";
@@ -112,4 +113,17 @@ export const generarOtraRondaTorneoEquipos = async (
   request: GenerarOtraRondaEquiposRequestDTO
 ) => {
   return http.post(`Torneo/Gestion/Generar-Otra-Ronda-Equipos`, request);
+};
+
+export const modificarPairingTorneoEquipos = async (
+  request: ModificarPairingTorneoEquiposDTO
+) => {
+  return http.post(
+    `Torneo/Gestion/Equipos/Modificar-Pairing-Equipos/${request.idTorneo}`,
+    request
+  );
+};
+
+export const getEquiposDisponiblesAsync = async (idTorneo: number) => {
+  return http.get(`Torneo/Gestion/Equipos/Equipos-disponibles/${idTorneo}`);
 };

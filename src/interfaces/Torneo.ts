@@ -225,3 +225,17 @@ export interface PairingDTO {
 export interface ClasificacionDTO {
   equipos: EquipoDTO[];
 }
+
+export interface ModificarPairingTorneoEquiposDTO {
+  idEquipo1Old: number;
+  idEquipo2Old: number;
+  idEquipo1: number;
+  idEquipo2: number;
+  numeroRonda: number;
+  idTorneo: number;
+}
+
+export interface EquipoDisponibleParaModificacionDTO {
+  idEquipo: number;
+  nombreEquipo: string;
+}
