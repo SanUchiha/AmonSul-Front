@@ -51,13 +51,19 @@ export interface AddPairingTorneoDTO {
 
 export interface Clasificacion {
   nick: string;
-  victorias: number;
+  puntosTorneo: number;
   puntosFavor: number;
   puntosContra: number;
   diferenciaPuntos: number;
   lider: number;
   idUsuario: number;
   bando?: string;
+  nombreCortoEjercito?: string;
+  idTorneo: number;
+  ejercito?: string;
+  victorias: number;
+  empates: number;
+  derrotas: number;
 }
 
 export interface RequestUpdatePairingTorneoDTO {

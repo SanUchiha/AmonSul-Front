@@ -259,6 +259,7 @@ const initializeComponent = async () => {
           validMatches.value.push(element);
         else pendingMatches.value.push(element);
       });
+
       validMatches.value = validMatches.value.reverse();
       pendingMatches.value = pendingMatches.value.reverse();
 
@@ -333,6 +334,7 @@ const refrescarPartidas = async () => {
           validMatches.value.push(element);
         else pendingMatches.value.push(element);
       });
+
       validMatches.value = validMatches.value.reverse();
       pendingMatches.value = pendingMatches.value.reverse();
     } catch (error) {

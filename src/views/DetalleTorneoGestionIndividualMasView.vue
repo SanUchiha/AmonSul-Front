@@ -459,7 +459,7 @@
                           <td>{{ index + 1 }}</td>
                           <td>{{ jugador.nick }}</td>
                           <td>
-                            {{ jugador.victorias }}
+                            {{ jugador.puntosTorneo }}
                           </td>
                           <td>{{ jugador.puntosFavor }}</td>
                           <td>
@@ -500,7 +500,7 @@
                           <td>{{ index + 1 }}</td>
                           <td>{{ jugador.nick }}</td>
                           <td>
-                            {{ jugador.victorias }}
+                            {{ jugador.puntosTorneo }}
                           </td>
                           <td>{{ jugador.puntosFavor }}</td>
                           <td>
@@ -546,7 +546,7 @@
                           <td>{{ index + 1 }}</td>
                           <td>{{ jugador.nick }}</td>
                           <td>
-                            {{ jugador.victorias }}
+                            {{ jugador.puntosTorneo }}
                           </td>
                           <td>{{ jugador.puntosFavor }}</td>
                           <td>
@@ -1090,6 +1090,10 @@ const calcularClasificacion = () => {
       diferenciaPuntos: number;
       lider: number;
       idUsuario: number;
+      idTorneo: number;
+      empates: number;
+      derrotas: number;
+      puntosTorneo: number;
     }
   > = {};
   const rankingDividido: Record<
@@ -1102,6 +1106,10 @@ const calcularClasificacion = () => {
       diferenciaPuntos: number;
       lider: number;
       idUsuario: number;
+      idTorneo: number;
+      empates: number;
+      derrotas: number;
+      puntosTorneo: number;
     }
   > = {};
 
@@ -1128,6 +1136,10 @@ const calcularClasificacion = () => {
           diferenciaPuntos: 0,
           lider: 0,
           idUsuario: partida.idUsuario1,
+          empates: 0,
+          derrotas: 0,
+          puntosTorneo: 0,
+          idTorneo: partida.idTorneo,
         };
       }
       if (!rankingDividido[partida.idUsuario2]) {
@@ -1139,6 +1151,10 @@ const calcularClasificacion = () => {
           diferenciaPuntos: 0,
           lider: 0,
           idUsuario: partida.idUsuario2,
+          empates: 0,
+          derrotas: 0,
+          puntosTorneo: 0,
+          idTorneo: partida.idTorneo,
         };
       }
 
@@ -1156,16 +1172,21 @@ const calcularClasificacion = () => {
         rankingDividido[partida.idUsuario2].puntosFavor -
         rankingDividido[partida.idUsuario2].puntosContra;
 
-      // Actualizamos las victorias
+      // Actualizamos las puntosTorneo
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        rankingDividido[partida.idUsuario1].victorias += 3;
-      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-        rankingDividido[partida.idUsuario2].victorias += 3;
-      } else {
+        rankingDividido[partida.idUsuario1].puntosTorneo += 3;
         rankingDividido[partida.idUsuario1].victorias += 1;
+        rankingDividido[partida.idUsuario2].derrotas += 1;
+      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        rankingDividido[partida.idUsuario2].puntosTorneo += 3;
         rankingDividido[partida.idUsuario2].victorias += 1;
+        rankingDividido[partida.idUsuario1].derrotas += 1;
+      } else {
+        rankingDividido[partida.idUsuario1].puntosTorneo += 1;
+        rankingDividido[partida.idUsuario2].puntosTorneo += 1;
+        rankingDividido[partida.idUsuario1].empates += 1;
+        rankingDividido[partida.idUsuario2].empates += 1;
       }
-
       // Lider muerto primero
       if (liderMuertoUsuario1) {
         rankingDividido[partida.idUsuario1].lider += 1;
@@ -1176,9 +1197,9 @@ const calcularClasificacion = () => {
   });
 
   clasificacionDividida.value = Object.values(rankingDividido).sort((a, b) => {
-    // 1. Ordenar por victorias
-    if (b.victorias !== a.victorias) {
-      return b.victorias - a.victorias;
+    // 1. Ordenar por puntosTorneo
+    if (b.puntosTorneo !== a.puntosTorneo) {
+      return b.puntosTorneo - a.puntosTorneo;
     }
     // 2. Ordenar por diferencia de puntos (puntos a favor - puntos en contra)
     if (b.diferenciaPuntos !== a.diferenciaPuntos) {
@@ -1213,6 +1234,10 @@ const calcularClasificacion = () => {
           diferenciaPuntos: 0,
           lider: 0,
           idUsuario: partida.idUsuario1,
+          empates: 0,
+          derrotas: 0,
+          puntosTorneo: 0,
+          idTorneo: partida.idTorneo,
         };
       }
       if (!ranking[partida.idUsuario2]) {
@@ -1224,6 +1249,10 @@ const calcularClasificacion = () => {
           diferenciaPuntos: 0,
           lider: 0,
           idUsuario: partida.idUsuario2,
+          empates: 0,
+          derrotas: 0,
+          puntosTorneo: 0,
+          idTorneo: partida.idTorneo,
         };
       }
 
@@ -1241,14 +1270,20 @@ const calcularClasificacion = () => {
         ranking[partida.idUsuario2].puntosFavor -
         ranking[partida.idUsuario2].puntosContra;
 
-      // Actualizamos las victorias
+      // Actualizamos las puntosTorneo
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        ranking[partida.idUsuario1].victorias += 3;
-      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-        ranking[partida.idUsuario2].victorias += 3;
-      } else {
+        ranking[partida.idUsuario1].puntosTorneo += 3;
         ranking[partida.idUsuario1].victorias += 1;
+        ranking[partida.idUsuario2].derrotas += 1;
+      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        ranking[partida.idUsuario2].puntosTorneo += 3;
         ranking[partida.idUsuario2].victorias += 1;
+        ranking[partida.idUsuario1].derrotas += 1;
+      } else {
+        ranking[partida.idUsuario1].puntosTorneo += 1;
+        ranking[partida.idUsuario2].puntosTorneo += 1;
+        ranking[partida.idUsuario1].empates += 1;
+        ranking[partida.idUsuario2].empates += 1;
       }
 
       // Lider muerto primero
@@ -1261,9 +1296,9 @@ const calcularClasificacion = () => {
   });
 
   clasificacion.value = Object.values(ranking).sort((a, b) => {
-    // 1. Ordenar por victorias
-    if (b.victorias !== a.victorias) {
-      return b.victorias - a.victorias;
+    // 1. Ordenar por puntosTorneo
+    if (b.puntosTorneo !== a.puntosTorneo) {
+      return b.puntosTorneo - a.puntosTorneo;
     }
     // 2. Ordenar por diferencia de puntos (puntos a favor - puntos en contra)
     if (b.diferenciaPuntos !== a.diferenciaPuntos) {

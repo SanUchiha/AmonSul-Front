@@ -10,7 +10,7 @@
             <th class="text-center">PV</th>
             <th class="text-center">PD</th>
             <th class="text-center">+-</th>
-            <th class="tect-center">L</th>
+            <th class="text-center">G</th>
           </tr>
         </thead>
         <tbody>
@@ -23,8 +23,24 @@
             }"
           >
             <td>{{ index + 1 }}</td>
-            <td>{{ jugador.nick }}</td>
-            <td>{{ jugador.victorias }}</td>
+            <td class="jugador-cell">
+              <div class="jugador-contenido">
+                {{ jugador.nick }}
+                <v-chip
+                  class="ml-2"
+                  color="grey-lighten-2"
+                  text-color="black"
+                  label
+                  size="small"
+                  variant="tonal"
+                  @click="onClickEjercito(jugador)"
+                >
+                  {{ jugador.nombreCortoEjercito }}
+                </v-chip>
+              </div>
+            </td>
+
+            <td>{{ jugador.puntosTorneo }}</td>
             <td>{{ jugador.puntosFavor }}</td>
             <td>{{ jugador.puntosContra }}</td>
             <td>{{ jugador.diferenciaPuntos }}</td>
@@ -35,118 +51,54 @@
     </div>
     <div v-else><p>Esperando resultados...</p></div>
   </v-window-item>
+
+  <ModalDetalleActuacionTorneo
+    v-model:show="showModal"
+    :jugador="clasificacionSelected!"
+  />
 </template>
 
 <script setup lang="ts">
-import { EquipoDTO } from "@/interfaces/Inscripcion";
+import ModalDetalleActuacionTorneo from "@/components/ResultadosTorneos/ModalDetalleActuacionTorneo.vue";
 import { Clasificacion } from "@/interfaces/Live";
-import { PartidaTorneoDTO } from "@/interfaces/Partidas";
-import { ClasificacionEquipo, Torneo } from "@/interfaces/Torneo";
-import { defineProps, ref, watch, defineEmits } from "vue";
+import { defineProps, ref } from "vue";
 
-const props = defineProps<{
+defineProps<{
   tabClasificacion: number | undefined;
   activeTab: number;
   clasificacion: Clasificacion[];
 }>();
 
-const emit = defineEmits(["enviarClasificacion"]);
+const showModal = ref<boolean>(false);
+const clasificacionSelected = ref<Clasificacion>();
 
-const clasificacionEquipos = ref<ClasificacionEquipo[]>([]);
-
-// watch(
-//   [() => props.equipos, () => props.partidas],
-//   ([equipos, partidas]) => {
-//     if ((equipos?.length ?? 0) > 0 && (partidas?.length ?? 0) > 0) {
-//       generarClasificacionEquipos();
-//     }
-//   },
-//   { immediate: true }
-// );
-
-function generarClasificacionEquipos() {
-  // const equipos = props.equipos ?? [];
-  // const partidas = props.partidas ?? [];
-
-  // const clasificacionMap = new Map<number, ClasificacionEquipo>();
-
-  // equipos.forEach((equipo) => {
-  //   clasificacionMap.set(equipo.idEquipo, {
-  //     nombreEquipo: equipo.nombreEquipo ?? `Equipo ${equipo.idEquipo}`,
-  //     idEquipo: equipo.idEquipo,
-  //     puntos: 0,
-  //     puntosFavor: 0,
-  //     puntosContra: 0,
-  //     diferencia: 0,
-  //     lideresMatados: 0,
-  //   });
-  // });
-
-  // partidas.forEach((partida) => {
-  //   const {
-  //     idEquipo1,
-  //     idEquipo2,
-  //     resultadoUsuario1,
-  //     resultadoUsuario2,
-  //     partidaValidadaUsuario1,
-  //     partidaValidadaUsuario2,
-  //     liderMuertoUsuario1,
-  //     liderMuertoUsuario2,
-  //   } = partida;
-
-  //   const esValida = partidaValidadaUsuario1 && partidaValidadaUsuario2;
-  //   if (!esValida || idEquipo1 === null || idEquipo2 === null) return;
-
-  //   // Acumulamos datos para equipo 1
-  //   const equipo1 = clasificacionMap.get(idEquipo1);
-  //   const equipo2 = clasificacionMap.get(idEquipo2);
-
-  //   const res1 = resultadoUsuario1 ?? 0;
-  //   const res2 = resultadoUsuario2 ?? 0;
-
-  //   // Empate
-  //   if (res1 === res2) {
-  //     if (equipo1) equipo1.puntos += 1;
-  //     if (equipo2) equipo2.puntos += 1;
-  //   } else {
-  //     if (equipo1 && res1 > res2) equipo1.puntos += 3;
-  //     if (equipo2 && res2 > res1) equipo2.puntos += 3;
-  //   }
-
-  //   if (equipo1) {
-  //     equipo1.puntosFavor += res1;
-  //     equipo1.puntosContra += res2;
-  //     if (liderMuertoUsuario2 === true) equipo1.lideresMatados += 1;
-  //     equipo1.diferencia = equipo1.puntosFavor - equipo1.puntosContra;
-  //   }
-
-  //   if (equipo2) {
-  //     equipo2.puntosFavor += res2;
-  //     equipo2.puntosContra += res1;
-  //     if (liderMuertoUsuario1 === true) equipo2.lideresMatados += 1;
-  //     equipo2.diferencia = equipo2.puntosFavor - equipo2.puntosContra;
-  //   }
-  // });
-
-  // clasificacionEquipos.value = Array.from(clasificacionMap.values()).sort(
-  //   (a, b) => {
-  //     if (b.puntos !== a.puntos) return b.puntos - a.puntos;
-  //     if (b.diferencia !== a.diferencia) return b.diferencia - a.diferencia;
-  //     if (b.puntosFavor !== a.puntosFavor) return b.puntosFavor - a.puntosFavor;
-  //     return b.lideresMatados - a.lideresMatados;
-  //   }
-  // );
-
-  emit("enviarClasificacion", clasificacionEquipos.value);
+function onClickEjercito(jugador: Clasificacion) {
+  if (jugador) {
+    clasificacionSelected.value = jugador;
+    showModal.value = true;
+  }
 }
 </script>
 
 <style scoped>
+.jugador-cell {
+  text-align: center;
+  padding: 8px;
+}
+
+.jugador-contenido {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
 .good-bando {
-  background-color: #57a86a; /* Verde claro */
+  background-color: #377746;
 }
 
 .evil-bando {
-  background-color: #ce4b56; /* Rojo claro */
+  background-color: #4b2263;
 }
 </style>

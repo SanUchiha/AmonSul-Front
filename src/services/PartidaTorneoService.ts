@@ -31,3 +31,10 @@ export const deletePartidaTorneo = async (idPartida: number) => {
 export const getTournamentMatches = async (idUsuario: number) => {
   return http.get(`Torneo/Partidas/Usuario/${idUsuario}`);
 };
+
+export const getPartidasTorneoByUsuarioAsync = async (
+  idTorneo: number,
+  idUsuario: number
+) => {
+  return http.get(`Torneo/Partidas/Usuario/${idUsuario}/Torneo/${idTorneo}`);
+};

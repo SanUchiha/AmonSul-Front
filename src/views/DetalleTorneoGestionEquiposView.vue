@@ -1014,6 +1014,10 @@ const calcularClasificacion = () => {
       diferenciaPuntos: number;
       lider: number;
       idUsuario: number;
+      idTorneo: number;
+      empates: number;
+      derrotas: number;
+      puntosTorneo: number;
     }
   > = {};
   const rankingDividido: Record<
@@ -1026,6 +1030,10 @@ const calcularClasificacion = () => {
       diferenciaPuntos: number;
       lider: number;
       idUsuario: number;
+      idTorneo: number;
+      empates: number;
+      derrotas: number;
+      puntosTorneo: number;
     }
   > = {};
 
@@ -1052,6 +1060,10 @@ const calcularClasificacion = () => {
           diferenciaPuntos: 0,
           lider: 0,
           idUsuario: partida.idUsuario1,
+          idTorneo: partida.idTorneo,
+          empates: 0,
+          derrotas: 0,
+          puntosTorneo: 0,
         };
       }
       if (!rankingDividido[partida.idUsuario2]) {
@@ -1063,6 +1075,10 @@ const calcularClasificacion = () => {
           diferenciaPuntos: 0,
           lider: 0,
           idUsuario: partida.idUsuario2,
+          idTorneo: partida.idTorneo,
+          empates: 0,
+          derrotas: 0,
+          puntosTorneo: 0,
         };
       }
 
@@ -1080,14 +1096,20 @@ const calcularClasificacion = () => {
         rankingDividido[partida.idUsuario2].puntosFavor -
         rankingDividido[partida.idUsuario2].puntosContra;
 
-      // Actualizamos las victorias
+      // Actualizamos las puntosTorneo
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        rankingDividido[partida.idUsuario1].victorias += 3;
-      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-        rankingDividido[partida.idUsuario2].victorias += 3;
-      } else {
+        rankingDividido[partida.idUsuario1].puntosTorneo += 3;
         rankingDividido[partida.idUsuario1].victorias += 1;
+        rankingDividido[partida.idUsuario2].derrotas += 1;
+      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        rankingDividido[partida.idUsuario2].puntosTorneo += 3;
         rankingDividido[partida.idUsuario2].victorias += 1;
+        rankingDividido[partida.idUsuario1].derrotas += 1;
+      } else {
+        rankingDividido[partida.idUsuario1].puntosTorneo += 1;
+        rankingDividido[partida.idUsuario2].puntosTorneo += 1;
+        rankingDividido[partida.idUsuario1].empates += 1;
+        rankingDividido[partida.idUsuario2].empates += 1;
       }
 
       // Lider muerto primero
@@ -1100,9 +1122,9 @@ const calcularClasificacion = () => {
   });
 
   clasificacionDividida.value = Object.values(rankingDividido).sort((a, b) => {
-    // 1. Ordenar por victorias
-    if (b.victorias !== a.victorias) {
-      return b.victorias - a.victorias;
+    // 1. Ordenar por puntosTorneo
+    if (b.puntosTorneo !== a.puntosTorneo) {
+      return b.puntosTorneo - a.puntosTorneo;
     }
     // 2. Ordenar por diferencia de puntos (puntos a favor - puntos en contra)
     if (b.diferenciaPuntos !== a.diferenciaPuntos) {
@@ -1137,6 +1159,10 @@ const calcularClasificacion = () => {
           diferenciaPuntos: 0,
           lider: 0,
           idUsuario: partida.idUsuario1,
+          idTorneo: partida.idTorneo,
+          empates: 0,
+          derrotas: 0,
+          puntosTorneo: 0,
         };
       }
       if (!ranking[partida.idUsuario2]) {
@@ -1148,6 +1174,10 @@ const calcularClasificacion = () => {
           diferenciaPuntos: 0,
           lider: 0,
           idUsuario: partida.idUsuario2,
+          idTorneo: partida.idTorneo,
+          empates: 0,
+          derrotas: 0,
+          puntosTorneo: 0,
         };
       }
 
@@ -1165,16 +1195,21 @@ const calcularClasificacion = () => {
         ranking[partida.idUsuario2].puntosFavor -
         ranking[partida.idUsuario2].puntosContra;
 
-      // Actualizamos las victorias
+      // Actualizamos las puntosTorneo
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        ranking[partida.idUsuario1].victorias += 3;
-      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-        ranking[partida.idUsuario2].victorias += 3;
-      } else {
+        ranking[partida.idUsuario1].puntosTorneo += 3;
         ranking[partida.idUsuario1].victorias += 1;
+        ranking[partida.idUsuario2].derrotas += 1;
+      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+        ranking[partida.idUsuario2].puntosTorneo += 3;
         ranking[partida.idUsuario2].victorias += 1;
+        ranking[partida.idUsuario1].derrotas += 1;
+      } else {
+        ranking[partida.idUsuario1].puntosTorneo += 1;
+        ranking[partida.idUsuario2].puntosTorneo += 1;
+        ranking[partida.idUsuario1].empates += 1;
+        ranking[partida.idUsuario2].empates += 1;
       }
-
       // Lider muerto primero
       if (liderMuertoUsuario1) {
         ranking[partida.idUsuario1].lider += 1;
@@ -1185,9 +1220,9 @@ const calcularClasificacion = () => {
   });
 
   clasificacion.value = Object.values(ranking).sort((a, b) => {
-    // 1. Ordenar por victorias
-    if (b.victorias !== a.victorias) {
-      return b.victorias - a.victorias;
+    // 1. Ordenar por puntosTorneo
+    if (b.puntosTorneo !== a.puntosTorneo) {
+      return b.puntosTorneo - a.puntosTorneo;
     }
     // 2. Ordenar por diferencia de puntos (puntos a favor - puntos en contra)
     if (b.diferenciaPuntos !== a.diferenciaPuntos) {
@@ -1232,14 +1267,20 @@ const calcularClasificacion = () => {
       nick: jugador.nick,
       ejercito: jugador.ejercito,
       bando: ejercito ? ejercito.band : "desconocido",
+      shortName: ejercito?.shortName,
     };
   });
 
   clasificacion.value = clasificacion.value.map((j) => {
-    const bando = ejercitosJugadoresConBando.find(
+    const datosEjercito = ejercitosJugadoresConBando.find(
       (e) => e.nick === j.nick
-    )?.bando;
-    return { ...j, bando }; // Devuelve el objeto original más el atributo bando
+    );
+    return {
+      ...j,
+      bando: datosEjercito?.bando ?? "desconocido",
+      nombreCortoEjercito: datosEjercito?.shortName ?? undefined,
+      ejercito: datosEjercito?.ejercito ?? undefined,
+    };
   });
 };
 

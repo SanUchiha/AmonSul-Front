@@ -1,4 +1,3 @@
-<!-- ModalPuntos.vue -->
 <template>
   <v-dialog v-model="isModalValidarVisible" max-width="400">
     <v-card>
