@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="internalShow" max-width="600">
+  <v-dialog v-model="internalShow" max-width="500">
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center">
         Resumen actuación
@@ -22,11 +22,11 @@
                 <h3 class="text-h6 text-md-h5 mb-2">{{ data?.nick }}</h3>
               </v-col>
 
-              <v-col cols="12" sm="6">
+              <v-col cols="12">
                 <strong>Ejército:</strong> {{ data?.ejercito }}
               </v-col>
 
-              <v-col cols="12" sm="6">
+              <v-col cols="12">
                 <strong>Puntos de torneo:</strong> {{ data?.puntosTorneo }}
               </v-col>
 
@@ -50,11 +50,13 @@
         <div v-if="!isLoadingLista" class="w-100">
           <v-card class="section-card stats-section pt-0 mt-0">
             <template v-if="listaBase64">
-              <img
-                :src="listaBase64"
-                alt="Lista"
-                style="max-width: 100%; height: auto"
-              />
+              <div class="image-container">
+                <img
+                  :src="listaBase64"
+                  alt="Lista"
+                  style="max-width: 100%; height: auto"
+                />
+              </div>
             </template>
             <template v-else>
               <p>No hay lista disponible</p>
@@ -69,24 +71,15 @@
       <v-card-actions class="flex-column align-start">
         <div v-if="!isLoadingMatches && matches.length > 0" class="w-100">
           <v-card class="section-card stats-section pt-0 mt-0">
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-                lg="4"
-                xl="4"
-                class="pb-0"
+            <div class="matches-list">
+              <CardPartidaTorneo
                 v-for="match in matches"
                 :key="match.idPartidaTorneo"
-              >
-                <CardPartidaTorneo
-                  :idUsuario="props.jugador.idUsuario"
-                  :match="match"
-                  class="mb-4"
-                />
-              </v-col>
-            </v-row>
+                :idUsuario="props.jugador.idUsuario"
+                :match="match"
+                class="mb-4"
+              />
+            </div>
           </v-card>
         </div>
         <div v-else class="px-4 py-2">
@@ -196,5 +189,19 @@ onMounted(() => {
   .player-info-card {
     padding: 16px !important;
   }
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 </style>
