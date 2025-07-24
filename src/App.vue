@@ -176,6 +176,10 @@
 
     <FooterComponent absolute="true" />
   </v-app>
+
+  <v-snackbar v-model="showToast" :color="toastColor" timeout="3000" top right>
+    {{ toastMessage }}
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
@@ -189,9 +193,11 @@ import FooterComponent from "@/components/Commons/FooterComponent.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import defaultAvatar from "@/assets/icons/perfil.png";
+import { useToast } from "@/composables/useToast";
 
 const usuariosStore = useUsuariosStore();
 const user = ref<UsuarioViewDTO>({} as UsuarioViewDTO);
+const { showToast, toastMessage, toastColor } = useToast();
 
 const { logout, getUser } = useAuth();
 const router = useRouter();

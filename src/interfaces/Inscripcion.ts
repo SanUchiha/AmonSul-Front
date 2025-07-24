@@ -46,6 +46,11 @@ export interface UpdateEstadoPagoDTO {
   esPago: string;
 }
 
+export interface UpdatePuntosExtraDTO {
+  idInscripcion: number;
+  puntosExtra: number;
+}
+
 export interface UpdateEstadoPagoEquipoDTO {
   idEquipo: number;
   esPago: string;

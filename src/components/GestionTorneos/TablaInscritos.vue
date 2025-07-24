@@ -1,6 +1,4 @@
 <template>
-  <!-- Tabla inscritos -->
-
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
       Inscritos
@@ -83,6 +81,33 @@
               {{ formattedEstadoPago(item.esPago).text }}
             </v-chip>
           </td>
+
+          <!-- Puntos extra -->
+          <td class="d-flex align-center">
+            <v-btn
+              icon
+              small
+              color="primary"
+              variant="tonal"
+              :loading="loadingPuntosExtra"
+              @click.stop="actualizarPuntos(item, -1)"
+            >
+              <v-icon>mdi-minus</v-icon>
+            </v-btn>
+
+            <span class="mx-2">{{ item.puntosExtra }}</span>
+
+            <v-btn
+              icon
+              small
+              color="primary"
+              variant="tonal"
+              :loading="loadingPuntosExtra"
+              @click.stop="actualizarPuntos(item, 1)"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </td>
         </tr>
       </template>
     </v-data-table>
@@ -158,10 +183,16 @@ import ModalAddJugadorTorneo from "./ModalAddJugadorTorneo.vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import { getInfoTorneoCreado } from "@/services/TorneosService";
 import ModalSorteo from "./ModalSorteo.vue";
+import { useToast } from "@/composables/useToast";
+import { updatePuntosExtraAsync } from "@/services/InscripcionesService";
+import { UpdatePuntosExtraDTO } from "@/interfaces/Inscripcion";
+
+const { triggerToast } = useToast();
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO }>();
 const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 const isLoading = ref<boolean>(true);
+const loadingPuntosExtra = ref<boolean>(false);
 const showConfigModal = ref<boolean>(false);
 const showSorteoModal = ref<boolean>(false);
 const showAddJugadorModal = ref<boolean>(false);
@@ -198,6 +229,31 @@ const openSorteo = async () => {
     isLoading.value = false;
   }
   showSorteoModal.value = true;
+};
+
+const actualizarPuntos = async (
+  inscripcion: InscripcionTorneoCreadoDTO,
+  puntos: number
+) => {
+  loadingPuntosExtra.value = true;
+  try {
+    inscripcion.puntosExtra += puntos;
+
+    const request: UpdatePuntosExtraDTO = {
+      idInscripcion: inscripcion.idInscripcion,
+      puntosExtra: inscripcion.puntosExtra,
+    };
+    await updatePuntosExtraAsync(request);
+
+    triggerToast("success", "Puntos extra modificados correctamente.");
+  } catch (error) {
+    console.error("Error al actualizar puntos:", error);
+    inscripcion.puntosExtra -= puntos;
+
+    triggerToast("error", "Puntos extra no han podido ser modificados.");
+  } finally {
+    loadingPuntosExtra.value = false;
+  }
 };
 
 const closeSorteoModal = () => {
@@ -282,9 +338,10 @@ const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
     listasPorJugador: 0,
     tipoTorneo: "Individual",
     mostrarListas: false,
-    mostrarClasificacion: false
+    mostrarClasificacion: false,
   },
   idTorneo: 0,
+  puntosExtra: 0,
 });
 
 const headers = computed(() => [
@@ -293,6 +350,7 @@ const headers = computed(() => [
   { title: "Estado Lista", key: "estadoLista" },
   { title: "Fecha Entrega", key: "fechaEntrega" },
   { title: "Pagado", key: "esPago" },
+  { title: "Pts Extra", key: "puntosExtra" },
 ]);
 
 const formattedDate = (date: string | null | undefined) => {

@@ -92,6 +92,7 @@ export interface InscripcionTorneoCreadoDTO {
   ejercito?: string | null;
   listaData?: string | null;
   idTorneo: number;
+  puntosExtra: number;
 }
 
 export interface InscripcionTorneoCreadoMasDTO {

@@ -233,7 +233,8 @@ import CardPartidaTorneoMasLive from "@/components/PartidasTorneo/CardPartidaTor
 import { useAuth } from "@/composables/useAuth";
 import { Clasificacion } from "@/interfaces/Live";
 import { PartidaTorneoMasDTO } from "@/interfaces/Partidas";
-import { Torneo } from "@/interfaces/Torneo";
+import { InscripcionTorneoCreadoDTO, Torneo } from "@/interfaces/Torneo";
+import { getInscripcionesTorneo } from "@/services/InscripcionesService";
 import { getPartidasTorneoMas, getTorneo } from "@/services/TorneosService";
 import { appsettings } from "@/settings/appsettings";
 import { onMounted, ref } from "vue";
@@ -259,6 +260,7 @@ const jugadoresZona2 = ref<Clasificacion[]>([]);
 const clasificacionDividida = ref<Clasificacion[]>([]);
 const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
+const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 
 onMounted(async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
@@ -288,6 +290,15 @@ onMounted(async () => {
       }, {} as Record<number, PartidaTorneoMasDTO[]>);
     }
     tabClasificacion.value = numeroRondas.value.length + 1;
+
+    try {
+      const responseInscripciones = await getInscripcionesTorneo(
+        idTorneo.value
+      );
+      inscripciones.value = responseInscripciones.data;
+    } catch (error) {
+      console.error(error);
+    }
 
     calcularClasificacion();
   } catch (error) {
@@ -511,6 +522,13 @@ const calcularClasificacion = async () => {
       } else if (liderMuertoUsuario2) {
         ranking[partida.idUsuario2].lider += 1;
       }
+    }
+  });
+
+  inscripciones.value.forEach((inscripcion) => {
+    const userId = inscripcion.idUsuario;
+    if (ranking[userId]) {
+      ranking[userId].puntosTorneo += inscripcion.puntosExtra;
     }
   });
 

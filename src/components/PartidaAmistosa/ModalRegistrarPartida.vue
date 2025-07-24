@@ -225,7 +225,6 @@ const registrar = async () => {
     if (!rival)
       throw new Error(`Rival con nick ${formData.value.rival} no encontrado`);
     if (!parseInt(idUsuario.value)) throw new Error(`Usuario no encontrado`);
-    console.log("Datos registrados:", formData.value);
 
     const request: CreatePartidaAmistosaDTO = {
       IdUsuario1: parseInt(idUsuario.value),

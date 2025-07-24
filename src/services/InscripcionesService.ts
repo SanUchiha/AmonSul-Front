@@ -5,6 +5,7 @@ import {
   UpdateEstadoListaDTO,
   UpdateEstadoPagoDTO,
   UpdateEstadoPagoEquipoDTO,
+  UpdatePuntosExtraDTO,
 } from "@/interfaces/Inscripcion";
 import { http } from "./index";
 
@@ -48,6 +49,10 @@ export const updateEstadoLista = async (nuevaEstado: UpdateEstadoListaDTO) => {
 
 export const updateEstadoPago = async (nuevaEstado: UpdateEstadoPagoDTO) => {
   return http.put(`Inscripcion/Estado-Pago`, nuevaEstado);
+};
+
+export const updatePuntosExtraAsync = async (request: UpdatePuntosExtraDTO) => {
+  return http.put(`Inscripcion/Puntos-Extra`, request);
 };
 
 export const updateEstadoPagoEquipo = async (

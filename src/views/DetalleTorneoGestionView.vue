@@ -712,6 +712,7 @@ import TablaInscritos from "@/components/GestionTorneos/TablaInscritos.vue";
 import CardGestionTorneo from "@/components/GestionTorneos/CardGestionTorneo.vue";
 import {
   GuardarResultadosDTO,
+  InscripcionTorneoCreadoDTO,
   ResultadoJugador,
   TorneoGestionInfoDTO,
 } from "@/interfaces/Torneo";
@@ -745,6 +746,7 @@ import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalElimina
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
 import { ListaDTO } from "@/interfaces/Usuario";
+import { getInscripcionesTorneo } from "@/services/InscripcionesService";
 //import { getUsuariosByTorneo } from "@/services/UsuariosService";
 
 const isLoadingImage = ref<boolean>(false);
@@ -827,6 +829,7 @@ const partidaActual = ref<PartidaTorneoDTO>({
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
 const idTorneoComputed = computed(() => idTorneo.value ?? 0);
+const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 
 onMounted(async () => {
   isLoading.value = true;
@@ -837,10 +840,7 @@ onMounted(async () => {
   } catch (error) {
     console.error(error);
     router.push({ name: "error" });
-  } finally {
-    isLoading.value = false;
   }
-
   isLoading.value = true;
 
   try {
@@ -868,6 +868,15 @@ onMounted(async () => {
     }
 
     tabClasificacion.value = numeroRondas.value.length + 1;
+
+    try {
+      const responseInscripciones = await getInscripcionesTorneo(
+        idTorneo.value
+      );
+      inscripciones.value = responseInscripciones.data;
+    } catch (error) {
+      console.error(error);
+    }
 
     calcularClasificacion();
 
@@ -1284,6 +1293,13 @@ const calcularClasificacion = () => {
       } else if (liderMuertoUsuario2) {
         ranking[partida.idUsuario2].lider += 1;
       }
+    }
+  });
+
+  inscripciones.value.forEach((inscripcion) => {
+    const userId = inscripcion.idUsuario;
+    if (ranking[userId]) {
+      ranking[userId].puntosTorneo += inscripcion.puntosExtra;
     }
   });
 

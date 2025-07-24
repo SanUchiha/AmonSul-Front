@@ -620,6 +620,7 @@ import {
 import {
   ClasificacionEquipo,
   GuardarResultadosDTO,
+  InscripcionTorneoCreadoDTO,
   ResultadoJugador,
 } from "@/interfaces/Torneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
@@ -665,6 +666,7 @@ import { ListaDTO } from "@/interfaces/Usuario";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
 import ModalCambiarPairingEquipoGestion from "@/components/PartidasTorneo/ModalCambiarPairingEquipoGestion.vue";
 import CardEmparejamientosGestion from "@/components/GestionTorneos/Equipos/CardEmparejamientosGestion.vue";
+import { getInscripcionesTorneo } from "@/services/InscripcionesService";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -737,6 +739,7 @@ const wasSave = ref<boolean>(false);
 const currentEjercito = ref<string>();
 const listaDTO = ref<ListaDTO>();
 const clasificacionEquipos = ref<ClasificacionEquipo[]>([]);
+const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 
 //Variables para el buscador
 const busquedaEquipo = ref<string>("");
@@ -764,11 +767,7 @@ onMounted(async () => {
   } catch (error) {
     console.error(error);
     router.push({ name: "error" });
-  } finally {
-    isLoading.value = false;
   }
-
-  isLoading.value = true;
 
   try {
     const responseTorneo = await getTorneo(idTorneo.value);
@@ -797,6 +796,15 @@ onMounted(async () => {
     if (partidas.value.length > 0) estaRondaUnoGenerada.value = true;
 
     tabClasificacion.value = numeroRondas.value.length + 1;
+
+    try {
+      const responseInscripciones = await getInscripcionesTorneo(
+        idTorneo.value
+      );
+      inscripciones.value = responseInscripciones.data;
+    } catch (error) {
+      console.error(error);
+    }
 
     calcularClasificacion();
 
@@ -1216,6 +1224,13 @@ const calcularClasificacion = () => {
       } else if (liderMuertoUsuario2) {
         ranking[partida.idUsuario2].lider += 1;
       }
+    }
+  });
+
+  inscripciones.value.forEach((inscripcion) => {
+    const userId = inscripcion.idUsuario;
+    if (ranking[userId]) {
+      ranking[userId].puntosTorneo += inscripcion.puntosExtra;
     }
   });
 

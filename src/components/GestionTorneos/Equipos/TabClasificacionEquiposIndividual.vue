@@ -63,7 +63,7 @@ import ModalDetalleActuacionTorneo from "@/components/ResultadosTorneos/ModalDet
 import { Clasificacion } from "@/interfaces/Live";
 import { defineProps, ref } from "vue";
 
-defineProps<{
+const props = defineProps<{
   tabClasificacion: number | undefined;
   activeTab: number;
   clasificacion: Clasificacion[];

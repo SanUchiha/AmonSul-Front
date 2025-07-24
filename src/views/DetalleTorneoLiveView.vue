@@ -145,7 +145,12 @@ import { useAuth } from "@/composables/useAuth";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import { Clasificacion } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
-import { ClasificacionEquipo, Torneo } from "@/interfaces/Torneo";
+import {
+  ClasificacionEquipo,
+  InscripcionTorneoCreadoDTO,
+  Torneo,
+} from "@/interfaces/Torneo";
+import { getInscripcionesTorneo } from "@/services/InscripcionesService";
 import {
   getInfoTorneoEquipoCreado,
   getPartidasTorneo,
@@ -178,6 +183,7 @@ const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
 const torneoGestion = ref<TorneoEquipoGestionInfoDTO | null>(null);
 const clasificacionEquipos = ref<ClasificacionEquipo[]>([]);
+const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 
 function manejarClasificacion(clasificacion: ClasificacionEquipo[]) {
   clasificacionEquipos.value = clasificacion;
@@ -216,18 +222,16 @@ onMounted(async () => {
       torneoGestion.value = responseTorneo.data;
     } catch (error) {
       console.error(error);
-    } finally {
-      isLoading.value = false;
     }
-    // if (torneoGestion.value) {
-    //   for (const equipo of torneoGestion.value.equipos) {
-    //     if (
-    //       equipo.inscripciones.some((ins) => ins.idUsuario === idUsuario.value)
-    //     ) {
-    //       idEquipo.value = equipo.idEquipo;
-    //     }
-    //   }
-    // }
+
+    try {
+      const responseInscripciones = await getInscripcionesTorneo(
+        idTorneo.value
+      );
+      inscripciones.value = responseInscripciones.data;
+    } catch (error) {
+      console.error(error);
+    }
 
     calcularClasificacion();
 
@@ -460,6 +464,13 @@ const calcularClasificacion = async () => {
       } else if (liderMuertoUsuario2) {
         ranking[partida.idUsuario2].lider += 1;
       }
+    }
+  });
+
+  inscripciones.value.forEach((inscripcion) => {
+    const userId = inscripcion.idUsuario;
+    if (ranking[userId]) {
+      ranking[userId].puntosTorneo += inscripcion.puntosExtra;
     }
   });
 
