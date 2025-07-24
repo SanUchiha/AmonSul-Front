@@ -174,11 +174,6 @@
       @cancelar="mostrarDialogoLogout = false"
     />
 
-    <!-- Modal de registrar partida -->
-    <v-dialog v-model="dialog">
-      <FormCrearPartida @close="dialog = false" :isVisible="dialog" />
-    </v-dialog>
-
     <FooterComponent absolute="true" />
   </v-app>
 </template>
@@ -191,7 +186,6 @@ import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
 import LogoAmonSulPNG from "@/assets/icons/Logo2.png";
 import LogoAmonSulSVG from "@/assets/icons/logo_horizontal3.png";
 import FooterComponent from "@/components/Commons/FooterComponent.vue";
-import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
 import { useUsuariosStore } from "@/store/usuarios";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import defaultAvatar from "@/assets/icons/perfil.png";

@@ -1,13 +1,17 @@
 <template>
   <v-container class="text-center">
-    <!-- Modal aviso -->
-    <!-- <ModalAviso /> -->
     <div v-if="isLoading">
       <LoadingGandalf />
     </div>
     <div v-else>
       <!-- Titulo -->
       <CardTitleMisPartidas message="Mis Partidas" textsize="text-h4" />
+      <v-spacer class="my-4"></v-spacer>
+
+      <v-btn @click="openRegistroPartida" variant="tonal" class="animated-btn">
+        Registrar nueva Partida
+      </v-btn>
+
       <v-spacer class="my-4"></v-spacer>
 
       <!-- Resumen partidas -->
@@ -22,26 +26,6 @@
           />
         </v-col>
       </v-card>
-      <!-- Boton partidas -->
-      <div
-        v-if="$vuetify.display.mdAndUp"
-        class="custom-btn d-flex align-center fab-btn"
-        @click="dialog = true"
-        @mouseenter="isHovering = true"
-        @mouseleave="isHovering = false"
-      >
-        <transition name="slide-fade">
-          <span v-if="isHovering" class="text-button ringbearer"
-            >Nueva partida</span
-          >
-        </transition>
-        <img
-          src="@/assets/icons/nuevaPartida.png"
-          alt="Icono personalizado"
-          width="80"
-          height="80"
-        />
-      </div>
 
       <!-- partidas pendientes -->
       <div v-if="pendingMatches.length > 0 && !isLoadingPending">
@@ -105,52 +89,9 @@
       <v-divider class="my-3"></v-divider>
     </div>
 
-    <v-bottom-navigation
-      v-if="$vuetify.display.smAndDown"
-      app
-      fixed
-      height="64"
-      color="primary"
-      grow
-      class="bottom-nav"
-    >
-      <!-- Botón 1: Modal registrar partida -->
-      <v-btn icon @click="openRegistroPartida" class="animated-btn">
-        <img
-          src="@/assets/icons/nuevaPartida.png"
-          alt="Icono personalizado"
-          width="50"
-          height="50"
-        />
-        Nueva Partida
-      </v-btn>
-
-      <!-- Botón 2: Ruta (cuando definas) 
-      <v-btn
-        icon
-        :to="{ path: '/mis-partidas' }"
-        :class="{ 'active-btn': $route.path === '/mis-partidas' }"
-        class="animated-btn"
-      >
-        <img src="@/assets/icons/misPartidas.png" alt="Icono personalizado" width="50" height="50">
-        Mis Partidas
-      </v-btn>-->
-
-      <!-- Botón 3: Ruta (cuando definas) 
-      <v-btn
-        icon
-        :to="{ path: '/mis-torneos' }"
-        :class="{ 'active-btn': $route.path === '/mis-torneos' }"
-        class="animated-btn"
-      >
-        <img src="@/assets/icons/misTorneos.png" alt="Icono personalizado" width="50" height="50">
-        Mis Torneos
-      </v-btn>-->
-    </v-bottom-navigation>
-
     <!-- Modal con el componente RegistrarPartidas -->
     <v-dialog v-model="dialog">
-      <FormCrearPartida
+      <ModalRegistrarPartida
         @close="dialog = false"
         @registroExitoso="refrescarPartidas"
       />
@@ -177,9 +118,9 @@ import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getPartidasAmistosasByIdUser } from "@/services/PartidasAmistosasService";
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
 import { getProteccionDatos } from "@/services/UsuariosService";
 import ModalProteccionDatos from "@/components/Usuarios/ModalProteccionDatos.vue";
+import ModalRegistrarPartida from "@/components/PartidaAmistosa/ModalRegistrarPartida.vue";
 
 const isLoading = ref(true);
 const { getidUsuario } = useAuth();
@@ -219,7 +160,6 @@ const usuarioData = ref<UsuarioDataDTO>({
   rankingElo: 0,
 });
 const dialog = ref<boolean>(false);
-const isHovering = ref<boolean>(false);
 const showModalProteccionDatos = ref<boolean>(false);
 
 //Variables para filtrar partidas segun el click en la barra de estadisticas

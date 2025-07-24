@@ -3,14 +3,16 @@
     <v-card v-if="!isLoading" :class="['match-card']">
       <v-divider></v-divider>
 
-      <v-card-title class="text-center text-wrap">
+      <v-card-title class="text-center">
         <v-row align="center" justify="center" class="match-score" no-gutters>
           <v-col
             @click="verProfileUser(match.idUsuario1)"
             cols="5"
-            class="player-name text-left"
+            class="player-name text-center"
           >
-            <span class="ml-2 text-wrap">{{ match.nickUsuario1 }}</span>
+            <span class="player-nick">
+              {{ match.nickUsuario1 }}
+            </span>
             <v-card-subtitle class="text-wrap">{{
               match.ejercitoUsuario1
             }}</v-card-subtitle>
@@ -26,8 +28,7 @@
             cols="5"
             class="player-name text-right"
           >
-            <span class="ml-2 text-wrap">{{ match.nickUsuario2 }}</span
-            ><br />
+            <span class="player-nick"> {{ match.nickUsuario2 }} </span><br />
             <v-card-subtitle class="text-wrap">{{
               match.ejercitoUsuario2
             }}</v-card-subtitle>
@@ -38,21 +39,20 @@
       <!-- Información de la partida -->
       <v-card-text>
         <v-row align="center">
-          <v-col cols="4" class="text-center">
-            <v-icon left>mdi-cash-multiple</v-icon>
+          <v-col cols="6" class="text-center">
             {{ match.puntosPartida }} pts
           </v-col>
 
-          <v-col cols="4" class="text-center">
-            <v-icon left>mdi-calendar</v-icon> {{ fechaPartidaFormateada }}
+          <v-col cols="6" class="player-nick">
+            {{ fechaPartidaFormateada }}
           </v-col>
         </v-row>
 
         <v-row class="mt-3 match-scenario">
           <v-col cols="12" class="text-center">
-            <v-icon left class="location-icon">mdi-map-marker</v-icon>
-            Escenario:
-            <strong>{{ match.escenarioPartida || "No disponible" }}</strong>
+            <strong>{{
+              match.escenarioPartida || "Escenario no disponible"
+            }}</strong>
           </v-col>
 
           <!--TODO Implementar detalles, de momento no hay nada que mostrar
@@ -162,7 +162,7 @@ const fechaPartidaFormateada = ref<string>("");
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
 }>();
-const emit = defineEmits(["close", "registroExitoso"]); // Se emiten eventos
+const emit = defineEmits(["close", "registroExitoso"]);
 
 onMounted(async () => {
   isLoading.value = true;
@@ -215,12 +215,12 @@ const cancelPartida = async () => {
 
 watch([showSuccessValidarModal], ([newshowSuccessValidarModal]) => {
   if (!newshowSuccessValidarModal) {
-    emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
+    emit("registroExitoso");
   }
 });
 watch([showSuccessCancelarModal], ([newshowSuccessCancelarModal]) => {
   if (!newshowSuccessCancelarModal) {
-    emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
+    emit("registroExitoso");
   }
 });
 
@@ -257,5 +257,16 @@ const controlValidacionesPartidas = () => {
 <style scoped>
 .no-validada {
   color: rgb(233, 69, 69);
+}
+
+.player-nick {
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+  .player-nick {
+    font-size: 0.85rem;
+  }
 }
 </style>

@@ -19,7 +19,7 @@
           cols="5"
           class="player-name text-center"
         >
-          <span class="player-nick" style="cursor: pointer">
+          <span class="player-nick">
             {{ match.nickUsuario1 }}
           </span>
           <v-card-subtitle class="text-wrap">{{
@@ -37,9 +37,7 @@
           cols="5"
           class="player-name text-center"
         >
-          <span class="player-nick" style="cursor: pointer">
-            {{ match.nickUsuario2 }} </span
-          ><br />
+          <span class="player-nick"> {{ match.nickUsuario2 }} </span><br />
           <v-card-subtitle class="text-wrap">{{
             match.ejercitoUsuario2
           }}</v-card-subtitle>
@@ -67,7 +65,9 @@
 
       <v-row class="mt-3 match-scenario">
         <v-col cols="12" class="text-center">
-          <strong>{{ match.escenarioPartida || "No disponible" }}</strong>
+          <strong>{{
+            match.escenarioPartida || "Escenario no disponible"
+          }}</strong>
         </v-col>
 
         <!--TODO Implementar detalles, de momento no hay nada que mostrar

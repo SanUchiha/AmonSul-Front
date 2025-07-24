@@ -4,16 +4,15 @@
 
     <v-row justify="center">
       <v-col cols="12" md="6">
-        <v-card
-          class="pa-4 rounded-lg elevation-3 dark-form-card scrollable-modal"
-        >
-          <v-card-title class="text-h6 font-weight-bold text-center text-white">
-            <v-icon class="me-2" color="deep-orange">mdi-sword-cross</v-icon>
+        <v-card class="pa-4 rounded-lg elevation-3 scrollable-modal">
+          <v-card-title class="text-h6 font-weight-bold text-center">
+            <v-icon class="me-2" variant="tonal" color="primary"
+              >mdi-sword-cross</v-icon
+            >
             Registrar partida
           </v-card-title>
 
           <v-divider class="mt-3"></v-divider>
-
           <v-card-text>
             <v-form @submit.prevent="validateForm" ref="form">
               <!-- CONTRINCANTE -->
@@ -26,7 +25,6 @@
                 required
                 variant="tonal"
                 color="primary"
-                hide-details="auto"
               />
               <v-progress-linear
                 v-if="isLoadingNicks"
@@ -40,7 +38,7 @@
               <v-combobox
                 v-model="ejercitoRival"
                 :items="listadoEjercitos"
-                label="¿Qué llevaba tu rival?"
+                label="¿Qué ejercito llevaba tu rival?"
                 item-title="name"
                 @click="loadEjercitos"
                 :rules="[rules.required]"
@@ -53,7 +51,7 @@
                 v-model="ejercitoPropio"
                 :items="listadoEjercitos"
                 item-title="name"
-                label="¿Qué llevabas tú?"
+                label="¿Qué ejercito llevabas tú?"
                 @click="loadEjercitos"
                 :rules="[rules.required]"
                 required
@@ -72,9 +70,9 @@
               <!-- PUNTOS -->
               <v-text-field
                 v-model="puntosJugadorUno"
-                label="Tus puntos"
+                label="¿Cuántos puntos has conseguido en la partida?"
                 type="number"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.number]"
                 required
                 variant="tonal"
                 color="primary"
@@ -82,9 +80,9 @@
               />
               <v-text-field
                 v-model="puntosJugadorDos"
-                label="Puntos del rival"
+                label="¿Cuántos puntos ha conseguido el rival en la partida?"
                 type="number"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.number]"
                 required
                 variant="tonal"
                 color="primary"
@@ -120,9 +118,9 @@
               <!-- PUNTOS PARTIDA -->
               <v-text-field
                 v-model="puntosPartida"
-                label="¿A cuántos puntos has jugado?"
+                label="¿A cuántos puntos has jugado? 800, 750..."
                 type="number"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.number]"
                 required
                 variant="tonal"
                 color="primary"
@@ -144,8 +142,8 @@
                 <v-col cols="12" sm="6">
                   <v-btn
                     class="mx-2"
-                    color="deep-orange"
-                    variant="flat"
+                    color="primary"
+                    variant="tonal"
                     @click="validateForm"
                     block
                   >
@@ -201,7 +199,7 @@ import { useUsuariosStore } from "@/store/usuarios";
 import { ArmyDTO } from "@/interfaces/Army";
 
 const usuariosStore = useUsuariosStore();
-
+const formRef = ref();
 const router = useRouter();
 const { getUser, getidUsuario } = useAuth();
 const isLoading = ref(false);
@@ -230,50 +228,38 @@ const rawListaUsuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(
   () => usuariosStore.usuarios
 );
 
-const emit = defineEmits(["close", "registroExitoso"]); // Se emiten eventos
+const emit = defineEmits(["close", "registroExitoso"]);
 
 const rules = {
-  required: (value: string | null) => !!value || "Este campo es obligatorio.",
+  required: (v: any) => !!v || "Este campo es obligatorio.",
+  number: (v: any) =>
+    (v !== null && v !== "" && !isNaN(v)) || "Debe ser un número válido.",
 };
 
 const loadNicks = async () => {
-  //isLoadingNick.value = true;
   isLoadingNicks.value = true;
-
   try {
-    if (!rawListaUsuarios.value.length) {
-      await usuariosStore.requestUsuarios();
-    }
-    listaUsuarios.value = [...rawListaUsuarios.value];
-    listaUsuarios.value = listaUsuarios.value.filter(
+    if (!rawListaUsuarios.value.length) await usuariosStore.requestUsuarios();
+    listaUsuarios.value = [...rawListaUsuarios.value].filter(
       (u) => u.email != emailOwner.value
     );
     listadoNicks.value = listaUsuarios.value.map((f) => f.nick).sort();
   } catch (error) {
     console.error("Error al obtener los nicks:", error);
   } finally {
-    isLoading.value = false;
     isLoadingNicks.value = false;
   }
 };
 
 const loadEjercitos = async () => {
-  isLoading.value = true;
   loadingEjercitos.value = true;
-
   listadoEjercitos.value = appsettings.armies;
-
-  isLoading.value = false;
   loadingEjercitos.value = false;
 };
 
 const loadEscenarios = async () => {
-  isLoading.value = true;
   loadingEscenarios.value = true;
-
   listaEscenarios.value = appsettings.escenarios;
-
-  isLoading.value = false;
   loadingEscenarios.value = false;
 };
 
@@ -292,87 +278,41 @@ const validateForm = () => {
   errors.puntosJugadorDos = puntosJugadorDos.value === null;
   errors.puntosPartida = puntosPartida.value === null;
 
-  const formIsValid = Object.values(errors).every((error) => !error);
-
-  if (formIsValid) {
-    handlerNuevaPartida();
-  } else {
-    alert("Por favor, completa todos los campos requeridos correctamente.");
-  }
+  if (Object.values(errors).every((e) => !e)) handlerNuevaPartida();
+  else alert("Por favor, completa todos los campos requeridos correctamente.");
 };
 
 const handlerNuevaPartida = async () => {
   isLoading.value = true;
+  const rival = listaUsuarios.value.find(
+    (u) => u.nick == nickDosSelected.value
+  );
+  if (!rival)
+    throw new Error(`Rival con nick ${nickDosSelected.value} no encontrado`);
+  if (!parseInt(idUsuario.value)) throw new Error(`Usuario no encontrado`);
 
-  if (listaUsuarios.value != null) {
-    const rival: UsuarioNickDTO | undefined = listaUsuarios.value.find(
-      (u) => u.nick == nickDosSelected.value
-    );
+  const nuevaPartida: CreatePartidaAmistosaDTO = {
+    IdUsuario1: parseInt(idUsuario.value),
+    IdUsuario2: rival.idUsuario,
+    resultadoUsuario1: puntosJugadorUno.value ?? 0,
+    resultadoUsuario2: puntosJugadorDos.value ?? 0,
+    puntosPartida: puntosPartida.value ?? 0,
+    esMatchedPlayPartida: checkEsMatchedPlay.value ?? false,
+    escenarioPartida: escenarioSelected.value,
+    esTorneo: esTorneo.value ?? false,
+    ejercitoUsuario1: ejercitoPropio.value!,
+    ejercitoUsuario2: ejercitoRival.value!,
+    esElo: false,
+    partidaValidadaUsuario1: true,
+  };
 
-    if (!rival)
-      throw new Error(`Rival with nick ${nickDosSelected.value} not found`);
-    if (!parseInt(idUsuario.value)) throw new Error(`Usuario not found`);
-
-    const nuevaPartida: CreatePartidaAmistosaDTO = {
-      IdUsuario1: parseInt(idUsuario.value),
-      IdUsuario2: rival.idUsuario,
-      resultadoUsuario1: puntosJugadorUno.value ?? 0,
-      resultadoUsuario2: puntosJugadorDos.value ?? 0,
-      puntosPartida: puntosPartida.value ?? 0,
-      esMatchedPlayPartida: checkEsMatchedPlay.value ?? false,
-      escenarioPartida: escenarioSelected.value,
-      esTorneo: esTorneo.value ?? false,
-      ejercitoUsuario1: ejercitoPropio.value!,
-      ejercitoUsuario2: ejercitoRival.value!,
-      esElo: false,
-      partidaValidadaUsuario1: true,
-    };
-
-    try {
-      await registrarPartida(nuevaPartida);
-      showSuccessModal.value = true;
-    } catch (error: unknown) {
-      showErrorModal.value = true;
-    } finally {
-      isLoading.value = false;
-    }
+  try {
+    await registrarPartida(nuevaPartida);
+    showSuccessModal.value = true;
+  } catch {
+    showErrorModal.value = true;
+  } finally {
+    isLoading.value = false;
   }
 };
-
-watch(
-  [showSuccessModal, showErrorModal],
-  ([newShowSuccessModal, newShowErrorModal]) => {
-    if (!newShowSuccessModal && !newShowErrorModal) {
-      emit("registroExitoso"); // Emitimos evento para refrescar datos en MisPartidas
-      emit("close"); // Cerramos el modal
-    }
-  }
-);
 </script>
-
-<style scoped>
-.scrollable-modal {
-  max-height: 90vh;
-  overflow-y: auto;
-  padding-bottom: 24px;
-}
-
-.dark-form-card {
-  background-color: #1e1e1e;
-  color: white;
-  border: 1px solid #2c2c2c;
-}
-
-.v-label,
-.v-input__control {
-  color: white !important;
-}
-
-.v-icon {
-  vertical-align: middle;
-}
-
-.v-divider {
-  opacity: 0.1;
-}
-</style>

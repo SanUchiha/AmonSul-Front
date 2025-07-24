@@ -8,7 +8,6 @@ import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
 import TorneosView from "@/views/TorneosView.vue";
 import ErrorView from "@/views/ErrorView.vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import FormCrearPartida from "@/components/PartidaAmistosa/FormCrearPartida.vue";
 import EloView from "@/views/EloView.vue";
 import DetalleInscripcionView from "@/views/DetalleInscripcionView.vue";
 import GestionTorneosView from "@/views/GestionTorneosView.vue";
@@ -84,12 +83,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/detalle-torneo-live-mas/:idTorneo",
     name: "detalle-torneo-live-mas",
     component: DetalleTorneoLiveMasView,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/registrar-partida",
-    name: "registrar-partida",
-    component: FormCrearPartida,
     meta: { requiresAuth: true },
   },
   {
