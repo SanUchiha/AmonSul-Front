@@ -28,7 +28,16 @@
             required
             @update:modelValue="addPlayer"
             :return-object="true"
+            :allow-new="false"
+            :loading="loading"
           ></v-combobox>
+          <v-progress-linear
+            v-if="loading"
+            indeterminate
+            color="primary"
+            height="2"
+            class="mt-1"
+          />
 
           <div v-show="selectedPlayers.length">
             <p>Jugadores seleccionados:</p>
@@ -118,12 +127,13 @@ const jugadorSelected = ref<UsuarioSinEquipoDTO | null>(null);
 const jugadores = ref<UsuarioSinEquipoDTO[]>([]);
 const selectedPlayers = ref<UsuarioSinEquipoDTO[]>([]);
 const idsSelected = ref<number[]>([]);
-const isRegistering = ref(false);
-const showSuccessModal = ref(false);
-const showErrorModal = ref(false);
-const snackBarShow = ref(false);
-const snackBarMessage = ref("");
-const snackBarTimeOut = ref(3000);
+const isRegistering = ref<boolean>(false);
+const showSuccessModal = ref<boolean>(false);
+const showErrorModal = ref<boolean>(false);
+const snackBarShow = ref<boolean>(false);
+const snackBarMessage = ref<string>("");
+const snackBarTimeOut = ref<number>(3000);
+const loading = ref<boolean>(false);
 
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
@@ -145,9 +155,27 @@ const dialogVisible = computed({
 
 const addPlayer = (player: UsuarioSinEquipoDTO) => {
   if (
+    !player ||
+    typeof player === "string" ||
+    !player.idUsuario ||
+    !player.nick
+  ) {
+    jugadorSelected.value = null;
+    return;
+  }
+
+  if (
     player &&
     !selectedPlayers.value.some((p) => p.idUsuario === player.idUsuario)
   ) {
+    if (selectedPlayers.value.length >= maxPlayers.value - 1) {
+      snackBarMessage.value = `Solo puedes añadir un máximo de ${
+        maxPlayers.value - 1
+      } jugadores.`;
+      snackBarShow.value = true;
+      jugadorSelected.value = null;
+      return;
+    }
     selectedPlayers.value.push(player);
     idsSelected.value.push(player.idUsuario);
   }
@@ -212,6 +240,7 @@ const closeDialog = () => {
 };
 
 onMounted(async () => {
+  loading.value = true;
   try {
     const responseJugadores = await getUsuariosNoInscritosTorneoAsync(
       props.idTorneo
@@ -222,6 +251,8 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error al obtener jugadores: ", error);
     jugadores.value = [];
+  } finally {
+    loading.value = false;
   }
 });
 </script>
