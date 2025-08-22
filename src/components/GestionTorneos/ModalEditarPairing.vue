@@ -78,10 +78,10 @@ import {
   RequestUpdatePairingTorneoDTO,
   UpdatePairingTorneoDTO,
 } from "@/interfaces/Live";
-import { updatePairingTorneo } from "@/services/PartidaTorneoService";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useRoute } from "vue-router";
+import { updatePairingTorneoAsync } from "@/services/PartidaTorneoService";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -158,7 +158,7 @@ const changeJugador = async () => {
       idUsuario2: idUsuario2 as number,
     };
 
-    await updatePairingTorneo(body);
+    await updatePairingTorneoAsync(body);
     showSuccessModal.value = true;
   } catch (error) {
     console.error(error);

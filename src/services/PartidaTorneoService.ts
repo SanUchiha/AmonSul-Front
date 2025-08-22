@@ -14,10 +14,16 @@ export const updatePartidaTorneo = async (partida: UpdatePartidaTorneoDTO) => {
   return http.put(`Torneo/Editar-Partida`, partida);
 };
 
-export const updatePairingTorneo = async (
+export const updatePairingTorneoAsync = async (
   pairing: RequestUpdatePairingTorneoDTO
 ) => {
   return http.put(`Torneo/Editar-Pairing`, pairing);
+};
+
+export const updatePairingTorneoEquipoAsync = async (
+  pairing: RequestUpdatePairingTorneoDTO
+) => {
+  return http.put(`Torneo/Editar-Pairing-Equipo`, pairing);
 };
 
 export const addPairingTorneo = async (pairing: RequestAddPairingTorneoDTO) => {

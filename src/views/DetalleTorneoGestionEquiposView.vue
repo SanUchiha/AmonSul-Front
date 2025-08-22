@@ -643,7 +643,7 @@ import {
 import { Torneo } from "@/interfaces/Torneo";
 import { getlistaTorneo } from "@/services/ListasService";
 import {
-  updatePairingTorneo,
+  updatePairingTorneoEquipoAsync,
   updatePartidaTorneo,
 } from "@/services/PartidaTorneoService";
 import {
@@ -1473,7 +1473,7 @@ const sendUpdateBack = async (idJugador1: number, idJugador2: number) => {
       idUsuario2: idJugador2,
     };
 
-    await updatePairingTorneo(body);
+    await updatePairingTorneoEquipoAsync(body);
     return true;
   } catch (error) {
     console.error(error);
