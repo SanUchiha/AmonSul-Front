@@ -7,6 +7,9 @@
 
       <v-card-text>
         <v-form ref="form" v-model="isValid" lazy-validation>
+          <v-snackbar v-model="showToast" :color="toastColor" timeout="2000" top right>
+            <div style="white-space: pre-line">{{ toastMessage }}</div>
+          </v-snackbar>
           <!-- Nombre del torneo -->
           <v-text-field
             v-model="nombreTorneo"
@@ -14,6 +17,8 @@
             required
             type="text"
             :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            :error="missingFieldsSet.has('Nombre del torneo')"
+
           ></v-text-field>
 
           <!-- Descripción del torneo -->
@@ -33,6 +38,8 @@
             @keyup.enter="searchLocation"
             required
             :loading="isSearching"
+            :error="missingFieldsSet.has('Dirección del torneo')"
+
           >
             <template v-slot:append>
               <v-btn color="primary" variant="tonal" @click="searchLocation"
@@ -72,6 +79,7 @@
             type="number"
             :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
                (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :error="missingFieldsSet.has('Limite de jugadores')"
           ></v-text-field>
 
           <!-- puntosTorneo -->
@@ -82,6 +90,7 @@
             type="number"
             :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
                (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :error="missingFieldsSet.has('Puntos del torneo')"
           ></v-text-field>
 
           <!-- listasPorJugador -->
@@ -92,6 +101,7 @@
             type="number"
             :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
                (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :error="missingFieldsSet.has('Listas por jugador')"
           ></v-text-field>
 
           <!-- Numero de rondas -->
@@ -102,6 +112,7 @@
             type="number"
             :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
                (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :error="missingFieldsSet.has('Numero de rondas')"
           ></v-text-field>
 
           <!-- Tipo de torneo -->
@@ -111,6 +122,19 @@
             required
             :items="['Individual', 'Parejas', 'Equipos de 4', 'Equipos de 6']"
             :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            :error="missingFieldsSet.has('Tipo de torneo')"
+          />
+
+           <!-- Tipo de clasificación -->
+          <v-select
+            v-model="classificationType"
+            label="¿Qué tipo de clasificación se utilizará?"
+            required
+            :items="classificationTypeOptions"
+            item-title="label"
+            item-value="value"
+            :rules="[(v:number) => !!v || 'Campo obligatorio']"
+            :error="missingFieldsSet.has('Tipo de clasificación')"
           />
 
           <!-- fecha de inicio -->
@@ -125,6 +149,7 @@
             ]"
             required
             @dateChanged="handleDateChangeInicio"
+            :error="missingFieldsSet.has('Fecha de inicio del torneo')"
           ></v-text-field>
 
           <!-- Fecha de fin del torneo -->
@@ -135,6 +160,7 @@
             :rules="[validateRequired, validateFechaFinInicioTorneo]"
             required
             @dateChanged="handleDateChangeFin"
+            :error="missingFieldsSet.has('Fecha de fin del torneo')"
           ></v-text-field>
 
           <!-- Precio del torneo -->
@@ -144,6 +170,7 @@
             required
             type="number"
             :rules="[(v: number) => !isNaN(v) || 'Debe ser un número']"
+            :error="missingFieldsSet.has('Precio del torneo')"
           ></v-text-field>
 
           <!-- metodosPago -->
@@ -173,6 +200,7 @@
             required
             clearable
             @dateChanged="handleDateChangeInicioInscripcion"
+            :error="missingFieldsSet.has('Primer día para apuntarse')"
           ></v-text-field>
 
           <!-- Último día para apuntarse -->
@@ -193,6 +221,7 @@
             ]"
             required
             @dateChanged="handleDateChangeInscripcion"
+            :error="missingFieldsSet.has('Último día para apuntarse')"
           ></v-text-field>
 
           <!-- Último día para entregar las listas -->
@@ -213,6 +242,7 @@
             ]"
             required
             @dateChanged="handleDateChangeListas"
+            :error="missingFieldsSet.has('Último día para entregar listas')"
           ></v-text-field>
 
           <!-- bases del torneo -->
@@ -261,7 +291,7 @@
       <v-card-actions>
         <v-row justify="center" class="my-4 ga-5">
           <v-btn
-            :disabled="isGenerating || formattedAddress == ''"
+            :disabled="isGenerating"
             @click="confirmarConfiguracion"
             color="primary"
             variant="tonal"
@@ -311,7 +341,18 @@ import { crearTorneo } from "@/services/TorneosService";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
+import { ClassificationType, ClassificationTypeLabels } from "@/Constant/TipoClasificacion";
 
+const showToast = ref<boolean>(false);
+const toastMessage = ref<string>("");
+const toastColor = ref<string>("warning");
+const missingFieldsSet = ref<Set<string>>(new Set());
+
+function triggerToast(type: string, message: string) {
+  toastColor.value = type === "warning" ? "orange" : type;
+  toastMessage.value = message;
+  showToast.value = true;
+}
 const searchQuery = ref<string>("");
 const formattedAddress = ref<string>("");
 const selectedLocation = ref<{ lat: number; lng: number } | null>(null);
@@ -435,6 +476,7 @@ const byteArrayBases = ref<Uint8Array | null>(null);
 const isGenerating = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
+const classificationType = ref<ClassificationType>();
 
 const closeModal = () => {
   internalIsVisible.value = false;
@@ -481,6 +523,12 @@ watch(
         : "";
   }
 );
+
+const classificationTypeOptions = [
+  { label: ClassificationTypeLabels[ClassificationType.NORMAL], value: ClassificationType.NORMAL },
+  { label: ClassificationTypeLabels[ClassificationType.EXTENDED], value: ClassificationType.EXTENDED },
+  { label: ClassificationTypeLabels[ClassificationType.ALEMAN], value: ClassificationType.ALEMAN },
+];
 
 const convertirFecha = (dateString: string) => {
   const dateParts = dateString.split("/");
@@ -575,15 +623,20 @@ const confirmarConfiguracion = async () => {
     if (!horaInicioTorneo.value)
       missingFields.push("Hora de inicio del torneo");
     if (!tipoTorneo.value) missingFields.push("Tipo de torneo");
+    if (!classificationType.value) missingFields.push("Tipo de clasificación");
+    if (!numeroPartidas.value) missingFields.push("Número de partidas");
 
-    // Alert with missing fields
-    alert(
-      `Por favor, rellena los siguientes campos:\n- ${missingFields.join(
-        "\n- "
-      )}`
+
+    missingFieldsSet.value = new Set(missingFields);
+
+    triggerToast(
+      "warning",
+      `Por favor, rellena los siguientes campos:\n- ${missingFields.join("\n- ")}`
     );
     return;
   }
+
+  missingFieldsSet.value.clear();
 
   const basesTorneoBase64 = byteArrayBases.value
     ? btoa(
@@ -621,6 +674,7 @@ const confirmarConfiguracion = async () => {
     descripcionTorneo: descripcionTorneo.value,
     inicioInscripciones: fechaInicioInscripcion.value ?? "",
     listasPorJugador: listasPorJugador.value ?? 1,
+    classificationType: classificationType.value ?? ClassificationType.NORMAL,
   };
   try {
     isGenerating.value = true;

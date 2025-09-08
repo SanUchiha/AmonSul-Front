@@ -395,11 +395,11 @@ const calcularClasificacion = async () => {
 
       // Actualizamos la diferencia de puntos
       rankingDividido[partida.idUsuario1].diferenciaPuntos =
-        rankingDividido[partida.idUsuario1].puntosFavor -
-        rankingDividido[partida.idUsuario1].puntosContra;
+      rankingDividido[partida.idUsuario1].puntosFavor -
+      rankingDividido[partida.idUsuario1].puntosContra;
       rankingDividido[partida.idUsuario2].diferenciaPuntos =
-        rankingDividido[partida.idUsuario2].puntosFavor -
-        rankingDividido[partida.idUsuario2].puntosContra;
+      rankingDividido[partida.idUsuario2].puntosFavor -
+      rankingDividido[partida.idUsuario2].puntosContra;
 
       // Actualizamos las puntosTorneo
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
@@ -501,19 +501,61 @@ const calcularClasificacion = async () => {
         ranking[partida.idUsuario2].puntosContra;
 
       // Actualizamos las puntosTorneo
-      if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        ranking[partida.idUsuario1].puntosTorneo += 3;
-        ranking[partida.idUsuario1].victorias += 1;
-        ranking[partida.idUsuario2].derrotas += 1;
-      } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-        ranking[partida.idUsuario2].puntosTorneo += 3;
-        ranking[partida.idUsuario2].victorias += 1;
-        ranking[partida.idUsuario1].derrotas += 1;
-      } else {
-        ranking[partida.idUsuario1].puntosTorneo += 1;
-        ranking[partida.idUsuario2].puntosTorneo += 1;
-        ranking[partida.idUsuario1].empates += 1;
-        ranking[partida.idUsuario2].empates += 1;
+     if(torneo.value?.classificationType === 1){ //CLASIFICACION TIPO NORMAL
+        if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
+          ranking[partida.idUsuario1].puntosTorneo += 3;
+          ranking[partida.idUsuario1].victorias += 1;
+          ranking[partida.idUsuario2].derrotas += 1;
+        } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
+          ranking[partida.idUsuario2].puntosTorneo += 3;
+          ranking[partida.idUsuario2].victorias += 1;
+          ranking[partida.idUsuario1].derrotas += 1;
+        } else {
+          ranking[partida.idUsuario1].puntosTorneo += 1;
+          ranking[partida.idUsuario2].puntosTorneo += 1;
+          ranking[partida.idUsuario1].empates += 1;
+          ranking[partida.idUsuario2].empates += 1;
+        }
+      }
+      else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
+        const res1 = ranking[partida.idUsuario1].puntosFavor ?? 0;
+        const res2 = ranking[partida.idUsuario2].puntosFavor ?? 0;
+        if (res1 === res2) {
+          ranking[partida.idUsuario1].puntosTorneo += 1;
+          ranking[partida.idUsuario2].puntosTorneo += 1;
+          ranking[partida.idUsuario1].empates += 1;
+          ranking[partida.idUsuario2].empates += 1;
+        } else {
+          if (res1 > res2) {
+            if (res1 >= 2 * res2) {
+              ranking[partida.idUsuario1].puntosTorneo += 6;
+              ranking[partida.idUsuario1].victorias += 1;
+              ranking[partida.idUsuario2].derrotas += 1;
+              ranking[partida.idUsuario2].puntosTorneo += 0;
+            } else {
+              ranking[partida.idUsuario1].puntosTorneo += 5;
+              ranking[partida.idUsuario1].victorias += 1;
+              ranking[partida.idUsuario2].derrotas += 1;
+              ranking[partida.idUsuario2].puntosTorneo += 1;
+            }
+          }
+          if (res2 > res1) {
+            if (res2 >= 2 * res1) {
+              ranking[partida.idUsuario2].puntosTorneo += 6;
+              ranking[partida.idUsuario2].victorias += 1;
+              ranking[partida.idUsuario1].derrotas += 1;
+              ranking[partida.idUsuario1].puntosTorneo += 0;
+            } else {
+              ranking[partida.idUsuario2].puntosTorneo += 5;
+              ranking[partida.idUsuario2].victorias += 1;
+              ranking[partida.idUsuario1].derrotas += 1;
+              ranking[partida.idUsuario1].puntosTorneo += 1;
+            }
+          }
+        }
+      }
+      else if(torneo.value?.classificationType === 3){ //CLASIFICACION TIPO SUICIDIO
+        //
       }
 
       // Lider muerto primero

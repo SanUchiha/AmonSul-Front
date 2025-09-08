@@ -117,6 +117,17 @@
             :rules="[(v:string) => !!v || 'Campo obligatorio']"
           />
 
+          <!-- Tipo de clasificación -->
+          <v-select
+            v-model="classificationType"
+            label="¿Qué tipo de clasificación se utilizará?"
+            required
+            :items="classificationTypeOptions"
+            item-title="label"
+            item-value="value"
+            :rules="[(v:number) => !!v || 'Campo obligatorio']"
+          />
+
           <!-- fecha de inicio -->
           <v-text-field
             v-model="fechaInicioTorneo"
@@ -213,10 +224,6 @@
             type="date"
             :rules="[
               validateRequired,
-              validateAntesDe(
-                fechaFinInscripcion,
-                'Debe ser anterior al cierre de inscripciones'
-              ),
               validateAntesDe(
                 fechaInicioTorneo,
                 'Debe ser antes del inicio del torneo'
@@ -324,6 +331,9 @@ import { modificarTorneo } from "@/services/TorneosService";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
 import { torneoType, TorneoType } from "@/Constant/TiposTorneo";
+import { ClassificationType, ClassificationTypeLabels } from "@/Constant/TipoClasificacion";
+
+
 
 const props = defineProps<{
   isVisible: boolean;
@@ -333,6 +343,12 @@ const emit = defineEmits(["close", "confirm"]);
 
 const internalIsVisible = ref(props.isVisible);
 const isValid = ref(true);
+
+const classificationTypeOptions = [
+  { label: ClassificationTypeLabels[ClassificationType.NORMAL], value: ClassificationType.NORMAL },
+  { label: ClassificationTypeLabels[ClassificationType.EXTENDED], value: ClassificationType.EXTENDED },
+  { label: ClassificationTypeLabels[ClassificationType.ALEMAN], value: ClassificationType.ALEMAN },
+];
 
 watch(
   () => props.isVisible,
@@ -430,6 +446,7 @@ const puntosTorneo = ref<number>();
 const estadoTorneo = ref<number>(1);
 const lugarTorneo = ref<string>();
 const tipoTorneo = ref<string>("");
+const classificationType = ref<ClassificationType>();
 const esLiga = ref<boolean>(false);
 const idRangoTorneo = ref<number>(1);
 const esMatchedPlayTorneo = ref<boolean>(false);
@@ -479,6 +496,7 @@ watch(
       fechaInicioInscripcion.value = newTorneo.inicioInscripciones;
       listasPorJugador.value = newTorneo.listasPorJugador;
       tipoTorneo.value = newTorneo.tipoTorneo;
+      classificationType.value = newTorneo.classificationType;
     }
   },
   { immediate: true }
@@ -646,6 +664,7 @@ const confirmarConfiguracion = async () => {
     idTorneo: props.torneo?.idTorneo,
     inicioInscripciones: fechaInicioInscripcion.value,
     listasPorJugador: listasPorJugador.value ?? 1,
+    classificationType: classificationType.value ?? ClassificationType.NORMAL,
   };
   try {
     isGenerating.value = true;

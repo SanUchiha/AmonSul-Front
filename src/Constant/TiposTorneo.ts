@@ -6,3 +6,4 @@ export const torneoType = [
 ] as const;
 
 export type TorneoType = (typeof torneoType)[number];
+

@@ -1,3 +1,4 @@
+import { ClassificationType } from "@/Constant/TipoClasificacion";
 import { EquipoDTO } from "./Inscripcion";
 import { GenerarRonda } from "./Live";
 import { ListaDTO } from "./Usuario";
@@ -32,6 +33,7 @@ export interface Torneo {
   listasPorJugador: number;
   mostrarListas: boolean;
   mostrarClasificacion: boolean;
+  classificationType: ClassificationType;
 }
 
 export interface TorneoReducidoDTO {
@@ -143,6 +145,7 @@ export interface CrearTorneoDTO {
   horaInicioTorneo: string; // formato de hora "HH:mm:ss"
   horaFinTorneo: string; // formato de hora "HH:mm:ss"
   listasPorJugador: number;
+  classificationType: ClassificationType;
 }
 
 export interface ModificarTorneoDTO {
@@ -170,6 +173,7 @@ export interface ModificarTorneoDTO {
   horaFinTorneo?: string; // formato de hora "HH:mm:ss"
   inicioInscripciones?: string; // Fecha límite de inscripción
   listasPorJugador: number;
+  classificationType: ClassificationType;
 }
 
 export interface ModificarBasesTorneoDTO {

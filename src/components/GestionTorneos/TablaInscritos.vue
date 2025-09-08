@@ -186,6 +186,7 @@ import ModalSorteo from "./ModalSorteo.vue";
 import { useToast } from "@/composables/useToast";
 import { updatePuntosExtraAsync } from "@/services/InscripcionesService";
 import { UpdatePuntosExtraDTO } from "@/interfaces/Inscripcion";
+import { ClassificationType } from "@/Constant/TipoClasificacion";
 
 const { triggerToast } = useToast();
 
@@ -339,6 +340,7 @@ const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
     tipoTorneo: "Individual",
     mostrarListas: false,
     mostrarClasificacion: false,
+    classificationType: ClassificationType.NORMAL
   },
   idTorneo: 0,
   puntosExtra: 0,
