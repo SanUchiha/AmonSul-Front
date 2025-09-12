@@ -186,7 +186,7 @@ import ModalSorteo from "./ModalSorteo.vue";
 import { useToast } from "@/composables/useToast";
 import { updatePuntosExtraAsync } from "@/services/InscripcionesService";
 import { UpdatePuntosExtraDTO } from "@/interfaces/Inscripcion";
-import { ClassificationType } from "@/constant/TipoClasificacion";
+import { ClassificationType } from "@/Constant/TipoClasificacion";
 
 const { triggerToast } = useToast();
 

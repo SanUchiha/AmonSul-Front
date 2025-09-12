@@ -1,4 +1,4 @@
-import { MatchResultGeneral, MatchResultPoint, ResultMatchMatchedPlayType } from "@/constant/TipoClasificacion";
+import { MatchResultGeneral, MatchResultPoint, ResultMatchMatchedPlayType } from "@/Constant/TipoClasificacion";
 import { Clasificacion } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";

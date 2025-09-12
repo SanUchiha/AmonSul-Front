@@ -667,7 +667,7 @@ import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClas
 import ModalCambiarPairingEquipoGestion from "@/components/PartidasTorneo/ModalCambiarPairingEquipoGestion.vue";
 import CardEmparejamientosGestion from "@/components/GestionTorneos/Equipos/CardEmparejamientosGestion.vue";
 import { getInscripcionesTorneo } from "@/services/InscripcionesService";
-import { MatchResultGeneral, MatchResultPoint, ResultMatchMatchedPlayExtendedType, ResultMatchMatchedPlayType } from "@/constant/TipoClasificacion";
+import { MatchResultGeneral, MatchResultPoint, ResultMatchMatchedPlayExtendedType, ResultMatchMatchedPlayType } from "@/Constant/TipoClasificacion";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();

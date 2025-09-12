@@ -145,7 +145,7 @@ import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
 import CardAddTorneoLiga from "./CardAddTorneoLiga.vue";
 import ModalHandlerMostrarListas from "./ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "./ModalHandlerMostrarClasificacion.vue";
-import { ClassificationType } from "@/constant/TipoClasificacion";
+import { ClassificationType } from "@/Constant/TipoClasificacion";
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 const showErrorModal = ref<boolean>(false);

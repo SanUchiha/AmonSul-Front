@@ -179,7 +179,7 @@ import ModalModificarTorneo from "../ModalModificarTorneo.vue";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import ModalHandlerMostrarListas from "../ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "../ModalHandlerMostrarClasificacion.vue";
-import { ClassificationType } from "@/constant/TipoClasificacion";
+import { ClassificationType } from "@/Constant/TipoClasificacion";
 
 const props = defineProps<{ torneo: TorneoEquipoGestionInfoDTO | null }>();
 const showErrorModal = ref<boolean>(false);

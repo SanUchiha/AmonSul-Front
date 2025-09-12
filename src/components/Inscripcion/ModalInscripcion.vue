@@ -325,7 +325,7 @@ import { ArmyDTO } from "@/interfaces/Army";
 import { ListaDTO } from "@/interfaces/Usuario";
 import ModalModificarLista from "./ModalModificarLista.vue";
 import ModalEnviarLista from "./ModalEnviarLista.vue";
-import { ClassificationType } from "@/constant/TipoClasificacion";
+import { ClassificationType } from "@/Constant/TipoClasificacion";
 
 const props = defineProps<{
   idInscripcion: number;

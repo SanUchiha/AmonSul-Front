@@ -1,4 +1,4 @@
-import { ClassificationType } from "@/constant/TipoClasificacion";
+import { ClassificationType } from "@/Constant/TipoClasificacion";
 import { EquipoDTO } from "./Inscripcion";
 import { GenerarRonda } from "./Live";
 import { ListaDTO } from "./Usuario";

@@ -142,7 +142,7 @@ import TabClasificacionEquiposIndividual from "@/components/GestionTorneos/Equip
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import { useAuth } from "@/composables/useAuth";
-import { ResultMatchMatchedPlayType, MatchResultPoint, ResultMatchMatchedPlayExtendedType, MatchResultGeneral } from "@/constant/TipoClasificacion";
+import { ResultMatchMatchedPlayType, MatchResultPoint, ResultMatchMatchedPlayExtendedType, MatchResultGeneral } from "@/Constant/TipoClasificacion";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import { Clasificacion } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";

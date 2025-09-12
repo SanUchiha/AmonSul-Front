@@ -231,7 +231,7 @@
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import CardPartidaTorneoMasLive from "@/components/PartidasTorneo/CardPartidaTorneoMasLive.vue";
 import { useAuth } from "@/composables/useAuth";
-import { ResultMatchMatchedPlayType, MatchResultPoint, ResultMatchMatchedPlayExtendedType, MatchResultGeneral } from "@/constant/TipoClasificacion";
+import { ResultMatchMatchedPlayType, MatchResultPoint, ResultMatchMatchedPlayExtendedType, MatchResultGeneral } from "@/Constant/TipoClasificacion";
 import { Clasificacion } from "@/interfaces/Live";
 import { PartidaTorneoMasDTO } from "@/interfaces/Partidas";
 import { InscripcionTorneoCreadoDTO, Torneo } from "@/interfaces/Torneo";

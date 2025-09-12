@@ -747,7 +747,7 @@ import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
 import { ListaDTO } from "@/interfaces/Usuario";
 import { getInscripcionesTorneo } from "@/services/InscripcionesService";
-import { MatchResultGeneral, MatchResultPoint, ResultMatchMatchedPlayExtendedType, ResultMatchMatchedPlayType } from "@/constant/TipoClasificacion";
+import { MatchResultGeneral, MatchResultPoint, ResultMatchMatchedPlayExtendedType, ResultMatchMatchedPlayType } from "@/Constant/TipoClasificacion";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
