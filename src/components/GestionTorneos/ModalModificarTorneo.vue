@@ -330,8 +330,8 @@ import { ModificarTorneoDTO, Torneo } from "@/interfaces/Torneo";
 import { modificarTorneo } from "@/services/TorneosService";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
-import { torneoType, TorneoType } from "@/Constant/TiposTorneo";
-import { ClassificationType, ClassificationTypeLabels } from "@/Constant/TipoClasificacion";
+import { torneoType, TorneoType } from "@/constant/TiposTorneo";
+import { ClassificationType, ClassificationTypeLabels } from "@/constant/TipoClasificacion";
 
 
 

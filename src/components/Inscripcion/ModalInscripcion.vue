@@ -325,6 +325,7 @@ import { ArmyDTO } from "@/interfaces/Army";
 import { ListaDTO } from "@/interfaces/Usuario";
 import ModalModificarLista from "./ModalModificarLista.vue";
 import ModalEnviarLista from "./ModalEnviarLista.vue";
+import { ClassificationType } from "@/constant/TipoClasificacion";
 
 const props = defineProps<{
   idInscripcion: number;
@@ -374,8 +375,12 @@ const inscripcionData = ref<InscripcionTorneoCreadoDTO>({
     inicioInscripciones: "",
     listasPorJugador: 0,
     tipoTorneo: "Individual",
+    mostrarListas: false,
+    mostrarClasificacion: false,
+    classificationType: ClassificationType.NORMAL
   },
   idTorneo: 0,
+  puntosExtra: 0
 });
 const torneo = ref<Torneo>({
   idTorneo: 0,
@@ -403,6 +408,9 @@ const torneo = ref<Torneo>({
   inicioInscripciones: "",
   listasPorJugador: 0,
   tipoTorneo: "Individual",
+  mostrarListas: false,
+  mostrarClasificacion: false,
+  classificationType: ClassificationType.NORMAL
 });
 const currentInscripcionId = ref<number>();
 const currentIdLista = ref<number>();

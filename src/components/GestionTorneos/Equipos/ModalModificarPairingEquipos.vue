@@ -7,7 +7,6 @@
           <p><strong>Emparejamiento actual:</strong></p>
           <p>
             {{ equipoOriginal1?.nombre }} vs {{ equipoOriginal2?.nombre }}
-            {{ showSuccessModal }}
           </p>
         </div>
         <v-select
@@ -138,6 +137,12 @@ watch(
 onMounted(async () => {
   const response = await getEquiposDisponiblesAsync(props.idTorneo);
   equiposDisponibles.value = response.data;
+  if (equiposDisponibles.value.length % 2 !== 0) {
+    equiposDisponibles.value.push({
+      idEquipo: 117,
+      nombreEquipo: "BYE",
+    });
+  }
 });
 
 async function confirmarCambio() {

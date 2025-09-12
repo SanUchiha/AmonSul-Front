@@ -1,3 +1,4 @@
+import { MatchResultGeneral, MatchResultPoint, ResultMatchMatchedPlayType } from "@/constant/TipoClasificacion";
 import { Clasificacion } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
@@ -78,24 +79,24 @@ export function generarClasificacionIndividual({
         ranking[partida.idUsuario2].puntosContra;
 
       if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-        ranking[partida.idUsuario1].puntosTorneo += 3;
-        ranking[partida.idUsuario1].victorias += 1;
-        ranking[partida.idUsuario2].derrotas += 1;
+        ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayType.WIN;
+        ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
+        ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
       } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-        ranking[partida.idUsuario2].puntosTorneo += 3;
-        ranking[partida.idUsuario2].victorias += 1;
-        ranking[partida.idUsuario1].derrotas += 1;
+        ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayType.WIN;
+        ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
+        ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
       } else {
-        ranking[partida.idUsuario1].puntosTorneo += 1;
-        ranking[partida.idUsuario2].puntosTorneo += 1;
-        ranking[partida.idUsuario1].empates += 1;
-        ranking[partida.idUsuario2].empates += 1;
+        ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayType.DRAW;
+        ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayType.DRAW;
+        ranking[partida.idUsuario1].empates += MatchResultPoint.DRAW;
+        ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
       }
 
       if (liderMuertoUsuario1) {
-        ranking[partida.idUsuario1].lider += 1;
+        ranking[partida.idUsuario1].lider += MatchResultGeneral.DEAD;
       } else if (liderMuertoUsuario2) {
-        ranking[partida.idUsuario2].lider += 1;
+        ranking[partida.idUsuario2].lider += MatchResultGeneral.DEAD;
       }
     }
   });

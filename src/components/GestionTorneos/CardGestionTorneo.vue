@@ -145,6 +145,7 @@ import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
 import CardAddTorneoLiga from "./CardAddTorneoLiga.vue";
 import ModalHandlerMostrarListas from "./ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "./ModalHandlerMostrarClasificacion.vue";
+import { ClassificationType } from "@/constant/TipoClasificacion";
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 const showErrorModal = ref<boolean>(false);
@@ -186,6 +187,7 @@ const torneoMod = ref<Torneo>({
   listasPorJugador: 0,
   mostrarListas: false,
   mostrarClasificacion: false,
+  classificationType: ClassificationType.NORMAL
 });
 
 const plazasRestantes = computed(() => {

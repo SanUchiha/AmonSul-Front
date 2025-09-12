@@ -341,7 +341,7 @@ import { crearTorneo } from "@/services/TorneosService";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
-import { ClassificationType, ClassificationTypeLabels } from "@/Constant/TipoClasificacion";
+import { ClassificationType, ClassificationTypeLabels } from "@/constant/TipoClasificacion";
 
 const showToast = ref<boolean>(false);
 const toastMessage = ref<string>("");
