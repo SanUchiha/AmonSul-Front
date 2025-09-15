@@ -21,8 +21,13 @@
               :isLoading="isLoading"
               :listaTorneos="
                 (inscripcionesIndividual ?? []).filter(
-                  (torneo) =>
-                    new Date(torneo.torneo.fechaFinTorneo) >= new Date()
+                  (torneo) => {
+                    const fin = new Date(torneo.torneo.fechaFinTorneo);
+                    const hoy = new Date();
+                    fin.setHours(0,0,0,0);
+                    hoy.setHours(0,0,0,0);
+                    return fin >= hoy;
+                  }
                 )
               "
               :idUsuario="idUsuario"
@@ -34,8 +39,13 @@
               :isLoading="isLoading"
               :listaTorneos="
                 (inscripcionesEquipo ?? []).filter(
-                  (torneo) =>
-                    new Date(torneo.torneo.fechaFinTorneo) >= new Date()
+                  (torneo) => {
+                    const fin = new Date(torneo.torneo.fechaFinTorneo);
+                    const hoy = new Date();
+                    fin.setHours(0,0,0,0);
+                    hoy.setHours(0,0,0,0);
+                    return fin >= hoy;
+                  }
                 )
               "
               :idUsuario="idUsuario"
@@ -50,8 +60,13 @@
               :isLoading="isLoading"
               :listaTorneos="
                 (inscripcionesIndividual ?? []).filter(
-                  (torneo) =>
-                    new Date(torneo.torneo.fechaFinTorneo) < new Date()
+                  (torneo) => {
+                    const fin = new Date(torneo.torneo.fechaFinTorneo);
+                    const hoy = new Date();
+                    fin.setHours(0,0,0,0);
+                    hoy.setHours(0,0,0,0);
+                    return fin < hoy;
+                  }
                 )
               "
               :idUsuario="idUsuario"
@@ -63,8 +78,13 @@
               :isLoading="isLoading"
               :listaTorneos="
                 (inscripcionesEquipo ?? []).filter(
-                  (torneo) =>
-                    new Date(torneo.torneo.fechaFinTorneo) < new Date()
+                  (torneo) => {
+                    const fin = new Date(torneo.torneo.fechaFinTorneo);
+                    const hoy = new Date();
+                    fin.setHours(0,0,0,0);
+                    hoy.setHours(0,0,0,0);
+                    return fin < hoy;
+                  }
                 )
               "
               :idUsuario="idUsuario"

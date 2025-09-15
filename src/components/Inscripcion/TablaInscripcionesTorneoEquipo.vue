@@ -9,15 +9,6 @@
           @click="verDetalleTorneo(torneo.idTorneo)"
           class="clickable-list-item"
         >
-          <template v-slot:prepend>
-            <img
-              src="@/assets/icons/misTorneos.png"
-              alt="Icono personalizado"
-              width="30"
-              height="30"
-            />
-          </template>
-
           <v-list-item-title class="text-wrap text-left pl-2">{{
             torneo.nombreTorneo
           }}</v-list-item-title>
@@ -39,48 +30,47 @@
 
   <div v-if="hasAcciones">
     <v-container :loading="isLoading" class="mb-0 pb-0">
+      <h3 class="ringbearer text-center mb-4">Torneos equipos</h3>
       <v-list>
-        <v-list-item
-          v-for="torneo in listaTorneos"
-          :key="torneo.idInscripcion"
-          @click="verDetalleTorneo(torneo.idTorneo)"
-          class="clickable-list-item"
+        <template v-if="listaTorneos && listaTorneos.length > 0">
+          <v-list-item
+            v-for="torneo in listaTorneos"
+            :key="torneo.idInscripcion"
+            @click="verDetalleTorneo(torneo.idTorneo)"
+            class="clickable-list-item"
         >
-          <template v-slot:prepend>
-            <img
-              src="@/assets/icons/misTorneos.png"
-              alt="Icono personalizado"
-              width="30"
-              height="30"
-            />
-          </template>
-
           <v-list-item-title class="text-wrap text-left pl-2">{{
             torneo.nombreTorneo
           }}</v-list-item-title>
 
           <template v-slot:append>
-            <v-btn icon @click.stop="VerResultadoTorneo(torneo.idTorneo)">
-              <img
-                src="@/assets/icons/clasificacionTorneo.png"
-                alt="Icono personalizado"
-                width="40"
-                height="40"
-              />
-            </v-btn>
-            <v-btn
-              icon
-              @click.stop="verDetalleInscripcionEquipo(torneo.idInscripcion)"
-            >
-              <img
-                src="@/assets/icons/verLista.png"
-                alt="Icono personalizado"
-                width="40"
-                height="40"
-              />
-            </v-btn>
+            <div class="btns-col">
+              <v-btn 
+                text
+                class="btn-mini"
+                @click.stop="VerResultadoTorneo(torneo.idTorneo)"
+                variant="tonal"
+                color="primary"
+              >
+              Clasificación
+              </v-btn>
+              <v-btn
+                text
+                class="btn-mini"
+                color="secondary"
+                variant="tonal"
+                @click.stop="verDetalleInscripcionEquipo(torneo.idInscripcion)"
+              >Inscripción
+              </v-btn>
+            </div>
           </template>
         </v-list-item>
+        </template>
+        <template v-else>
+          <v-list-item>
+            <v-list-item-title class="text-center grey--text text-wrap aviso-torneos">No tienes torneos por equipos en el horizonte.</v-list-item-title>
+          </v-list-item>
+        </template>
       </v-list>
     </v-container>
   </div>
@@ -210,11 +200,26 @@ const closeModal = () => {
 </script>
 
 <style scoped>
+.btns-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
 .clickable-list-item {
   cursor: pointer;
   transition: background 0.2s;
 }
 .clickable-list-item:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+.btn-mini {
+  font-size: 0.65rem !important;
+  min-width: 0 !important;
+  padding: 0 4px !important;
+  height: 18px !important;
+  line-height: 1 !important;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 </style>

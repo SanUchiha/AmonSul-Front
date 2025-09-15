@@ -362,8 +362,8 @@ const calcularClasificacion = async () => {
         }
       }
       else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
-        const res1 = rankingDividido[partida.idUsuario1].puntosFavor ?? 0;
-        const res2 = rankingDividido[partida.idUsuario2].puntosFavor ?? 0;
+        const res1 = partida.resultadoUsuario1 ?? 0;
+        const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
           rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
@@ -502,8 +502,8 @@ const calcularClasificacion = async () => {
         }
       }
       else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
-        const res1 = ranking[partida.idUsuario1].puntosFavor ?? 0;
-        const res2 = ranking[partida.idUsuario2].puntosFavor ?? 0;
+        const res1 = partida.resultadoUsuario1 ?? 0;
+        const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
           ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;

@@ -2,7 +2,7 @@
   <v-container fluid class="pa-4">
     <v-row class="justify-center">
       <v-col cols="12" sm="8" md="6" lg="4">
-        <v-card class="mx-auto pa-4" outlined>
+        <v-card class="mx-auto pa-4" tonal>
           <v-card-title class="d-flex align-center justify-between">
             <v-icon>mdi-alert</v-icon>
             <span class="font-weight-black title-centered">Error Server</span>

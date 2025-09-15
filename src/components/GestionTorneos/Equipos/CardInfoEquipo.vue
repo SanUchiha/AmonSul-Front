@@ -268,7 +268,7 @@
                 <td :colspan="5" class="text-center py-4">
                   <v-btn
                     color="primary"
-                    variant="outlined"
+                    variant="tonal"
                     size="small"
                     @click.stop="handlerModalRegistrarMiembroEquipo()"
                   >

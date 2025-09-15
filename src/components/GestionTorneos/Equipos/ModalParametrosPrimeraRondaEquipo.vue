@@ -47,7 +47,7 @@
                       item-title="nombreEquipo"
                       item-value="idEquipo"
                       return-object
-                      variant="outlined"
+                      variant="tonal"
                       clearable
                       dense
                     />
@@ -61,7 +61,7 @@
                       item-title="nombreEquipo"
                       item-value="idEquipo"
                       return-object
-                      variant="outlined"
+                      variant="tonal"
                       clearable
                       dense
                     />

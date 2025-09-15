@@ -281,6 +281,8 @@ const partidaSelected = ref<PartidaTorneoDTO>({
   idEquipo2: null,
   nombreEquipo1: null,
   nombreEquipo2: null,
+  idCapitan1: null,
+  idCapitan2: null
 });
 
 const props = defineProps<{

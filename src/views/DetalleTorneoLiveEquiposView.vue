@@ -439,8 +439,8 @@ const calcularClasificacion = async () => {
         }
       }
       else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
-        const res1 = rankingDividido[partida.idUsuario1].puntosFavor ?? 0;
-        const res2 = rankingDividido[partida.idUsuario2].puntosFavor ?? 0;
+        const res1 = partida.resultadoUsuario1 ?? 0;
+        const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
           rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
@@ -555,11 +555,11 @@ const calcularClasificacion = async () => {
 
       // Actualizamos la diferencia de puntos
       ranking[partida.idUsuario1].diferenciaPuntos =
-      ranking[partida.idUsuario1].puntosFavor -
-      ranking[partida.idUsuario1].puntosContra;
+        ranking[partida.idUsuario1].puntosFavor -
+        ranking[partida.idUsuario1].puntosContra;
       ranking[partida.idUsuario2].diferenciaPuntos =
-      ranking[partida.idUsuario2].puntosFavor -
-      ranking[partida.idUsuario2].puntosContra;
+        ranking[partida.idUsuario2].puntosFavor -
+        ranking[partida.idUsuario2].puntosContra;
 
       // Actualizamos las puntosTorneo
       if(torneo.value?.classificationType === 1){ //CLASIFICACION TIPO NORMAL
@@ -579,8 +579,8 @@ const calcularClasificacion = async () => {
         }
       }
       else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
-        const res1 = ranking[partida.idUsuario1].puntosFavor ?? 0;
-        const res2 = ranking[partida.idUsuario2].puntosFavor ?? 0;
+        const res1 = partida.resultadoUsuario1 ?? 0;
+        const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
           ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
@@ -588,7 +588,7 @@ const calcularClasificacion = async () => {
           ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
-            if (res1 >= 2 * res2) {
+            if ((res1 >= (2 * res2)) && (res1 >= 6)) {
               ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
@@ -601,7 +601,7 @@ const calcularClasificacion = async () => {
             }
           }
           if (res2 > res1) {
-            if (res2 >= 2 * res1) {
+            if ((res2 >= (2 * res1)) && (res2 >= 6)) {
               ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;

@@ -2,6 +2,7 @@ import { ClasificacionEquipo } from "@/interfaces/Torneo";
 import { EquipoDTO } from "@/interfaces/Inscripcion";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
+import { MatchResultGeneral, MatchResultPoint, ResultMatchMatchedPlayExtendedType } from "@/Constant/TipoClasificacion";
 
 
 function crearClasificacionBase(equipos: EquipoDTO[]): Map<number, ClasificacionEquipo> {
@@ -40,22 +41,22 @@ function clasificacionNormal(equipos: EquipoDTO[], partidas: PartidaTorneoDTO[])
     const res1 = resultadoUsuario1 ?? 0;
     const res2 = resultadoUsuario2 ?? 0;
     if (res1 === res2) {
-      if (equipo1) equipo1.puntos += 1;
-      if (equipo2) equipo2.puntos += 1;
+      if (equipo1) equipo1.puntos += MatchResultPoint.DRAW;
+      if (equipo2) equipo2.puntos += MatchResultPoint.DRAW;
     } else {
-      if (equipo1 && res1 > res2) equipo1.puntos += 3;
-      if (equipo2 && res2 > res1) equipo2.puntos += 3;
+      if (equipo1 && res1 > res2) equipo1.puntos += MatchResultPoint.WIN;
+      if (equipo2 && res2 > res1) equipo2.puntos += MatchResultPoint.LOSS;
     }
     if (equipo1) {
       equipo1.puntosFavor += res1;
       equipo1.puntosContra += res2;
-      if (liderMuertoUsuario2 === true) equipo1.lideresMatados += 1;
+      if (liderMuertoUsuario2 === true) equipo1.lideresMatados += MatchResultGeneral.DEAD;
       equipo1.diferencia = equipo1.puntosFavor - equipo1.puntosContra;
     }
     if (equipo2) {
       equipo2.puntosFavor += res2;
       equipo2.puntosContra += res1;
-      if (liderMuertoUsuario1 === true) equipo2.lideresMatados += 1;
+      if (liderMuertoUsuario1 === true) equipo2.lideresMatados += MatchResultGeneral.DEAD;
       equipo2.diferencia = equipo2.puntosFavor - equipo2.puntosContra;
     }
   });
@@ -87,38 +88,38 @@ function clasificacionExtendida(equipos: EquipoDTO[], partidas: PartidaTorneoDTO
     const res1 = resultadoUsuario1 ?? 0;
     const res2 = resultadoUsuario2 ?? 0;
     if (res1 === res2) {
-      if (equipo1) equipo1.puntos += 2;
-      if (equipo2) equipo2.puntos += 2;
+      if (equipo1) equipo1.puntos += ResultMatchMatchedPlayExtendedType.DRAW;
+      if (equipo2) equipo2.puntos += ResultMatchMatchedPlayExtendedType.DRAW;
     } else {
       if (res1 > res2) {
-        if (res1 >= 2 * res2) {
-          if (equipo1) equipo1.puntos += 6;
-          if (equipo2) equipo2.puntos += 0;
+        if (res1 >= 2 * res2 && res1 >= 6) {
+          if (equipo1) equipo1.puntos += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+          if (equipo2) equipo2.puntos += ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
         } else {
-          if (equipo1) equipo1.puntos += 5;
-          if (equipo2) equipo2.puntos += 1;
+          if (equipo1) equipo1.puntos += ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+          if (equipo2) equipo2.puntos += ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
         }
       }
       if (res2 > res1) {
-        if (res2 >= 2 * res1) {
-          if (equipo2) equipo2.puntos += 6;
-          if (equipo1) equipo1.puntos += 0;
+        if (res2 >= 2 * res1 && res2 >= 6) {
+          if (equipo2) equipo2.puntos += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+          if (equipo1) equipo1.puntos += ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
         } else {
-          if (equipo2) equipo2.puntos += 5;
-          if (equipo1) equipo1.puntos += 1;
+          if (equipo2) equipo2.puntos += ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+          if (equipo1) equipo1.puntos += ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
         }
       }
     }
     if (equipo1) {
       equipo1.puntosFavor += res1;
       equipo1.puntosContra += res2;
-      if (liderMuertoUsuario2 === true) equipo1.lideresMatados += 1;
+      if (liderMuertoUsuario2 === true) equipo1.lideresMatados += MatchResultGeneral.DEAD;
       equipo1.diferencia = equipo1.puntosFavor - equipo1.puntosContra;
     }
     if (equipo2) {
       equipo2.puntosFavor += res2;
       equipo2.puntosContra += res1;
-      if (liderMuertoUsuario1 === true) equipo2.lideresMatados += 1;
+      if (liderMuertoUsuario1 === true) equipo2.lideresMatados += MatchResultGeneral.DEAD;
       equipo2.diferencia = equipo2.puntosFavor - equipo2.puntosContra;
     }
   });

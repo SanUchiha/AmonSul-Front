@@ -120,7 +120,7 @@
                       </v-chip>
                       <span
                         dark
-                        outlined
+                        tonal
                         small
                         class="ml-2"
                         :style="{

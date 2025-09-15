@@ -354,7 +354,7 @@ import { getlistaTorneo } from "@/services/ListasService";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
 import {
-  updatePairingTorneoEquipoAsync,
+  updatePairingTorneoAsync,
   updatePartidaTorneo,
 } from "@/services/PartidaTorneoService";
 import {
@@ -480,7 +480,7 @@ const sendUpdateBack = async (idJugador1: number, idJugador2: number) => {
       idUsuario2: idJugador2,
     };
 
-    await updatePairingTorneoEquipoAsync(body);
+    await updatePairingTorneoAsync(body);
     return true;
   } catch (error) {
     console.error(error);

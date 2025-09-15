@@ -643,7 +643,7 @@ import {
 import { Torneo } from "@/interfaces/Torneo";
 import { getlistaTorneo } from "@/services/ListasService";
 import {
-  updatePairingTorneoEquipoAsync,
+  updatePairingTorneoAsync,
   updatePartidaTorneo,
 } from "@/services/PartidaTorneoService";
 import {
@@ -1123,8 +1123,8 @@ const calcularClasificacion = () => {
         }
       }
       else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
-        const res1 = rankingDividido[partida.idUsuario1].puntosFavor ?? 0;
-        const res2 = rankingDividido[partida.idUsuario2].puntosFavor ?? 0;
+        const res1 = partida.resultadoUsuario1 ?? 0;
+        const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
           rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
@@ -1263,8 +1263,8 @@ const calcularClasificacion = () => {
         }
       }
       else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
-        const res1 = ranking[partida.idUsuario1].puntosFavor ?? 0;
-        const res2 = ranking[partida.idUsuario2].puntosFavor ?? 0;
+        const res1 = partida.resultadoUsuario1 ?? 0;
+        const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
           ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
@@ -1557,8 +1557,7 @@ const sendUpdateBack = async (idJugador1: number, idJugador2: number) => {
       idUsuario1: idJugador1,
       idUsuario2: idJugador2,
     };
-
-    await updatePairingTorneoEquipoAsync(body);
+    await updatePairingTorneoAsync(body);
     return true;
   } catch (error) {
     console.error(error);

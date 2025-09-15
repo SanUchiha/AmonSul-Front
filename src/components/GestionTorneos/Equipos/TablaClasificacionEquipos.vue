@@ -32,7 +32,7 @@
 import { ClasificacionEquipo } from "@/interfaces/Torneo";
 import { defineProps } from "vue";
 
-const props = defineProps<{
+defineProps<{
   clasificacion: ClasificacionEquipo[];
 }>();
 </script>
