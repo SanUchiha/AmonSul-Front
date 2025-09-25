@@ -198,7 +198,12 @@ import TabClasificacionEquiposIndividual from "@/components/GestionTorneos/Equip
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import CardPartidaTorneoEquipoLive from "@/components/PartidasTorneo/CardPartidaTorneoEquipoLive.vue";
 import { useAuth } from "@/composables/useAuth";
-import { ResultMatchMatchedPlayType, MatchResultPoint, ResultMatchMatchedPlayExtendedType, MatchResultGeneral } from "@/Constant/TipoClasificacion";
+import {
+  ResultMatchMatchedPlayType,
+  MatchResultPoint,
+  ResultMatchMatchedPlayExtendedType,
+  MatchResultGeneral,
+} from "@/Constant/TipoClasificacion";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import { Clasificacion } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
@@ -214,6 +219,7 @@ import {
   getTorneo,
 } from "@/services/TorneosService";
 import { appsettings } from "@/settings/appsettings";
+import { calcularPuntosAleman } from "@/utils/sistemaAleman";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -421,63 +427,102 @@ const calcularClasificacion = async () => {
         rankingDividido[partida.idUsuario2].puntosFavor -
         rankingDividido[partida.idUsuario2].puntosContra;
 
-            // Actualizamos las puntosTorneo
-      if(torneo.value?.classificationType === 1){ //CLASIFICACION TIPO NORMAL
+      // Actualizamos las puntosTorneo
+      if (torneo.value?.classificationType === 1) {
+        //CLASIFICACION TIPO NORMAL
         if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-          rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayType.WIN;
+          rankingDividido[partida.idUsuario1].puntosTorneo +=
+            ResultMatchMatchedPlayType.WIN;
           rankingDividido[partida.idUsuario1].victorias += MatchResultPoint.WIN;
           rankingDividido[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
         } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-          rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayType.WIN;
+          rankingDividido[partida.idUsuario2].puntosTorneo +=
+            ResultMatchMatchedPlayType.WIN;
           rankingDividido[partida.idUsuario2].victorias += MatchResultPoint.WIN;
           rankingDividido[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
         } else {
-          rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayType.DRAW;
-          rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayType.DRAW;
+          rankingDividido[partida.idUsuario1].puntosTorneo +=
+            ResultMatchMatchedPlayType.DRAW;
+          rankingDividido[partida.idUsuario2].puntosTorneo +=
+            ResultMatchMatchedPlayType.DRAW;
           rankingDividido[partida.idUsuario1].empates += MatchResultPoint.DRAW;
           rankingDividido[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         }
-      }
-      else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
+      } else if (torneo.value?.classificationType === 2) {
+        //CLASIFICACION TIPO EXTENDED
         const res1 = partida.resultadoUsuario1 ?? 0;
         const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
-          rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
-          rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
+          rankingDividido[partida.idUsuario1].puntosTorneo +=
+            ResultMatchMatchedPlayExtendedType.DRAW;
+          rankingDividido[partida.idUsuario2].puntosTorneo +=
+            ResultMatchMatchedPlayExtendedType.DRAW;
           rankingDividido[partida.idUsuario1].empates += MatchResultPoint.DRAW;
           rankingDividido[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
             if (res1 >= 2 * res2) {
-              rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
-              rankingDividido[partida.idUsuario1].victorias += MatchResultPoint.WIN;
-              rankingDividido[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
-              rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+              rankingDividido[partida.idUsuario1].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+              rankingDividido[partida.idUsuario1].victorias +=
+                MatchResultPoint.WIN;
+              rankingDividido[partida.idUsuario2].derrotas +=
+                MatchResultPoint.LOSS;
+              rankingDividido[partida.idUsuario2].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
             } else {
-              rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MINOR_WIN;
-              rankingDividido[partida.idUsuario1].victorias += MatchResultPoint.WIN;
-              rankingDividido[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
-              rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+              rankingDividido[partida.idUsuario1].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+              rankingDividido[partida.idUsuario1].victorias +=
+                MatchResultPoint.WIN;
+              rankingDividido[partida.idUsuario2].derrotas +=
+                MatchResultPoint.LOSS;
+              rankingDividido[partida.idUsuario2].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
             }
           }
           if (res2 > res1) {
             if (res2 >= 2 * res1) {
-              rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
-              rankingDividido[partida.idUsuario2].victorias += MatchResultPoint.WIN;
-              rankingDividido[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
-              rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+              rankingDividido[partida.idUsuario2].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+              rankingDividido[partida.idUsuario2].victorias +=
+                MatchResultPoint.WIN;
+              rankingDividido[partida.idUsuario1].derrotas +=
+                MatchResultPoint.LOSS;
+              rankingDividido[partida.idUsuario1].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
             } else {
-              rankingDividido[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MINOR_WIN;
-              rankingDividido[partida.idUsuario2].victorias += MatchResultPoint.WIN;
-              rankingDividido[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
-              rankingDividido[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+              rankingDividido[partida.idUsuario2].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+              rankingDividido[partida.idUsuario2].victorias +=
+                MatchResultPoint.WIN;
+              rankingDividido[partida.idUsuario1].derrotas +=
+                MatchResultPoint.LOSS;
+              rankingDividido[partida.idUsuario1].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
             }
           }
         }
-      } else if(torneo.value?.classificationType === 3){ //CLASIFICACION TIPO ALEMAN
-        //
+      } else if (torneo.value?.classificationType === 3) {
+        //CLASIFICACION TIPO ALEMAN
+        // Sistema alemán: la suma de puntos de ambos jugadores es 20
+        const res1 = partida.resultadoUsuario1 ?? 0;
+        const res2 = partida.resultadoUsuario2 ?? 0;
+        if (res1 > res2) {
+          rankingDividido[partida.idUsuario1].victorias += MatchResultPoint.WIN;
+          rankingDividido[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
+        } else if (res2 > res1) {
+          rankingDividido[partida.idUsuario2].victorias += MatchResultPoint.WIN;
+          rankingDividido[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
+        } else {
+          rankingDividido[partida.idUsuario1].empates += MatchResultPoint.DRAW;
+          rankingDividido[partida.idUsuario2].empates += MatchResultPoint.DRAW;
+        }
+        const { jugador1, jugador2 } = calcularPuntosAleman(res1, res2);
+        rankingDividido[partida.idUsuario1].puntosTorneo += jugador1;
+        rankingDividido[partida.idUsuario2].puntosTorneo += jugador2;
       }
-      
+
       // Lider muerto primero
       if (liderMuertoUsuario1) {
         rankingDividido[partida.idUsuario1].lider += MatchResultGeneral.DEAD;
@@ -562,61 +607,91 @@ const calcularClasificacion = async () => {
         ranking[partida.idUsuario2].puntosContra;
 
       // Actualizamos las puntosTorneo
-      if(torneo.value?.classificationType === 1){ //CLASIFICACION TIPO NORMAL
+      if (torneo.value?.classificationType === 1) {
+        //CLASIFICACION TIPO NORMAL
         if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-          ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayType.WIN;
+          ranking[partida.idUsuario1].puntosTorneo +=
+            ResultMatchMatchedPlayType.WIN;
           ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
           ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
         } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-          ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayType.WIN;
+          ranking[partida.idUsuario2].puntosTorneo +=
+            ResultMatchMatchedPlayType.WIN;
           ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
           ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
         } else {
-          ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayType.DRAW;
-          ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayType.DRAW;
+          ranking[partida.idUsuario1].puntosTorneo +=
+            ResultMatchMatchedPlayType.DRAW;
+          ranking[partida.idUsuario2].puntosTorneo +=
+            ResultMatchMatchedPlayType.DRAW;
           ranking[partida.idUsuario1].empates += MatchResultPoint.DRAW;
           ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         }
-      }
-      else if(torneo.value?.classificationType === 2){ //CLASIFICACION TIPO EXTENDED
+      } else if (torneo.value?.classificationType === 2) {
+        //CLASIFICACION TIPO EXTENDED
         const res1 = partida.resultadoUsuario1 ?? 0;
         const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
-          ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
-          ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.DRAW;
+          ranking[partida.idUsuario1].puntosTorneo +=
+            ResultMatchMatchedPlayExtendedType.DRAW;
+          ranking[partida.idUsuario2].puntosTorneo +=
+            ResultMatchMatchedPlayExtendedType.DRAW;
           ranking[partida.idUsuario1].empates += MatchResultPoint.DRAW;
           ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
-            if ((res1 >= (2 * res2)) && (res1 >= 6)) {
-              ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+            if (res1 >= 2 * res2 && res1 >= 6) {
+              ranking[partida.idUsuario1].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
-              ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+              ranking[partida.idUsuario2].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
             } else {
-              ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+              ranking[partida.idUsuario1].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
-              ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+              ranking[partida.idUsuario2].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
             }
           }
           if (res2 > res1) {
-            if ((res2 >= (2 * res1)) && (res2 >= 6)) {
-              ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+            if (res2 >= 2 * res1 && res2 >= 6) {
+              ranking[partida.idUsuario2].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
-              ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+              ranking[partida.idUsuario1].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
             } else {
-              ranking[partida.idUsuario2].puntosTorneo += ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+              ranking[partida.idUsuario2].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
-              ranking[partida.idUsuario1].puntosTorneo += ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+              ranking[partida.idUsuario1].puntosTorneo +=
+                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
             }
           }
         }
-      }
-      else if(torneo.value?.classificationType === 3){ //CLASIFICACION TIPO ALEMNAN
-        //
+      } else if (torneo.value?.classificationType === 3) {
+        //CLASIFICACION TIPO ALEMAN
+        // Sistema alemán: la suma de puntos de ambos jugadores es 20
+        const res1 = partida.resultadoUsuario1 ?? 0;
+        const res2 = partida.resultadoUsuario2 ?? 0;
+        if (res1 > res2) {
+          ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
+          ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
+        } else if (res2 > res1) {
+          ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
+          ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
+        } else {
+          ranking[partida.idUsuario1].empates += MatchResultPoint.DRAW;
+          ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
+        }
+        const { jugador1, jugador2 } = calcularPuntosAleman(res1, res2);
+        ranking[partida.idUsuario1].puntosTorneo += jugador1;
+        ranking[partida.idUsuario2].puntosTorneo += jugador2;
       }
 
       // Lider muerto primero
