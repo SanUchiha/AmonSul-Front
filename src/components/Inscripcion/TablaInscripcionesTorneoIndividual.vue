@@ -28,7 +28,11 @@
         </template>
         <template v-else>
           <v-list-item>
-            <v-list-item-title class="text-center grey--text text-wrap aviso-torneos">No tienes torneos individuales en el horizonte.</v-list-item-title>
+            <v-list-item-title
+              class="text-center grey--text text-wrap aviso-torneos"
+              >No tienes torneos individuales en el
+              horizonte.</v-list-item-title
+            >
           </v-list-item>
         </template>
       </v-list>
@@ -42,47 +46,53 @@
           <v-list-item
             v-for="torneo in listaTorneos"
             :key="torneo.idInscripcion"
-            @click="verDetalleTorneo(torneo.idTorneo)"
             class="clickable-list-item"
           >
-            <v-list-item-title class="text-wrap text-left pl-2">{{
-              torneo.torneo.nombreTorneo
-            }}</v-list-item-title>
-
+            <v-list-item-title class="text-wrap text-left pl-2">
+              {{ torneo.torneo.nombreTorneo }}
+            </v-list-item-title>
             <template v-slot:append>
-              <div class="btns-col">
-                <v-btn
-                  text
-                  class="btn-mini"
-                  @click.stop="
-                    torneo.torneo.tipoTorneo == 'Individual' &&
-                    torneo.torneo.listasPorJugador > 1
-                      ? VerResultadoTorneoMas(torneo.idTorneo)
-                      : VerResultadoTorneo(torneo.idTorneo)
-                  "
-                  variant="tonal"
-                  color="primary"
-                >
-                  Clasificación
-                </v-btn>
-                <v-btn
-                  text
-                  class="btn-mini"
-                  @click.stop="verDetalleInscripcion(torneo.idInscripcion)"
-                  variant="tonal"
-                  color="secondary"
-
-
-                >
-                  Inscripción
-                </v-btn>
-              </div>
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-btn icon v-bind="props">
+                    <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item @click="verDetalleTorneo(torneo.idTorneo)">
+                    <v-list-item-title
+                      >Ver detalle del torneo</v-list-item-title
+                    >
+                  </v-list-item>
+                  <v-list-item
+                    @click="verDetalleInscripcion(torneo.idInscripcion)"
+                  >
+                    <v-list-item-title
+                      >Subir lista y ver inscripción</v-list-item-title
+                    >
+                  </v-list-item>
+                  <v-list-item
+                    @click="
+                      torneo.torneo.tipoTorneo == 'Individual' &&
+                      torneo.torneo.listasPorJugador > 1
+                        ? VerResultadoTorneoMas(torneo.idTorneo)
+                        : VerResultadoTorneo(torneo.idTorneo)
+                    "
+                  >
+                    <v-list-item-title>Ver resultados</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </template>
           </v-list-item>
         </template>
         <template v-else>
           <v-list-item>
-            <v-list-item-title class="text-center grey--text text-wrap aviso-torneos">No tienes torneos individuales en el horizonte.</v-list-item-title>
+            <v-list-item-title
+              class="text-center grey--text text-wrap aviso-torneos"
+              >No tienes torneos individuales en el
+              horizonte.</v-list-item-title
+            >
           </v-list-item>
         </template>
       </v-list>
