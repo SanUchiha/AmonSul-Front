@@ -491,7 +491,7 @@ const toggleExpand = () => {
   isExpanded.value = !isExpanded.value;
 };
 
-const numeroMiembrosEquipo = ref<number>();
+const numeroMiembrosEquipo = ref<number>(0);
 const equipoConHuecos = computed(() => {
   const miembros = inscripcionesEquipo.value ?? [];
   const faltantes = Math.max(
@@ -504,7 +504,7 @@ const listasOk = computed(() => {
   return inscripcionesEquipo.value.filter((i) => i.estadoLista === "OK").length;
 });
 const equipoIncompleto = computed(() => {
-  return listasOk.value < numeroMiembrosEquipo.value!;
+  return listasOk.value < numeroMiembrosEquipo.value;
 });
 
 const miembrosPorTipo: Record<string, number> = {
@@ -517,7 +517,14 @@ numeroMiembrosEquipo.value =
   miembrosPorTipo[props.torneo.tipoTorneo ?? "Individual"] || 1;
 
 const verLista = async (idLista: number, nombre: string, ejercito: string) => {
+  isLoading.value = true;
   const responseLista = await getListaById(idLista);
+  if (responseLista.status !== 200) {
+    isLoading.value = false;
+    showErrorModal.value = true;
+    return;
+  }
+  isLoading.value = false;
   const listaJugadorDTO: ListaJugador = {
     listaData: responseLista.data.listaData,
     nick: nombre,
@@ -563,12 +570,22 @@ const guardarLista = async (newLista: RequesListaDTO) => {
   try {
     let nuevoIdLista = miembro.idLista;
 
+    if (!currentInscripcionId.value) {
+      console.error('ID de inscripción no disponible');
+      return;
+    }
+
+    if (!miembro.idLista) {
+      console.error('ID de lista no disponible para modificación');
+      return;
+    }
+
     if (esModificacion) {
       mensajeCarga.value = "Modificando lista...";
 
       const requestLista: ModificarListaTorneoRequestDTO = {
-        idInscripcion: currentInscripcionId.value!,
-        idLista: miembro.idLista!,
+        idInscripcion: currentInscripcionId.value ,
+        idLista: miembro.idLista,
         listaData: newLista.listaData,
         ejercito: newLista.ejercito,
         idUsuario: newLista.idUsuario,
@@ -580,13 +597,13 @@ const guardarLista = async (newLista: RequesListaDTO) => {
       mensajeCarga.value = "Enviando lista...";
 
       const requestLista: CrearListaTorneoRequestDTO = {
-        idInscripcion: currentInscripcionId.value!,
+        idInscripcion: currentInscripcionId.value,
         listaData: newLista.listaData,
         ejercito: newLista.ejercito,
         idUsuario: newLista.idUsuario,
         idTorneo: props.torneo.idTorneo,
         nick: newLista.nick,
-        nombreEquipo: props.equipo.nombreEquipo!,
+        nombreEquipo: props.equipo.nombreEquipo ?? "Sin nombre",
       };
 
       const response = await subirListaTorneo(requestLista);
