@@ -557,6 +557,7 @@ const guardarLista = async (newLista: RequesListaDTO) => {
     (m) => m.idInscripcion === currentInscripcionId.value
   );
 
+
   if (miembroIndex === -1) {
     isCargandoAccion.value = false;
     showErrorModalLista.value = true;
@@ -566,7 +567,7 @@ const guardarLista = async (newLista: RequesListaDTO) => {
   const miembro = inscripcionesEquipo.value[miembroIndex];
 
   const esModificacion = !!miembro.idLista;
-
+  
   try {
     let nuevoIdLista = miembro.idLista;
 
@@ -575,7 +576,7 @@ const guardarLista = async (newLista: RequesListaDTO) => {
       return;
     }
 
-    if (!miembro.idLista) {
+    if (esModificacion && !miembro.idLista) {
       console.error('ID de lista no disponible para modificación');
       return;
     }
