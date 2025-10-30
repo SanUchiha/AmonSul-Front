@@ -5,7 +5,7 @@ export const getEloUsuario = async (idUsuario: number) => {
 };
 
 export const getClasifiacionElo = async () => {
-  return http.get("Elo/Clasificacion/");
+  return http.get("Elo/Clasificacion-cache/");
 };
 
 export const getClasifiacionEloMensual = async () => {
