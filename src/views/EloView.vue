@@ -36,16 +36,17 @@ import TablaClasificacionElo from "@/components/Elo/TablaClasificacionElo.vue";
 import TablaClasificacionEloEquipos from "@/components/Elo/TablaClasificacionEloEquipos.vue";
 import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
 import { FaccionDTO } from "@/interfaces/Faccion";
-import { getClasifiacionElo } from "@/services/EloService";
 import { getFacciones } from "@/services/FaccionesService";
 import { onMounted, ref, computed, ComputedRef } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
+import { useEloStore } from "@/store/elo";
 import { ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
 
 const usuariosStore = useUsuariosStore();
+const eloStore = useEloStore();
 
 const tab = ref<string>("Individual");
 
@@ -74,13 +75,13 @@ onMounted(async () => {
     idUsuario.value = id;
 
     // Hacer peticiones en paralelo
-    const [responseClasificacionElo, faccionesResponse] = await Promise.all([
-      getClasifiacionElo(),
+    const [clasificacionEloData, faccionesResponse] = await Promise.all([
+      eloStore.fetchClasificacionElo(),
       getFacciones(),
     ]);
 
     // Procesar la clasificación ELO
-    eloClasificacion.value = responseClasificacionElo.data.sort(
+    eloClasificacion.value = clasificacionEloData.sort(
       (a: { elo: number }, b: { elo: number }) => b.elo - a.elo
     );
     eloClasificacion.value = eloClasificacion.value.map((item, index) => ({
