@@ -5,37 +5,51 @@
   <div v-else>
     <v-card flat>
       <v-card-title class="d-flex align-center pe-2">
-        <v-row>
-          <v-col cols="12" sm="4">
-            <v-icon class="me-2" color="primary">mdi-account-group</v-icon>
-            Usuarios
+        <v-row align="center">
+          <!-- Título -->
+          <v-col cols="12" md="3" lg="2">
+            <div class="d-flex align-center">
+              <v-icon class="me-2" color="primary">mdi-account-group</v-icon>
+              <span class="text-h6">Usuarios</span>
+            </div>
           </v-col>
-          <v-col cols="12" sm="4">
+
+          <!-- Buscador -->
+          <v-col cols="12" md="4" lg="4">
             <v-text-field
               v-model="search"
               density="compact"
               label="Buscar usuario"
               prepend-inner-icon="mdi-magnify"
-              variant="solo-filled"
-              flat
+              variant="outlined"
               hide-details
               single-line
             ></v-text-field>
           </v-col>
-          <v-col cols="12" sm="4">
+
+          <!-- Filtro por facción -->
+          <v-col cols="12" sm="6" md="2" lg="3">
             <v-select
               v-model="selectedFaction"
               :items="factions"
               label="Filtrar por facción"
+              variant="outlined"
+              density="compact"
               clearable
+              hide-details
             ></v-select>
           </v-col>
-          <v-col cols="12" sm="4">
+
+          <!-- Filtro por provincia -->
+          <v-col cols="12" sm="6" md="3" lg="3">
             <v-select
               v-model="selectedProvince"
               :items="provinces"
               label="Filtrar por provincia"
+              variant="outlined"
+              density="compact"
               clearable
+              hide-details
             ></v-select>
           </v-col>
         </v-row>
@@ -51,9 +65,9 @@
         <template v-slot:item="{ item }">
           <tr @click="goToUserDetail(item.idUsuario)" class="clickable-row">
             <td>
-              <v-avatar size="32" class="me-2">
+              <!--<v-avatar size="32" class="me-2">
                 <v-img :src="item.avatar || defaultAvatar" alt="Avatar" />
-              </v-avatar>
+              </v-avatar>-->
               {{ item.nick }}
             </td>
             <td>
@@ -99,12 +113,12 @@ const headers = [
 ];
 
 const provinces = computed(() => [
-  ...new Set(items.value.map((user) => user.ciudad).filter(Boolean)),
+  ...new Set(items.value.map(user => user.ciudad).filter(Boolean)),
 ]);
 
 const factions = computed(() => [
   ...new Set(
-    items.value.map((user) => user.faccion?.nombreFaccion).filter(Boolean)
+    items.value.map(user => user.faccion?.nombreFaccion).filter(Boolean)
   ),
 ]);
 
@@ -116,7 +130,7 @@ watch(
 );
 
 const filteredItems = computed(() => {
-  return items.value.filter((user) => {
+  return items.value.filter(user => {
     return (
       (!selectedProvince.value || user.ciudad === selectedProvince.value) &&
       (!selectedFaction.value ||

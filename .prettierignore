@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+coverage
+.nuxt
+.next
+.out
+.vercel
+*.min.js
+*.min.css
+package-lock.json
+yarn.lock
+public
