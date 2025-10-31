@@ -1,54 +1,120 @@
 <template>
-  <v-card class="profile-section">
+  <v-card class="profile-section" style="position: relative">
+    <v-btn
+      v-if="!isEditing && editable"
+      @click="toggleEditMode"
+      color="primary"
+      variant="tonal"
+      style="position: absolute; top: 16px; right: 16px; z-index: 2"
+    >
+      Editar
+    </v-btn>
+    <v-btn
+      v-if="isEditing"
+      @click="toggleEditMode"
+      color="error"
+      variant="tonal"
+      style="position: absolute; top: 16px; right: 16px; z-index: 2"
+    >
+      Cancelar
+    </v-btn>
     <v-avatar size="120" class="avatar">
       <v-img :src="editableUser.imagen || defaultAvatar" alt="Avatar"></v-img>
     </v-avatar>
     <v-file-input
       v-if="isEditing"
       accept="image/*"
-      label="Subir nueva imagen"
+      label="Cambiar imagen"
       @change="handleImageUpload"
       variant="solo"
       dense
     ></v-file-input>
 
     <h2 class="player-name text-wrap">
-      <v-btn v-if="isEditing" @click="toggleEditMode" variant="text"
-        >Cancelar</v-btn
-      >
       <v-text-field
         v-if="isEditing"
         v-model="editableUser.nick"
         label="Nick"
-        dense
-        variant="solo"
       ></v-text-field>
       <v-text-field
         v-if="isEditing"
         v-model="editableUser.nombreUsuario"
         label="Nombre"
         dense
-        variant="solo"
       ></v-text-field>
       <v-text-field
         v-if="isEditing"
         v-model="editableUser.primerApellido"
         label="Primer apellido"
-        dense
-        variant="solo"
       ></v-text-field>
       <v-text-field
         v-if="isEditing"
         v-model="editableUser.segundoApellido"
         label="Segundo apellido"
-        dense
-        variant="solo"
       ></v-text-field>
       <p v-if="!isEditing">
         {{ editableUser.nombreUsuario }} {{ editableUser.primerApellido }}
         {{ editableUser.segundoApellido }}
-        <v-btn icon @click="toggleEditMode" v-if="editable"
-          ><v-icon size="x-small">mdi-pen</v-icon></v-btn
+      </p>
+      <p v-if="isEditing">
+        <v-combobox
+          v-if="isEditing"
+          v-model="editableFaccionName"
+          :items="faccionesCombo"
+          item-title="nombreFaccion"
+          item-value="idFaccion"
+          label="Selecciona una comunidad"
+          @update:modelValue="logFaccionSelection"
+        >
+        </v-combobox>
+      </p>
+      <p v-if="isEditing">
+        <v-text-field
+          v-model="editableUser.nickLGDA"
+          label="Nick LGDA"
+        ></v-text-field>
+      </p>
+      <p v-if="isEditing">
+        <v-text-field
+          v-model="editableUser.ciudad"
+          label="Ciudad"
+        ></v-text-field>
+      </p>
+      <p v-if="isEditing">
+        <v-text-field v-model="editableUser.email" label="Email"></v-text-field>
+      </p>
+      <p v-if="isEditing">
+        <v-menu
+          v-model="datePickerMenu"
+          :close-on-content-click="false"
+          transition="scale-transition"
+          offset-y
+        >
+          <template v-slot:activator="{ props }">
+            <v-text-field
+              v-bind="props"
+              v-model="formattedFechaNacimiento"
+              label="Fecha de nacimiento"
+              prepend-icon="mdi-calendar"
+              readonly
+              @click="datePickerMenu = true"
+            ></v-text-field>
+          </template>
+          <v-date-picker
+            v-model="dateObject"
+            @update:modelValue="updateFechaNacimiento"
+          ></v-date-picker>
+        </v-menu>
+      </p>
+      <p v-if="isEditing">
+        <v-text-field
+          v-model="editableUser.telefono"
+          label="Teléfono"
+        ></v-text-field>
+      </p>
+      <p v-if="isEditing">
+        <v-btn color="primary" variant="tonal" block @click="saveChanges"
+          >Guardar</v-btn
         >
       </p>
     </h2>
@@ -56,31 +122,14 @@
       {{ editableUser.nick }}
     </h2>
 
-    <v-divider class="mb-3"></v-divider>
-    <v-card-text class="mt-0 text-left">
-      <v-combobox
-        v-if="isEditing"
-        v-model="editableFaccionName"
-        :items="faccionesCombo"
-        item-title="nombreFaccion"
-        item-value="idFaccion"
-        label="Selecciona una comunidad"
-        @update:modelValue="logFaccionSelection"
-      >
-      </v-combobox>
-      <p v-else class="profile-info">
+    <v-divider v-if="!isEditing" class="mb-3"></v-divider>
+    <v-card-text v-if="!isEditing" class="mt-0 text-left">
+      <p class="profile-info">
         <strong>Comunidad:</strong> {{ editableFaccionName }}
       </p>
 
-      <v-text-field
-        v-if="isEditing"
-        v-model="editableUser.nickLGDA"
-        label="Nick LGDA"
-        dense
-        variant="solo"
-      ></v-text-field>
-      <p v-else class="profile-info">
-        <strong>Nick LGDA:</strong>
+      <p class="profile-info">
+        <strong>Nick LGDA: </strong>
         <a
           :href="
             'https://www.laguerradelanillo.com/tu-perfil/' +
@@ -91,78 +140,24 @@
         >
       </p>
 
-      <v-text-field
-        v-if="isEditing"
-        v-model="editableUser.ciudad"
-        label="Ciudad"
-        dense
-        variant="solo"
-      ></v-text-field>
-      <p v-else class="profile-info">
+      <p class="profile-info">
         <strong>Ciudad:</strong> {{ editableUser.ciudad }}
       </p>
 
-      <v-text-field
-        v-if="isEditing"
-        v-model="editableUser.email"
-        label="Email"
-        dense
-        variant="solo"
-      ></v-text-field>
-      <p v-else class="profile-info">
+      <p class="profile-info">
         <strong>Email:</strong> {{ editableUser.email }}
       </p>
 
-      <!-- Campo de Fecha con Date Picker en Modo Edición -->
-      <v-menu
-        v-if="isEditing"
-        v-model="datePickerMenu"
-        :close-on-content-click="false"
-        transition="scale-transition"
-        offset-y
-      >
-        <template v-slot:activator="{ props }">
-          <v-text-field
-            v-bind="props"
-            v-model="formattedFechaNacimiento"
-            label="Fecha de nacimiento"
-            prepend-icon="mdi-calendar"
-            readonly
-            @click="datePickerMenu = true"
-          ></v-text-field>
-        </template>
-        <v-date-picker
-          v-model="dateObject"
-          @update:modelValue="updateFechaNacimiento"
-        ></v-date-picker>
-      </v-menu>
-      <!-- Texto con fecha formateada en modo vista (no edición) -->
-      <p v-else class="profile-info">
+      <p class="profile-info">
         <strong>Fecha de nacimiento:</strong>
         {{ convertirFecha(editableUser.fechaNacimiento) }}
       </p>
 
-      <v-text-field
-        v-if="isEditing"
-        v-model="editableUser.telefono"
-        label="Teléfono"
-        dense
-        variant="solo"
-      ></v-text-field>
-      <p v-else class="profile-info">
+      <p class="profile-info">
         <span v-if="editable"
           ><strong>Teléfono:</strong> {{ editableUser.telefono }}</span
         >
       </p>
-
-      <v-btn
-        v-if="isEditing"
-        color="primary"
-        variant="tonal"
-        block
-        @click="saveChanges"
-        >Guardar</v-btn
-      >
     </v-card-text>
   </v-card>
 
@@ -193,7 +188,9 @@ import { getFacciones } from "@/services/FaccionesService";
 import { editarUsuario } from "@/services/UsuariosService";
 import { FaccionDTO } from "@/interfaces/Faccion";
 import defaultAvatar from "@/assets/icons/perfil.png";
+
 import ModalCambiarPass from "./ModalCambiarPass.vue";
+import { useToast } from "@/composables/useToast";
 
 const props = withDefaults(
   defineProps<{
@@ -215,21 +212,34 @@ const datePickerMenu = ref<boolean>(false);
 const showModalCambiarPass = ref<boolean>(false);
 
 const dateObject = ref<Date>(); // Aquí guardamos la fecha como objeto Date
+const { triggerToast } = useToast();
 
 // Convertir `dateObject` de vuelta a `YYYY-MM-DD` cuando el usuario seleccione una fecha
 const updateFechaNacimiento = (date: Date) => {
   dateObject.value = date;
-  editableUser.fechaNacimiento = date.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+  // Formatear la fecha en local (YYYY-MM-DD)
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  editableUser.fechaNacimiento = `${year}-${month}-${day}`;
   datePickerMenu.value = false;
+  console.log("Setting date from input:", editableUser.fechaNacimiento);
 };
 
-// Computed para mostrar siempre la fecha correctamente en el input
+// Computed para mostrar siempre la fecha correctamente en el input (formato local)
 const formattedFechaNacimiento = computed({
-  get: () =>
-    dateObject.value ? dateObject.value.toISOString().split("T")[0] : "",
-  set: (value) => {
+  get: () => {
+    if (!dateObject.value) return "";
+    const year = dateObject.value.getFullYear();
+    const month = String(dateObject.value.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObject.value.getDate()).padStart(2, "0");
+    return `${day}-${month}-${year}`;
+  },
+  set: value => {
     if (value) {
-      dateObject.value = new Date(value);
+      // value es YYYY-MM-DD
+      const [year, month, day] = value.split("-").map(Number);
+      dateObject.value = new Date(year, month - 1, day);
     }
   },
 });
@@ -249,7 +259,7 @@ const closeModalCambiarPass = () => {
 const logFaccionSelection = (value: FaccionDTO) => {
   // Buscar la facción seleccionada en el array de facciones
   const foundFaccion = faccionesCombo.value.find(
-    (f) => f.idFaccion === value.idFaccion
+    f => f.idFaccion === value.idFaccion
   );
 
   if (foundFaccion) {
@@ -278,8 +288,10 @@ const saveChanges = async () => {
 
   try {
     await editarUsuario(editusu);
+    triggerToast("success", "Perfil actualizado correctamente");
   } catch (error) {
-    console.error("Error al editar usuario: "), error;
+    console.error("Error al editar usuario: ", error);
+    triggerToast("error", "Error al actualizar el perfil");
   }
 };
 
@@ -304,7 +316,7 @@ onMounted(async () => {
     // Preseleccionar la facción del usuario
     if (props.selectedFaccionName) {
       const foundFaccion = faccionesCombo.value.find(
-        (f) => f.idFaccion === props.selectedFaccionName
+        f => f.idFaccion === props.selectedFaccionName
       );
       if (foundFaccion) {
         editableFaccionName.value = foundFaccion.nombreFaccion;
