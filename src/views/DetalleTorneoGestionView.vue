@@ -9,12 +9,7 @@
           <v-card class="mx-auto" max-width="800">
             <v-tabs v-model="activeTab" grow center-active fixed-tabs>
               <v-tab :key="0" :text="`Gestión`" :value="0">Gestión</v-tab>
-              <v-tab
-                v-for="n in numeroRondas"
-                :key="n"
-                :text="`Ronda ${n}`"
-                :value="n"
-              >
+              <v-tab :key="tabRondas" :text="`Rondas`" :value="tabRondas">
               </v-tab>
               <v-tab
                 :key="tabClasificacion"
@@ -37,386 +32,8 @@
                 </div>
               </v-tabs-window-item>
 
-              <div
-                v-if="isRondaValidada(activeTab)"
-                class="ma-3 text-green-500"
-              >
-                Todas las partidas están validadas
-                <div>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        <div class="flex-column align-items-center">
-                          <v-btn
-                            class="mt-2"
-                            variant="tonal"
-                            color="secondary"
-                            @click="agregarPairing(activeTab)"
-                          >
-                            Añadir partida
-                          </v-btn>
-                        </div>
-                      </v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                </div>
-                <div v-if="ultimaRonda != activeTab" class="mt-3">
-                  <div
-                    v-if="partidasPorRonda[activeTab + 1] != undefined"
-                    class="mt-3"
-                  >
-                    La ronda {{ activeTab + 1 }} ya se ha generado
-                  </div>
-                  <div v-else>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>
-                          <div class="flex-column align-items-center">
-                            <v-btn
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              @click="generarSiguienteRonda(activeTab + 1)"
-                            >
-                              Generar siguiente ronda
-                            </v-btn>
-                          </div>
-                        </v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </div>
-                </div>
-                <div v-else class="mt-3">
-                  <!-- boton para cerrar el torneo -->
-                  <v-btn
-                    v-if="!wasSave"
-                    class="mt-2"
-                    variant="tonal"
-                    color="primary"
-                    @click="resultados(activeTab)"
-                  >
-                    Guardar resultados
-                  </v-btn>
-                </div>
-              </div>
-              <div v-else class="ma-3">
-                <div
-                  v-if="
-                    !partidasPorRonda[activeTab] &&
-                    activeTab != 0 &&
-                    activeTab != numeroRondas.length + 1
-                  "
-                >
-                  Esperando ronda...
-                  <div>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>
-                          <div class="flex-column align-items-center">
-                            <v-btn
-                              class="mt-2"
-                              variant="tonal"
-                              color="secondary"
-                              @click="agregarPairing(activeTab)"
-                            >
-                              Añadir partida
-                            </v-btn>
-                          </div>
-                        </v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </div>
-                </div>
-                <div v-else>
-                  <div v-if="partidasPorRonda[activeTab]" class="text-red-500">
-                    Faltan partidas por validar
-                    <div>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>
-                            <div class="flex-column align-items-center">
-                              <v-btn
-                                class="mt-2"
-                                variant="tonal"
-                                color="secondary"
-                                @click="agregarPairing(activeTab)"
-                              >
-                                Añadir partida
-                              </v-btn>
-                            </div>
-                          </v-list-item-title>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <!-- tab rondas dinamicas -->
-              <v-tabs-item
-                v-for="(partida, index) in partidasPorRonda[activeTab!]"
-                :key="partida.idPartidaTorneo"
-                :value="activeTab"
-              >
-                <div class="card-container">
-                  <v-card class="ma-3 bordered-card" max-width="400">
-                    <v-card-title class="underlined-title"
-                      >Mesa {{ index + 1 }}</v-card-title
-                    >
-                    <v-card-subtitle> </v-card-subtitle>
-                    <v-divider></v-divider>
-
-                    <v-card-text>
-                      <div class="player-container">
-                        <!-- jugador 1 -->
-                        <div class="player-details">
-                          <!-- Validar 1 -->
-                          <div class="player-info">
-                            <span>
-                              <v-icon
-                                v-if="partida.partidaValidadaUsuario1"
-                                color="green"
-                                >mdi-check</v-icon
-                              >
-                              <v-icon v-else color="red">mdi-close</v-icon>
-
-                              <v-btn
-                                class="mt-2"
-                                variant="tonal"
-                                color="primary"
-                                size="small"
-                                @click="
-                                  abrirModalValidar(partida.idPartidaTorneo, 1)
-                                "
-                              >
-                                Validar
-                              </v-btn>
-                            </span>
-                          </div>
-                          <!-- nick 1 -->
-                          <div class="player-info">
-                            <span
-                              :class="{
-                                highlight: partida.idUsuario1 === idUsuario,
-                              }"
-                            >
-                              {{ partida.nick1 }}
-                            </span>
-                          </div>
-                          <!-- resultado 1 -->
-                          <div class="player-info">
-                            <span v-if="partida.resultadoUsuario1 != null"
-                              >{{ partida.resultadoUsuario1 }}
-                            </span>
-                            <span v-else>
-                              <v-icon color="red">mdi-close</v-icon>
-                            </span>
-                          </div>
-                          <!-- lider 1 -->
-                          <div class="player-info">
-                            <span v-if="partida.liderMuertoUsuario1 != null">
-                              ¿General?
-                              {{
-                                partida.liderMuertoUsuario1 === true
-                                  ? "Sí"
-                                  : partida.liderMuertoUsuario1 === false
-                                  ? "No"
-                                  : "N/A"
-                              }}
-                            </span>
-                            <span v-else>
-                              ¿General?
-                              <v-icon color="red">mdi-close</v-icon>
-                            </span>
-                          </div>
-                          <!-- ejercito 1 -->
-                          <div class="player-info">
-                            <v-icon>mdi-shield-outline</v-icon>
-                            <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
-                          </div>
-                          <!-- lista 1 -->
-                          <div class="player-info">
-                            <v-btn
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              size="small"
-                              @click="
-                                verLista(
-                                  partida.idUsuario1,
-                                  partida.idTorneo,
-                                  partida.nick1
-                                )
-                              "
-                            >
-                              Lista
-                            </v-btn>
-                          </div>
-                        </div>
-
-                        <v-divider vertical class="divider"></v-divider>
-
-                        <!-- jugador 2 -->
-                        <div class="player-details">
-                          <!-- validar 2 -->
-                          <div class="player-info">
-                            <span>
-                              <v-icon
-                                v-if="partida.partidaValidadaUsuario2"
-                                color="green"
-                                >mdi-check</v-icon
-                              >
-                              <v-icon v-else color="red">mdi-close</v-icon>
-
-                              <v-btn
-                                class="mt-2"
-                                variant="tonal"
-                                color="primary"
-                                size="small"
-                                @click="
-                                  abrirModalValidar(partida.idPartidaTorneo, 2)
-                                "
-                              >
-                                Validar
-                              </v-btn>
-                            </span>
-                          </div>
-                          <!-- nick 2 -->
-                          <div class="player-info">
-                            <span
-                              :class="{
-                                highlight: partida.idUsuario2 === idUsuario,
-                              }"
-                            >
-                              {{ partida.nick2 }}
-                            </span>
-                          </div>
-                          <!-- resultado 2 -->
-                          <div class="player-info">
-                            <span v-if="partida.resultadoUsuario2 != null"
-                              >{{ partida.resultadoUsuario2 }}
-                            </span>
-                            <span v-else>
-                              <v-icon color="red">mdi-close</v-icon>
-                            </span>
-                          </div>
-                          <!-- lider 2 -->
-                          <div class="player-info">
-                            <span v-if="partida.liderMuertoUsuario2 != null">
-                              ¿General?
-                              {{
-                                partida.liderMuertoUsuario2 === true
-                                  ? "Sí"
-                                  : partida.liderMuertoUsuario2 === false
-                                  ? "No"
-                                  : "N/A"
-                              }}
-                            </span>
-                            <span v-else>
-                              ¿General?
-                              <v-icon color="red">mdi-close</v-icon>
-                            </span>
-                          </div>
-                          <!-- ejercito 2 -->
-                          <div class="player-info">
-                            <v-icon>mdi-shield-outline</v-icon>
-                            <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
-                          </div>
-                          <!-- lista 2 -->
-                          <div class="player-info">
-                            <v-btn
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              size="small"
-                              @click="
-                                verLista(
-                                  partida.idUsuario2,
-                                  partida.idTorneo,
-                                  partida.nick2
-                                )
-                              "
-                            >
-                              Lista
-                            </v-btn>
-                          </div>
-                        </div>
-                      </div>
-                      <v-divider></v-divider>
-                      <v-list class="centered-list">
-                        <!-- ganador -->
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <v-icon>mdi-trophy</v-icon>
-                              {{ getGanador(partida) }}
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <!-- fecha -->
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <v-icon>mdi-calendar</v-icon>
-                              {{ formatDate(partida.fechaPartida) }}
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <!-- escenario -->
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <v-icon>mdi-map-marker</v-icon>
-                              {{ partida.escenarioPartida }}
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <!-- Modificar partida -->
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <div class="flex-column align-items-center">
-                                <v-btn
-                                  class="mt-2"
-                                  variant="tonal"
-                                  color="secondary"
-                                  @click="modificarPartida(partida)"
-                                >
-                                  Modificar Resultado
-                                </v-btn>
-                              </div>
-                            </v-list-item-title>
-                            <v-list-item-title>
-                              <div class="flex-column align-items-center">
-                                <v-btn
-                                  class="mt-2"
-                                  variant="tonal"
-                                  color="secondary"
-                                  @click="modificarPairing(partida)"
-                                >
-                                  Modificar Pairing
-                                </v-btn>
-                              </div>
-                            </v-list-item-title>
-                            <v-list-item-title>
-                              <div class="flex-column align-items-center">
-                                <v-btn
-                                  class="mt-2"
-                                  variant="tonal"
-                                  color="error"
-                                  @click="eliminarPartida(partida)"
-                                >
-                                  Eliminar partida
-                                </v-btn>
-                              </div>
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                      </v-list>
-                    </v-card-text>
-                  </v-card>
-                </div>
-              </v-tabs-item>
+              <TabRondasDinamicas :partidas="partidas" />
 
               <!-- Tab clasificacion -->
               <v-tabs-window-item
@@ -424,7 +41,7 @@
                 :key="tabClasificacion"
               >
                 <!-- División en dos zonas a a partir de la ronda 3 -->
-                <div v-if="(torneo!.idTorneo === 7)">
+                <div v-if="torneo!.idTorneo === 7">
                   <div
                     v-if="
                       clasificacionZona1.length > 0 &&
@@ -710,6 +327,7 @@ import {
 } from "@/services/TorneosService";
 import TablaInscritos from "@/components/GestionTorneos/TablaInscritos.vue";
 import CardGestionTorneo from "@/components/GestionTorneos/CardGestionTorneo.vue";
+import TabRondasDinamicas from "@/components/GestionTorneos/individual/tabs/TabRondasDinamicas.vue";
 import {
   GuardarResultadosDTO,
   InscripcionTorneoCreadoDTO,
@@ -759,9 +377,8 @@ const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
-const activeTab = ref<number>(2);
+const activeTab = ref<number>(0);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
-const idUsuario = ref<number>();
 const isModalListaVisible = ref<boolean>(false);
 const listaData = ref<string>("");
 const listaDTO = ref<ListaDTO>();
@@ -774,6 +391,7 @@ const isModalLiderVisible = ref<boolean>(false);
 const isModalEscenarioVisible = ref<boolean>(false);
 const isModalValidarVisible = ref<boolean>(false);
 const tabClasificacion = ref<number>();
+const tabRondas = ref<number>();
 const route = useRoute();
 const idTorneo = ref<number>(parseInt(route.params.idTorneo.toString()));
 const isLoading = ref<boolean>(false);
@@ -863,14 +481,17 @@ onMounted(async () => {
       );
     }
     if (partidas.value) {
-      partidasPorRonda.value = partidas.value.reduce((acc, partida) => {
-        const { numeroRonda } = partida;
-        if (!acc[numeroRonda]) {
-          acc[numeroRonda] = [];
-        }
-        acc[numeroRonda].push(partida);
-        return acc;
-      }, {} as Record<number, PartidaTorneoDTO[]>);
+      partidasPorRonda.value = partidas.value.reduce(
+        (acc, partida) => {
+          const { numeroRonda } = partida;
+          if (!acc[numeroRonda]) {
+            acc[numeroRonda] = [];
+          }
+          acc[numeroRonda].push(partida);
+          return acc;
+        },
+        {} as Record<number, PartidaTorneoDTO[]>
+      );
     }
 
     tabClasificacion.value = numeroRondas.value.length + 1;
@@ -1017,11 +638,6 @@ watch(
   }
 );
 
-const modificarPartida = (partidaRecibida: PartidaTorneoDTO) => {
-  partidaActual.value = partidaRecibida;
-  showModificarPartidaTorneoModal.value = true;
-};
-
 const recargarPagina = () => {
   window.location.reload();
 };
@@ -1062,19 +678,9 @@ const handleEliminarPartidaConfirm = () => {
   }
 };
 
-const modificarPairing = (partidaRecibida: PartidaTorneoDTO) => {
-  partidaActual.value = partidaRecibida;
-  showModificarPairingModal.value = true;
-};
-
 const agregarPairing = (idRonda: number) => {
   idRondaSelected.value = idRonda;
   showAgregarPairingModal.value = true;
-};
-
-const eliminarPartida = (partidaRecibida: PartidaTorneoDTO) => {
-  partidaActual.value = partidaRecibida;
-  showEliminarPartidaModal.value = true;
 };
 
 const generarSiguienteRonda = (ronda: number) => {
@@ -1122,10 +728,10 @@ const calcularClasificacion = () => {
 
   // Filtramos hasta la ronda 2 para dividir el grupo
   const partidasFiltradas = partidas.value?.filter(
-    (partida) => partida.numeroRonda <= 2
+    partida => partida.numeroRonda <= 2
   );
 
-  partidasFiltradas?.forEach((partida) => {
+  partidasFiltradas?.forEach(partida => {
     // Verifica que la partida esté validada por ambos usuarios
     if (partida.partidaValidadaUsuario1 && partida.partidaValidadaUsuario2) {
       const puntosUsuario1 = partida.resultadoUsuario1 ?? 0;
@@ -1304,7 +910,7 @@ const calcularClasificacion = () => {
   dividirClasificacionEnZonas();
 
   // Clasificacion normal
-  partidas.value?.forEach((partida) => {
+  partidas.value?.forEach(partida => {
     // Verifica que la partida esté validada por ambos usuarios
     if (partida.partidaValidadaUsuario1 && partida.partidaValidadaUsuario2) {
       const puntosUsuario1 = partida.resultadoUsuario1 ?? 0;
@@ -1441,7 +1047,7 @@ const calcularClasificacion = () => {
     }
   });
 
-  inscripciones.value.forEach((inscripcion) => {
+  inscripciones.value.forEach(inscripcion => {
     const userId = inscripcion.idUsuario;
     if (ranking[userId]) {
       ranking[userId].puntosTorneo += inscripcion.puntosExtra;
@@ -1466,12 +1072,12 @@ const calcularClasificacion = () => {
   });
 
   // Clasificacion por zonas
-  clasificacionZona1.value = clasificacion.value.filter((jugador) =>
-    jugadoresZona1.value.some((z) => z.idUsuario === jugador.idUsuario)
+  clasificacionZona1.value = clasificacion.value.filter(jugador =>
+    jugadoresZona1.value.some(z => z.idUsuario === jugador.idUsuario)
   );
 
-  clasificacionZona2.value = clasificacion.value.filter((jugador) =>
-    jugadoresZona2.value.some((z) => z.idUsuario === jugador.idUsuario)
+  clasificacionZona2.value = clasificacion.value.filter(jugador =>
+    jugadoresZona2.value.some(z => z.idUsuario === jugador.idUsuario)
   );
 
   type JugadorConEjercito = {
@@ -1490,8 +1096,8 @@ const calcularClasificacion = () => {
 
   const listaEjercitos = appsettings.armies;
 
-  const ejercitosJugadoresConBando = jugadoresConEjercitos.map((jugador) => {
-    const ejercito = listaEjercitos.find((e) => e.name === jugador.ejercito);
+  const ejercitosJugadoresConBando = jugadoresConEjercitos.map(jugador => {
+    const ejercito = listaEjercitos.find(e => e.name === jugador.ejercito);
     return {
       nick: jugador.nick,
       ejercito: jugador.ejercito,
@@ -1499,9 +1105,9 @@ const calcularClasificacion = () => {
     };
   });
 
-  clasificacion.value = clasificacion.value.map((j) => {
+  clasificacion.value = clasificacion.value.map(j => {
     const bando = ejercitosJugadoresConBando.find(
-      (e) => e.nick === j.nick
+      e => e.nick === j.nick
     )?.bando;
     return { ...j, bando }; // Devuelve el objeto original más el atributo bando
   });
@@ -1525,7 +1131,7 @@ const isRondaValidada = (numeroRonda: number) => {
   }
 
   return partidasPorRonda.value[numeroRonda].every(
-    (partida) =>
+    partida =>
       partida.partidaValidadaUsuario1 === true &&
       partida.partidaValidadaUsuario2 === true
   );
@@ -1536,7 +1142,7 @@ const handleInscripcionEliminada = (idInscripcion: number) => {
     // Actualiza las inscripciones eliminando la inscripción correspondiente
     torneoGestion.value.inscripciones =
       torneoGestion.value.inscripciones.filter(
-        (inscripcion) => inscripcion.idInscripcion !== idInscripcion
+        inscripcion => inscripcion.idInscripcion !== idInscripcion
       );
   }
 };
