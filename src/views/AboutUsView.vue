@@ -67,7 +67,7 @@
           color="primary"
           variant="tonal"
           class="mt-3"
-          href="https://www.paypal.com/donate?hosted_button_id=PCW6MDL3WBE6N"
+          href="https://paypal.me/sanuchiha"
           target="_blank"
         >
           Donar con PayPal
@@ -112,7 +112,8 @@ export default {
         {
           date: "Q4 2025",
           title: "Sistema de trofeos",
-          description: "Sistema de trofeos y niveles de experiencia por jugador. ",
+          description:
+            "Sistema de trofeos y niveles de experiencia por jugador. ",
           color: "red",
         },
       ],
