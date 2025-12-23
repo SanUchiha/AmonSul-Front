@@ -701,7 +701,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, computed } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import router from "@/router";
 import {
@@ -726,7 +726,6 @@ import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
 import {
   Clasificacion,
   GenerarRonda,
-  RequestUpdatePairingTorneoDTO,
   UpdatePartidaTorneoDTO,
 } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
