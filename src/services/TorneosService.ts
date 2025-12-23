@@ -15,6 +15,28 @@ export const getTorneos = async () => {
   return http.get(`Torneo`);
 };
 
+export const getTorneosProximosPaginadosAsync = async (
+  pageNumber = 1,
+  pageSize = 10
+) => {
+  return http.get(
+    `torneo/proximos?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  );
+};
+
+export const getTorneosPasadosPaginadosAsync = async (
+  pageNumber = 1,
+  pageSize = 10
+) => {
+  return http.get(
+    `torneo/pasados?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  );
+};
+
+export const buscarTorneosPorNombreAsync = async (nombre: string) => {
+  return http.get(`torneo/buscar?nombre=${encodeURIComponent(nombre)}`);
+};
+
 export const isSaveTournament = async (idTorneo: number) => {
   return http.get(`Torneo/Gestion/issave/${idTorneo}`);
 };
