@@ -220,8 +220,8 @@
                                 partida.liderMuertoUsuario1 === true
                                   ? "Sí"
                                   : partida.liderMuertoUsuario1 === false
-                                  ? "No"
-                                  : "N/A"
+                                    ? "No"
+                                    : "N/A"
                               }}
                             </span>
                             <span v-else>
@@ -308,8 +308,8 @@
                                 partida.liderMuertoUsuario2 === true
                                   ? "Sí"
                                   : partida.liderMuertoUsuario2 === false
-                                  ? "No"
-                                  : "N/A"
+                                    ? "No"
+                                    : "N/A"
                               }}
                             </span>
                             <span v-else>
@@ -424,7 +424,7 @@
                 :key="tabClasificacion"
               >
                 <!-- División en dos zonas a a partir de la ronda 3 -->
-                <div v-if="(torneo!.idTorneo === 7)">
+                <div v-if="torneo!.idTorneo === 7">
                   <div
                     v-if="
                       clasificacionZona1.length > 0 &&
@@ -726,6 +726,7 @@ import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
 import {
   Clasificacion,
   GenerarRonda,
+  RequestUpdatePairingTorneoDTO,
   UpdatePartidaTorneoDTO,
 } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
@@ -863,14 +864,17 @@ onMounted(async () => {
       );
     }
     if (partidas.value) {
-      partidasPorRonda.value = partidas.value.reduce((acc, partida) => {
-        const { numeroRonda } = partida;
-        if (!acc[numeroRonda]) {
-          acc[numeroRonda] = [];
-        }
-        acc[numeroRonda].push(partida);
-        return acc;
-      }, {} as Record<number, PartidaTorneoDTO[]>);
+      partidasPorRonda.value = partidas.value.reduce(
+        (acc, partida) => {
+          const { numeroRonda } = partida;
+          if (!acc[numeroRonda]) {
+            acc[numeroRonda] = [];
+          }
+          acc[numeroRonda].push(partida);
+          return acc;
+        },
+        {} as Record<number, PartidaTorneoDTO[]>
+      );
     }
 
     tabClasificacion.value = numeroRondas.value.length + 1;
@@ -898,42 +902,6 @@ onMounted(async () => {
 });
 
 const resultados = async (ronda: number) => {
-  // //TODO  domadores
-  // if (torneo.value?.idTorneo == 7) {
-  //   try {
-  //     isGenerating.value = true;
-  //     const resultados1: Resultado[] = clasificacionZona1.value.map(
-  //       (clasificacion, index) => {
-  //         return {
-  //           idUsuario: clasificacion.idUsuario,
-  //           idTorneo: torneo.value?.idTorneo,
-  //           resultado: index + 1,
-  //         };
-  //       }
-  //     );
-
-  //     await guardarResultados(resultados1);
-
-  //     const resultados2: Resultado[] = clasificacionZona2.value.map(
-  //       (clasificacion, index) => {
-  //         return {
-  //           idUsuario: clasificacion.idUsuario,
-  //           idTorneo: torneo.value?.idTorneo,
-  //           resultado: index + 1,
-  //         };
-  //       }
-  //     );
-
-  //     await guardarResultados(resultados2);
-
-  //     showSuccessModal.value = true;
-  //   } catch (error) {
-  //     showErrorModal.value = true;
-  //     console.error(error);
-  //   } finally {
-  //     isGenerating.value = false;
-  //   }
-
   try {
     isGenerating.value = true;
     const ganadores: ResultadoJugador[] = clasificacion.value.map(
@@ -995,7 +963,24 @@ const handleModificarPartidaTorneoConfirm = async (
 
   if (partidaEditada !== null) {
     try {
-      await updatePartidaTorneo(partidaEditada);
+      const response = await updatePartidaTorneo(partidaEditada);
+      const index = partidas.value.findIndex(
+        partida => partida.idPartidaTorneo === response.idPartidaTorneo
+      );
+      if (index !== -1) {
+        partidas.value[index] = response;
+      }
+      partidasPorRonda.value = partidas.value.reduce(
+        (acc, partida) => {
+          const { numeroRonda } = partida;
+          if (!acc[numeroRonda]) {
+            acc[numeroRonda] = [];
+          }
+          acc[numeroRonda].push(partida);
+          return acc;
+        },
+        {} as Record<number, PartidaTorneoDTO[]>
+      );
       showSuccessModal.value = true;
     } catch (error) {
       console.error(error);
@@ -1007,23 +992,66 @@ const handleModificarPartidaTorneoConfirm = async (
   }
 };
 
-// Watch para detectar cuando se cierra el modal de éxito
-watch(
-  () => showSuccessModal.value,
-  (newValue, oldValue) => {
-    if (oldValue && !newValue) {
-      recargarPagina();
+const handleModificarPairingTorneoConfirm = async (
+  pairingEditado: PartidaTorneoDTO
+) => {
+  isGenerating.value = true;
+  try {
+    const response = pairingEditado;
+    const index = partidas.value.findIndex(
+      partida => partida.idPartidaTorneo === response.idPartidaTorneo
+    );
+    if (index !== -1) {
+      partidas.value[index] = response;
     }
+    partidasPorRonda.value = partidas.value.reduce(
+      (acc, partida) => {
+        const { numeroRonda } = partida;
+        if (!acc[numeroRonda]) {
+          acc[numeroRonda] = [];
+        }
+        acc[numeroRonda].push(partida);
+        return acc;
+      },
+      {} as Record<number, PartidaTorneoDTO[]>
+    );
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isGenerating.value = false;
+    closeModificarPairingModal();
   }
-);
+};
+
+const handleEliminarPartidaConfirm = (idPartidaEliminada: number) => {
+  try {
+    partidas.value = partidas.value.filter(
+      partida => partida.idPartidaTorneo !== idPartidaEliminada
+    );
+    partidasPorRonda.value = partidas.value.reduce(
+      (acc, partida) => {
+        const { numeroRonda } = partida;
+        if (!acc[numeroRonda]) {
+          acc[numeroRonda] = [];
+        }
+        acc[numeroRonda].push(partida);
+        return acc;
+      },
+      {} as Record<number, PartidaTorneoDTO[]>
+    );
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isGenerating.value = false;
+    closeEliminarPartidaModal();
+  }
+};
 
 const modificarPartida = (partidaRecibida: PartidaTorneoDTO) => {
   partidaActual.value = partidaRecibida;
   showModificarPartidaTorneoModal.value = true;
-};
-
-const recargarPagina = () => {
-  window.location.reload();
 };
 
 const closeModificarPairingModal = () => {
@@ -1036,30 +1064,6 @@ const closeAgregarPairingModal = () => {
 
 const closeEliminarPartidaModal = () => {
   showEliminarPartidaModal.value = false;
-};
-
-const handleModificarPairingTorneoConfirm = () => {
-  try {
-    showSuccessModal.value = true;
-  } catch (error) {
-    console.error(error);
-    showErrorModal.value = true;
-  } finally {
-    isGenerating.value = false;
-    closeModificarPairingModal();
-  }
-};
-
-const handleEliminarPartidaConfirm = () => {
-  try {
-    showSuccessModal.value = true;
-  } catch (error) {
-    console.error(error);
-    showErrorModal.value = true;
-  } finally {
-    isGenerating.value = false;
-    closeEliminarPartidaModal();
-  }
 };
 
 const modificarPairing = (partidaRecibida: PartidaTorneoDTO) => {
@@ -1122,10 +1126,10 @@ const calcularClasificacion = () => {
 
   // Filtramos hasta la ronda 2 para dividir el grupo
   const partidasFiltradas = partidas.value?.filter(
-    (partida) => partida.numeroRonda <= 2
+    partida => partida.numeroRonda <= 2
   );
 
-  partidasFiltradas?.forEach((partida) => {
+  partidasFiltradas?.forEach(partida => {
     // Verifica que la partida esté validada por ambos usuarios
     if (partida.partidaValidadaUsuario1 && partida.partidaValidadaUsuario2) {
       const puntosUsuario1 = partida.resultadoUsuario1 ?? 0;
@@ -1304,7 +1308,7 @@ const calcularClasificacion = () => {
   dividirClasificacionEnZonas();
 
   // Clasificacion normal
-  partidas.value?.forEach((partida) => {
+  partidas.value?.forEach(partida => {
     // Verifica que la partida esté validada por ambos usuarios
     if (partida.partidaValidadaUsuario1 && partida.partidaValidadaUsuario2) {
       const puntosUsuario1 = partida.resultadoUsuario1 ?? 0;
@@ -1441,7 +1445,7 @@ const calcularClasificacion = () => {
     }
   });
 
-  inscripciones.value.forEach((inscripcion) => {
+  inscripciones.value.forEach(inscripcion => {
     const userId = inscripcion.idUsuario;
     if (ranking[userId]) {
       ranking[userId].puntosTorneo += inscripcion.puntosExtra;
@@ -1466,12 +1470,12 @@ const calcularClasificacion = () => {
   });
 
   // Clasificacion por zonas
-  clasificacionZona1.value = clasificacion.value.filter((jugador) =>
-    jugadoresZona1.value.some((z) => z.idUsuario === jugador.idUsuario)
+  clasificacionZona1.value = clasificacion.value.filter(jugador =>
+    jugadoresZona1.value.some(z => z.idUsuario === jugador.idUsuario)
   );
 
-  clasificacionZona2.value = clasificacion.value.filter((jugador) =>
-    jugadoresZona2.value.some((z) => z.idUsuario === jugador.idUsuario)
+  clasificacionZona2.value = clasificacion.value.filter(jugador =>
+    jugadoresZona2.value.some(z => z.idUsuario === jugador.idUsuario)
   );
 
   type JugadorConEjercito = {
@@ -1490,8 +1494,8 @@ const calcularClasificacion = () => {
 
   const listaEjercitos = appsettings.armies;
 
-  const ejercitosJugadoresConBando = jugadoresConEjercitos.map((jugador) => {
-    const ejercito = listaEjercitos.find((e) => e.name === jugador.ejercito);
+  const ejercitosJugadoresConBando = jugadoresConEjercitos.map(jugador => {
+    const ejercito = listaEjercitos.find(e => e.name === jugador.ejercito);
     return {
       nick: jugador.nick,
       ejercito: jugador.ejercito,
@@ -1499,9 +1503,9 @@ const calcularClasificacion = () => {
     };
   });
 
-  clasificacion.value = clasificacion.value.map((j) => {
+  clasificacion.value = clasificacion.value.map(j => {
     const bando = ejercitosJugadoresConBando.find(
-      (e) => e.nick === j.nick
+      e => e.nick === j.nick
     )?.bando;
     return { ...j, bando }; // Devuelve el objeto original más el atributo bando
   });
@@ -1525,7 +1529,7 @@ const isRondaValidada = (numeroRonda: number) => {
   }
 
   return partidasPorRonda.value[numeroRonda].every(
-    (partida) =>
+    partida =>
       partida.partidaValidadaUsuario1 === true &&
       partida.partidaValidadaUsuario2 === true
   );
@@ -1536,7 +1540,7 @@ const handleInscripcionEliminada = (idInscripcion: number) => {
     // Actualiza las inscripciones eliminando la inscripción correspondiente
     torneoGestion.value.inscripciones =
       torneoGestion.value.inscripciones.filter(
-        (inscripcion) => inscripcion.idInscripcion !== idInscripcion
+        inscripcion => inscripcion.idInscripcion !== idInscripcion
       );
   }
 };

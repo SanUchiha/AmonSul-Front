@@ -5,19 +5,24 @@ import {
   UpdatePartidaTorneoDTO,
 } from "@/interfaces/Live";
 import { http } from "./index";
+import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 
 export const generarRonda = async (nuevaRonda: GenerarRonda) => {
   return http.post(`Torneo/Gestion/Generar-Ronda`, nuevaRonda);
 };
 
-export const updatePartidaTorneo = async (partida: UpdatePartidaTorneoDTO) => {
-  return http.put(`Torneo/Editar-Partida`, partida);
+export const updatePartidaTorneo = async (
+  partida: UpdatePartidaTorneoDTO
+): Promise<PartidaTorneoDTO> => {
+  const response = await http.put(`Torneo/Editar-Partida`, partida);
+  return response.data as PartidaTorneoDTO;
 };
 
 export const updatePairingTorneoAsync = async (
   pairing: RequestUpdatePairingTorneoDTO
-) => {
-  return http.put(`Torneo/Editar-Pairing`, pairing);
+): Promise<PartidaTorneoDTO> => {
+  const response = await http.put(`Torneo/Editar-Pairing`, pairing);
+  return response.data as PartidaTorneoDTO;
 };
 
 export const updatePairingTorneoEquipoAsync = async (

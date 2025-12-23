@@ -116,14 +116,14 @@ const cerrarModal = () => {
 // Monitorea cambios en la visibilidad del modal
 watch(
   () => props.isVisible,
-  (newVal) => {
+  newVal => {
     isModalPairingVisible.value = newVal;
   }
 );
 
 watch(
   () => props.partida,
-  (newPartida) => {
+  newPartida => {
     pairingEditado.value.idUsuario1 = newPartida.idUsuario1;
     pairingEditado.value.idUsuario2 = newPartida.idUsuario2;
   },
@@ -132,7 +132,7 @@ watch(
 
 // Reglas de validación
 const rules = {
-  required: (value: any) =>
+  required: (value: unknown) =>
     (value !== null && value !== undefined && value !== "") ||
     "Este campo es obligatorio",
 };
@@ -158,14 +158,19 @@ const changeJugador = async () => {
       idUsuario2: idUsuario2 as number,
     };
 
-    await updatePairingTorneoAsync(body);
+    const response = await updatePairingTorneoAsync(body);
+
+    if (response === null || response === undefined) {
+      throw new Error("No se pudo modificar el pairing");
+    }
+
     showSuccessModal.value = true;
+    emit("confirm", response);
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;
   } finally {
     isGenerating.value = false;
-    emit("confirm");
     cerrarModal();
   }
 };

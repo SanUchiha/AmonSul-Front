@@ -73,7 +73,7 @@ const cerrarModal = () => {
 // Monitorea cambios en la visibilidad del modal
 watch(
   () => props.isVisible,
-  (newVal) => {
+  newVal => {
     isModalEliminarVisible.value = newVal;
   }
 );
@@ -83,12 +83,12 @@ const confirmar = async () => {
     isGenerating.value = true;
     await deletePartidaTorneo(props.partida.idPartidaTorneo);
     showSuccessModal.value = true;
+    emit("confirm", props.partida.idPartidaTorneo);
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;
   } finally {
     isGenerating.value = false;
-    emit("confirm");
     cerrarModal();
   }
 };
