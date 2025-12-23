@@ -476,7 +476,7 @@ const expanded = ref<string[]>([]); // Guardará los equipos expandidos
 
 const toggleExpand = (nombreEquipo: string) => {
   if (expanded.value.includes(nombreEquipo)) {
-    expanded.value = expanded.value.filter((item) => item !== nombreEquipo);
+    expanded.value = expanded.value.filter(item => item !== nombreEquipo);
   } else {
     expanded.value.push(nombreEquipo);
   }
@@ -485,7 +485,7 @@ const toggleExpand = (nombreEquipo: string) => {
 //Conmuted para personalizar el botón de borrar inscripcion por equipos
 const buttonText = computed(() => {
   const isCapitan = infoEquipos.value.some(
-    (equipo) =>
+    equipo =>
       equipo.idCapitan ===
       (idUsuario.value ? parseInt(idUsuario.value) : undefined)
   );
@@ -500,7 +500,7 @@ const buttonText = computed(() => {
 // Computado para determinar si el usuario es el capitán
 const isCapitan = computed(() => {
   const equipoCapitan = infoEquipos.value.find(
-    (equipo) =>
+    equipo =>
       equipo.idCapitan ===
       (idUsuario.value ? parseInt(idUsuario.value) : undefined)
   );
@@ -510,7 +510,7 @@ const isCapitan = computed(() => {
 // Watch para actualizar el idEquipo cuando se encuentra el capitán
 watch([infoEquipos, idUsuario], () => {
   const equipoCapitan = infoEquipos.value.find(
-    (equipo) =>
+    equipo =>
       equipo.idCapitan ===
       (idUsuario.value ? parseInt(idUsuario.value) : undefined)
   );
@@ -669,7 +669,7 @@ onMounted(async () => {
 
     // Verificar si el usuario ya está apuntado
     if (torneosApuntado.value != null) {
-      torneosApuntado.value.forEach((element) => {
+      torneosApuntado.value.forEach(element => {
         if (element.idTorneo === idTorneo.value) {
           idInscripcion.value = element.idInscripcion;
           estaApuntado.value = true;
@@ -718,7 +718,7 @@ onMounted(async () => {
 
 watch(
   () => showSuccessModal.value,
-  (newValue) => {
+  newValue => {
     if (!newValue) {
       router.push({ name: "mis-torneos", params: { tab: "three" } });
     }
