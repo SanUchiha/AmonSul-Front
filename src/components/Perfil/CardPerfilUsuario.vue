@@ -223,7 +223,6 @@ const updateFechaNacimiento = (date: Date) => {
   const day = String(date.getDate()).padStart(2, "0");
   editableUser.fechaNacimiento = `${year}-${month}-${day}`;
   datePickerMenu.value = false;
-  console.log("Setting date from input:", editableUser.fechaNacimiento);
 };
 
 // Computed para mostrar siempre la fecha correctamente en el input (formato local)
