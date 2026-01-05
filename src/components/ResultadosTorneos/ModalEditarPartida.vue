@@ -94,7 +94,6 @@ const partidaEditada = ref<UpdatePartidaTorneoDTO>({
 });
 const isFormValid = ref<boolean>(false);
 
-const escenario = ref<string>();
 const listaEscenarios = ref<string[]>([]);
 const isLoading = ref<boolean>(false);
 const isLoadingEscenarios = ref<boolean>(false);

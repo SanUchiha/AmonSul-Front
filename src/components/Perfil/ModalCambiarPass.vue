@@ -79,13 +79,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineEmits } from "vue";
+import { ref, computed } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { cambiarPass } from "@/services/UsuariosService";
 import { UsuarioCambioPassDTO } from "@/interfaces/Usuario";
 import { useAuth } from "@/composables/useAuth";
 
+//eslint-disable-next-line no-undef
 const emit = defineEmits<{
   (e: "close"): void;
 }>();
@@ -135,7 +136,7 @@ const cambiar = async () => {
   if (isFormValid.value) {
     try {
       const body: UsuarioCambioPassDTO = {
-        idUsuario: parseInt(idUsuario.value!),
+        idUsuario: parseInt(idUsuario.value ?? "0"),
         oldPass: oldPass.value,
         newPass: newPass1.value,
       };

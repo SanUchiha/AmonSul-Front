@@ -85,12 +85,12 @@
 
 <script setup lang="ts">
 import { UsuarioDTO } from "@/interfaces/Usuario";
-import { onMounted, ref, computed, defineProps, watch } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
-import defaultAvatar from "@/assets/icons/perfil.png";
 import debounce from "lodash/debounce";
 
+//eslint-disable-next-line no-undef
 const props = defineProps({
   usuarios: {
     type: Array as () => UsuarioDTO[],
@@ -107,9 +107,9 @@ const selectedProvince = ref<string | null>(null);
 const selectedFaction = ref<string | null>(null);
 
 const headers = [
-  { title: "Nick", key: "nick", align: "start" },
-  { title: "Facción", key: "faccion" },
-  { title: "Ciudad", key: "ciudad" },
+  { title: "Nick", key: "nick", align: "start" as const },
+  { title: "Facción", key: "faccion", align: "start" as const },
+  { title: "Ciudad", key: "ciudad", align: "start" as const },
 ];
 
 const provinces = computed(() => [

@@ -88,18 +88,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, watch, defineProps } from "vue";
+import { ref, watch } from "vue";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { appsettings } from "@/settings/appsettings";
 import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
 
-// Definir las props
+//eslint-disable-next-line no-undef
 const props = defineProps<{
   isVisible: boolean;
   partida: PartidaTorneoDTO;
 }>();
 
-// Emitir eventos
+//eslint-disable-next-line no-undef
 const emit = defineEmits(["confirm", "cerrar"]);
 
 // Variables reactivas
@@ -127,13 +127,14 @@ const cerrarModal = () => {
 
 // Función para confirmar la edición
 const confirmarEditarPartida = () => {
+  console.log("Partida editada:", partidaEditada.value);
   emit("confirm", partidaEditada.value);
 };
 
 // Monitorea cambios en la visibilidad del modal
 watch(
   () => props.isVisible,
-  (newVal) => {
+  newVal => {
     isModalEditarPartidaVisible.value = newVal;
   }
 );
@@ -141,7 +142,7 @@ watch(
 // Monitorea cambios en los datos de la partida
 watch(
   () => props.partida,
-  (newPartida) => {
+  newPartida => {
     partidaEditada.value = { ...newPartida };
   },
   { immediate: true }

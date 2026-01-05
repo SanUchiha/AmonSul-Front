@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { InscripcionUsuarioEquipoDTO } from "@/interfaces/Inscripcion";
 import router from "@/router";
 import {
@@ -133,6 +133,7 @@ import ModalError from "../Commons/ModalError.vue";
 import { useAuth } from "@/composables/useAuth";
 import ModalInscripcionEquipo from "./ModalInscripcionEquipo.vue";
 
+//eslint-disable-next-line no-undef
 const props = defineProps<{
   isLoading: boolean;
   listaTorneos: InscripcionUsuarioEquipoDTO[];
