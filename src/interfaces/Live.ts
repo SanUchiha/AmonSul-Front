@@ -31,6 +31,8 @@ export interface UpdatePartidaTorneoDTO {
   partidaValidadaUsuario2?: boolean | null;
   liderMuertoUsuario1?: boolean | null;
   liderMuertoUsuario2?: boolean | null;
+  ejercitoUsuario1?: string | null;
+  ejercitoUsuario2?: string | null;
 }
 
 export interface UpdatePairingTorneoDTO {

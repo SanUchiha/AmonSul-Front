@@ -16,16 +16,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, watch, defineProps } from "vue";
+import { ref, watch } from "vue";
 
-// Props recibidas
+//eslint-disable-next-line no-undef
 const props = defineProps({
   isVisible: Boolean,
   idPartidaTorneo: Number,
   usuario: Number,
 });
 
-// Emite evento para cerrar el modal y enviar los puntos
+//eslint-disable-next-line no-undef
 const emit = defineEmits(["confirmar", "cerrar"]);
 
 // Variables reactivas
@@ -45,7 +45,7 @@ const confirmarValidar = () => {
 // Monitorea cambios en la visibilidad del modal
 watch(
   () => props.isVisible,
-  (newVal) => {
+  newVal => {
     isModalValidarVisible.value = newVal;
   }
 );

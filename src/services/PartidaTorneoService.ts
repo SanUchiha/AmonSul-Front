@@ -49,3 +49,7 @@ export const getPartidasTorneoByUsuarioAsync = async (
 ) => {
   return http.get(`Torneo/Partidas/Usuario/${idUsuario}/Torneo/${idTorneo}`);
 };
+
+export const getPartidasTorneoPorFechaAsync = async (idUsuario: number) => {
+  return http.get(`Torneo/estoy-jugando/${idUsuario}`);
+};

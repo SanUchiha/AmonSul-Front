@@ -175,6 +175,13 @@
     />
 
     <FooterComponent absolute="true" />
+
+    <!-- Modal de partidas activas modular -->
+    <ModalPartidasActivas
+      v-model="mostrarModalPartidas"
+      :estaJugando="estaJugando"
+      :idUsuario="Number(getidUsuario)"
+    />
   </v-app>
 
   <v-snackbar v-model="showToast" :color="toastColor" timeout="3000" top right>
@@ -183,6 +190,11 @@
 </template>
 
 <script setup lang="ts">
+import ModalPartidasActivas from "@/components/Commons/ModalPartidasActivas.vue";
+import { getPartidasTorneoPorFechaAsync } from "@/services/PartidaTorneoService";
+// Estado para el modal y las partidas activas
+const mostrarModalPartidas = ref<boolean>(false);
+
 import { ref, computed, onMounted, watch } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
@@ -194,18 +206,18 @@ import { useUsuariosStore } from "@/store/usuarios";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import defaultAvatar from "@/assets/icons/perfil.png";
 import { useToast } from "@/composables/useToast";
+import { EstaJugandoDTO } from "./interfaces/Partidas";
 
 const usuariosStore = useUsuariosStore();
 const user = ref<UsuarioViewDTO>({} as UsuarioViewDTO);
 const { showToast, toastMessage, toastColor } = useToast();
 
-const { logout, getUser } = useAuth();
+const { logout, getUser, getidUsuario } = useAuth();
 const router = useRouter();
 const drawer = ref(false);
 const mostrarDialogoLogout = ref(false);
 const { isAuthenticated } = useAuth();
-
-const dialog = ref(false);
+const estaJugando = ref<EstaJugandoDTO>();
 
 const isLoggedIn = computed(() => !!getUser.value);
 
@@ -219,7 +231,6 @@ const handleLogout = async () => {
 const cargarUsuario = async () => {
   try {
     await usuariosStore.requestUsuario(getUser.value);
-
     user.value = usuariosStore.usuario;
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
@@ -228,7 +239,7 @@ const cargarUsuario = async () => {
 
 watch(
   () => getUser.value,
-  (nuevoUsuario) => {
+  nuevoUsuario => {
     if (nuevoUsuario) {
       cargarUsuario();
     } else {
@@ -238,10 +249,27 @@ watch(
   { immediate: true }
 );
 
+// Llamada real al backend para comprobar partidas activas
+const comprobarPartidasActivas = async (idUsuario: string) => {
+  try {
+    const response = await getPartidasTorneoPorFechaAsync(Number(idUsuario));
+
+    if (response.status === 200) {
+      estaJugando.value = response.data;
+      if (estaJugando.value?.tienePartidas) {
+        mostrarModalPartidas.value = true;
+      }
+    }
+  } catch (error) {
+    console.error("Error al comprobar partidas activas:", error);
+  }
+};
+
 onMounted(() => {
   if (isLoggedIn.value) {
     cargarUsuario();
   }
+  comprobarPartidasActivas(getidUsuario.value);
 });
 </script>
 

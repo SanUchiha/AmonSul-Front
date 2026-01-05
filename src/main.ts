@@ -8,8 +8,8 @@ import "vuetify/styles";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import "@mdi/font/css/materialdesignicons.min.css";
-import "@/styles/index.scss"
-import '@/styles/cardPartida.scss';
+import "@/styles/index.scss";
+import "@/styles/cardPartida.scss";
 
 const vuetify = createVuetify({
   theme: {

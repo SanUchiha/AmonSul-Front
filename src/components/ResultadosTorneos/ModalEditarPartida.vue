@@ -19,7 +19,7 @@
           ></v-text-field>
 
           <v-combobox
-            v-model="escenario"
+            v-model="partidaEditada.escenarioPartida"
             :items="listaEscenarios"
             @click="loadEscenarios"
             label="Escenario"
@@ -65,18 +65,18 @@
 
 <script setup lang="ts">
 import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
-import { ref, defineEmits, watch, defineProps } from "vue";
+import { ref, watch } from "vue";
 import { PartidaTorneoDTO, PartidaTorneoMasDTO } from "@/interfaces/Partidas";
 import { appsettings } from "@/settings/appsettings";
 
-// Tipamos las props correctamente
+//eslint-disable-next-line no-undef
 const props = defineProps<{
   isVisible: boolean;
   partida: PartidaTorneoDTO | PartidaTorneoMasDTO;
   idUsuario: number;
 }>();
 
-// Emite evento para cerrar el modal y enviar los puntos
+//eslint-disable-next-line no-undef
 const emit = defineEmits(["confirmar", "cerrar"]);
 
 // Variables reactivas
@@ -119,14 +119,14 @@ const confirmarEditarPartida = () => {
 // Monitorea cambios en la visibilidad del modal y en la prop 'partida'
 watch(
   () => props.isVisible,
-  (newVal) => {
+  newVal => {
     isModalEditarPartidaVisible.value = newVal;
   }
 );
 
 watch(
   () => props.partida,
-  (newPartida) => {
+  newPartida => {
     partidaEditada.value = { ...newPartida };
   },
   { immediate: true }

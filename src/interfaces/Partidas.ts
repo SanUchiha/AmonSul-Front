@@ -68,6 +68,9 @@ export interface PartidaTorneoDTO {
   nombreEquipo2: string | null;
   idCapitan1: number | null;
   idCapitan2: number | null;
+  listasJugador1: ListaDTO[] | null;
+  listasJugador2: ListaDTO[] | null;
+  numeroMesa: number | null;
 }
 
 export interface PartidaTorneoMasDTO {
@@ -119,4 +122,10 @@ export interface ActualizarPairingEquiposDTO {
   ejercitoEquipo2: string | null;
   nick1: string;
   nick2: string;
+}
+
+export interface EstaJugandoDTO {
+  tienePartidas: boolean;
+  partidas: PartidaTorneoDTO[];
+  tipoTorneo: string | null;
 }
