@@ -4,7 +4,6 @@ import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
 import {
   MatchResultGeneral,
-  MatchResultPoint,
   ResultMatchMatchedPlayExtendedType,
   ResultMatchMatchedPlayType,
 } from "@/Constant/TipoClasificacion";
@@ -14,7 +13,7 @@ function crearClasificacionBase(
   equipos: EquipoDTO[]
 ): Map<number, ClasificacionEquipo> {
   const clasificacionMap = new Map<number, ClasificacionEquipo>();
-  equipos.forEach((equipo) => {
+  equipos.forEach(equipo => {
     clasificacionMap.set(equipo.idEquipo, {
       nombreEquipo: equipo.nombreEquipo ?? `Equipo ${equipo.idEquipo}`,
       idEquipo: equipo.idEquipo,
@@ -33,7 +32,7 @@ function clasificacionNormal(
   partidas: PartidaTorneoDTO[]
 ): ClasificacionEquipo[] {
   const clasificacionMap = crearClasificacionBase(equipos);
-  partidas.forEach((partida) => {
+  partidas.forEach(partida => {
     const {
       idEquipo1,
       idEquipo2,
@@ -91,7 +90,7 @@ function clasificacionExtendida(
   partidas: PartidaTorneoDTO[]
 ): ClasificacionEquipo[] {
   const clasificacionMap = crearClasificacionBase(equipos);
-  partidas.forEach((partida) => {
+  partidas.forEach(partida => {
     const {
       idEquipo1,
       idEquipo2,
@@ -167,7 +166,7 @@ function clasificacionAleman(
   partidas: PartidaTorneoDTO[]
 ): ClasificacionEquipo[] {
   const clasificacionMap = crearClasificacionBase(equipos);
-  partidas.forEach((partida) => {
+  partidas.forEach(partida => {
     const {
       idEquipo1,
       idEquipo2,

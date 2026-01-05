@@ -51,8 +51,9 @@ import { JugadoresEquipoParaCambioDTO } from "@/interfaces/Inscripcion";
 import { UpdatePairingTorneoDTO } from "@/interfaces/Live";
 import { ActualizarPairingEquiposDTO } from "@/interfaces/Partidas";
 import { getJugadoresEquipos } from "@/services/InscripcionesService";
-import { ref, watch, defineProps, defineEmits } from "vue";
+import { ref, watch } from "vue";
 
+//eslint-disable-next-line no-undef
 const props = defineProps<{
   isVisible: boolean;
   idEquipo1: number;
@@ -62,6 +63,7 @@ const props = defineProps<{
   partida: UpdatePairingTorneoDTO;
 }>();
 
+//eslint-disable-next-line no-undef
 const emit = defineEmits<{
   (e: "actualizar", payload: ActualizarPairingEquiposDTO): void;
   (e: "cerrar"): void;
@@ -70,7 +72,7 @@ const emit = defineEmits<{
 const isVisible = ref(props.isVisible);
 watch(
   () => props.isVisible,
-  (val) => (isVisible.value = val)
+  val => (isVisible.value = val)
 );
 
 const jugadorEquipo1Seleccionado = ref<number | null>(null);
@@ -88,8 +90,8 @@ const cargarJugadores = async () => {
       props.idEquipo2
     );
     equipos.value = response.data;
-    equipo1.value = equipos.value.find((e) => e.idEquipo === props.idEquipo1);
-    equipo2.value = equipos.value.find((e) => e.idEquipo === props.idEquipo2);
+    equipo1.value = equipos.value.find(e => e.idEquipo === props.idEquipo1);
+    equipo2.value = equipos.value.find(e => e.idEquipo === props.idEquipo2);
   } catch (error) {
     console.error("Error cargando jugadores", error);
   } finally {
@@ -102,7 +104,7 @@ const resetSeleccion = () => {
   jugadorEquipo2Seleccionado.value = null;
 };
 
-watch(isVisible, (val) => {
+watch(isVisible, val => {
   if (val) {
     cargarJugadores();
     resetSeleccion();
@@ -117,10 +119,10 @@ const actualizar = () => {
     equipo2.value
   ) {
     const jugador1 = equipo1.value.componentesEquipoDTO.find(
-      (j) => j.idUsuario === jugadorEquipo1Seleccionado.value
+      j => j.idUsuario === jugadorEquipo1Seleccionado.value
     );
     const jugador2 = equipo2.value.componentesEquipoDTO.find(
-      (j) => j.idUsuario === jugadorEquipo2Seleccionado.value
+      j => j.idUsuario === jugadorEquipo2Seleccionado.value
     );
 
     if (jugador1 && jugador2) {

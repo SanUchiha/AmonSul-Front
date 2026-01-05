@@ -47,17 +47,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, watch, defineProps } from "vue";
+import { ref, watch } from "vue";
 import { UpdatePairingTorneoDTO } from "@/interfaces/Live";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { deletePartidaTorneo } from "@/services/PartidaTorneoService";
 
+//eslint-disable-next-line no-undef
 const props = defineProps<{
   isVisible: boolean;
   partida: UpdatePairingTorneoDTO;
 }>();
 
+//eslint-disable-next-line no-undef
 const emit = defineEmits(["confirm", "cerrar"]);
 
 const isModalEliminarVisible = ref<boolean>(props.isVisible);

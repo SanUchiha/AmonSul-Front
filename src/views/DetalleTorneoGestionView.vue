@@ -232,7 +232,7 @@
                           <!-- ejercito 1 -->
                           <div class="player-info">
                             <v-icon>mdi-shield-outline</v-icon>
-                            <span>{{ partida.ejercitoUsuario1 ?? "N/A" }}</span>
+                            <span>{{ partida.ejercitoUsuario1 ?? null }}</span>
                           </div>
                           <!-- lista 1 -->
                           <div class="player-info">
@@ -320,7 +320,7 @@
                           <!-- ejercito 2 -->
                           <div class="player-info">
                             <v-icon>mdi-shield-outline</v-icon>
-                            <span>{{ partida.ejercitoUsuario2 ?? "N/A" }}</span>
+                            <span>{{ partida.ejercitoUsuario2 ?? null }}</span>
                           </div>
                           <!-- lista 2 -->
                           <div class="player-info">
@@ -831,6 +831,9 @@ const partidaActual = ref<PartidaTorneoDTO>({
   nombreEquipo2: null,
   idCapitan1: null,
   idCapitan2: null,
+  listasJugador1: null,
+  listasJugador2: null,
+  numeroMesa: null,
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);

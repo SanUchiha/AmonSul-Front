@@ -6,8 +6,8 @@
         resultado === 'Win'
           ? '#145c1750'
           : resultado === 'Lose'
-          ? '#75171050'
-          : '#e6c40050',
+            ? '#75171050'
+            : '#e6c40050',
     }"
   >
     <v-divider></v-divider>
@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
@@ -103,6 +103,7 @@ const router = useRouter();
 const resultado = ref<string>("");
 const fechaPartidaFormateada = ref<string>("");
 
+//eslint-disable-next-line no-undef
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
   idUsuario: number;
@@ -150,10 +151,6 @@ const cardColorClass = computed(() => {
 
 const verProfileUser = (idUser: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUser } });
-};
-
-const goToDetallePartida = () => {
-  showModalDetallePartida.value = true;
 };
 
 const closeModalDetallePartida = () => {

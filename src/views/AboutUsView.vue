@@ -104,16 +104,16 @@ export default {
       ],
       roadmap: [
         {
-          date: "Q2 2025",
-          title: "Torneos por equipos",
-          description: "Creación y gestión de torneos a parejas y por equipos.",
+          date: "Q1-Q2 2026",
+          title: "Estadísticas avanzadas",
+          description: "Visualización detallada de estadísticas de ejercitos.",
           color: "primary",
         },
         {
-          date: "Q4 2025",
+          date: "Q3-Q4 2026",
           title: "Sistema de trofeos",
           description:
-            "Sistema de trofeos y niveles de experiencia por jugador. ",
+            "Sistema de trofeos y niveles de experiencia por jugador.",
           color: "red",
         },
       ],
