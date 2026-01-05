@@ -3,7 +3,7 @@
     <v-card v-bind="props" class="match-card mt-3">
       <v-card-title
         class="text-center text-h5 text-wrap"
-        style="font-family: 'Roboto', sans-serif; color: #ffcc00"
+        style="font-family: &quot;Roboto&quot;, sans-serif; color: #ffcc00"
       >
         {{ mesa }}
       </v-card-title>
@@ -226,7 +226,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
@@ -282,9 +282,13 @@ const partidaSelected = ref<PartidaTorneoDTO>({
   nombreEquipo1: null,
   nombreEquipo2: null,
   idCapitan1: null,
-  idCapitan2: null
+  idCapitan2: null,
+  listasJugador1: null,
+  listasJugador2: null,
+  numeroMesa: null,
 });
 
+//eslint-disable-next-line no-undef
 const props = defineProps<{
   match: PartidaTorneoDTO;
   idUsuario: number;
@@ -405,6 +409,8 @@ const confirmarEditarPartida = async (partida: PartidaTorneoDTO) => {
       escenarioPartida: partida.escenarioPartida,
       liderMuertoUsuario1: partida.liderMuertoUsuario1,
       liderMuertoUsuario2: partida.liderMuertoUsuario2,
+      ejercitoUsuario1: partida.ejercitoUsuario1,
+      ejercitoUsuario2: partida.ejercitoUsuario2,
     };
 
     if (partida.partidaValidadaUsuario1) body.partidaValidadaUsuario1 = true;

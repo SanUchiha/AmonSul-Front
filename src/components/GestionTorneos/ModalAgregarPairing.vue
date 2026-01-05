@@ -109,7 +109,7 @@ const cerrarModal = () => {
 // Monitorea cambios en la visibilidad del modal
 watch(
   () => props.isVisible,
-  (newVal) => {
+  newVal => {
     isModalAgregarPairingVisible.value = newVal;
   }
 );

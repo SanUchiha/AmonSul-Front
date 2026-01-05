@@ -30,14 +30,6 @@
       <v-list-item-content>
         <v-list-item-title>
           <div class="flex-column align-items-center">
-            <!-- <v-btn
-              class="mt-2"
-              variant="tonal"
-              color="secondary"
-              @click="modificarTorneo()"
-            >
-              Modificar torneo
-            </v-btn> -->
             <div class="text-wrap text-sm">
               <v-btn
                 class="mt-2"
@@ -138,7 +130,7 @@
 
 <script setup lang="ts">
 import { Torneo, TorneoGestionInfoDTO } from "@/interfaces/Torneo";
-import { computed, defineProps, ref } from "vue";
+import { computed, ref } from "vue";
 import ModalModificarTorneo from "./ModalModificarTorneo.vue";
 import { getTorneo } from "@/services/TorneosService";
 import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
@@ -147,6 +139,7 @@ import ModalHandlerMostrarListas from "./ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "./ModalHandlerMostrarClasificacion.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
 
+// eslint-disable-next-line
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
@@ -187,7 +180,7 @@ const torneoMod = ref<Torneo>({
   listasPorJugador: 0,
   mostrarListas: false,
   mostrarClasificacion: false,
-  classificationType: ClassificationType.NORMAL
+  classificationType: ClassificationType.NORMAL,
 });
 
 const plazasRestantes = computed(() => {
@@ -205,12 +198,12 @@ const plazasRestantes = computed(() => {
 
 const listasLuz = computed(() => {
   if (!props.torneo) return 0;
-  return props.torneo.inscripciones.filter((i) => i.bando === "good").length;
+  return props.torneo.inscripciones.filter(i => i.bando === "good").length;
 });
 
 const listasOscuridad = computed(() => {
   if (!props.torneo) return 0;
-  return props.torneo.inscripciones.filter((i) => i.bando === "evil").length;
+  return props.torneo.inscripciones.filter(i => i.bando === "evil").length;
 });
 
 const totalInscripciones = computed(() => {
@@ -220,21 +213,21 @@ const totalInscripciones = computed(() => {
 const pagosRealizados = computed(() => {
   if (!props.torneo) return 0;
   return props.torneo.inscripciones.filter(
-    (inscripcion) => inscripcion.esPago === "SI"
+    inscripcion => inscripcion.esPago === "SI"
   ).length;
 });
 
 const listasLegales = computed(() => {
   if (!props.torneo) return 0;
   return props.torneo.inscripciones.filter(
-    (inscripcion) => inscripcion.estadoLista === "OK"
+    inscripcion => inscripcion.estadoLista === "OK"
   ).length;
 });
 
 const listasEntregadas = computed(() => {
   if (!props.torneo) return 0;
   return props.torneo.inscripciones.filter(
-    (inscripcion) =>
+    inscripcion =>
       inscripcion.estadoLista === "ENTREGADA" ||
       inscripcion.estadoLista === "OK" ||
       inscripcion.estadoLista === "ILEGAL"

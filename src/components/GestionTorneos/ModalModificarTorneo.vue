@@ -13,7 +13,7 @@
             label="Nombre del torneo"
             required
             type="text"
-            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            :rules="[(v: string) => !!v || 'Campo obligatorio']"
           ></v-text-field>
 
           <!-- Descripción del torneo -->
@@ -74,8 +74,10 @@
             label="Limite de jugadores"
             required
             type="number"
-            :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
-               (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :rules="[
+              (v: number) => !isNaN(v) || 'Debe ser un número',
+              (v: number) => v > 0 || 'Debe ser mayor que 0',
+            ]"
           ></v-text-field>
 
           <!-- puntosTorneo -->
@@ -84,8 +86,10 @@
             label="¿A cuantos puntos es el torneo?"
             required
             type="number"
-            :rules="[(v: number) => !isNaN(v) || 'Debe ser un número', 
-                (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :rules="[
+              (v: number) => !isNaN(v) || 'Debe ser un número',
+              (v: number) => v > 0 || 'Debe ser mayor que 0',
+            ]"
           ></v-text-field>
 
           <!-- listasPorJugador -->
@@ -94,8 +98,10 @@
             label="¿Cúantas listas necesitará un jugador?"
             required
             type="number"
-            :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
-               (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :rules="[
+              (v: number) => !isNaN(v) || 'Debe ser un número',
+              (v: number) => v > 0 || 'Debe ser mayor que 0',
+            ]"
           ></v-text-field>
 
           <!-- Numero de rondas -->
@@ -104,8 +110,10 @@
             label="¿Cuantas rondas tiene el torneo?"
             required
             type="number"
-            :rules="[(v: number) => !isNaN(v) || 'Debe ser un número', 
-                (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :rules="[
+              (v: number) => !isNaN(v) || 'Debe ser un número',
+              (v: number) => v > 0 || 'Debe ser mayor que 0',
+            ]"
           ></v-text-field>
 
           <!-- Tipo de torneo -->
@@ -113,8 +121,10 @@
             v-model="tipoTorneo"
             label="¿De qué tipo es el torneo?"
             required
-            :items="['Individual', 'Parejas', 'Equipos de 4', 'Equipos de 6']"
-            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            :items="tipoTorneoOptions"
+            item-title="label"
+            item-value="value"
+            :rules="[(v: string) => !!v || 'Campo obligatorio']"
           />
 
           <!-- Tipo de clasificación -->
@@ -125,7 +135,7 @@
             :items="classificationTypeOptions"
             item-title="label"
             item-value="value"
-            :rules="[(v:number) => !!v || 'Campo obligatorio']"
+            :rules="[(v: number) => !!v || 'Campo obligatorio']"
           />
 
           <!-- fecha de inicio -->
@@ -259,7 +269,7 @@
             label="Hora de inicio del torneo (HH:MM)"
             clearable
             :rules="[
-              (v:any) =>
+              (v: any) =>
                 /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(v) ||
                 'Formato debe ser HH:MM',
             ]"
@@ -271,7 +281,7 @@
             label="Hora de finalización del torneo (HH:MM)"
             clearable
             :rules="[
-              (v:any) =>
+              (v: any) =>
                 /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(v) ||
                 'Formato debe ser HH:MM',
             ]"
@@ -323,7 +333,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, watch, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { ModificarTorneoDTO, Torneo } from "@/interfaces/Torneo";
@@ -331,28 +341,48 @@ import { modificarTorneo } from "@/services/TorneosService";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
 import { torneoType, TorneoType } from "@/Constant/TiposTorneo";
-import { ClassificationType, ClassificationTypeLabels } from "@/Constant/TipoClasificacion";
+import {
+  ClassificationType,
+  ClassificationTypeLabels,
+} from "@/Constant/TipoClasificacion";
 
-
-
+// eslint-disable-next-line no-undef
 const props = defineProps<{
   isVisible: boolean;
   torneo: Torneo | undefined;
 }>();
+
+// eslint-disable-next-line no-undef
 const emit = defineEmits(["close", "confirm"]);
 
 const internalIsVisible = ref(props.isVisible);
 const isValid = ref(true);
 
+const tipoTorneoOptions = [
+  { label: "Individual", value: "Individual" },
+  { label: "Parejas", value: "Parejas" },
+  { label: "Equipos de 4", value: "Equipos_4" },
+  { label: "Equipos de 6", value: "Equipos_6" },
+];
+
 const classificationTypeOptions = [
-  { label: ClassificationTypeLabels[ClassificationType.NORMAL], value: ClassificationType.NORMAL },
-  { label: ClassificationTypeLabels[ClassificationType.EXTENDED], value: ClassificationType.EXTENDED },
-  { label: ClassificationTypeLabels[ClassificationType.ALEMAN], value: ClassificationType.ALEMAN },
+  {
+    label: ClassificationTypeLabels[ClassificationType.NORMAL],
+    value: ClassificationType.NORMAL,
+  },
+  {
+    label: ClassificationTypeLabels[ClassificationType.EXTENDED],
+    value: ClassificationType.EXTENDED,
+  },
+  {
+    label: ClassificationTypeLabels[ClassificationType.ALEMAN],
+    value: ClassificationType.ALEMAN,
+  },
 ];
 
 watch(
   () => props.isVisible,
-  (newValue) => {
+  newValue => {
     internalIsVisible.value = newValue;
   }
 );
@@ -458,7 +488,6 @@ const fechaInicioTorneo = ref<string>("");
 const fechaFinTorneo = ref<string>("");
 const fechaFinEntregaListas = ref<string>("");
 const fechaFinInscripcion = ref<string>("");
-const imageInput = ref<HTMLInputElement | null>(null);
 const imageBase64 = ref<string | null>(null);
 const byteArrayBases = ref<Uint8Array | null>(null);
 const isGenerating = ref<boolean>(false);
@@ -469,7 +498,7 @@ const form = ref();
 
 watch(
   () => props.torneo,
-  (newTorneo) => {
+  newTorneo => {
     if (newTorneo) {
       nombreTorneo.value = newTorneo.nombreTorneo || "";
       limiteParticipantes.value = newTorneo.limiteParticipantes;
@@ -566,7 +595,7 @@ const onImageSelected = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const img = new Image();
       img.onload = () => {
         const maxWidth = 500; // Cambia esto al ancho máximo deseado
@@ -606,7 +635,7 @@ const onFileChange = (event: Event) => {
   if (file) {
     const reader = new FileReader();
 
-    reader.onload = async (event) => {
+    reader.onload = async event => {
       if (event.target?.result) {
         const arrayBuffer = event.target.result as ArrayBuffer;
         byteArrayBases.value = new Uint8Array(arrayBuffer);
@@ -668,6 +697,7 @@ const confirmarConfiguracion = async () => {
   };
   try {
     isGenerating.value = true;
+
     await modificarTorneo(nuevoTorneo);
 
     showSuccessModal.value = true;

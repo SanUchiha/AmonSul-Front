@@ -3,17 +3,19 @@
     <v-container>
       <v-row justify="center">
         <v-col cols="12" class="text-center">
-          <!--<v-btn text class="mx-2" to="/reglas">Reglas de Torneos</v-btn>
-            <v-btn text class="mx-2" to="/soporte">Soporte</v-btn>-->
-          <v-btn text class="mx-2" to="/contacto">Contacto</v-btn>
-          <v-btn text href="https://paypal.me/sanuchiha" target="_blank">
+          <v-btn class="mx-2" to="/contacto">Contacto</v-btn>
+          <v-btn
+            class="mx-2"
+            href="https://paypal.me/sanuchiha"
+            target="_blank"
+          >
             Donar con PayPal
           </v-btn>
         </v-col>
         <v-col cols="12" class="text-center">
           <p class="text-caption">
-            &copy; {{ new Date().getFullYear() }} Amon Sûl Tournaments. Todos
-            los derechos reservados.
+            &copy; {{ new Date().getFullYear() }} Amon Sûl. Una App para
+            gobernarlos a todos.
           </p>
         </v-col>
       </v-row>

@@ -5,7 +5,7 @@
         class="text-center text-h5 text-wrap"
         style="
           position: relative;
-          font-family: 'Roboto', sans-serif;
+          font-family: &quot;Roboto&quot;, sans-serif;
           color: #ffcc00;
           text-align: center;
         "
@@ -258,7 +258,6 @@
             </v-btn>
           </v-col>
         </v-row>
-        <v-row v-else> </v-row>
       </v-card-text>
     </v-card>
   </v-hover>
@@ -342,7 +341,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted, computed, watch, reactive } from "vue";
+import { ref, onMounted, computed, watch, reactive } from "vue";
 import {
   ActualizarPairingEquiposDTO,
   PartidaTorneoDTO,
@@ -367,6 +366,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import ModalCambiarPairingEquipo from "./ModalCambiarPairingEquipo.vue";
 
+// eslint-disable-next-line no-undef
 const props = defineProps<{
   match: PartidaTorneoDTO;
   idUsuario: number;
@@ -426,6 +426,9 @@ const partidaSelected = ref<PartidaTorneoDTO>({
   nombreEquipo2: null,
   idCapitan1: null,
   idCapitan2: null,
+  listasJugador1: null,
+  listasJugador2: null,
+  numeroMesa: null,
 });
 
 //Variables para cambiar pairing entre equipos
@@ -438,7 +441,7 @@ const nombreEquipo2 = ref<string | null>(localMatch.nombreEquipo2);
 const partidaCompleta = ref<boolean>(props.completa);
 watch(
   () => props.completa,
-  (nuevoValor) => {
+  nuevoValor => {
     partidaCompleta.value = nuevoValor;
   }
 );
@@ -504,6 +507,8 @@ const initializeComponent = async () => {
     fechaPartidaFormateada.value = await formatFechaSpa(
       localMatch.fechaPartida
     );
+
+    //console.log("Prop match:", props);
   } catch (err) {
     console.error(error);
     error.value = (err as Error).message;
@@ -618,7 +623,7 @@ const confirmarEditarPartida = async (partida: PartidaTorneoDTO) => {
     try {
       const response = await updatePartidaTorneo(body);
 
-      if (response.data) {
+      if (response) {
         showSuccessModal.value = true;
         partidaCompleta.value = true;
       }
