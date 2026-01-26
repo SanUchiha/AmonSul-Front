@@ -35,16 +35,6 @@
           <td>
             <v-chip color="blue" dark>{{ item.elo }}</v-chip>
           </td>
-          <td>
-            <v-chip color="green" dark>{{ item.ganadas }}</v-chip>
-          </td>
-          <td>
-            <v-chip color="yellow" dark>{{ item.empatadas }}</v-chip>
-          </td>
-          <td>
-            <v-chip color="red" dark>{{ item.perdidas }}</v-chip>
-          </td>
-          <td>{{ item.partidas }}</td>
         </tr>
       </template>
     </v-data-table>
@@ -52,10 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, watch, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
 import { FaccionDTO } from "@/interfaces/Faccion";
 
+// eslint-disable-next-line no-undef
 const props = defineProps<{
   items: UsuarioEloTablaClasificacion[];
   facciones: FaccionDTO[];
@@ -68,10 +59,6 @@ const headers = [
   { title: "#", key: "clasificacion" },
   { title: "Equipo", key: "equipo" },
   { title: "ELO", key: "elo" },
-  { title: "V", key: "ganadas" },
-  { title: "E", key: "empatadas" },
-  { title: "D", key: "perdidas" },
-  { title: "Jugadas", key: "partidas" },
 ];
 
 const groupByEquipos = () => {
@@ -86,10 +73,10 @@ const groupByEquipos = () => {
 
   equipos.value = [];
 
-  for (const [key, value] of Object.entries(jugadoresPorEquipo)) {
+  for (const [, value] of Object.entries(jugadoresPorEquipo)) {
     if (value) {
       const nombre = props.facciones.find(
-        (faccion) => faccion.idFaccion === value[0].idFaccion
+        faccion => faccion.idFaccion === value[0].idFaccion
       )?.nombreFaccion;
 
       if (!nombre) continue;
@@ -126,7 +113,7 @@ onMounted(() => {
 
 watch(
   () => props.items,
-  (newItems) => {
+  newItems => {
     if (newItems && newItems.length) {
       groupByEquipos();
     }

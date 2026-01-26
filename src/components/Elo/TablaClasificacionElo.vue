@@ -35,16 +35,6 @@
           <td>
             <v-chip color="blue" dark>{{ item.elo }}</v-chip>
           </td>
-          <td>
-            <v-chip color="green" dark>{{ item.ganadas }}</v-chip>
-          </td>
-          <td>
-            <v-chip color="yellow" dark>{{ item.empatadas }}</v-chip>
-          </td>
-          <td>
-            <v-chip color="red" dark>{{ item.perdidas }}</v-chip>
-          </td>
-          <td>{{ item.partidas }}</td>
         </tr>
       </template>
     </v-data-table>
@@ -53,7 +43,7 @@
 
 <script setup lang="ts">
 import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
-import { ref, defineProps } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import {
   VDataTable,
@@ -63,6 +53,7 @@ import {
   VTextField,
 } from "vuetify/components";
 
+// eslint-disable-next-line no-undef
 defineProps<{
   items: UsuarioEloTablaClasificacion[];
 }>();
@@ -74,10 +65,6 @@ const headers = [
   { title: "#", key: "clasificacion" },
   { title: "Nick", key: "nick" },
   { title: "ELO", key: "elo" },
-  { title: "V", key: "ganadas" },
-  { title: "E", key: "empatadas" },
-  { title: "D", key: "perdidas" },
-  { title: "Jugadas", key: "partidas" },
 ];
 
 const goToUserDetail = (idUsuario: number) => {
