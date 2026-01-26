@@ -4,7 +4,7 @@ import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
 import {
   MatchResultGeneral,
-  ResultMatchMatchedPlayExtendedType,
+  ResultMatchMatchedPlayExtendedTeamType,
   ResultMatchMatchedPlayType,
 } from "@/Constant/TipoClasificacion";
 import { calcularPuntosAleman } from "./sistemaAleman";
@@ -108,33 +108,35 @@ function clasificacionExtendida(
     const res1 = resultadoUsuario1 ?? 0;
     const res2 = resultadoUsuario2 ?? 0;
     if (res1 === res2) {
-      if (equipo1) equipo1.puntos += ResultMatchMatchedPlayExtendedType.DRAW;
-      if (equipo2) equipo2.puntos += ResultMatchMatchedPlayExtendedType.DRAW;
+      if (equipo1)
+        equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.DRAW;
+      if (equipo2)
+        equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.DRAW;
     } else {
       if (res1 > res2) {
         if (res1 >= 2 * res2 && res1 >= 6) {
           if (equipo1)
-            equipo1.puntos += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+            equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
           if (equipo2)
-            equipo2.puntos += ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+            equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
         } else {
           if (equipo1)
-            equipo1.puntos += ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+            equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
           if (equipo2)
-            equipo2.puntos += ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+            equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
         }
       }
       if (res2 > res1) {
         if (res2 >= 2 * res1 && res2 >= 6) {
           if (equipo2)
-            equipo2.puntos += ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+            equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
           if (equipo1)
-            equipo1.puntos += ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+            equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
         } else {
           if (equipo2)
-            equipo2.puntos += ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+            equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
           if (equipo1)
-            equipo1.puntos += ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+            equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
         }
       }
     }

@@ -507,8 +507,6 @@ const initializeComponent = async () => {
     fechaPartidaFormateada.value = await formatFechaSpa(
       localMatch.fechaPartida
     );
-
-    //console.log("Prop match:", props);
   } catch (err) {
     console.error(error);
     error.value = (err as Error).message;

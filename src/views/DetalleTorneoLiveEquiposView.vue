@@ -201,7 +201,7 @@ import { useAuth } from "@/composables/useAuth";
 import {
   ResultMatchMatchedPlayType,
   MatchResultPoint,
-  ResultMatchMatchedPlayExtendedType,
+  ResultMatchMatchedPlayExtendedTeamType,
   MatchResultGeneral,
 } from "@/Constant/TipoClasificacion";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
@@ -267,9 +267,7 @@ onMounted(async () => {
   }
   if (torneoGestion.value) {
     for (const equipo of torneoGestion.value.equipos) {
-      if (
-        equipo.inscripciones.some((ins) => ins.idUsuario === idUsuario.value)
-      ) {
+      if (equipo.inscripciones.some(ins => ins.idUsuario === idUsuario.value)) {
         idEquipo.value = equipo.idEquipo;
       }
     }
@@ -289,14 +287,17 @@ onMounted(async () => {
       );
     }
     if (partidas.value) {
-      partidasPorRonda.value = partidas.value.reduce((acc, partida) => {
-        const { numeroRonda } = partida;
-        if (!acc[numeroRonda]) {
-          acc[numeroRonda] = [];
-        }
-        acc[numeroRonda].push(partida);
-        return acc;
-      }, {} as Record<number, PartidaTorneoDTO[]>);
+      partidasPorRonda.value = partidas.value.reduce(
+        (acc, partida) => {
+          const { numeroRonda } = partida;
+          if (!acc[numeroRonda]) {
+            acc[numeroRonda] = [];
+          }
+          acc[numeroRonda].push(partida);
+          return acc;
+        },
+        {} as Record<number, PartidaTorneoDTO[]>
+      );
     }
 
     try {
@@ -317,7 +318,7 @@ onMounted(async () => {
 
     //Mis partidas
     misPartidas.value = partidas.value.filter(
-      (p) => p.idEquipo1 == idEquipo.value || p.idEquipo2 == idEquipo.value
+      p => p.idEquipo1 == idEquipo.value || p.idEquipo2 == idEquipo.value
     );
 
     if (misPartidas.value.length > 0) {
@@ -370,10 +371,10 @@ const calcularClasificacion = async () => {
 
   // Filtramos hasta la ronda 2 para dividir el grupo
   const partidasFiltradas = partidas.value?.filter(
-    (partida) => partida.numeroRonda <= 2
+    partida => partida.numeroRonda <= 2
   );
 
-  partidasFiltradas?.forEach((partida) => {
+  partidasFiltradas?.forEach(partida => {
     // Verifica que la partida esté validada por ambos usuarios
     if (partida.partidaValidadaUsuario1 && partida.partidaValidadaUsuario2) {
       const puntosUsuario1 = partida.resultadoUsuario1 ?? 0;
@@ -454,52 +455,52 @@ const calcularClasificacion = async () => {
         const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           rankingDividido[partida.idUsuario1].puntosTorneo +=
-            ResultMatchMatchedPlayExtendedType.DRAW;
+            ResultMatchMatchedPlayExtendedTeamType.DRAW;
           rankingDividido[partida.idUsuario2].puntosTorneo +=
-            ResultMatchMatchedPlayExtendedType.DRAW;
+            ResultMatchMatchedPlayExtendedTeamType.DRAW;
           rankingDividido[partida.idUsuario1].empates += MatchResultPoint.DRAW;
           rankingDividido[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
             if (res1 >= 2 * res2) {
               rankingDividido[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               rankingDividido[partida.idUsuario1].victorias +=
                 MatchResultPoint.WIN;
               rankingDividido[partida.idUsuario2].derrotas +=
                 MatchResultPoint.LOSS;
               rankingDividido[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
             } else {
               rankingDividido[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
               rankingDividido[partida.idUsuario1].victorias +=
                 MatchResultPoint.WIN;
               rankingDividido[partida.idUsuario2].derrotas +=
                 MatchResultPoint.LOSS;
               rankingDividido[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
             }
           }
           if (res2 > res1) {
             if (res2 >= 2 * res1) {
               rankingDividido[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               rankingDividido[partida.idUsuario2].victorias +=
                 MatchResultPoint.WIN;
               rankingDividido[partida.idUsuario1].derrotas +=
                 MatchResultPoint.LOSS;
               rankingDividido[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
             } else {
               rankingDividido[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
               rankingDividido[partida.idUsuario2].victorias +=
                 MatchResultPoint.WIN;
               rankingDividido[partida.idUsuario1].derrotas +=
                 MatchResultPoint.LOSS;
               rankingDividido[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
             }
           }
         }
@@ -552,7 +553,7 @@ const calcularClasificacion = async () => {
   dividirClasificacionEnZonas();
 
   // CLASIFICACION GENERAL
-  partidas.value?.forEach((partida) => {
+  partidas.value?.forEach(partida => {
     // Verifica que la partida esté validada por ambos usuarios
     if (partida.partidaValidadaUsuario1 && partida.partidaValidadaUsuario2) {
       const puntosUsuario1 = partida.resultadoUsuario1 ?? 0;
@@ -633,44 +634,44 @@ const calcularClasificacion = async () => {
         const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           ranking[partida.idUsuario1].puntosTorneo +=
-            ResultMatchMatchedPlayExtendedType.DRAW;
+            ResultMatchMatchedPlayExtendedTeamType.DRAW;
           ranking[partida.idUsuario2].puntosTorneo +=
-            ResultMatchMatchedPlayExtendedType.DRAW;
+            ResultMatchMatchedPlayExtendedTeamType.DRAW;
           ranking[partida.idUsuario1].empates += MatchResultPoint.DRAW;
           ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
             if (res1 >= 2 * res2 && res1 >= 6) {
               ranking[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
               ranking[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
             } else {
               ranking[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
               ranking[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
             }
           }
           if (res2 > res1) {
             if (res2 >= 2 * res1 && res2 >= 6) {
               ranking[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
               ranking[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
             } else {
               ranking[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
               ranking[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
             }
           }
         }
@@ -703,7 +704,7 @@ const calcularClasificacion = async () => {
     }
   });
 
-  inscripciones.value.forEach((inscripcion) => {
+  inscripciones.value.forEach(inscripcion => {
     const userId = inscripcion.idUsuario;
     if (ranking[userId]) {
       ranking[userId].puntosTorneo += inscripcion.puntosExtra;
@@ -728,12 +729,12 @@ const calcularClasificacion = async () => {
   });
 
   // Clasificacion por zonas
-  clasificacionZona1.value = clasificacion.value.filter((jugador) =>
-    jugadoresZona1.value.some((z) => z.idUsuario === jugador.idUsuario)
+  clasificacionZona1.value = clasificacion.value.filter(jugador =>
+    jugadoresZona1.value.some(z => z.idUsuario === jugador.idUsuario)
   );
 
-  clasificacionZona2.value = clasificacion.value.filter((jugador) =>
-    jugadoresZona2.value.some((z) => z.idUsuario === jugador.idUsuario)
+  clasificacionZona2.value = clasificacion.value.filter(jugador =>
+    jugadoresZona2.value.some(z => z.idUsuario === jugador.idUsuario)
   );
 
   type JugadorConEjercito = {
@@ -752,8 +753,8 @@ const calcularClasificacion = async () => {
 
   const listaEjercitos = appsettings.armies;
 
-  const ejercitosJugadoresConBando = jugadoresConEjercitos.map((jugador) => {
-    const ejercito = listaEjercitos.find((e) => e.name === jugador.ejercito);
+  const ejercitosJugadoresConBando = jugadoresConEjercitos.map(jugador => {
+    const ejercito = listaEjercitos.find(e => e.name === jugador.ejercito);
     return {
       nick: jugador.nick,
       ejercito: jugador.ejercito,
@@ -762,9 +763,9 @@ const calcularClasificacion = async () => {
     };
   });
 
-  clasificacion.value = clasificacion.value.map((j) => {
+  clasificacion.value = clasificacion.value.map(j => {
     const datosEjercito = ejercitosJugadoresConBando.find(
-      (e) => e.nick === j.nick
+      e => e.nick === j.nick
     );
     return {
       ...j,

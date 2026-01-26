@@ -127,7 +127,6 @@ const cerrarModal = () => {
 
 // Función para confirmar la edición
 const confirmarEditarPartida = () => {
-  console.log("Partida editada:", partidaEditada.value);
   emit("confirm", partidaEditada.value);
 };
 
