@@ -14,9 +14,17 @@ export function getClassificationTypeLabel(type: ClassificationType): string {
   return ClassificationTypeLabels[type];
 }
 
-export const ResultMatchMatchedPlayExtendedType = {
+export const ResultMatchMatchedPlayExtendedTeamType = {
   MAJOR_WIN: 4,
   MINOR_WIN: 3,
+  DRAW: 2,
+  MINOR_LOSS: 1,
+  MAJOR_LOSS: 0,
+} as const;
+
+export const ResultMatchMatchedPlayExtendedIndividualType = {
+  MAJOR_WIN: 6,
+  MINOR_WIN: 5,
   DRAW: 2,
   MINOR_LOSS: 1,
   MAJOR_LOSS: 0,

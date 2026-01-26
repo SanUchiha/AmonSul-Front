@@ -668,7 +668,7 @@ import { getInscripcionesTorneo } from "@/services/InscripcionesService";
 import {
   MatchResultGeneral,
   MatchResultPoint,
-  ResultMatchMatchedPlayExtendedType,
+  ResultMatchMatchedPlayExtendedTeamType,
   ResultMatchMatchedPlayType,
 } from "@/Constant/TipoClasificacion";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
@@ -966,7 +966,6 @@ const handleModificarPartidaTorneoConfirm = async (
 
     try {
       const response = await updatePartidaTorneo(partidaEditada);
-      console.log("Respuesta de la actualización:", response);
       const index = partidas.value.findIndex(
         partida => partida.idPartidaTorneo === response.idPartidaTorneo
       );
@@ -1176,52 +1175,52 @@ const calcularClasificacion = () => {
         const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           rankingDividido[partida.idUsuario1].puntosTorneo +=
-            ResultMatchMatchedPlayExtendedType.DRAW;
+            ResultMatchMatchedPlayExtendedTeamType.DRAW;
           rankingDividido[partida.idUsuario2].puntosTorneo +=
-            ResultMatchMatchedPlayExtendedType.DRAW;
+            ResultMatchMatchedPlayExtendedTeamType.DRAW;
           rankingDividido[partida.idUsuario1].empates += MatchResultPoint.DRAW;
           rankingDividido[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
             if (res1 >= 2 * res2) {
               rankingDividido[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               rankingDividido[partida.idUsuario1].victorias +=
                 MatchResultPoint.WIN;
               rankingDividido[partida.idUsuario2].derrotas +=
                 MatchResultPoint.LOSS;
               rankingDividido[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
             } else {
               rankingDividido[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
               rankingDividido[partida.idUsuario1].victorias +=
                 MatchResultPoint.WIN;
               rankingDividido[partida.idUsuario2].derrotas +=
                 MatchResultPoint.LOSS;
               rankingDividido[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
             }
           }
           if (res2 > res1) {
             if (res2 >= 2 * res1) {
               rankingDividido[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               rankingDividido[partida.idUsuario2].victorias +=
                 MatchResultPoint.WIN;
               rankingDividido[partida.idUsuario1].derrotas +=
                 MatchResultPoint.LOSS;
               rankingDividido[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
             } else {
               rankingDividido[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
               rankingDividido[partida.idUsuario2].victorias +=
                 MatchResultPoint.WIN;
               rankingDividido[partida.idUsuario1].derrotas +=
                 MatchResultPoint.LOSS;
               rankingDividido[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
             }
           }
         }
@@ -1355,44 +1354,44 @@ const calcularClasificacion = () => {
         const res2 = partida.resultadoUsuario2 ?? 0;
         if (res1 === res2) {
           ranking[partida.idUsuario1].puntosTorneo +=
-            ResultMatchMatchedPlayExtendedType.DRAW;
+            ResultMatchMatchedPlayExtendedTeamType.DRAW;
           ranking[partida.idUsuario2].puntosTorneo +=
-            ResultMatchMatchedPlayExtendedType.DRAW;
+            ResultMatchMatchedPlayExtendedTeamType.DRAW;
           ranking[partida.idUsuario1].empates += MatchResultPoint.DRAW;
           ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
             if (res1 >= 2 * res2) {
               ranking[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
               ranking[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
             } else {
               ranking[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario2].derrotas += MatchResultPoint.LOSS;
               ranking[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
             }
           }
           if (res2 > res1) {
             if (res2 >= 2 * res1) {
               ranking[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
               ranking[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MAJOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
             } else {
               ranking[partida.idUsuario2].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_WIN;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
               ranking[partida.idUsuario1].derrotas += MatchResultPoint.LOSS;
               ranking[partida.idUsuario1].puntosTorneo +=
-                ResultMatchMatchedPlayExtendedType.MINOR_LOSS;
+                ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
             }
           }
         }
@@ -1671,7 +1670,6 @@ const sendUpdateBack = async (idJugador1: number, idJugador2: number) => {
       idUsuario2: idJugador2,
     };
     const response = await updatePairingTorneoAsync(body);
-    console.log("Respuesta de la actualización del pairing:", response);
     const index = partidas.value.findIndex(
       partida => partida.idPartidaTorneo === response.idPartidaTorneo
     );
