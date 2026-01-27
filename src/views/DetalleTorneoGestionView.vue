@@ -1668,12 +1668,31 @@ const confirmarValidar = async () => {
     else body.partidaValidadaUsuario2 = true;
 
     try {
-      await updatePartidaTorneo(body);
+      const response = await updatePartidaTorneo(body);
+      const updatedPartida: PartidaTorneoDTO = response;
+      // Actualiza la partida en el array partidas
+      const index = partidas.value.findIndex(
+        partida => partida.idPartidaTorneo === updatedPartida.idPartidaTorneo
+      );
+      if (index !== -1) {
+        partidas.value[index] = updatedPartida;
+      }
+      // Refresca partidasPorRonda
+      partidasPorRonda.value = partidas.value.reduce(
+        (acc, partida) => {
+          const { numeroRonda } = partida;
+          if (!acc[numeroRonda]) {
+            acc[numeroRonda] = [];
+          }
+          acc[numeroRonda].push(partida);
+          return acc;
+        },
+        {} as Record<number, PartidaTorneoDTO[]>
+      );
     } catch (error) {
       console.error(error);
     } finally {
       isModalValidarVisible.value = false;
-      window.location.reload();
     }
   }
 };
