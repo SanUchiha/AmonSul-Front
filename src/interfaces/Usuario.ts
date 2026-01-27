@@ -102,8 +102,8 @@ export interface UsuarioDataDTO {
   partidasValidadas: ViewPartidaAmistosaDTO[];
   partidasPendientes: ViewPartidaAmistosaDTO[];
   elos: EloDTO[];
-  InscripcionesIndividualTorneo: InscripcionUsuarioIndividualDTO[];
-  InscripcionesEquipoTorneo: InscripcionUsuarioEquipoDTO[];
+  inscripcionesIndividualTorneo: InscripcionUsuarioIndividualDTO[];
+  inscripcionesEquipoTorneo: InscripcionUsuarioEquipoDTO[];
   clasificacionElo: number;
   puntuacionElo: number;
   numeroPartidasJugadas: number;
@@ -111,8 +111,8 @@ export interface UsuarioDataDTO {
   partidasEmpatadas: number;
   partidasPerdidas: number;
   proteccionDatos: boolean | null;
-  PartidasTorneo: ViewPartidaTorneoDTO[];
-  ClasificacionTorneos: ClasificacionTorneosDTO[];
+  partidasTorneo: ViewPartidaTorneoDTO[];
+  clasificacionTorneos: ClasificacionTorneosDTO[];
   rankingElo: number;
   nickLGDA?: string;
   imagen?: string;

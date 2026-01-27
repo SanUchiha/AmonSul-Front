@@ -6,23 +6,14 @@
           <LoadingGandalf />
         </div>
         <div v-else>
-          <!-- tabs
-           1. info usuario / 2. partidas amistosas / 3. partidas torneos / 4. torneos jugador -->
-
-          <!--<v-tabs v-model="tab" color="primary" grow show-arrows next-icon="mdi-arrow-right-bold-box-outline" prev-icon="mdi-arrow-left-bold-box-outline">-->
           <v-tabs v-model="tab" color="primary" grow>
             <v-tab value="1">Perfil</v-tab>
-            <v-tab value="2"> Amistosas </v-tab>
-            <v-tab value="3"> Torneos </v-tab>
-            <v-tab value="4"
-              ><v-icon icon="mdi-calendar-account-outline"></v-icon
-            ></v-tab>
+            <v-tab value="2">Amistosas </v-tab>
+            <v-tab value="3">Torneos </v-tab>
+            <v-tab value="4">Inscripciones</v-tab>
           </v-tabs>
 
           <v-window v-model="tab">
-            <!-- Tab 1.
-             spark
-           Jugador card -->
             <v-window-item value="1">
               <PerfilUsuarioView
                 :email="usuarioData.email"
@@ -30,86 +21,27 @@
               ></PerfilUsuarioView>
             </v-window-item>
 
-            <!-- tab 2. (partidas)
-           Lista de partidas -->
             <v-window-item value="2">
-              <v-divider class="my-3"></v-divider>
-
-              <div v-if="!isLoading && validMatches.length > 0">
-                <v-card class="section-card stats-section pt-0 mt-0">
-                  <v-col cols="12"
-                    ><p class="text-h5 ringbearer">Partidas validadas</p></v-col
-                  >
-                  <v-divider></v-divider>
-                  <v-row>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="6"
-                      lg="4"
-                      xl="4"
-                      class="pb-0"
-                      v-for="match in validMatches"
-                      :key="match.idPartidaAmistosa"
-                    >
-                      <ValidadasMatchCard
-                        :idUsuario="usuarioData.idUsuario"
-                        :match="match"
-                        class="mb-4"
-                      />
-                    </v-col>
-                  </v-row>
-                </v-card>
-              </div>
-              <div v-else>
-                <h3>No tienes partidas validadas</h3>
-              </div>
-              <v-divider class="my-3"></v-divider>
-            </v-window-item>
-
-            <!-- tab 3 (partidas torneos) -->
-            <v-window-item value="3">
-              <div v-if="!isLoading && tournamentMatches.length > 0">
-                <v-card class="section-card stats-section pt-0 mt-0">
-                  <v-col cols="12"
-                    ><p class="text-h5 ringbearer">Partidas de torneo</p></v-col
-                  >
-                  <v-divider></v-divider>
-                  <v-row>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="6"
-                      lg="4"
-                      xl="4"
-                      class="pb-0"
-                      v-for="match in tournamentMatches"
-                      :key="match.idPartidaTorneo"
-                    >
-                      <CardPartidaTorneo
-                        :idUsuario="usuarioData.idUsuario"
-                        :match="match"
-                        class="mb-4"
-                      />
-                    </v-col>
-                  </v-row>
-                </v-card>
-              </div>
-              <div v-else>
-                <h3>No tiene partidas de torneo</h3>
-              </div>
-              <v-divider class="my-3"></v-divider>
-            </v-window-item>
-
-            <!-- tab 4.
-           Inscription a los tornoes (mis torneos)
-           Lista de partidas -->
-            <v-window-item value="4">
-              <TablaInscripcionesTorneoIndividual
+              <DetalleJugadorPartidasAmistosas
                 :isLoading="isLoading"
-                :listaTorneos="usuarioData.InscripcionesIndividualTorneo"
+                :amistosasMatches="validMatches"
                 :idUsuario="usuarioData.idUsuario"
-                :disputado="false"
+                :usuarioData="usuarioData"
+              />
+            </v-window-item>
+
+            <v-window-item value="3">
+              <DetalleJugadorPartidasTorneo
+                :isLoading="isLoading"
+                :tournamentMatches="tournamentMatches"
+                :idUsuario="usuarioData.idUsuario"
+                :usuarioData="usuarioData"
+              />
+            </v-window-item>
+
+            <v-window-item value="4">
+              <TablaTorneosDisputados
+                :clasificacionTorneos="usuarioData.clasificacionTorneos"
               />
             </v-window-item>
           </v-window>
@@ -140,12 +72,12 @@ import {
   ViewPartidaTorneoDTO,
 } from "@/interfaces/Partidas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
-import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
-import CardPartidaTorneo from "@/components/PartidasTorneo/CardPartidaTorneo.vue";
+import DetalleJugadorPartidasAmistosas from "@/components/DetalleJugador/DetalleJugadorPartidasAmistosas.vue";
+import DetalleJugadorPartidasTorneo from "@/components/DetalleJugador/DetalleJugadorPartidasTorneo.vue";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
-import TablaInscripcionesTorneoIndividual from "@/components/Inscripcion/TablaInscripcionesTorneoIndividual.vue";
+import TablaTorneosDisputados from "@/components/DetalleJugador/TablaTorneosDisputados.vue";
 
 const tab = ref<string>("one");
 const usuariosStore = useUsuariosStore();

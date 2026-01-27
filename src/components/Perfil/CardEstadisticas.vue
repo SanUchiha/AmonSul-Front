@@ -5,18 +5,31 @@
         <!--Leyenda victorias empates derrotas-->
         <v-row>
           <v-col cols="4">
-            <span class="font-weight-bold">Victorias: {{ usuario.partidasGanadas }}</span>
+            <span class="font-weight-bold"
+              >Victorias: {{ usuario.partidasGanadas }}</span
+            >
           </v-col>
           <v-col cols="4">
-            <span class="font-weight-bold">Empates: {{ usuario.partidasEmpatadas }}</span>
+            <span class="font-weight-bold"
+              >Empates: {{ usuario.partidasEmpatadas }}</span
+            >
           </v-col>
           <v-col cols="4" v-if="usuario.partidasPerdidas > 0">
-            <span class="font-weight-bold">Derrotas: {{ usuario.partidasPerdidas }}</span>
+            <span class="font-weight-bold"
+              >Derrotas: {{ usuario.partidasPerdidas }}</span
+            >
           </v-col>
         </v-row>
 
         <!--Barra de victorias empates derrotas con interactividad-->
-        <v-row><v-col class="pb-0 pt-1 text-left" cols="12"><v-icon class="ml-2" color="grey-lighten-1" size="20">mdi-filter-variant</v-icon> Pulsa sobre la barra para filtrar partidas</v-col></v-row>
+        <v-row
+          ><v-col class="pb-0 pt-1 text-left" cols="12"
+            ><v-icon class="ml-2" color="grey-lighten-1" size="20"
+              >mdi-filter-variant</v-icon
+            >
+            Pulsa sobre la barra para filtrar partidas</v-col
+          ></v-row
+        >
         <v-row>
           <v-col cols="12" class="pt-0">
             <div class="resultado-barra">
@@ -62,7 +75,9 @@
           class="px-4"
         >
           <template #default>
-            <v-icon class="mr-2" color="yellow-lighten-2">mdi-filter-check</v-icon>
+            <v-icon class="mr-2" color="yellow-lighten-2"
+              >mdi-filter-check</v-icon
+            >
             {{ textoSnackbar }}
           </template>
         </v-snackbar>
@@ -107,16 +122,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, ref, defineEmits } from "vue";
+import { computed, ref } from "vue";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 
+// eslint-disable-next-line no-undef
 const props = defineProps<{ usuario: UsuarioDataDTO }>();
 
 const defaultUsuario = {
   partidasGanadas: 0,
   partidasPerdidas: 0,
   partidasEmpatadas: 0,
-  numeroPartidasJugadas: 0
+  numeroPartidasJugadas: 0,
 };
 
 //Para el snackbar
@@ -125,27 +141,36 @@ const textoSnackbar = ref("");
 
 const usuarioData = computed(() => props.usuario ?? defaultUsuario);
 
-const winRate = computed(() =>
-  (usuarioData.value.partidasGanadas / usuarioData.value.numeroPartidasJugadas) * 100
+const winRate = computed(
+  () =>
+    (usuarioData.value.partidasGanadas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
 );
-const lossRate = computed(() =>
-  (usuarioData.value.partidasPerdidas / usuarioData.value.numeroPartidasJugadas) * 100
+const lossRate = computed(
+  () =>
+    (usuarioData.value.partidasPerdidas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
 );
-const drawRate = computed(() =>
-  (usuarioData.value.partidasEmpatadas / usuarioData.value.numeroPartidasJugadas) * 100
+const drawRate = computed(
+  () =>
+    (usuarioData.value.partidasEmpatadas /
+      usuarioData.value.numeroPartidasJugadas) *
+    100
 );
 
 // Estado del filtro activo (win, loss, draw o null)
-const filtroActivo = ref<'win' | 'loss' | 'draw' | null>(null);
+const filtroActivo = ref<"win" | "loss" | "draw" | null>(null);
 
-// Emitir evento al padre cuando se cambia el filtro
+// eslint-disable-next-line no-undef
 const emit = defineEmits<{
-  (e: 'filtroCambiar', tipo: 'win' | 'loss' | 'draw' | null): void;
+  (e: "filtroCambiar", tipo: "win" | "loss" | "draw" | null): void;
 }>();
 
-function toggleFiltro(tipo: 'win' | 'loss' | 'draw') {
+function toggleFiltro(tipo: "win" | "loss" | "draw") {
   filtroActivo.value = filtroActivo.value === tipo ? null : tipo;
-  emit('filtroCambiar', filtroActivo.value);
+  emit("filtroCambiar", filtroActivo.value);
 
   // Texto descriptivo para el snackbar
   const mensajes = {
@@ -169,7 +194,10 @@ function toggleFiltro(tipo: 'win' | 'loss' | 'draw') {
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
-  transition: transform 0.2s ease, outline 0.2s ease, outline-offset 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    outline 0.2s ease,
+    outline-offset 0.2s ease;
   outline: none;
   outline-offset: 0;
 }
@@ -197,7 +225,10 @@ function toggleFiltro(tipo: 'win' | 'loss' | 'draw') {
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
-  transition: transform 0.2s ease, outline 0.2s ease, outline-offset 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    outline 0.2s ease,
+    outline-offset 0.2s ease;
   outline: none;
   outline-offset: 0;
 }
