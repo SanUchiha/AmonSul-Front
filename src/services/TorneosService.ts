@@ -149,3 +149,9 @@ export const modificarPairingTorneoEquipos = async (
 export const getEquiposDisponiblesAsync = async (idTorneo: number) => {
   return http.get(`Torneo/Gestion/Equipos/Equipos-disponibles/${idTorneo}`);
 };
+
+export const getListasTorneoAsync = async (idTorneo: number) => {
+  return http.get(`Torneo/Gestion/Listas-Pdf/${idTorneo}`, {
+    responseType: "blob",
+  });
+};

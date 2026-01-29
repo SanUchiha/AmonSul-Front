@@ -74,6 +74,16 @@
                 Clasificación</v-btn
               >
             </div>
+            <div class="text-wrap text-sm">
+              <v-btn
+                variant="tonal"
+                color="secondary"
+                @click="descargarListasTorneo"
+                block
+              >
+                Descargar Listas</v-btn
+              >
+            </div>
           </div>
         </v-list-item-title>
       </v-list-item-content>
@@ -123,19 +133,26 @@
     message="No se han podido modificar el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
+
+  <LoadingLOTR
+    :isVisible="isDownloading"
+    mensaje="Generando PDF, por favor espera..."
+  />
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, ref } from "vue";
+import { computed, ref } from "vue";
 import { TorneoGestionInfoMasDTO, Torneo } from "@/interfaces/Torneo";
-import { getTorneo } from "@/services/TorneosService";
+import { getListasTorneoAsync, getTorneo } from "@/services/TorneosService";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalModificarBasesTorneo from "../ModalModificarBasesTorneo.vue";
 import ModalModificarTorneo from "../ModalModificarTorneo.vue";
 import ModalHandlerMostrarListas from "../ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "../ModalHandlerMostrarClasificacion.vue";
+import LoadingLOTR from "@/components/Commons/LoadingLOTR.vue";
 
+// eslint-disable-next-line no-undef
 const props = defineProps<{ torneo: TorneoGestionInfoMasDTO }>();
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
@@ -150,6 +167,7 @@ const showModalHandlerMostrarClasificacion = ref<boolean>(false);
 const mostrarListas = ref(props.torneo?.torneo.mostrarListas);
 const mostrarClasificacion = ref(props.torneo?.torneo.mostrarClasificacion);
 const isLoading = ref<boolean>(false);
+const isDownloading = ref<boolean>(false);
 
 const plazasRestantes = computed(() => {
   if (!props.torneo || props.torneo.inscripciones.length === null) {
@@ -164,7 +182,7 @@ const plazasRestantes = computed(() => {
 const todasLasListas = computed(() => {
   if (!props.torneo || !props.torneo.inscripciones) return [];
 
-  return props.torneo.inscripciones.flatMap((inscripcion) => inscripcion.lista);
+  return props.torneo.inscripciones.flatMap(inscripcion => inscripcion.lista);
 });
 
 const listasTotales = computed(() => {
@@ -176,12 +194,12 @@ const listasTotales = computed(() => {
 
 const listasLuz = computed(() => {
   if (!props.torneo) return 0;
-  return todasLasListas.value.filter((l) => l.bando === "good").length;
+  return todasLasListas.value.filter(l => l.bando === "good").length;
 });
 
 const listasOscuridad = computed(() => {
   if (!props.torneo) return 0;
-  return todasLasListas.value.filter((l) => l.bando === "evil").length;
+  return todasLasListas.value.filter(l => l.bando === "evil").length;
 });
 
 const totalInscripciones = computed(() => {
@@ -191,19 +209,19 @@ const totalInscripciones = computed(() => {
 const pagosRealizados = computed(() => {
   if (!props.torneo) return 0;
   return props.torneo.inscripciones.filter(
-    (inscripcion) => inscripcion.esPago === "SI"
+    inscripcion => inscripcion.esPago === "SI"
   ).length;
 });
 
 const listasLegales = computed(() => {
   if (!props.torneo) return 0;
-  return todasLasListas.value.filter((l) => l.estadoLista == "OK").length;
+  return todasLasListas.value.filter(l => l.estadoLista == "OK").length;
 });
 
 const listasEntregadas = computed(() => {
   if (!props.torneo) return 0;
   return todasLasListas.value.filter(
-    (l) =>
+    l =>
       l.estadoLista == "ENTREGADA" ||
       l.estadoLista === "ILEGAL" ||
       l.estadoLista === "OK"
@@ -296,6 +314,42 @@ const handlerMostrarClasificacion = async () => {
     showErrorModal.value = true;
   } finally {
     isLoading.value = false;
+    showErrorModal.value = false;
+  }
+};
+
+const descargarListasTorneo = async () => {
+  if (
+    props.torneo?.torneo.idTorneo != undefined &&
+    props.torneo?.torneo.idTorneo != 0 &&
+    props.torneo?.torneo.idTorneo != null
+  )
+    idTorneo.value = props.torneo?.torneo.idTorneo;
+
+  try {
+    isDownloading.value = true;
+    const response = await getListasTorneoAsync(idTorneo.value);
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    let fileName = torneoMod?.value?.nombreTorneo
+      ? torneoMod.value.nombreTorneo + ".pdf"
+      : "listas_torneo.pdf";
+    const disposition =
+      response.headers && response.headers["content-disposition"];
+    if (disposition) {
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      if (match && match[1]) fileName = match[1];
+    }
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isDownloading.value = false;
     showErrorModal.value = false;
   }
 };

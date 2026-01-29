@@ -121,6 +121,15 @@
               mostrarClasificacion ? "Ocultar" : "Mostrar"
             }}
             Clasificación</v-btn
+          > </v-col
+        ><v-col>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            @click="descargarListasTorneo"
+            block
+          >
+            Descargar Listas</v-btn
           >
         </v-col>
       </v-row>
@@ -168,19 +177,27 @@
     message="No se han podido modificar el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
+  <LoadingLOTR
+    :isVisible="isDownloading"
+    mensaje="Generando PDF, por favor espera..."
+  />
 </template>
 
 <script setup lang="ts">
 import { Torneo } from "@/interfaces/Torneo";
-import { computed, defineProps, ref, watch } from "vue";
-import { getTorneo } from "@/services/TorneosService";
+import { computed, ref, watch } from "vue";
+import { getListasTorneoAsync, getTorneo } from "@/services/TorneosService";
 import ModalModificarBasesTorneo from "../ModalModificarBasesTorneo.vue";
 import ModalModificarTorneo from "../ModalModificarTorneo.vue";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import ModalHandlerMostrarListas from "../ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "../ModalHandlerMostrarClasificacion.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
+import LoadingLOTR from "@/components/Commons/LoadingLOTR.vue";
+import ModalError from "@/components/Commons/ModalError.vue";
+import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 
+// eslint-disable-next-line no-undef
 const props = defineProps<{ torneo: TorneoEquipoGestionInfoDTO | null }>();
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
@@ -194,20 +211,21 @@ const mostrarListas = ref(props.torneo?.torneo.mostrarListas);
 
 watch(
   () => props.torneo?.torneo.mostrarListas,
-  (nuevoValor) => {
+  nuevoValor => {
     mostrarListas.value = nuevoValor;
   }
 );
 
 watch(
   () => props.torneo?.torneo.mostrarClasificacion,
-  (nuevoValor) => {
+  nuevoValor => {
     mostrarClasificacion.value = nuevoValor;
   }
 );
 
 const idTorneo = ref<number>(0);
 const isLoading = ref<boolean>(false);
+const isDownloading = ref<boolean>(false);
 const torneoMod = ref<Torneo>({
   idTorneo: 0,
   idUsuario: 0,
@@ -236,7 +254,7 @@ const torneoMod = ref<Torneo>({
   listasPorJugador: 0,
   mostrarListas: false,
   mostrarClasificacion: false,
-  classificationType: ClassificationType.NORMAL
+  classificationType: ClassificationType.NORMAL,
 });
 
 const plazasRestantes = computed(() => {
@@ -263,7 +281,7 @@ const totalJugadores = computed(() => {
 
 const pagosRealizados = computed(() => {
   if (!props.torneo) return 0;
-  return props.torneo.equipos.filter((equipo) => equipo.esPago === "SI").length;
+  return props.torneo.equipos.filter(equipo => equipo.esPago === "SI").length;
 });
 
 const listasLegales = computed(() => {
@@ -271,7 +289,7 @@ const listasLegales = computed(() => {
   return props.torneo.equipos.reduce((contador, equipo) => {
     // Para cada equipo, contamos cuántas inscripciones cumplen con los estados
     const listas = equipo.inscripciones.filter(
-      (lista) => lista.estadoLista === "OK"
+      lista => lista.estadoLista === "OK"
     ).length;
 
     // Sumamos el número de listas válidas al contador
@@ -285,7 +303,7 @@ const listasEntregadas = computed(() => {
   return props.torneo.equipos.reduce((contador, equipo) => {
     // Para cada equipo, contamos cuántas inscripciones cumplen con los estados
     const listas = equipo.inscripciones.filter(
-      (lista) =>
+      lista =>
         lista.estadoLista === "OK" ||
         lista.estadoLista === "ENTREGADA" ||
         lista.estadoLista === "ILEGAL"
@@ -381,6 +399,42 @@ const handlerMostrarClasificacion = async () => {
     showErrorModal.value = true;
   } finally {
     isLoading.value = false;
+    showErrorModal.value = false;
+  }
+};
+
+const descargarListasTorneo = async () => {
+  if (
+    props.torneo?.torneo.idTorneo != undefined &&
+    props.torneo?.torneo.idTorneo != 0 &&
+    props.torneo?.torneo.idTorneo != null
+  )
+    idTorneo.value = props.torneo?.torneo.idTorneo;
+
+  try {
+    isDownloading.value = true;
+    const response = await getListasTorneoAsync(idTorneo.value);
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    let fileName = torneoMod?.value?.nombreTorneo
+      ? torneoMod.value.nombreTorneo + ".pdf"
+      : "listas_torneo.pdf";
+    const disposition =
+      response.headers && response.headers["content-disposition"];
+    if (disposition) {
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      if (match && match[1]) fileName = match[1];
+    }
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isDownloading.value = false;
     showErrorModal.value = false;
   }
 };
