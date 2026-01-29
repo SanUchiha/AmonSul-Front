@@ -26,62 +26,63 @@
       <p><strong>Listas de luz:</strong> {{ listasLuz }}</p>
       <p><strong>Listas de oscuridad:</strong> {{ listasOscuridad }}</p>
     </v-card-text>
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title>
-          <div class="flex-column align-items-center">
-            <div class="text-wrap text-sm">
-              <v-btn
-                class="mt-2"
-                variant="tonal"
-                color="secondary"
-                @click="modificarTorneo()"
-              >
-                Modificar torneo
-              </v-btn>
-            </div>
+    <v-card-actions>
+      <v-row>
+        <v-col>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            @click="modificarTorneo"
+            block
+            >Modificar torneo</v-btn
+          >
+        </v-col>
+        <v-col>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            @click="modificarBasesTorneo"
+            block
+            >Modificar bases</v-btn
+          >
+        </v-col>
 
-            <div class="text-wrap text-sm">
-              <v-btn
-                class="mt-2"
-                variant="tonal"
-                color="secondary"
-                @click="modificarBasesTorneo()"
-              >
-                Modificar bases
-              </v-btn>
-            </div>
+        <v-col>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            @click="handlerMostrarListas"
+            block
+            >{{ mostrarListas ? "Ocultar" : "Mostrar" }} Listas</v-btn
+          >
+        </v-col>
 
-            <div class="text-wrap text-sm">
-              <v-btn
-                class="mt-2"
-                variant="tonal"
-                color="secondary"
-                @click="handlerMostrarListas"
-              >
-                {{ mostrarListas ? "Ocultar" : "Mostrar" }} Listas
-              </v-btn>
-
-              <div class="text-wrap text-sm">
-                <v-btn
-                  class="mt-2"
-                  variant="tonal"
-                  color="secondary"
-                  @click="handlerMostrarClasificacion"
-                >
-                  {{ mostrarClasificacion ? "Ocultar" : "Mostrar" }}
-                  Clasificacion
-                </v-btn>
-              </div>
-            </div>
-
-            <v-spacer class="my-4"></v-spacer>
-
-            <CardAddTorneoLiga :idTorneo="props.torneo?.torneo.idTorneo!" />
-          </div>
-        </v-list-item-title>
-      </v-list-item-content>
-    </v-list-item>
+        <v-col>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            @click="handlerMostrarClasificacion"
+            block
+            >{{
+              mostrarClasificacion ? "Ocultar" : "Mostrar"
+            }}
+            Clasificación</v-btn
+          > </v-col
+        ><v-col>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            @click="descargarListasTorneo"
+            block
+          >
+            Descargar Listas</v-btn
+          >
+        </v-col>
+        <v-col>
+          <CardAddTorneoLiga :idTorneo="props.torneo?.torneo.idTorneo!" />
+        </v-col>
+      </v-row>
+    </v-card-actions>
   </v-card>
 
   <!-- modal para modificar el torneo -->
@@ -126,18 +127,25 @@
     message="No se han podido modificar el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
+  <LoadingLOTR
+    :isVisible="isDownloading"
+    mensaje="Generando PDF, por favor espera..."
+  />
 </template>
 
 <script setup lang="ts">
 import { Torneo, TorneoGestionInfoDTO } from "@/interfaces/Torneo";
 import { computed, ref } from "vue";
 import ModalModificarTorneo from "./ModalModificarTorneo.vue";
-import { getTorneo } from "@/services/TorneosService";
+import { getListasTorneoAsync, getTorneo } from "@/services/TorneosService";
 import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
 import CardAddTorneoLiga from "./CardAddTorneoLiga.vue";
 import ModalHandlerMostrarListas from "./ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "./ModalHandlerMostrarClasificacion.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
+import ModalError from "../Commons/ModalError.vue";
+import ModalSuccess from "../Commons/ModalSuccess.vue";
+import LoadingLOTR from "../Commons/LoadingLOTR.vue";
 
 // eslint-disable-next-line
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
@@ -152,6 +160,7 @@ const mostrarClasificacion = ref(props.torneo?.torneo.mostrarClasificacion);
 
 const idTorneo = ref<number>(0);
 const isLoading = ref<boolean>(false);
+const isDownloading = ref<boolean>(false);
 const torneoMod = ref<Torneo>({
   idTorneo: 0,
   idUsuario: 0,
@@ -336,6 +345,42 @@ const handlerMostrarClasificacion = async () => {
     showErrorModal.value = true;
   } finally {
     isLoading.value = false;
+    showErrorModal.value = false;
+  }
+};
+
+const descargarListasTorneo = async () => {
+  if (
+    props.torneo?.torneo.idTorneo != undefined &&
+    props.torneo?.torneo.idTorneo != 0 &&
+    props.torneo?.torneo.idTorneo != null
+  )
+    idTorneo.value = props.torneo?.torneo.idTorneo;
+
+  try {
+    isDownloading.value = true;
+    const response = await getListasTorneoAsync(idTorneo.value);
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    let fileName = torneoMod?.value?.nombreTorneo
+      ? torneoMod.value.nombreTorneo + ".pdf"
+      : "listas_torneo.pdf";
+    const disposition =
+      response.headers && response.headers["content-disposition"];
+    if (disposition) {
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      if (match && match[1]) fileName = match[1];
+    }
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error(error);
+    showErrorModal.value = true;
+  } finally {
+    isDownloading.value = false;
     showErrorModal.value = false;
   }
 };
