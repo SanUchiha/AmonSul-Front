@@ -7,7 +7,13 @@
 
       <v-card-text>
         <v-form ref="form" v-model="isValid" lazy-validation>
-          <v-snackbar v-model="showToast" :color="toastColor" timeout="2000" top right>
+          <v-snackbar
+            v-model="showToast"
+            :color="toastColor"
+            timeout="2000"
+            top
+            right
+          >
             <div style="white-space: pre-line">{{ toastMessage }}</div>
           </v-snackbar>
           <!-- Nombre del torneo -->
@@ -16,9 +22,8 @@
             label="Nombre del torneo"
             required
             type="text"
-            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            :rules="[(v: string) => !!v || 'Campo obligatorio']"
             :error="missingFieldsSet.has('Nombre del torneo')"
-
           ></v-text-field>
 
           <!-- Descripción del torneo -->
@@ -39,7 +44,6 @@
             required
             :loading="isSearching"
             :error="missingFieldsSet.has('Dirección del torneo')"
-
           >
             <template v-slot:append>
               <v-btn color="primary" variant="tonal" @click="searchLocation"
@@ -77,8 +81,10 @@
             label="Limite de jugadores"
             required
             type="number"
-            :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
-               (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :rules="[
+              (v: number) => !isNaN(v) || 'Debe ser un número',
+              (v: number) => v > 0 || 'Debe ser mayor que 0',
+            ]"
             :error="missingFieldsSet.has('Limite de jugadores')"
           ></v-text-field>
 
@@ -88,8 +94,10 @@
             label="¿A cuantos puntos es el torneo?"
             required
             type="number"
-            :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
-               (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :rules="[
+              (v: number) => !isNaN(v) || 'Debe ser un número',
+              (v: number) => v > 0 || 'Debe ser mayor que 0',
+            ]"
             :error="missingFieldsSet.has('Puntos del torneo')"
           ></v-text-field>
 
@@ -99,8 +107,10 @@
             label="¿Cúantas listas necesitará un jugador?"
             required
             type="number"
-            :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
-               (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :rules="[
+              (v: number) => !isNaN(v) || 'Debe ser un número',
+              (v: number) => v > 0 || 'Debe ser mayor que 0',
+            ]"
             :error="missingFieldsSet.has('Listas por jugador')"
           ></v-text-field>
 
@@ -110,8 +120,10 @@
             label="¿Cuantas rondas tiene el torneo?"
             required
             type="number"
-            :rules="[(v: number) => !isNaN(v) || 'Debe ser un número',
-               (v: number) => v > 0 || 'Debe ser mayor que 0']"
+            :rules="[
+              (v: number) => !isNaN(v) || 'Debe ser un número',
+              (v: number) => v > 0 || 'Debe ser mayor que 0',
+            ]"
             :error="missingFieldsSet.has('Numero de rondas')"
           ></v-text-field>
 
@@ -121,11 +133,11 @@
             label="¿De qué tipo es el torneo?"
             required
             :items="['Individual', 'Parejas', 'Equipos de 4', 'Equipos de 6']"
-            :rules="[(v:string) => !!v || 'Campo obligatorio']"
+            :rules="[(v: string) => !!v || 'Campo obligatorio']"
             :error="missingFieldsSet.has('Tipo de torneo')"
           />
 
-           <!-- Tipo de clasificación -->
+          <!-- Tipo de clasificación -->
           <v-select
             v-model="classificationType"
             label="¿Qué tipo de clasificación se utilizará?"
@@ -133,7 +145,7 @@
             :items="classificationTypeOptions"
             item-title="label"
             item-value="value"
-            :rules="[(v:number) => !!v || 'Campo obligatorio']"
+            :rules="[(v: number) => !!v || 'Campo obligatorio']"
             :error="missingFieldsSet.has('Tipo de clasificación')"
           />
 
@@ -270,7 +282,7 @@
             label="Hora de inicio del torneo (HH:MM)"
             clearable
             :rules="[
-              (v:any) =>
+              (v: any) =>
                 /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(v) ||
                 'Formato debe ser HH:MM',
             ]"
@@ -281,7 +293,7 @@
             label="Hora de finalización del torneo (HH:MM)"
             clearable
             :rules="[
-              (v:any) =>
+              (v: any) =>
                 /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(v) ||
                 'Formato debe ser HH:MM',
             ]"
@@ -333,7 +345,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, watch } from "vue";
+import { ref, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { CrearTorneoDTO } from "@/interfaces/Torneo";
@@ -341,7 +353,10 @@ import { crearTorneo } from "@/services/TorneosService";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
-import { ClassificationType, ClassificationTypeLabels } from "@/Constant/TipoClasificacion";
+import {
+  ClassificationType,
+  ClassificationTypeLabels,
+} from "@/Constant/TipoClasificacion";
 
 const showToast = ref<boolean>(false);
 const toastMessage = ref<string>("");
@@ -418,10 +433,12 @@ const formatAddress = (data: any): string => {
     .join(", ");
 };
 
+// eslint-disable-next-line no-undef
 const props = defineProps<{
   isVisible: boolean;
   idUsuario: number;
 }>();
+// eslint-disable-next-line no-undef
 const emit = defineEmits(["close", "confirm"]);
 
 const internalIsVisible = ref(props.isVisible);
@@ -429,7 +446,7 @@ const isValid = ref(true);
 
 watch(
   () => props.isVisible,
-  (newValue) => {
+  newValue => {
     internalIsVisible.value = newValue;
   }
 );
@@ -525,9 +542,18 @@ watch(
 );
 
 const classificationTypeOptions = [
-  { label: ClassificationTypeLabels[ClassificationType.NORMAL], value: ClassificationType.NORMAL },
-  { label: ClassificationTypeLabels[ClassificationType.EXTENDED], value: ClassificationType.EXTENDED },
-  { label: ClassificationTypeLabels[ClassificationType.ALEMAN], value: ClassificationType.ALEMAN },
+  {
+    label: ClassificationTypeLabels[ClassificationType.NORMAL],
+    value: ClassificationType.NORMAL,
+  },
+  {
+    label: ClassificationTypeLabels[ClassificationType.EXTENDED],
+    value: ClassificationType.EXTENDED,
+  },
+  {
+    label: ClassificationTypeLabels[ClassificationType.ALEMAN],
+    value: ClassificationType.ALEMAN,
+  },
 ];
 
 const convertirFecha = (dateString: string) => {
@@ -548,7 +574,7 @@ const onImageSelected = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const img = new Image();
       img.onload = () => {
         const maxWidth = 500; // Cambia esto al ancho máximo deseado
@@ -573,7 +599,7 @@ const onImageSelected = async (event: Event) => {
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
           // Convertir el canvas a base64
-          imageBase64.value = canvas.toDataURL("image/jpeg", 0.7); // Ajusta la calidad de 0 a 1
+          imageBase64.value = canvas.toDataURL("image/jpeg", 1); // Ajusta la calidad de 0 a 1
         }
       };
       img.src = e.target?.result as string;
@@ -588,7 +614,7 @@ const onFileChange = (event: Event) => {
   if (file) {
     const reader = new FileReader();
 
-    reader.onload = async (event) => {
+    reader.onload = async event => {
       if (event.target?.result) {
         const arrayBuffer = event.target.result as ArrayBuffer;
         byteArrayBases.value = new Uint8Array(arrayBuffer);
@@ -625,7 +651,6 @@ const confirmarConfiguracion = async () => {
     if (!tipoTorneo.value) missingFields.push("Tipo de torneo");
     if (!classificationType.value) missingFields.push("Tipo de clasificación");
     if (!numeroPartidas.value) missingFields.push("Número de partidas");
-
 
     missingFieldsSet.value = new Set(missingFields);
 
