@@ -63,8 +63,9 @@
 import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
 import { appsettings } from "@/settings/appsettings";
-import { defineProps, defineEmits, ref, watch, computed } from "vue";
+import { ref, watch, computed } from "vue";
 
+// eslint-disable-next-line no-undef
 const props = defineProps<{
   isVisible: boolean;
   idLista: number;
@@ -103,7 +104,7 @@ const onImageSelected = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const img = new Image();
       img.onload = () => {
         const maxWidth = 500; // Cambia esto al ancho máximo deseado
@@ -128,7 +129,7 @@ const onImageSelected = async (event: Event) => {
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
           // Convertir el canvas a base64
-          imageBase64.value = canvas.toDataURL("image/jpeg", 0.7); // Ajusta la calidad de 0 a 1
+          imageBase64.value = canvas.toDataURL("image/jpeg", 1); // Ajusta la calidad de 0 a 1
         }
       };
       img.src = e.target?.result as string;
@@ -139,11 +140,12 @@ const onImageSelected = async (event: Event) => {
 
 watch(
   () => props.isVisible,
-  (newVal) => {
+  newVal => {
     internalIsVisible.value = newVal;
   }
 );
 
+// eslint-disable-next-line no-undef
 const emit = defineEmits(["update:isVisible", "enviarLista"]);
 
 const close = () => {
@@ -152,9 +154,12 @@ const close = () => {
 };
 
 const enviarLista = () => {
+  if (!imageBase64.value || !ejercitoSelected.value) {
+    return;
+  }
   const newLista: RequesListaDTO = {
-    listaData: imageBase64.value!,
-    ejercito: ejercitoSelected.value!,
+    listaData: imageBase64.value,
+    ejercito: ejercitoSelected.value,
     idUsuario: 0,
     nick: "",
   };
