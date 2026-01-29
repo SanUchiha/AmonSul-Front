@@ -936,6 +936,8 @@ const resultados = async (ronda: number) => {
       generarRondaDTO: partidasUltimasRonda,
     };
     await guardarResultados(guardarResultadosDTO);
+    wasSave.value = true;
+
     showSuccessModal.value = true;
   } catch (error) {
     showErrorModal.value = true;

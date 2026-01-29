@@ -842,42 +842,6 @@ onMounted(async () => {
 });
 
 const resultados = async (ronda: number) => {
-  // //TODO  domadores
-  // if (torneo.value?.idTorneo == 7) {
-  //   try {
-  //     isGenerating.value = true;
-  //     const resultados1: Resultado[] = clasificacionZona1.value.map(
-  //       (clasificacion, index) => {
-  //         return {
-  //           idUsuario: clasificacion.idUsuario,
-  //           idTorneo: torneo.value?.idTorneo,
-  //           resultado: index + 1,
-  //         };
-  //       }
-  //     );
-
-  //     await guardarResultados(resultados1);
-
-  //     const resultados2: Resultado[] = clasificacionZona2.value.map(
-  //       (clasificacion, index) => {
-  //         return {
-  //           idUsuario: clasificacion.idUsuario,
-  //           idTorneo: torneo.value?.idTorneo,
-  //           resultado: index + 1,
-  //         };
-  //       }
-  //     );
-
-  //     await guardarResultados(resultados2);
-
-  //     showSuccessModal.value = true;
-  //   } catch (error) {
-  //     showErrorModal.value = true;
-  //     console.error(error);
-  //   } finally {
-  //     isGenerating.value = false;
-  //   }
-
   try {
     isGenerating.value = true;
     const ganadores: ResultadoJugador[] = clasificacion.value.map(
@@ -910,6 +874,7 @@ const resultados = async (ronda: number) => {
       generarRondaDTO: partidasUltimasRonda,
     };
     await guardarResultados(guardarResultadosDTO);
+    wasSave.value = true;
     showSuccessModal.value = true;
   } catch (error) {
     showErrorModal.value = true;
