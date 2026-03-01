@@ -151,7 +151,5 @@ export const getEquiposDisponiblesAsync = async (idTorneo: number) => {
 };
 
 export const getListasTorneoAsync = async (idTorneo: number) => {
-  return http.get(`Torneo/Gestion/Listas-Pdf/${idTorneo}`, {
-    responseType: "blob",
-  });
+  return http.get(`Torneo/Gestion/Listas/${idTorneo}`);
 };

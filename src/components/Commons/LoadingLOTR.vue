@@ -13,6 +13,7 @@
           "Todo lo que tenemos que decidir es qué hacer con el tiempo que se nos
           ha dado."
         </div>
+        <slot />
       </v-card-text>
     </v-card>
   </v-dialog>

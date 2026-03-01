@@ -1,3 +1,14 @@
+// DTO para la descarga de listas completas de un torneo
+export interface ListaCompletaDTO {
+  idLista: number;
+  idInscripcion: number;
+  nick: string;
+  listaData?: string;
+  bando?: string;
+  ejercito?: string;
+  estadoLista?: string;
+  fechaEntrega?: string; // DateOnly se serializa como string (YYYY-MM-DD)
+}
 import { ArmyDTO } from "./Army";
 
 export interface CrearListaTorneoRequestDTO {
