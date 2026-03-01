@@ -196,6 +196,8 @@ import { ClassificationType } from "@/Constant/TipoClasificacion";
 import LoadingLOTR from "@/components/Commons/LoadingLOTR.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
+import { ListaCompletaDTO } from "@/interfaces/Lista";
+import jsPDF from "jspdf";
 
 // eslint-disable-next-line no-undef
 const props = defineProps<{ torneo: TorneoEquipoGestionInfoDTO | null }>();
@@ -403,6 +405,14 @@ const handlerMostrarClasificacion = async () => {
   }
 };
 
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+}
+
 const descargarListasTorneo = async () => {
   if (
     props.torneo?.torneo.idTorneo != undefined &&
@@ -413,23 +423,50 @@ const descargarListasTorneo = async () => {
 
   try {
     isDownloading.value = true;
+    // Llama al endpoint para obtener las listas completas
     const response = await getListasTorneoAsync(idTorneo.value);
-    const blob = new Blob([response.data], { type: "application/pdf" });
-    let fileName = torneoMod?.value?.nombreTorneo
-      ? torneoMod.value.nombreTorneo + ".pdf"
-      : "listas_torneo.pdf";
-    const disposition =
-      response.headers && response.headers["content-disposition"];
-    if (disposition) {
-      const match = disposition.match(/filename="?([^";]+)"?/);
-      if (match && match[1]) fileName = match[1];
+    const listas: ListaCompletaDTO[] = response.data;
+
+    const chunkedListas = chunkArray(listas, 40);
+    console.log("Listas chunked:", chunkedListas);
+    for (let i = 0; i < chunkedListas.length; i++) {
+      const doc = new jsPDF();
+      let y = 10;
+      chunkedListas[i].forEach((lista, idx) => {
+        doc.text(`Nick: ${lista.nick}`, 10, y);
+        y += 7;
+        console.log(lista.nick);
+        doc.text(
+          `Ejército: ${lista.ejercito || "-"} | Bando: ${lista.bando || "-"} | Estado: ${lista.estadoLista || "-"}`,
+          10,
+          y
+        );
+        y += 7;
+        doc.text(`Lista:`, 10, y);
+        y += 7;
+        // Divide ListaData en líneas si es muy larga
+        if (lista.listaData) {
+          const lines = doc.splitTextToSize(lista.listaData, 180);
+          doc.text(lines, 10, y);
+          y += lines.length * 7;
+        }
+        doc.line(10, y, 200, y); // separador
+        y += 10;
+        // Nueva página si se pasa del límite
+        if (y > 270 && idx < chunkedListas[i].length - 1) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+      const baseName = torneoMod?.value?.nombreTorneo
+        ? torneoMod.value.nombreTorneo + "_listas"
+        : "listas_torneo";
+      const fileName =
+        chunkedListas.length > 1
+          ? `${baseName}_${i + 1}.pdf`
+          : `${baseName}.pdf`;
+      doc.save(fileName);
     }
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;

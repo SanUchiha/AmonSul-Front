@@ -360,16 +360,30 @@ const descargarListasTorneo = async () => {
   try {
     isDownloading.value = true;
     const response = await getListasTorneoAsync(idTorneo.value);
-    const blob = new Blob([response.data], { type: "application/pdf" });
+    console.log("Respuesta del servidor recibida:", response);
     let fileName = torneoMod?.value?.nombreTorneo
-      ? torneoMod.value.nombreTorneo + ".pdf"
-      : "listas_torneo.pdf";
+      ? torneoMod.value.nombreTorneo
+      : "listas_torneo";
+    let contentType = response.headers["content-type"];
+    if (contentType.includes("application/pdf")) {
+      fileName += ".pdf";
+    } else if (contentType.includes("application/zip")) {
+      fileName += ".zip";
+    }
     const disposition =
       response.headers && response.headers["content-disposition"];
     if (disposition) {
       const match = disposition.match(/filename="?([^";]+)"?/);
       if (match && match[1]) fileName = match[1];
     }
+    console.log("Archivo descargado:", fileName);
+    // Detecta el tipo MIME según la extensión
+    const fileType = fileName.endsWith(".zip")
+      ? "application/zip"
+      : "application/pdf";
+
+    console.log("Tipo de archivo detectado:", fileType);
+    const blob = new Blob([response.data], { type: fileType });
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
     link.download = fileName;
