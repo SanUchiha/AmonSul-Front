@@ -180,7 +180,15 @@
   <LoadingLOTR
     :isVisible="isDownloading"
     mensaje="Generando PDF, por favor espera..."
-  />
+  >
+    <template #default>
+      <div v-if="isDownloading" style="margin-top: 10px">
+        <div style="text-align: center; font-size: 12px; margin-top: 4px">
+          {{ progressPDF }}%
+        </div>
+      </div>
+    </template>
+  </LoadingLOTR>
 </template>
 
 <script setup lang="ts">
@@ -210,6 +218,8 @@ const showModalHandlerMostrarClasificacion = ref<boolean>(false);
 
 const mostrarClasificacion = ref(props.torneo?.torneo.mostrarClasificacion);
 const mostrarListas = ref(props.torneo?.torneo.mostrarListas);
+
+const progressPDF = ref<number>(0);
 
 watch(
   () => props.torneo?.torneo.mostrarListas,
@@ -423,43 +433,69 @@ const descargarListasTorneo = async () => {
 
   try {
     isDownloading.value = true;
-    // Llama al endpoint para obtener las listas completas
     const response = await getListasTorneoAsync(idTorneo.value);
     const listas: ListaCompletaDTO[] = response.data;
-
     const chunkedListas = chunkArray(listas, 40);
-    console.log("Listas chunked:", chunkedListas);
+    const total = chunkedListas.reduce((acc, arr) => acc + arr.length, 0);
+    let processed = 0;
     for (let i = 0; i < chunkedListas.length; i++) {
       const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       let y = 10;
-      chunkedListas[i].forEach((lista, idx) => {
-        doc.text(`Nick: ${lista.nick}`, 10, y);
-        y += 7;
-        console.log(lista.nick);
-        doc.text(
-          `Ejército: ${lista.ejercito || "-"} | Bando: ${lista.bando || "-"} | Estado: ${lista.estadoLista || "-"}`,
-          10,
-          y
-        );
-        y += 7;
-        doc.text(`Lista:`, 10, y);
-        y += 7;
-        // Divide ListaData en líneas si es muy larga
+      for (let idx = 0; idx < chunkedListas[i].length; idx++) {
+        const lista = chunkedListas[i][idx];
         if (lista.listaData) {
-          const lines = doc.splitTextToSize(lista.listaData, 180);
-          doc.text(lines, 10, y);
-          y += lines.length * 7;
+          const imgMatch = lista.listaData.match(
+            /^data:image\/(png|jpeg|jpg);base64,/
+          );
+          if (imgMatch) {
+            if (idx !== 0) doc.addPage();
+
+            doc.setFontSize(18);
+            doc.text(`${lista.nick}`, pageWidth / 2, 20, { align: "center" });
+
+            const margin = 15;
+            const imgProps = doc.getImageProperties(lista.listaData);
+            let imgWidth = pageWidth - margin * 2;
+            let imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+            if (imgHeight > pageHeight - 40 - margin) {
+              imgHeight = pageHeight - 40 - margin;
+              imgWidth = (imgProps.width * imgHeight) / imgProps.height;
+            }
+            const x = (pageWidth - imgWidth) / 2;
+            const yImg = 30;
+            doc.addImage(
+              lista.listaData,
+              imgMatch[1],
+              x,
+              yImg,
+              imgWidth,
+              imgHeight
+            );
+          } else {
+            doc.text(`${lista.nick}`, 10, y);
+            y += 10;
+            const lines = doc.splitTextToSize(lista.listaData, 180);
+            doc.text(lines, 10, y);
+            y += lines.length * 7;
+            doc.line(10, y, 200, y); // separador
+            y += 10;
+            if (y > 270 && idx < chunkedListas[i].length - 1) {
+              doc.addPage();
+              y = 10;
+            }
+          }
+        } else {
+          doc.text(`${lista.nick}`, 10, y);
+          y += 10;
         }
-        doc.line(10, y, 200, y); // separador
-        y += 10;
-        // Nueva página si se pasa del límite
-        if (y > 270 && idx < chunkedListas[i].length - 1) {
-          doc.addPage();
-          y = 10;
-        }
-      });
-      const baseName = torneoMod?.value?.nombreTorneo
-        ? torneoMod.value.nombreTorneo + "_listas"
+        processed++;
+        progressPDF.value = Math.round((processed / total) * 100);
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      const baseName = props.torneo?.torneo.nombreTorneo
+        ? props.torneo?.torneo.nombreTorneo + "_listas"
         : "listas_torneo";
       const fileName =
         chunkedListas.length > 1
@@ -471,6 +507,7 @@ const descargarListasTorneo = async () => {
     console.error(error);
     showErrorModal.value = true;
   } finally {
+    progressPDF.value = 0;
     isDownloading.value = false;
     showErrorModal.value = false;
   }

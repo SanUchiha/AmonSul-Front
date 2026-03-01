@@ -130,7 +130,15 @@
   <LoadingLOTR
     :isVisible="isDownloading"
     mensaje="Generando PDF, por favor espera..."
-  />
+  >
+    <template #default>
+      <div v-if="isDownloading" style="margin-top: 10px">
+        <div style="text-align: center; font-size: 12px; margin-top: 4px">
+          {{ progressPDF }}%
+        </div>
+      </div>
+    </template>
+  </LoadingLOTR>
 </template>
 
 <script setup lang="ts">
@@ -146,6 +154,8 @@ import { ClassificationType } from "@/Constant/TipoClasificacion";
 import ModalError from "../Commons/ModalError.vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import LoadingLOTR from "../Commons/LoadingLOTR.vue";
+import { ListaCompletaDTO } from "@/interfaces/Lista";
+import jsPDF from "jspdf";
 
 // eslint-disable-next-line
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
@@ -157,6 +167,8 @@ const showModalHandlerMostrarListas = ref<boolean>(false);
 const showModalHandlerMostrarClasificacion = ref<boolean>(false);
 const mostrarListas = ref(props.torneo?.torneo.mostrarListas);
 const mostrarClasificacion = ref(props.torneo?.torneo.mostrarClasificacion);
+
+const progressPDF = ref<number>(0);
 
 const idTorneo = ref<number>(0);
 const isLoading = ref<boolean>(false);
@@ -349,6 +361,14 @@ const handlerMostrarClasificacion = async () => {
   }
 };
 
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+}
+
 const descargarListasTorneo = async () => {
   if (
     props.torneo?.torneo.idTorneo != undefined &&
@@ -360,40 +380,80 @@ const descargarListasTorneo = async () => {
   try {
     isDownloading.value = true;
     const response = await getListasTorneoAsync(idTorneo.value);
-    console.log("Respuesta del servidor recibida:", response);
-    let fileName = torneoMod?.value?.nombreTorneo
-      ? torneoMod.value.nombreTorneo
-      : "listas_torneo";
-    let contentType = response.headers["content-type"];
-    if (contentType.includes("application/pdf")) {
-      fileName += ".pdf";
-    } else if (contentType.includes("application/zip")) {
-      fileName += ".zip";
-    }
-    const disposition =
-      response.headers && response.headers["content-disposition"];
-    if (disposition) {
-      const match = disposition.match(/filename="?([^";]+)"?/);
-      if (match && match[1]) fileName = match[1];
-    }
-    console.log("Archivo descargado:", fileName);
-    // Detecta el tipo MIME según la extensión
-    const fileType = fileName.endsWith(".zip")
-      ? "application/zip"
-      : "application/pdf";
+    const listas: ListaCompletaDTO[] = response.data;
+    const chunkedListas = chunkArray(listas, 40);
+    const total = chunkedListas.reduce((acc, arr) => acc + arr.length, 0);
+    let processed = 0;
+    for (let i = 0; i < chunkedListas.length; i++) {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let y = 10;
+      for (let idx = 0; idx < chunkedListas[i].length; idx++) {
+        const lista = chunkedListas[i][idx];
+        if (lista.listaData) {
+          const imgMatch = lista.listaData.match(
+            /^data:image\/(png|jpeg|jpg);base64,/
+          );
+          if (imgMatch) {
+            if (idx !== 0) doc.addPage();
 
-    console.log("Tipo de archivo detectado:", fileType);
-    const blob = new Blob([response.data], { type: fileType });
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+            doc.setFontSize(18);
+            doc.text(`${lista.nick}`, pageWidth / 2, 20, { align: "center" });
+
+            const margin = 15;
+            const imgProps = doc.getImageProperties(lista.listaData);
+            let imgWidth = pageWidth - margin * 2;
+            let imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+            if (imgHeight > pageHeight - 40 - margin) {
+              imgHeight = pageHeight - 40 - margin;
+              imgWidth = (imgProps.width * imgHeight) / imgProps.height;
+            }
+            const x = (pageWidth - imgWidth) / 2;
+            const yImg = 30;
+            doc.addImage(
+              lista.listaData,
+              imgMatch[1],
+              x,
+              yImg,
+              imgWidth,
+              imgHeight
+            );
+          } else {
+            doc.text(`${lista.nick}`, 10, y);
+            y += 10;
+            const lines = doc.splitTextToSize(lista.listaData, 180);
+            doc.text(lines, 10, y);
+            y += lines.length * 7;
+            doc.line(10, y, 200, y); // separador
+            y += 10;
+            if (y > 270 && idx < chunkedListas[i].length - 1) {
+              doc.addPage();
+              y = 10;
+            }
+          }
+        } else {
+          doc.text(`${lista.nick}`, 10, y);
+          y += 10;
+        }
+        processed++;
+        progressPDF.value = Math.round((processed / total) * 100);
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      const baseName = props.torneo?.torneo.nombreTorneo
+        ? props.torneo?.torneo.nombreTorneo + "_listas"
+        : "listas_torneo";
+      const fileName =
+        chunkedListas.length > 1
+          ? `${baseName}_${i + 1}.pdf`
+          : `${baseName}.pdf`;
+      doc.save(fileName);
+    }
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;
   } finally {
+    progressPDF.value = 0;
     isDownloading.value = false;
     showErrorModal.value = false;
   }
