@@ -435,7 +435,7 @@ const descargarListasTorneo = async () => {
     isDownloading.value = true;
     const response = await getListasTorneoAsync(idTorneo.value);
     const listas: ListaCompletaDTO[] = response.data;
-    const chunkedListas = chunkArray(listas, 40);
+    const chunkedListas = chunkArray(listas, jugadoresXEquipo.value);
     const total = chunkedListas.reduce((acc, arr) => acc + arr.length, 0);
     let processed = 0;
     for (let i = 0; i < chunkedListas.length; i++) {
