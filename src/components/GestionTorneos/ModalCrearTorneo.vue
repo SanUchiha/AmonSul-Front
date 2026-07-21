@@ -147,7 +147,11 @@
             item-value="value"
             :rules="[(v: number) => !!v || 'Campo obligatorio']"
             :error="missingFieldsSet.has('Tipo de clasificación')"
-          />
+          >
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props" :subtitle="item.raw.subtitle" />
+            </template>
+          </v-select>
 
           <!-- fecha de inicio -->
           <v-text-field
@@ -544,14 +548,17 @@ watch(
 const classificationTypeOptions = [
   {
     label: ClassificationTypeLabels[ClassificationType.NORMAL],
+    subtitle: "Victoria: 3pts · Empate: 1pt · Derrota: 0pts",
     value: ClassificationType.NORMAL,
   },
   {
     label: ClassificationTypeLabels[ClassificationType.EXTENDED],
+    subtitle: "Individual (6/5/2/1/0) · Equipos (4/3/2/1/0)",
     value: ClassificationType.EXTENDED,
   },
   {
     label: ClassificationTypeLabels[ClassificationType.ALEMAN],
+    subtitle: "Quien lo quiera utilizar, sabe como funciona",
     value: ClassificationType.ALEMAN,
   },
 ];
