@@ -27,23 +27,29 @@
           ></v-progress-circular>
         </div>
         <div v-else>
-          <v-file-input
-            ref="fileInput"
-            label="Selecciona una imagen"
-            @change="onImageSelected"
-            accept="image/*"
-          ></v-file-input>
+          <div v-if="imageBase64">
+            <img :src="imageBase64" alt="Lista cargada" class="uploaded-image" />
+          </div>
+          <div v-else>
+            <v-file-input
+              ref="fileInput"
+              label="Selecciona una imagen"
+              @change="onImageSelected"
+              accept="image/*"
+            ></v-file-input>
+          </div>
         </div>
       </v-card-text>
       <v-card-actions style="display: flex; justify-content: space-between">
         <v-spacer></v-spacer>
         <div v-if="imageBase64">
+          <v-btn variant="tonal" color="primary" @click="cambiarImagen">Cambiar</v-btn>
           <v-btn
             variant="tonal"
             color="primary"
             @click="enviarLista"
             :disabled="isSendButtonDisabled"
-            style="margin-right: 10px"
+            style="margin-left: 8px; margin-right: 10px"
             >Enviar</v-btn
           >
         </div>
@@ -81,10 +87,7 @@ const ejercitoSelected = ref<ArmyDTO>();
 const listadoEjercitos = ref<ArmyDTO[]>([]);
 const loadingEjercitos = ref(false);
 const isSendButtonDisabled = computed(() => {
-  return (
-    !ejercitoSelected.value ||
-    !listadoEjercitos.value.includes(ejercitoSelected.value)
-  );
+  return !ejercitoSelected.value || !imageBase64.value;
 });
 
 const rules = {
@@ -128,6 +131,13 @@ const emit = defineEmits(["update:isVisible", "enviarLista"]);
 const close = () => {
   emit("update:isVisible", false);
   internalIsVisible.value = false;
+};
+
+const cambiarImagen = () => {
+  if (fileInput.value) {
+    fileInput.value.value = "";
+  }
+  imageBase64.value = null;
 };
 
 const enviarLista = () => {

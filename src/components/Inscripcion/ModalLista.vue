@@ -96,10 +96,7 @@ const ejercitoSelected = ref<ArmyDTO>();
 const listadoEjercitos = ref<ArmyDTO[]>([]);
 const loadingEjercitos = ref<boolean>(false);
 const isSendButtonDisabled = computed(() => {
-  return (
-    !ejercitoSelected.value ||
-    !listadoEjercitos.value.includes(ejercitoSelected.value)
-  );
+  return !ejercitoSelected.value || !imageBase64.value;
 });
 
 const rules = {

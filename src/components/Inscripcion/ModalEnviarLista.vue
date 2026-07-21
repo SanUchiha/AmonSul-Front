@@ -20,39 +20,38 @@
           class="progress-linear-margin"
         ></v-progress-linear>
         <div v-if="isLoading" class="loading-container">
-          <!-- Indicador de carga -->
           <v-progress-circular
             indeterminate
             color="primary"
           ></v-progress-circular>
         </div>
-        <v-file-input
-          label="Selecciona una imagen"
-          @change="onImageSelected"
-          accept="image/*"
-        ></v-file-input>
-
-        <div v-if="isLoading" class="loading-container">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
-        </div>
-
-        <div v-if="imageBase64">
-          <img :src="imageBase64" alt="Lista cargada" class="uploaded-image" />
+        <div v-else>
+          <div v-if="imageBase64">
+            <img :src="imageBase64" alt="Lista cargada" class="uploaded-image" />
+          </div>
+          <div v-else>
+            <v-file-input
+              label="Selecciona una imagen"
+              @change="onImageSelected"
+              accept="image/*"
+            ></v-file-input>
+          </div>
         </div>
       </v-card-text>
 
       <v-card-actions style="display: flex; justify-content: flex-end">
-        <v-btn
-          variant="tonal"
-          color="primary"
-          @click="enviarLista"
-          :disabled="!imageBase64"
-        >
-          Enviar
-        </v-btn>
+        <div v-if="imageBase64">
+          <v-btn variant="tonal" color="primary" @click="cambiarImagen">Cambiar</v-btn>
+          <v-btn
+            variant="tonal"
+            color="primary"
+            @click="enviarLista"
+            :disabled="!imageBase64 || !ejercitoSelected"
+            style="margin-left: 8px"
+          >
+            Enviar
+          </v-btn>
+        </div>
         <v-btn variant="tonal" color="secondary" @click="close">
           Cancelar
         </v-btn>
@@ -94,6 +93,10 @@ const imageBase64 = ref<string | null>(null);
 const ejercitoSelected = ref<ArmyDTO>();
 const listadoEjercitos = ref<ArmyDTO[]>([]);
 const loadingEjercitos = ref<boolean>(false);
+
+const cambiarImagen = () => {
+  imageBase64.value = null;
+};
 
 const onImageSelected = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
