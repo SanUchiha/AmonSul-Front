@@ -76,6 +76,7 @@ import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
 import { getlista } from "@/services/ListasService";
 import { appsettings } from "@/settings/appsettings";
+import { uploadImageToCloudinary } from "@/services/CloudinaryService";
 import { ref, watch, onMounted, computed } from "vue";
 
 // eslint-disable-next-line no-undef
@@ -118,38 +119,14 @@ const loadEjercitos = async () => {
 const onImageSelected = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const maxWidth = 500; // Cambia esto al ancho máximo deseado
-        const maxHeight = 500; // Cambia esto a la altura máxima deseada
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth || height > maxHeight) {
-          if (width > height) {
-            height *= maxWidth / width;
-            width = maxWidth;
-          } else {
-            width *= maxHeight / height;
-            height = maxHeight;
-          }
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          // Convertir el canvas a base64
-          imageBase64.value = canvas.toDataURL("image/jpeg", 1); // Ajusta la calidad de 0 a 1
-        }
-      };
-      img.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    isLoading.value = true;
+    try {
+      imageBase64.value = await uploadImageToCloudinary(file);
+    } catch (error) {
+      console.error("Error al subir la imagen:", error);
+    } finally {
+      isLoading.value = false;
+    }
   }
 };
 

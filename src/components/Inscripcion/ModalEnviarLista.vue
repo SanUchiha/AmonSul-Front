@@ -65,6 +65,7 @@
 import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
 import { appsettings } from "@/settings/appsettings";
+import { uploadImageToCloudinary } from "@/services/CloudinaryService";
 import { defineProps, defineEmits, ref, computed, watch } from "vue";
 
 const props = defineProps<{
@@ -94,40 +95,17 @@ const ejercitoSelected = ref<ArmyDTO>();
 const listadoEjercitos = ref<ArmyDTO[]>([]);
 const loadingEjercitos = ref<boolean>(false);
 
-const onImageSelected = (event: Event) => {
+const onImageSelected = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const maxWidth = 500;
-        const maxHeight = 500;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth || height > maxHeight) {
-          if (width > height) {
-            height *= maxWidth / width;
-            width = maxWidth;
-          } else {
-            width *= maxHeight / height;
-            height = maxHeight;
-          }
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          imageBase64.value = canvas.toDataURL("image/jpeg", 1);
-        }
-      };
-      img.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    isLoading.value = true;
+    try {
+      imageBase64.value = await uploadImageToCloudinary(file);
+    } catch (error) {
+      console.error("Error al subir la imagen:", error);
+    } finally {
+      isLoading.value = false;
+    }
   }
 };
 
