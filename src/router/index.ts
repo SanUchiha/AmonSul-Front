@@ -20,8 +20,8 @@ import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
 import MisPartidasView from "@/views/MisPartidasView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
 import LigasView from "@/views/LigasView.vue";
-import AboutUsView from "@/views/AboutUsView.vue";
 import DetalleTorneoGestionIndividualMasView from "@/views/DetalleTorneoGestionIndividualMasView.vue";
+import HomeView from "@/views/HomeView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -53,12 +53,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/gestion-torneos",
     name: "gestion-torneos",
     component: GestionTorneosView,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/about-us",
-    name: "about-us",
-    component: AboutUsView,
     meta: { requiresAuth: true },
   },
   {
@@ -156,6 +150,12 @@ const routes: Array<RouteRecordRaw> = [
     component: ErrorView,
   },
 
+  {
+    path: "/home",
+    name: "home",
+    component: HomeView,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/",
     redirect: { name: "inicio-sesion" },
