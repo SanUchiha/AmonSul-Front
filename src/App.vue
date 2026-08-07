@@ -14,6 +14,19 @@
       </v-list-item>
       <v-divider></v-divider>
       <v-list class="ringbearer">
+        <v-list-item link to="/home" v-if="isAuthenticated">
+          <v-list-item-content class="d-flex ga-2">
+            <v-list-item-icon>
+              <img
+                src="@/assets/icons/logo_redondo.png"
+                alt="Icono personalizado"
+                width="30"
+                height="30"
+              />
+            </v-list-item-icon>
+            <v-list-item-title class="mt-1">Home</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item link to="/mis-partidas" v-if="isAuthenticated">
           <v-list-item-content class="d-flex ga-2">
             <v-list-item-icon>
@@ -116,19 +129,6 @@
               />
             </v-list-item-icon>
             <v-list-item-title class="mt-1">Perfil</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link to="/about-us" v-if="isAuthenticated">
-          <v-list-item-content class="d-flex ga-2">
-            <v-list-item-icon>
-              <img
-                src="@/assets/icons/sobreNosotros.png"
-                alt="Icono personalizado"
-                width="30"
-                height="30"
-              />
-            </v-list-item-icon>
-            <v-list-item-title class="mt-1">Sobre nosotros</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>

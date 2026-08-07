@@ -69,7 +69,7 @@ watch(
 const handlerOk = () => {
   emits("update:isVisible", false);
   internalVisible.value = false;
-  router.push({ name: "mis-partidas" });
+  router.push({ name: "home" });
 };
 
 const handleKeyDown = (event: KeyboardEvent) => {
