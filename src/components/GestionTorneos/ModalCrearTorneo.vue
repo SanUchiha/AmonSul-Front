@@ -302,6 +302,16 @@
                 'Formato debe ser HH:MM',
             ]"
           ></v-text-field>
+
+          <!-- Contacto (opcional) -->
+          <v-text-field
+            v-model="contacto"
+            label="Contacto (email o teléfono, opcional)"
+            hint="El contacto será visible si se rellena"
+            persistent-hint
+            clearable
+            type="text"
+          ></v-text-field>
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -486,6 +496,7 @@ const esMatchedPlayTorneo = ref<boolean>(false);
 const metodosPago = ref<string>("");
 const horaInicioTorneo = ref<string>("00:00");
 const horaFinTorneo = ref<string>("00:00");
+const contacto = ref<string | undefined>(undefined);
 const fechaInicioInscripcion = ref<string>("");
 const fechaInicioTorneo = ref<string>("");
 const fechaFinTorneo = ref<string>("");
@@ -707,6 +718,7 @@ const confirmarConfiguracion = async () => {
     inicioInscripciones: fechaInicioInscripcion.value ?? "",
     listasPorJugador: listasPorJugador.value ?? 1,
     classificationType: classificationType.value ?? ClassificationType.NORMAL,
+    contacto: contacto.value || undefined,
   };
   try {
     isGenerating.value = true;
@@ -742,6 +754,7 @@ const resetElement = () => {
   descripcionTorneo.value = "";
   fechaInicioInscripcion.value = "";
   listasPorJugador.value = 1;
+  contacto.value = undefined;
 };
 
 const today = new Date().toISOString().split("T")[0];

@@ -68,6 +68,12 @@ export default {
       novedades: [
         {
           fecha: "Agosto 2026",
+          titulo: "Contacto en torneos",
+          descripcion:
+            "Los organizadores ya pueden añadir un email o teléfono de contacto al crear un torneo. Si se rellena, será visible para los jugadores en el detalle del torneo.",
+        },
+        {
+          fecha: "Agosto 2026",
           titulo: "Vista Home",
           descripcion:
             "Nueva pantalla de bienvenida con novedades y resumen de funcionalidades de la app.",
