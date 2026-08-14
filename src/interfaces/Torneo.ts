@@ -34,6 +34,7 @@ export interface Torneo {
   mostrarListas: boolean;
   mostrarClasificacion: boolean;
   classificationType: ClassificationType;
+  contacto?: string;
 }
 
 export interface TorneoReducidoDTO {
@@ -146,6 +147,7 @@ export interface CrearTorneoDTO {
   horaFinTorneo: string; // formato de hora "HH:mm:ss"
   listasPorJugador: number;
   classificationType: ClassificationType;
+  contacto?: string;
 }
 
 export interface ModificarTorneoDTO {
@@ -174,6 +176,7 @@ export interface ModificarTorneoDTO {
   inicioInscripciones?: string; // Fecha límite de inscripción
   listasPorJugador: number;
   classificationType: ClassificationType;
+  contacto?: string;
 }
 
 export interface ModificarBasesTorneoDTO {

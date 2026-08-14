@@ -108,6 +108,23 @@
                         </p>
                       </v-col>
                     </v-row>
+
+                    <v-row v-if="torneo.contacto">
+                      <v-col cols="12">
+                        <p>
+                          <v-icon left color="blue-grey">mdi-contacts</v-icon>
+                          <strong>Contacto:</strong> {{ torneo.contacto }}
+                        </p>
+                      </v-col>
+                    </v-row>
+                    <v-row v-else>
+                      <v-col cols="12">
+                        <p class="text-body-2 text-medium-emphasis">
+                          <v-icon left size="small">mdi-information-outline</v-icon>
+                          Para más información consulta las bases del torneo.
+                        </p>
+                      </v-col>
+                    </v-row>
                   </v-card-text>
 
                   <v-divider class="mb-3"></v-divider>
