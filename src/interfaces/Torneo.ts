@@ -247,3 +247,12 @@ export interface EquipoDisponibleParaModificacionDTO {
   idEquipo: number;
   nombreEquipo: string;
 }
+
+export interface ResumenTorneoDTO {
+  fecha: string;
+  listasVisibles: boolean;
+  numeroRondas: number;
+  rondas: boolean[];
+  clasificacionVisible: boolean;
+  ganadores: string[];
+}

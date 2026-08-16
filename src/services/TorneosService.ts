@@ -153,3 +153,7 @@ export const getEquiposDisponiblesAsync = async (idTorneo: number) => {
 export const getListasTorneoAsync = async (idTorneo: number) => {
   return http.get(`Torneo/Gestion/Listas/${idTorneo}`);
 };
+
+export const getResumenTorneoAsync = async (idTorneo: number) => {
+  return http.get(`Torneo/resumen/${idTorneo}`);
+};
