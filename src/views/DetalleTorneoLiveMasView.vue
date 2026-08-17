@@ -7,6 +7,11 @@
       <!-- TABS -->
       <v-tabs v-model="activeTab" fixed-tabs>
         <v-tab
+          :key="-1"
+          text="Resumen"
+          :value="-1"
+        ></v-tab>
+        <v-tab
           v-if="torneo?.mostrarListas"
           :key="tabListas"
           :text="`Listas`"
@@ -27,14 +32,40 @@
         ></v-tab>
       </v-tabs>
       <!-- Contenido de las Tabs -->
+      <v-btn
+        v-if="activeTab !== -1"
+        variant="text"
+        size="small"
+        prepend-icon="mdi-arrow-left"
+        class="mt-1 mb-1"
+        @click="activeTab = -1"
+      >Resumen</v-btn>
       <v-window v-model="activeTab">
-        <div v-if="partidas.length === 0">
+        <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1">
           <p>Aún no se ha generado ninguna ronda</p>
         </div>
+
+        <!-- Tab Resumen -->
+        <v-window-item :value="-1" :key="-1">
+          <TabResumenTorneo
+            v-if="resumen"
+            :resumen="resumen"
+            :isLoadingPartidas="isLoadingPartidas"
+            :idTorneo="idTorneo"
+            :nombreTorneo="torneo?.nombreTorneo"
+            @go-listas="activeTab = tabListas"
+            @go-clasificacion="activeTab = tabClasificacion"
+            @go-ronda="(n) => (activeTab = n)"
+          />
+        </v-window-item>
 
         <!-- tab dinamicas -->
         <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
           <v-row>
+            <v-col v-if="isLoadingPartidas" cols="12" class="d-flex justify-center pa-8">
+              <v-progress-circular indeterminate color="primary" />
+            </v-col>
+            <template v-else>
             <v-col
               cols="12"
               sm="12"
@@ -42,9 +73,8 @@
               lg="6"
               xl="4"
               class="pb-0"
-              v-for="(partida, index) in partidasPorRonda[activeTab!]"
+              v-for="(partida, index) in partidasPorRonda[n]"
               :key="partida.idPartidaTorneo"
-              :value="activeTab"
             >
               <!-- Partida completada -->
               <div
@@ -74,6 +104,7 @@
                 />
               </div>
             </v-col>
+            </template>
           </v-row>
         </v-window-item>
 
@@ -230,6 +261,7 @@
 <script setup lang="ts">
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import CardPartidaTorneoMasLive from "@/components/PartidasTorneo/CardPartidaTorneoMasLive.vue";
+import TabResumenTorneo from "@/components/GestionTorneos/TabResumenTorneo.vue";
 import { useAuth } from "@/composables/useAuth";
 import {
   ResultMatchMatchedPlayType,
@@ -239,9 +271,9 @@ import {
 } from "@/Constant/TipoClasificacion";
 import { Clasificacion } from "@/interfaces/Live";
 import { PartidaTorneoMasDTO } from "@/interfaces/Partidas";
-import { InscripcionTorneoCreadoDTO, Torneo } from "@/interfaces/Torneo";
+import { InscripcionTorneoCreadoDTO, ResumenTorneoDTO, Torneo } from "@/interfaces/Torneo";
 import { getInscripcionesTorneo } from "@/services/InscripcionesService";
-import { getPartidasTorneoMas, getTorneo } from "@/services/TorneosService";
+import { getPartidasTorneoMas, getResumenTorneoAsync, getTorneo } from "@/services/TorneosService";
 import { appsettings } from "@/settings/appsettings";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
 import { onMounted, ref } from "vue";
@@ -258,7 +290,8 @@ const partidasPorRonda = ref<Record<number, PartidaTorneoMasDTO[]>>({});
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 const idUsuario = ref<number>();
-const activeTab = ref(1);
+const activeTab = ref(-1);
+const TAB_RESUMEN = -1;
 const tabClasificacion = ref<number>(1);
 const tabListas = ref<number>(0);
 const clasificacion = ref<Clasificacion[]>([]);
@@ -268,54 +301,58 @@ const clasificacionDividida = ref<Clasificacion[]>([]);
 const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
 const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
+const resumen = ref<ResumenTorneoDTO | null>(null);
+const isLoadingPartidas = ref(true);
 
 onMounted(async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
   isLoading.value = true;
 
-  try {
-    const responseTorneo = await getTorneo(idTorneo.value);
-    torneo.value = responseTorneo.data;
+  // Llamadas críticas en paralelo: en cuanto respondan se muestra la vista
+  const [resTorneo, resResumen] = await Promise.allSettled([
+    getTorneo(idTorneo.value),
+    getResumenTorneoAsync(idTorneo.value),
+  ]);
 
-    const responsePartidas = await getPartidasTorneoMas(idTorneo.value);
-    partidas.value = responsePartidas.data;
+  if (resTorneo.status === "fulfilled") {
+    torneo.value = resTorneo.value.data;
+    numeroRondas.value = Array.from(
+      { length: torneo.value!.numeroPartidas },
+      (_, index) => index + 1
+    );
+    tabClasificacion.value = numeroRondas.value.length + 1;
+  }
 
-    if (torneo.value) {
-      numeroRondas.value = Array.from(
-        { length: torneo.value.numeroPartidas },
-        (_, index) => index + 1
-      );
-    }
-    if (partidas.value) {
+  if (resResumen.status === "fulfilled") {
+    resumen.value = resResumen.value.data;
+  }
+
+  activeTab.value = TAB_RESUMEN;
+  isLoading.value = false;
+
+  // Llamadas secundarias en background — actualizan reactivamente
+  Promise.allSettled([
+    getPartidasTorneoMas(idTorneo.value),
+    getInscripcionesTorneo(idTorneo.value),
+  ]).then(([resPartidas, resInscripciones]) => {
+    if (resPartidas.status === "fulfilled") {
+      partidas.value = resPartidas.value.data;
       partidasPorRonda.value = partidas.value.reduce(
         (acc, partida) => {
           const { numeroRonda } = partida;
-          if (!acc[numeroRonda]) {
-            acc[numeroRonda] = [];
-          }
+          if (!acc[numeroRonda]) acc[numeroRonda] = [];
           acc[numeroRonda].push(partida);
           return acc;
         },
         {} as Record<number, PartidaTorneoMasDTO[]>
       );
+      calcularClasificacion();
     }
-    tabClasificacion.value = numeroRondas.value.length + 1;
-
-    try {
-      const responseInscripciones = await getInscripcionesTorneo(
-        idTorneo.value
-      );
-      inscripciones.value = responseInscripciones.data;
-    } catch (error) {
-      console.error(error);
+    isLoadingPartidas.value = false;
+    if (resInscripciones.status === "fulfilled") {
+      inscripciones.value = resInscripciones.value.data;
     }
-
-    calcularClasificacion();
-  } catch (error) {
-    console.error("calcularClasificacion", error);
-  } finally {
-    isLoading.value = false;
-  }
+  });
 });
 
 const calcularClasificacion = async () => {

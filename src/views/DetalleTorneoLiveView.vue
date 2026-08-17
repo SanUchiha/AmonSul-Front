@@ -7,6 +7,11 @@
       <!-- TABS -->
       <v-tabs v-model="activeTab" fixed-tabs>
         <v-tab
+          :key="-1"
+          text="Resumen"
+          :value="-1"
+        ></v-tab>
+        <v-tab
           v-if="torneo?.mostrarListas"
           :key="tabListas"
           :text="`Listas`"
@@ -36,10 +41,34 @@
         ></v-tab>
       </v-tabs>
       <!-- Contenido de las Tabs -->
+      <v-btn
+        v-if="activeTab !== -1"
+        variant="text"
+        size="small"
+        prepend-icon="mdi-arrow-left"
+        class="mt-1 mb-1"
+        @click="activeTab = -1"
+      >Resumen</v-btn>
       <v-window v-model="activeTab">
-        <div v-if="partidas.length === 0">
+        <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1">
           <p>Aún no se ha generado ninguna ronda</p>
         </div>
+
+        <!-- Tab Resumen -->
+        <v-window-item :value="-1" :key="-1">
+          <TabResumenTorneo
+            v-if="resumen"
+            :resumen="resumen"
+            :isLoadingPartidas="isLoadingPartidas"
+            :tipoTorneo="torneo?.tipoTorneo"
+            :podioEquipos="podioEquipos"
+            :idTorneo="idTorneo"
+            :nombreTorneo="torneo?.nombreTorneo"
+            @go-listas="activeTab = tabListas"
+            @go-clasificacion="activeTab = tabClasificacion"
+            @go-ronda="(n) => (activeTab = n)"
+          />
+        </v-window-item>
 
         <!-- Tab Listas -->
         <v-window-item :value="tabListas" :key="tabListas">
@@ -49,6 +78,10 @@
         <!-- tab dinamicas -->
         <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
           <v-row>
+            <v-col v-if="isLoadingPartidas" cols="12" class="d-flex justify-center pa-8">
+              <v-progress-circular indeterminate color="primary" />
+            </v-col>
+            <template v-else>
             <CardEmparejamientos
               v-if="torneo?.tipoTorneo !== 'Individual'"
               :partidas="partidas"
@@ -61,9 +94,8 @@
               lg="6"
               xl="4"
               class="pb-0"
-              v-for="(partida, index) in partidasPorRonda[activeTab!]"
+              v-for="(partida, index) in partidasPorRonda[n]"
               :key="partida.idPartidaTorneo"
-              :value="activeTab"
             >
               <!-- Partida completada -->
               <div
@@ -93,6 +125,7 @@
                 />
               </div>
             </v-col>
+            </template>
           </v-row>
         </v-window-item>
 
@@ -140,6 +173,7 @@ import CardEmparejamientos from "@/components/GestionTorneos/Equipos/CardEmparej
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
 import TabClasificacionEquiposIndividual from "@/components/GestionTorneos/Equipos/TabClasificacionEquiposIndividual.vue";
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
+import TabResumenTorneo from "@/components/GestionTorneos/TabResumenTorneo.vue";
 import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import { useAuth } from "@/composables/useAuth";
 import {
@@ -155,17 +189,19 @@ import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import {
   ClasificacionEquipo,
   InscripcionTorneoCreadoDTO,
+  ResumenTorneoDTO,
   Torneo,
 } from "@/interfaces/Torneo";
 import { getInscripcionesTorneo } from "@/services/InscripcionesService";
 import {
   getInfoTorneoEquipoCreado,
   getPartidasTorneo,
+  getResumenTorneoAsync,
   getTorneo,
 } from "@/services/TorneosService";
 import { appsettings } from "@/settings/appsettings";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -192,6 +228,12 @@ const clasificacionZona2 = ref<Clasificacion[]>([]);
 const torneoGestion = ref<TorneoEquipoGestionInfoDTO | null>(null);
 const clasificacionEquipos = ref<ClasificacionEquipo[]>([]);
 const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
+const resumen = ref<ResumenTorneoDTO | null>(null);
+const TAB_RESUMEN = -1;
+const isLoadingPartidas = ref(true);
+const podioEquipos = computed(() =>
+  clasificacionEquipos.value.slice(0, 3).map(e => e.nombreEquipo)
+);
 
 function manejarClasificacion(clasificacion: ClasificacionEquipo[]) {
   clasificacionEquipos.value = clasificacion;
@@ -201,64 +243,57 @@ onMounted(async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
   isLoading.value = true;
 
-  try {
-    const responseTorneo = await getTorneo(idTorneo.value);
-    torneo.value = responseTorneo.data;
+  // Llamadas críticas en paralelo: en cuanto respondan se muestra la vista
+  const [resTorneo, resResumen] = await Promise.allSettled([
+    getTorneo(idTorneo.value),
+    getResumenTorneoAsync(idTorneo.value),
+  ]);
 
-    const responsePartidas = await getPartidasTorneo(idTorneo.value);
-    partidas.value = responsePartidas.data;
+  if (resTorneo.status === "fulfilled") {
+    torneo.value = resTorneo.value.data;
+    numeroRondas.value = Array.from(
+      { length: torneo.value!.numeroPartidas },
+      (_, index) => index + 1
+    );
+    tabClasificacion.value = numeroRondas.value.length + 2;
+    tabClasificacionIndividual.value = numeroRondas.value.length + 3;
+    tabListas.value = numeroRondas.value.length + 1;
+  }
 
-    if (torneo.value) {
-      numeroRondas.value = Array.from(
-        { length: torneo.value.numeroPartidas },
-        (_, index) => index + 1
-      );
-    }
-    if (partidas.value) {
+  if (resResumen.status === "fulfilled") {
+    resumen.value = resResumen.value.data;
+  }
+
+  activeTab.value = TAB_RESUMEN;
+  isLoading.value = false;
+
+  // Llamadas secundarias en background — actualizan reactivamente
+  Promise.allSettled([
+    getPartidasTorneo(idTorneo.value),
+    getInfoTorneoEquipoCreado(idTorneo.value),
+    getInscripcionesTorneo(idTorneo.value),
+  ]).then(([resPartidas, resTorneoGestion, resInscripciones]) => {
+    if (resPartidas.status === "fulfilled") {
+      partidas.value = resPartidas.value.data;
       partidasPorRonda.value = partidas.value.reduce(
         (acc, partida) => {
           const { numeroRonda } = partida;
-          if (!acc[numeroRonda]) {
-            acc[numeroRonda] = [];
-          }
+          if (!acc[numeroRonda]) acc[numeroRonda] = [];
           acc[numeroRonda].push(partida);
           return acc;
         },
         {} as Record<number, PartidaTorneoDTO[]>
       );
+      calcularClasificacion();
     }
-
-    try {
-      const responseTorneo = await getInfoTorneoEquipoCreado(idTorneo.value);
-      torneoGestion.value = responseTorneo.data;
-    } catch (error) {
-      console.error(error);
+    isLoadingPartidas.value = false;
+    if (resTorneoGestion.status === "fulfilled") {
+      torneoGestion.value = resTorneoGestion.value.data;
     }
-
-    try {
-      const responseInscripciones = await getInscripcionesTorneo(
-        idTorneo.value
-      );
-      inscripciones.value = responseInscripciones.data;
-    } catch (error) {
-      console.error(error);
+    if (resInscripciones.status === "fulfilled") {
+      inscripciones.value = resInscripciones.value.data;
     }
-
-    calcularClasificacion();
-
-    tabClasificacion.value = numeroRondas.value.length + 2;
-    tabClasificacionIndividual.value = numeroRondas.value.length + 3;
-    tabListas.value = numeroRondas.value.length + 1;
-    if (torneo.value?.mostrarListas) {
-      activeTab.value = tabListas.value;
-    } else {
-      activeTab.value = numeroRondas.value[0] ?? 1;
-    }
-  } catch (error) {
-    console.error("calcularClasificacion", error);
-  } finally {
-    isLoading.value = false;
-  }
+  });
 });
 
 const calcularClasificacion = async () => {

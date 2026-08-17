@@ -68,6 +68,12 @@ export default {
       novedades: [
         {
           fecha: "Agosto 2026",
+          titulo: "Resumen de torneo",
+          descripcion:
+            "Nueva pestaña 'Resumen' en la vista de 'Resultados' en torneos. Muestra de un vistazo la fecha de inicio, el estado de cada ronda, si las listas y la clasificación son visibles, y el podio final. Carga de forma inmediata sin esperar al resto de datos. En torneos por equipos incluye podio individual y podio por equipos. Si las listas están disponibles, permite descargarlas en PDF directamente desde esta pantalla.",
+        },
+        {
+          fecha: "Agosto 2026",
           titulo: "Contacto en torneos",
           descripcion:
             "Los organizadores ya pueden añadir un email o teléfono de contacto al crear un torneo. Si se rellena, será visible para los jugadores en el detalle del torneo.",
