@@ -206,6 +206,7 @@ import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import { ListaCompletaDTO } from "@/interfaces/Lista";
 import jsPDF from "jspdf";
+import { descargarListasPDF } from "@/utils/descargarListas";
 
 // eslint-disable-next-line no-undef
 const props = defineProps<{ torneo: TorneoEquipoGestionInfoDTO | null }>();
@@ -435,74 +436,12 @@ const descargarListasTorneo = async () => {
     isDownloading.value = true;
     const response = await getListasTorneoAsync(idTorneo.value);
     const listas: ListaCompletaDTO[] = response.data;
-    const chunkedListas = chunkArray(listas, jugadoresXEquipo.value);
-    const total = chunkedListas.reduce((acc, arr) => acc + arr.length, 0);
-    let processed = 0;
-    for (let i = 0; i < chunkedListas.length; i++) {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      let y = 10;
-      for (let idx = 0; idx < chunkedListas[i].length; idx++) {
-        const lista = chunkedListas[i][idx];
-        if (lista.listaData) {
-          const imgMatch = lista.listaData.match(
-            /^data:image\/(png|jpeg|jpg);base64,/
-          );
-          if (imgMatch) {
-            if (idx !== 0) doc.addPage();
-
-            doc.setFontSize(18);
-            doc.text(`${lista.nick}`, pageWidth / 2, 20, { align: "center" });
-
-            const margin = 15;
-            const imgProps = doc.getImageProperties(lista.listaData);
-            let imgWidth = pageWidth - margin * 2;
-            let imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-            if (imgHeight > pageHeight - 40 - margin) {
-              imgHeight = pageHeight - 40 - margin;
-              imgWidth = (imgProps.width * imgHeight) / imgProps.height;
-            }
-            const x = (pageWidth - imgWidth) / 2;
-            const yImg = 30;
-            doc.addImage(
-              lista.listaData,
-              imgMatch[1],
-              x,
-              yImg,
-              imgWidth,
-              imgHeight
-            );
-          } else {
-            doc.text(`${lista.nick}`, 10, y);
-            y += 10;
-            const lines = doc.splitTextToSize(lista.listaData, 180);
-            doc.text(lines, 10, y);
-            y += lines.length * 7;
-            doc.line(10, y, 200, y); // separador
-            y += 10;
-            if (y > 270 && idx < chunkedListas[i].length - 1) {
-              doc.addPage();
-              y = 10;
-            }
-          }
-        } else {
-          doc.text(`${lista.nick}`, 10, y);
-          y += 10;
-        }
-        processed++;
-        progressPDF.value = Math.round((processed / total) * 100);
-        await new Promise(resolve => setTimeout(resolve, 0));
-      }
-      const baseName = props.torneo?.torneo.nombreTorneo
-        ? props.torneo?.torneo.nombreTorneo + "_listas"
-        : "listas_torneo";
-      const fileName =
-        chunkedListas.length > 1
-          ? `${baseName}_${i + 1}.pdf`
-          : `${baseName}.pdf`;
-      doc.save(fileName);
-    }
+    await descargarListasPDF(
+      listas,
+      props.torneo?.torneo.nombreTorneo ?? "",
+      jugadoresXEquipo.value,
+      (current, total) => { progressPDF.value = Math.round((current / total) * 100); }
+    );
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;

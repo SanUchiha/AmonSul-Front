@@ -12,17 +12,22 @@
         >
           Listas {{ resumen.listasVisibles ? 'visibles' : 'ocultas' }}
         </v-chip>
-        <v-btn
+        <div
           v-if="resumen.listasVisibles"
-          icon
-          size="x-small"
-          variant="text"
-          color="primary"
-          :loading="isDownloading"
-          @click="descargarListas"
+          class="d-flex align-center ga-2"
         >
-          <v-icon>mdi-download</v-icon>
-        </v-btn>
+          <v-btn
+            icon
+            size="x-small"
+            variant="text"
+            color="primary"
+            :loading="isDownloading"
+            :disabled="isDownloading"
+            @click="descargarListas"
+          >
+            <v-icon>mdi-download</v-icon>
+          </v-btn>
+        </div>
       </div>
       <v-chip
         size="small"
@@ -109,14 +114,32 @@
       <p v-else class="text-body-2 text-medium-emphasis">Sin resultados aún</p>
     </template>
   </v-card>
+
+  <ModalError
+    :isVisible="showErrorModal"
+    message="No se han podido descargar las listas. Inténtalo de nuevo."
+    @update:isVisible="showErrorModal = $event"
+  />
+  <LoadingLOTR
+    :isVisible="isDownloading"
+    mensaje="Generando PDF, por favor espera..."
+  >
+    <template #default>
+      <div v-if="isDownloading" style="margin-top: 10px; text-align: center; font-size: 12px">
+        {{ progressPDF }}%
+      </div>
+    </template>
+  </LoadingLOTR>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import jsPDF from "jspdf";
 import { ListaCompletaDTO } from "@/interfaces/Lista";
 import { getListasTorneoAsync } from "@/services/TorneosService";
 import { ResumenTorneoDTO } from "@/interfaces/Torneo";
+import { descargarListasPDF } from "@/utils/descargarListas";
+import LoadingLOTR from "@/components/Commons/LoadingLOTR.vue";
+import ModalError from "@/components/Commons/ModalError.vue";
 
 const props = defineProps<{
   resumen: ResumenTorneoDTO;
@@ -127,15 +150,19 @@ const props = defineProps<{
   nombreTorneo?: string;
 }>();
 
-const isTeamTournament = computed(() =>
-  ["Parejas", "Equipos_4", "Equipos_6"].includes(props.tipoTorneo ?? "")
-);
-const isDownloading = ref(false);
 const emit = defineEmits<{
   (e: "go-listas"): void;
   (e: "go-clasificacion"): void;
   (e: "go-ronda", n: number): void;
 }>();
+
+const isDownloading = ref(false);
+const progressPDF = ref(0);
+const showErrorModal = ref(false);
+
+const isTeamTournament = computed(() =>
+  ["Parejas", "Equipos_4", "Equipos_6"].includes(props.tipoTorneo ?? "")
+);
 
 function medalIcon(index: number): string {
   if (index === 0) return "mdi-medal";
@@ -154,62 +181,24 @@ function formatFecha(fecha: string): string {
   return `${day}/${month}/${year}`;
 }
 
-function chunkArray<T>(arr: T[], size: number): T[][] {
-  const result: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) result.push(arr.slice(i, i + size));
-  return result;
-}
-
 const descargarListas = async () => {
   try {
     isDownloading.value = true;
     const response = await getListasTorneoAsync(props.idTorneo);
     const listas: ListaCompletaDTO[] = response.data;
-    const chunkedListas = chunkArray(listas, 40);
-    for (let i = 0; i < chunkedListas.length; i++) {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      let y = 10;
-      for (let idx = 0; idx < chunkedListas[i].length; idx++) {
-        const lista = chunkedListas[i][idx];
-        if (lista.listaData) {
-          const imgMatch = lista.listaData.match(/^data:image\/(png|jpeg|jpg);base64,/);
-          if (imgMatch) {
-            if (idx !== 0) doc.addPage();
-            doc.setFontSize(18);
-            doc.text(`${lista.nick}`, pageWidth / 2, 20, { align: "center" });
-            const margin = 15;
-            const imgProps = doc.getImageProperties(lista.listaData);
-            let imgWidth = pageWidth - margin * 2;
-            let imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-            if (imgHeight > pageHeight - 40 - margin) {
-              imgHeight = pageHeight - 40 - margin;
-              imgWidth = (imgProps.width * imgHeight) / imgProps.height;
-            }
-            doc.addImage(lista.listaData, imgMatch[1], (pageWidth - imgWidth) / 2, 30, imgWidth, imgHeight);
-          } else {
-            doc.text(`${lista.nick}`, 10, y);
-            y += 10;
-            const lines = doc.splitTextToSize(lista.listaData, 180);
-            doc.text(lines, 10, y);
-            y += lines.length * 7;
-            doc.line(10, y, 200, y);
-            y += 10;
-            if (y > 270 && idx < chunkedListas[i].length - 1) { doc.addPage(); y = 10; }
-          }
-        } else {
-          doc.text(`${lista.nick}`, 10, y);
-          y += 10;
-        }
-      }
-      const baseName = (props.nombreTorneo ?? "listas_torneo") + "_listas";
-      doc.save(chunkedListas.length > 1 ? `${baseName}_${i + 1}.pdf` : `${baseName}.pdf`);
-    }
+    await descargarListasPDF(
+      listas,
+      props.nombreTorneo ?? "",
+      undefined,
+      (current, total) => { progressPDF.value = Math.round((current / total) * 100); }
+    );
   } catch (error) {
-    console.error(error);
+    console.error("Error descargando las listas:", error);
+    showErrorModal.value = true;
   } finally {
     isDownloading.value = false;
+    progressPDF.value = 0;
+    showErrorModal.value = false;
   }
 };
 </script>
