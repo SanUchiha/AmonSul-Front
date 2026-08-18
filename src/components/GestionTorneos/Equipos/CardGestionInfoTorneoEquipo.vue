@@ -134,6 +134,9 @@
         </v-col>
       </v-row>
     </v-card-actions>
+    <v-card-text>
+      <CardAddTorneoLiga :idTorneo="props.torneo?.torneo.idTorneo!" />
+    </v-card-text>
   </v-card>
 
   <!-- modal para modificar el torneo -->
@@ -200,6 +203,7 @@ import ModalModificarTorneo from "../ModalModificarTorneo.vue";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import ModalHandlerMostrarListas from "../ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "../ModalHandlerMostrarClasificacion.vue";
+import CardAddTorneoLiga from "../CardAddTorneoLiga.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
 import LoadingLOTR from "@/components/Commons/LoadingLOTR.vue";
 import ModalError from "@/components/Commons/ModalError.vue";

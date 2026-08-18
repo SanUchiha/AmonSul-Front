@@ -121,6 +121,12 @@ export const deleteTorneo = async (idTorneo: number) => {
   return http.delete(`Torneo/Gestion/${idTorneo}`);
 };
 
+export const deleteRonda = async (idTorneo: number, idRonda: number) => {
+  return http.delete(`Torneo/Gestion/${idTorneo}/Ronda/${idRonda}`, {
+    responseType: "text",
+  });
+};
+
 export const getEquiposByTorneoAsync = async (idTorneo: number) => {
   return http.get(`Torneo/equipos/${idTorneo}`);
 };

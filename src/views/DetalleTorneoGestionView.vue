@@ -97,6 +97,14 @@
                   >
                     Guardar resultados
                   </v-btn>
+                  <v-btn
+                    class="mt-2 ml-2"
+                    variant="tonal"
+                    color="error"
+                    @click="abrirEliminarRonda(activeTab)"
+                  >
+                    Eliminar ronda
+                  </v-btn>
                 </div>
               </div>
               <div v-else class="ma-3">
@@ -142,6 +150,15 @@
                                 @click="agregarPairing(activeTab)"
                               >
                                 Añadir partida
+                              </v-btn>
+                              <v-btn
+                                v-if="activeTab === ultimaRonda"
+                                class="mt-2"
+                                variant="tonal"
+                                color="error"
+                                @click="abrirEliminarRonda(activeTab)"
+                              >
+                                Eliminar ronda
                               </v-btn>
                             </div>
                           </v-list-item-title>
@@ -673,6 +690,16 @@
       @confirm="handleEliminarPartidaConfirm"
     />
 
+    <!-- Modal eliminar ronda -->
+    <ModalEliminarRondaTorneo
+      :isVisible="showEliminarRondaModal"
+      :idTorneo="idTorneo"
+      :idRonda="idRondaAEliminar"
+      @cerrar="closeEliminarRondaModal"
+      @confirm="handleEliminarRondaConfirm"
+      @error="handleEliminarRondaError"
+    />
+
     <!-- Modal success guardar resultados -->
     <ModalSuccess
       :isVisible="showSuccessModal"
@@ -743,6 +770,7 @@ import ModalError from "@/components/Commons/ModalError.vue";
 import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPartidaGestion.vue";
 import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.vue";
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
+import ModalEliminarRondaTorneo from "@/components/GestionTorneos/ModalEliminarRondaTorneo.vue";
 import { appsettings } from "@/settings/appsettings";
 import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing.vue";
 import { ListaDTO } from "@/interfaces/Usuario";
@@ -806,6 +834,8 @@ const showModificarPartidaTorneoModal = ref<boolean>(false);
 const showModificarPairingModal = ref<boolean>(false);
 const showAgregarPairingModal = ref<boolean>(false);
 const showEliminarPartidaModal = ref<boolean>(false);
+const showEliminarRondaModal = ref<boolean>(false);
+const idRondaAEliminar = ref<number>(0);
 const partidaActual = ref<PartidaTorneoDTO>({
   ejercitoUsuario1: null,
   ejercitoUsuario2: null,
@@ -1083,6 +1113,29 @@ const agregarPairing = (idRonda: number) => {
 const eliminarPartida = (partidaRecibida: PartidaTorneoDTO) => {
   partidaActual.value = partidaRecibida;
   showEliminarPartidaModal.value = true;
+};
+
+const abrirEliminarRonda = (idRonda: number) => {
+  idRondaAEliminar.value = idRonda;
+  showEliminarRondaModal.value = true;
+};
+
+const closeEliminarRondaModal = () => {
+  showEliminarRondaModal.value = false;
+};
+
+const handleEliminarRondaConfirm = (mensaje: string) => {
+  partidas.value = partidas.value.filter(
+    p => p.numeroRonda !== idRondaAEliminar.value
+  );
+  delete partidasPorRonda.value[idRondaAEliminar.value];
+  showSuccessModal.value = true;
+  console.info(mensaje);
+};
+
+const handleEliminarRondaError = (mensaje: string) => {
+  showErrorModal.value = true;
+  console.error(mensaje);
 };
 
 const generarSiguienteRonda = (ronda: number) => {

@@ -88,6 +88,9 @@
         </v-list-item-title>
       </v-list-item-content>
     </v-list-item>
+    <v-card-text>
+      <CardAddTorneoLiga :idTorneo="props.torneo?.torneo.idTorneo!" />
+    </v-card-text>
   </v-card>
 
   <!-- modal para modificar el torneo -->
@@ -161,6 +164,7 @@ import ModalHandlerMostrarClasificacion from "../ModalHandlerMostrarClasificacio
 import LoadingLOTR from "@/components/Commons/LoadingLOTR.vue";
 import { ListaCompletaDTO } from "@/interfaces/Lista";
 import jsPDF from "jspdf";
+import CardAddTorneoLiga from "../CardAddTorneoLiga.vue";
 
 const progressPDF = ref<number>(0);
 
