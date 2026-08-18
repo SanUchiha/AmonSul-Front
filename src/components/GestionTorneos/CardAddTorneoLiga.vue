@@ -8,7 +8,8 @@
         item-title="nombreLiga"
         item-value="idLiga"
         return-object
-        variant="tonal"
+        variant="outlined"
+        single-line
         clearable
         :disabled="ligasDisponibles.length === 0"
       />

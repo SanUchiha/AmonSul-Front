@@ -58,14 +58,18 @@ import gestionTorneos from "@/assets/icons/gestionTorneos.png";
 import ELO from "@/assets/icons/ELO.png";
 import clasificacion from "@/assets/icons/clasificacion.png";
 import misPartidas from "@/assets/icons/misPartidas.png";
-import ligas from "@/assets/icons/ligas.png";
 import usuarios from "@/assets/icons/usuarios.png";
-import estadisticas from "@/assets/icons/ejercitoMasUsado.png";
 
 export default {
   data() {
     return {
       novedades: [
+        {
+          fecha: "Agosto 2026",
+          titulo: "Eliminar ronda",
+          descripcion:
+            "El administrador de un torneo puede eliminar la última ronda generada desde la pantalla de gestión. La operación borra todas las partidas de esa ronda y deja el torneo listo para volver a generar emparejamientos. Solo se puede eliminar la ronda más reciente.",
+        },
         {
           fecha: "Agosto 2026",
           titulo: "Resumen de torneo",
