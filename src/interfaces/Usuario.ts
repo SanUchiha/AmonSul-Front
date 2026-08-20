@@ -68,6 +68,11 @@ export interface UsuarioNickDTO {
   email: string;
 }
 
+export interface UsuarioIdNickDTO {
+  idUsuario: number;
+  nick: string;
+}
+
 export interface ViewUsuarioPartidaDTO {
   idUsuario: number;
   email: string;

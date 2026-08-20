@@ -78,6 +78,10 @@ export const recordarPass = async (email: string) => {
   return http.get(`Usuario/Recordar-Pass/${email}`);
 };
 
+export const getUsuariosIdNick = async () => {
+  return http.get(`Usuario/IdNick`);
+};
+
 class UsuariosService {
   static newUser = (newUser: NewUserDTO) => {
     return http.post(`Usuario/Registrar`, newUser);

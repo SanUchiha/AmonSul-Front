@@ -159,11 +159,11 @@
 import { useAuth } from "@/composables/useAuth";
 import { ArmyDTO } from "@/interfaces/Army";
 import { CreatePartidaAmistosaDTO } from "@/interfaces/Partidas";
-import { UsuarioNickDTO, ViewUsuarioPartidaDTO } from "@/interfaces/Usuario";
+import { UsuarioIdNickDTO } from "@/interfaces/Usuario";
 import { registrarPartida } from "@/services/PartidasAmistosasService";
+import { getUsuariosIdNick } from "@/services/UsuariosService";
 import { appsettings } from "@/settings/appsettings";
-import { useUsuariosStore } from "@/store/usuarios";
-import { ref, defineEmits, computed, ComputedRef, watch } from "vue";
+import { ref, defineEmits, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 
@@ -171,26 +171,21 @@ const show = ref<boolean>(true);
 const valid = ref<boolean>(false);
 const form = ref();
 
-const usuariosStore = useUsuariosStore();
-const { getUser, getidUsuario } = useAuth();
+const { getidUsuario } = useAuth();
 const loading = ref(false);
 const loadingNicks = ref(false);
 const loadingEjercitos = ref(false);
 const loadingEscenarios = ref(false);
-const listaUsuarios = ref<UsuarioNickDTO[]>([]);
+const listaUsuarios = ref<UsuarioIdNickDTO[]>([]);
 const listadoNicks = ref<string[]>([]);
 const listadoEjercitos = ref<ArmyDTO[]>([]);
 const listaEscenarios = ref<string[]>([]);
 const ejercitoPropio = ref<ArmyDTO>();
 const ejercitoRival = ref<ArmyDTO>();
-const emailOwner = ref<string>(getUser.value!);
 const idUsuario = ref<string>(getidUsuario.value!);
 
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
-const rawListaUsuarios: ComputedRef<ViewUsuarioPartidaDTO[]> = computed(
-  () => usuariosStore.usuarios
-);
 
 const emit = defineEmits(["close", "registroExitoso"]);
 
@@ -262,11 +257,13 @@ watch(showSuccessModal, (newVal) => {
 const loadNicks = async () => {
   loadingNicks.value = true;
   try {
-    if (!rawListaUsuarios.value.length) await usuariosStore.requestUsuarios();
-    listaUsuarios.value = [...rawListaUsuarios.value].filter(
-      (u) => u.email != emailOwner.value
-    );
-    listadoNicks.value = listaUsuarios.value.map((f) => f.nick).sort();
+    if (!listaUsuarios.value.length) {
+      const response = await getUsuariosIdNick();
+      listaUsuarios.value = (response.data as UsuarioIdNickDTO[]).filter(
+        (u) => u.idUsuario !== parseInt(idUsuario.value)
+      );
+    }
+    listadoNicks.value = listaUsuarios.value.map((u) => u.nick).sort();
   } catch (error) {
     console.error("Error al obtener los nicks:", error);
   } finally {
