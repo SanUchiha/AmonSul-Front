@@ -23,7 +23,12 @@
 
       <v-tabs-window v-model="tab">
         <v-tabs-window-item value="ranking">
-          <TopBandosCard :data="topBandos" />
+          <TopBandosCard
+            :data="mostrarTodo ? topBandosTodo : topBandos"
+            :mostrarTodo="mostrarTodo"
+            :isLoadingTodo="isLoadingTodo"
+            @toggle="mostrarTodo ? (mostrarTodo = false) : cargarTodo()"
+          />
         </v-tabs-window-item>
 
         <v-tabs-window-item value="filtro">
@@ -44,7 +49,10 @@ import FiltroRatingEjercito from "@/components/Estadisticas/FiltroRatingEjercito
 
 const tab = ref<string>("ranking");
 const isLoading = ref(true);
+const isLoadingTodo = ref(false);
+const mostrarTodo = ref(false);
 const topBandos = ref<TopBandosResponseDTO | null>(null);
+const topBandosTodo = ref<TopBandosResponseDTO | null>(null);
 
 onMounted(async () => {
   try {
@@ -55,4 +63,16 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+async function cargarTodo() {
+  isLoadingTodo.value = true;
+  try {
+    topBandosTodo.value = await getTopEjercitosPorBando(999);
+    mostrarTodo.value = true;
+  } catch (e) {
+    console.error("Error al cargar ranking completo", e);
+  } finally {
+    isLoadingTodo.value = false;
+  }
+}
 </script>

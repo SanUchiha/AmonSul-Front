@@ -20,19 +20,24 @@
         </v-col>
 
         <!-- Bando rival -->
-        <v-col cols="12" md="6">
-          <v-select
+        <v-col cols="12" md="6" class="d-flex flex-column align-center justify-center">
+          <v-btn-toggle
             v-model="form.bandoRival"
-            label="Bando rival"
-            :items="bandosRivales"
-            item-title="label"
-            item-value="value"
-            clearable
-            prepend-inner-icon="mdi-sword"
             :disabled="form.ejercitosRivales.length > 0"
-            hint="Se ignora si hay ejércitos rivales concretos"
-            persistent-hint
-          />
+            density="comfortable"
+            rounded="lg"
+            divided
+          >
+            <v-btn value="good" color="blue-darken-2">
+              <v-icon start>mdi-shield-star</v-icon>
+              Luz
+            </v-btn>
+            <v-btn value="evil" color="red-darken-4">
+              <v-icon start>mdi-eye</v-icon>
+              Oscuridad
+            </v-btn>
+          </v-btn-toggle>
+          <p class="text-caption text-medium-emphasis mt-1">Se ignora si hay ejércitos rivales concretos</p>
         </v-col>
 
         <!-- Fecha desde -->
@@ -135,12 +140,21 @@
             {{ resultado.bando === "good" ? "Bien" : "Oscuridad" }}
           </v-chip>
         </v-col>
-        <v-col cols="auto" v-if="resultado.esFiltrado && resultado.descripcionFiltro">
-          <v-chip size="small" color="orange-darken-2" prepend-icon="mdi-filter">
-            {{ resultado.descripcionFiltro }}
-          </v-chip>
-        </v-col>
       </v-row>
+
+      <!-- Chips de filtros activos -->
+      <div v-if="resultado.esFiltrado && filtrosActivos.length" class="d-flex flex-wrap gap-2 mb-3">
+        <v-chip
+          v-for="f in filtrosActivos"
+          :key="f.label"
+          size="small"
+          color="orange-darken-2"
+          variant="tonal"
+          :prepend-icon="f.icon"
+        >
+          {{ f.label }}
+        </v-chip>
+      </div>
 
       <!-- Barra de resultado -->
       <div class="resultado-barra mb-3">
@@ -208,7 +222,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from "vue";
+import { ref, nextTick, computed } from "vue";
 import { getRatingEjercito } from "@/services/EstadisticasService";
 import { appsettings } from "@/settings/appsettings";
 import type {
@@ -221,6 +235,7 @@ const armyNames = appsettings.armies.map((a) => a.name).sort((a, b) => a.localeC
 const isLoading = ref(false);
 const resultado = ref<RatingEjercitoResponseDTO | null>(null);
 const resultadoRef = ref<HTMLElement | null>(null);
+const formEnviado = ref<typeof form.value | null>(null);
 
 const bandosRivales = [
   { label: "Bien", value: "good" },
@@ -258,6 +273,7 @@ async function buscar() {
       puntosPartidaMax: form.value.puntosPartidaMax || null,
     };
     resultado.value = await getRatingEjercito(request);
+    formEnviado.value = { ...form.value, ejercitosRivales: [...form.value.ejercitosRivales] };
     await nextTick();
     resultadoRef.value?.scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (e) {
@@ -278,7 +294,23 @@ function resetForm() {
     puntosPartidaMax: null,
   };
   resultado.value = null;
+  formEnviado.value = null;
 }
+
+const filtrosActivos = computed(() => {
+  const f = formEnviado.value;
+  if (!f) return [];
+  const chips: { label: string; icon: string }[] = [];
+  if (f.fechaDesde) chips.push({ label: `Desde: ${f.fechaDesde}`, icon: "mdi-calendar-start" });
+  if (f.fechaHasta) chips.push({ label: `Hasta: ${f.fechaHasta}`, icon: "mdi-calendar-end" });
+  if (f.ejercitosRivales.length)
+    f.ejercitosRivales.forEach((e) => chips.push({ label: `Rival: ${e}`, icon: "mdi-shield-half-full" }));
+  else if (f.bandoRival)
+    chips.push({ label: `Bando rival: ${f.bandoRival === "good" ? "Bien" : "Oscuridad"}`, icon: "mdi-sword" });
+  if (f.puntosPartidaMin != null) chips.push({ label: `Pts. mín: ${f.puntosPartidaMin}`, icon: "mdi-arrow-collapse-down" });
+  if (f.puntosPartidaMax != null) chips.push({ label: `Pts. máx: ${f.puntosPartidaMax}`, icon: "mdi-arrow-collapse-up" });
+  return chips;
+});
 </script>
 
 <style scoped>

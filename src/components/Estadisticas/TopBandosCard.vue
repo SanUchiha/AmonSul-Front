@@ -1,9 +1,30 @@
 <template>
   <v-row v-if="data">
     <v-col cols="12">
-      <v-alert type="info" variant="tonal" density="compact" class="mb-3" icon="mdi-information-outline">
+      <v-alert type="info" variant="tonal" density="compact" class="mb-2" icon="mdi-information-outline">
         Solo se muestran ejércitos con un mínimo de <strong>20 partidas</strong> jugadas desde el <strong>01/01/2025</strong>.
       </v-alert>
+      <div class="text-center mb-3">
+        <v-btn
+          v-if="!mostrarTodo"
+          color="secondary"
+          variant="tonal"
+          prepend-icon="mdi-format-list-numbered"
+          :loading="isLoadingTodo"
+          @click="$emit('toggle')"
+        >
+          Ver ranking completo
+        </v-btn>
+        <v-btn
+          v-else
+          color="secondary"
+          variant="tonal"
+          prepend-icon="mdi-trophy"
+          @click="$emit('toggle')"
+        >
+          Ver solo Top 3
+        </v-btn>
+      </div>
     </v-col>
 
     <!-- BIEN (good) -->
@@ -26,18 +47,20 @@
           color="green-darken-2"
         />
 
-        <v-divider class="my-3" />
+        <v-divider class="my-3" v-if="!mostrarTodo" />
 
-        <p class="text-subtitle-2 text-red-darken-3 font-weight-bold mb-1">
-          Bottom {{ data.bien.peores.length }}
-        </p>
-        <EjercitoStatsRow
-          v-for="(item, i) in data.bien.peores"
-          :key="'bien-peor-' + i"
-          :stats="item"
-          :posicion="i + 1"
-          color="red-darken-2"
-        />
+        <template v-if="!mostrarTodo">
+          <p class="text-subtitle-2 text-red-darken-3 font-weight-bold mb-1">
+            Bottom {{ data.bien.peores.length }}
+          </p>
+          <EjercitoStatsRow
+            v-for="(item, i) in data.bien.peores"
+            :key="'bien-peor-' + i"
+            :stats="item"
+            :posicion="i + 1"
+            color="red-darken-2"
+          />
+        </template>
       </v-card>
     </v-col>
 
@@ -61,18 +84,20 @@
           color="green-darken-2"
         />
 
-        <v-divider class="my-3" />
+        <v-divider class="my-3" v-if="!mostrarTodo" />
 
-        <p class="text-subtitle-2 text-red-darken-3 font-weight-bold mb-1">
-          Bottom {{ data.oscuridad.peores.length }}
-        </p>
-        <EjercitoStatsRow
-          v-for="(item, i) in data.oscuridad.peores"
-          :key="'osc-peor-' + i"
-          :stats="item"
-          :posicion="i + 1"
-          color="red-darken-2"
-        />
+        <template v-if="!mostrarTodo">
+          <p class="text-subtitle-2 text-red-darken-3 font-weight-bold mb-1">
+            Bottom {{ data.oscuridad.peores.length }}
+          </p>
+          <EjercitoStatsRow
+            v-for="(item, i) in data.oscuridad.peores"
+            :key="'osc-peor-' + i"
+            :stats="item"
+            :posicion="i + 1"
+            color="red-darken-2"
+          />
+        </template>
       </v-card>
     </v-col>
   </v-row>
@@ -86,5 +111,6 @@
 import type { TopBandosResponseDTO } from "@/interfaces/Estadisticas";
 import EjercitoStatsRow from "./EjercitoStatsRow.vue";
 
-defineProps<{ data: TopBandosResponseDTO | null }>();
+defineProps<{ data: TopBandosResponseDTO | null; mostrarTodo: boolean; isLoadingTodo: boolean }>();
+defineEmits<{ toggle: [] }>();
 </script>
