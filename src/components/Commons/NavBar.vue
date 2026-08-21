@@ -7,6 +7,7 @@
       <v-btn @click="goToPartidas"> Partidas </v-btn>
       <v-btn @click="goToConfig"> Configuración </v-btn>
       <v-btn @click="goToContact"> Contacto </v-btn>
+      <v-btn @click="goToEstadisticas"> Estadísticas </v-btn>
     </v-app-bar>
   </v-container>
 </template>
@@ -21,6 +22,7 @@ const goToJugadores = () => router.push("jugadores");
 const goToPartidas = () => router.push("partidas-amistosas");
 const goToConfig = () => router.push("configuracion");
 const goToContact = () => router.push("contactoHome");
+const goToEstadisticas = () => router.push("estadisticas-ejercito");
 </script>
 
 <style scoped></style>

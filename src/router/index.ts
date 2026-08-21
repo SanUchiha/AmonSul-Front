@@ -22,6 +22,7 @@ import MisTorneosView from "@/views/MisTorneosView.vue";
 import LigasView from "@/views/LigasView.vue";
 import DetalleTorneoGestionIndividualMasView from "@/views/DetalleTorneoGestionIndividualMasView.vue";
 import HomeView from "@/views/HomeView.vue";
+import EstadisticasEjercitoView from "@/views/EstadisticasEjercitoView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   { path: "/contacto", name: "contacto", component: ContactoView },
@@ -154,6 +155,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/home",
     name: "home",
     component: HomeView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/estadisticas-ejercito",
+    name: "estadisticas-ejercito",
+    component: EstadisticasEjercitoView,
     meta: { requiresAuth: true },
   },
   {
