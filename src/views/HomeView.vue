@@ -66,6 +66,12 @@ export default {
       novedades: [
         {
           fecha: "Agosto 2026",
+          titulo: "Estadísticas de ejércitos",
+          descripcion:
+            "Nueva sección de estadísticas accesible desde el menú. Muestra el ranking de ejércitos por bando (Bien y Oscuridad) con los mejores y peores win rates, ocultando ejércitos con menos de 20 partidas. También permite consultar el rating detallado de cualquier ejército aplicando filtros por fechas, ejércitos o bando rival, y rango de puntos de partida.",
+        },
+        {
+          fecha: "Agosto 2026",
           titulo: "Eliminar ronda",
           descripcion:
             "El administrador de un torneo puede eliminar la última ronda generada desde la pantalla de gestión. La operación borra todas las partidas de esa ronda y deja el torneo listo para volver a generar emparejamientos. Solo se puede eliminar la ronda más reciente.",
