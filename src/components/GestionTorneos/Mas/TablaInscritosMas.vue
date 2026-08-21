@@ -84,6 +84,21 @@
                 torneo.torneo.listasPorJugador
               }}
             </v-chip>
+            <v-tooltip
+              v-if="item.bando && item.countListasEntregadas > 0"
+              :text="item.bando === 'good' ? 'Bien' : 'Mal'"
+              location="top"
+            >
+              <template v-slot:activator="{ props: tooltipProps }">
+                <v-icon
+                  v-bind="tooltipProps"
+                  :color="item.bando === 'good' ? 'amber' : 'red'"
+                  class="ml-1"
+                >
+                  {{ item.bando === 'good' ? 'mdi-flare' : 'mdi-eye' }}
+                </v-icon>
+              </template>
+            </v-tooltip>
           </td>
 
           <!-- fecha ultima entrega de la lista -->

@@ -61,6 +61,21 @@
             <v-chip :color="formattedEstadoLista(item.estadoLista).color" dark>
               {{ formattedEstadoLista(item.estadoLista).text }}
             </v-chip>
+            <v-tooltip
+              v-if="item.bando && (item.estadoLista === 'ENTREGADA' || item.estadoLista === 'OK')"
+              :text="item.bando === 'good' ? 'Bien' : 'Mal'"
+              location="top"
+            >
+              <template v-slot:activator="{ props: tooltipProps }">
+                <v-icon
+                  v-bind="tooltipProps"
+                  :color="item.bando === 'good' ? 'amber' : 'red'"
+                  class="ml-1"
+                >
+                  {{ item.bando === 'good' ? 'mdi-flare' : 'mdi-eye' }}
+                </v-icon>
+              </template>
+            </v-tooltip>
           </td>
 
           <!-- fecha entrega de la lista -->
