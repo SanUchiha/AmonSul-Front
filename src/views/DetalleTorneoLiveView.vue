@@ -12,7 +12,6 @@
           :value="-1"
         ></v-tab>
         <v-tab
-          v-if="torneo?.mostrarListas"
           :key="tabListas"
           :text="`Listas`"
           :value="tabListas"
@@ -25,16 +24,13 @@
         >
         </v-tab>
         <v-tab
-          v-if="
-            torneo?.mostrarClasificacion && torneo.tipoTorneo != 'Individual'
-          "
+          v-if="torneo?.tipoTorneo != 'Individual'"
           :key="tabClasificacion"
           :text="`Clasificación`"
           :value="tabClasificacion"
         ></v-tab>
 
         <v-tab
-          v-if="torneo?.mostrarClasificacion"
           :key="tabClasificacionIndividual"
           :text="`Individual`"
           :value="tabClasificacionIndividual"
@@ -50,7 +46,7 @@
         @click="activeTab = -1"
       >Resumen</v-btn>
       <v-window v-model="activeTab">
-        <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1">
+        <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion && activeTab !== tabClasificacionIndividual">
           <p>Aún no se ha generado ninguna ronda</p>
         </div>
 
@@ -72,7 +68,8 @@
 
         <!-- Tab Listas -->
         <v-window-item :value="tabListas" :key="tabListas">
-          <TabMostrarListas :torneo="torneo" />
+          <TabMostrarListas v-if="torneo?.mostrarListas" :torneo="torneo" />
+          <v-alert v-else type="info" variant="tonal" class="ma-4">Las listas están ocultas</v-alert>
         </v-window-item>
 
         <!-- tab dinamicas -->
@@ -136,6 +133,7 @@
           :torneo="torneo"
           :partidas="partidas"
           :equipos="torneoGestion?.equipos"
+          :mostrarClasificacion="torneo?.mostrarClasificacion"
           @enviarClasificacion="manejarClasificacion"
         />
 
@@ -144,6 +142,7 @@
           :tabClasificacion="tabClasificacionIndividual"
           :activeTab="activeTab!"
           :clasificacion="clasificacion"
+          :mostrarClasificacion="torneo?.mostrarClasificacion"
           @enviarClasificacion="manejarClasificacion"
         />
       </v-window>

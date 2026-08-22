@@ -12,7 +12,6 @@
           :value="-1"
         ></v-tab>
         <v-tab
-          v-if="torneo?.mostrarListas"
           :key="tabListas"
           :text="`Listas`"
           :value="tabListas"
@@ -25,7 +24,6 @@
         >
         </v-tab>
         <v-tab
-          v-if="torneo?.mostrarClasificacion"
           :key="tabClasificacion"
           :text="`Clasificación`"
           :value="tabClasificacion"
@@ -41,7 +39,7 @@
         @click="activeTab = -1"
       >Resumen</v-btn>
       <v-window v-model="activeTab">
-        <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1">
+        <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion">
           <p>Aún no se ha generado ninguna ronda</p>
         </div>
 
@@ -57,6 +55,12 @@
             @go-clasificacion="activeTab = tabClasificacion"
             @go-ronda="(n) => (activeTab = n)"
           />
+        </v-window-item>
+
+        <!-- Tab Listas -->
+        <v-window-item :value="tabListas" :key="tabListas">
+          <TabMostrarListas v-if="torneo?.mostrarListas" :torneo="torneo" />
+          <v-alert v-else type="info" variant="tonal" class="ma-4">Las listas están ocultas</v-alert>
         </v-window-item>
 
         <!-- tab dinamicas -->
@@ -110,7 +114,8 @@
 
         <!-- Tab clasificacion -->
         <v-window-item :value="tabClasificacion" :key="tabClasificacion">
-          <!-- División en dos zonas a a partir de la ronda 3 -->
+          <template v-if="torneo?.mostrarClasificacion">
+            <!-- División en dos zonas a a partir de la ronda 3 -->
           <div v-if="idTorneo === 7">
             <div
               v-if="
@@ -236,6 +241,8 @@
             </div>
             <div v-else><p>Esperando resultados...</p></div>
           </div>
+          </template>
+          <v-alert v-else type="info" variant="tonal" class="ma-4">La clasificación está oculta</v-alert>
         </v-window-item>
       </v-window>
     </div>
@@ -262,6 +269,7 @@
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import CardPartidaTorneoMasLive from "@/components/PartidasTorneo/CardPartidaTorneoMasLive.vue";
 import TabResumenTorneo from "@/components/GestionTorneos/TabResumenTorneo.vue";
+import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import { useAuth } from "@/composables/useAuth";
 import {
   ResultMatchMatchedPlayType,

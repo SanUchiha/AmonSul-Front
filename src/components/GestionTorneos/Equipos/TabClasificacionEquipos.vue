@@ -1,7 +1,10 @@
 <template>
   <v-window-item :value="tabClasificacion" :key="tabClasificacion">
-    <h3 class="text-h6 my-2">Clasificación por Equipos</h3>
-    <TablaClasificacionEquipos :clasificacion="clasificacionEquipos" />
+    <template v-if="mostrarClasificacion !== false">
+      <h3 class="text-h6 my-2">Clasificación por Equipos</h3>
+      <TablaClasificacionEquipos :clasificacion="clasificacionEquipos" />
+    </template>
+    <v-alert v-else type="info" variant="tonal" class="ma-4">La clasificación está oculta</v-alert>
   </v-window-item>
 </template>
 
@@ -10,7 +13,7 @@
 import { EquipoDTO } from "@/interfaces/Inscripcion";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { ClasificacionEquipo, Torneo } from "@/interfaces/Torneo";
-import { defineProps, ref, watch, defineEmits } from "vue";
+import { ref, watch } from "vue";
 import { generarClasificacionEquipos } from "@/utils/clasificacionEquipos";
 import TablaClasificacionEquipos from "./TablaClasificacionEquipos.vue";
 
@@ -20,6 +23,7 @@ const props = defineProps<{
   torneo: Torneo | undefined;
   partidas: PartidaTorneoDTO[];
   equipos: EquipoDTO[] | null | undefined;
+  mostrarClasificacion?: boolean;
 }>();
 
 const emit = defineEmits(["enviarClasificacion"]);

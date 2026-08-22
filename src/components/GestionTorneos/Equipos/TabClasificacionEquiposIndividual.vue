@@ -1,9 +1,12 @@
 <template>
   <v-window-item :value="tabClasificacion" :key="tabClasificacion">
-    <TablaClasificacionIndividual
-      :clasificacion="clasificacion"
-      @click-ejercito="onClickEjercito"
-    />
+    <template v-if="mostrarClasificacion !== false">
+      <TablaClasificacionIndividual
+        :clasificacion="clasificacion"
+        @click-ejercito="onClickEjercito"
+      />
+    </template>
+    <v-alert v-else type="info" variant="tonal" class="ma-4">La clasificación está oculta</v-alert>
   </v-window-item>
 
   <ModalDetalleActuacionTorneo
@@ -16,12 +19,13 @@
 import ModalDetalleActuacionTorneo from "@/components/ResultadosTorneos/ModalDetalleActuacionTorneo.vue";
 import TablaClasificacionIndividual from "./TablaClasificacionIndividual.vue";
 import { Clasificacion } from "@/interfaces/Live";
-import { defineProps, ref } from "vue";
+import { ref } from "vue";
 
 defineProps<{
   tabClasificacion: number | undefined;
   activeTab: number;
   clasificacion: Clasificacion[];
+  mostrarClasificacion?: boolean;
 }>();
 
 const showModal = ref<boolean>(false);
