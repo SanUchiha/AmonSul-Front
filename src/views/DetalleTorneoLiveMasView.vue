@@ -354,12 +354,13 @@ onMounted(async () => {
         },
         {} as Record<number, PartidaTorneoMasDTO[]>
       );
-      calcularClasificacion();
     }
-    isLoadingPartidas.value = false;
     if (resInscripciones.status === "fulfilled") {
       inscripciones.value = resInscripciones.value.data;
     }
+    // Necesita las inscripciones cargadas para sumar los puntosExtra
+    if (resPartidas.status === "fulfilled") calcularClasificacion();
+    isLoadingPartidas.value = false;
   });
 });
 
@@ -490,7 +491,7 @@ const calcularClasificacion = async () => {
           rankingDividido[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
-            if (res1 >= 2 * res2) {
+            if (res1 >= 2 * res2 && res1 >= 6) {
               rankingDividido[partida.idUsuario1].puntosTorneo +=
                 ResultMatchMatchedPlayExtendedIndividualType.MAJOR_WIN;
               rankingDividido[partida.idUsuario1].victorias +=
@@ -511,7 +512,7 @@ const calcularClasificacion = async () => {
             }
           }
           if (res2 > res1) {
-            if (res2 >= 2 * res1) {
+            if (res2 >= 2 * res1 && res2 >= 6) {
               rankingDividido[partida.idUsuario2].puntosTorneo +=
                 ResultMatchMatchedPlayExtendedIndividualType.MAJOR_WIN;
               rankingDividido[partida.idUsuario2].victorias +=
@@ -555,7 +556,8 @@ const calcularClasificacion = async () => {
       // Lider muerto primero
       if (liderMuertoUsuario1) {
         rankingDividido[partida.idUsuario1].lider += MatchResultGeneral.DEAD;
-      } else if (liderMuertoUsuario2) {
+      }
+      if (liderMuertoUsuario2) {
         rankingDividido[partida.idUsuario2].lider += MatchResultGeneral.DEAD;
       }
     }
@@ -669,7 +671,7 @@ const calcularClasificacion = async () => {
           ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
-            if (res1 >= 2 * res2) {
+            if (res1 >= 2 * res2 && res1 >= 6) {
               ranking[partida.idUsuario1].puntosTorneo +=
                 ResultMatchMatchedPlayExtendedIndividualType.MAJOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
@@ -686,7 +688,7 @@ const calcularClasificacion = async () => {
             }
           }
           if (res2 > res1) {
-            if (res2 >= 2 * res1) {
+            if (res2 >= 2 * res1 && res2 >= 6) {
               ranking[partida.idUsuario2].puntosTorneo +=
                 ResultMatchMatchedPlayExtendedIndividualType.MAJOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
@@ -726,7 +728,8 @@ const calcularClasificacion = async () => {
       // Lider muerto primero
       if (liderMuertoUsuario1) {
         ranking[partida.idUsuario1].lider += MatchResultGeneral.DEAD;
-      } else if (liderMuertoUsuario2) {
+      }
+      if (liderMuertoUsuario2) {
         ranking[partida.idUsuario2].lider += MatchResultGeneral.DEAD;
       }
     }

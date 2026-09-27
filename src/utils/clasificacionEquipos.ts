@@ -192,14 +192,14 @@ function clasificacionAleman(
     if (equipo1) {
       equipo1.puntosFavor += res1;
       equipo1.puntosContra += res2;
-      if (liderMuertoUsuario2 === true)
+      if (liderMuertoUsuario1 === true)
         equipo1.lideresMatados += MatchResultGeneral.DEAD;
       equipo1.diferencia = equipo1.puntosFavor - equipo1.puntosContra;
     }
     if (equipo2) {
       equipo2.puntosFavor += res2;
       equipo2.puntosContra += res1;
-      if (liderMuertoUsuario1 === true)
+      if (liderMuertoUsuario2 === true)
         equipo2.lideresMatados += MatchResultGeneral.DEAD;
       equipo2.diferencia = equipo2.puntosFavor - equipo2.puntosContra;
     }

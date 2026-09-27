@@ -17,14 +17,18 @@ import { ref, watch } from "vue";
 import { generarClasificacionEquipos } from "@/utils/clasificacionEquipos";
 import TablaClasificacionEquipos from "./TablaClasificacionEquipos.vue";
 
-const props = defineProps<{
-  tabClasificacion: number | undefined;
-  activeTab: number;
-  torneo: Torneo | undefined;
-  partidas: PartidaTorneoDTO[];
-  equipos: EquipoDTO[] | null | undefined;
-  mostrarClasificacion?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    tabClasificacion: number | undefined;
+    activeTab: number;
+    torneo: Torneo | undefined;
+    partidas: PartidaTorneoDTO[];
+    equipos: EquipoDTO[] | null | undefined;
+    mostrarClasificacion?: boolean;
+  }>(),
+  // Sin default, Vue convierte el boolean ausente en false y la gestión la vería oculta
+  { mostrarClasificacion: true }
+);
 
 const emit = defineEmits(["enviarClasificacion"]);
 

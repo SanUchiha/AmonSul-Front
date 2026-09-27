@@ -1201,7 +1201,7 @@ const calcularClasificacion = () => {
           rankingDividido[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
-            if (res1 >= 2 * res2) {
+            if (res1 >= 2 * res2 && res1 >= 6) {
               rankingDividido[partida.idUsuario1].puntosTorneo +=
                 ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               rankingDividido[partida.idUsuario1].victorias +=
@@ -1222,7 +1222,7 @@ const calcularClasificacion = () => {
             }
           }
           if (res2 > res1) {
-            if (res2 >= 2 * res1) {
+            if (res2 >= 2 * res1 && res2 >= 6) {
               rankingDividido[partida.idUsuario2].puntosTorneo +=
                 ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               rankingDividido[partida.idUsuario2].victorias +=
@@ -1266,7 +1266,8 @@ const calcularClasificacion = () => {
       // Lider muerto primero
       if (liderMuertoUsuario1) {
         rankingDividido[partida.idUsuario1].lider += MatchResultGeneral.DEAD;
-      } else if (liderMuertoUsuario2) {
+      }
+      if (liderMuertoUsuario2) {
         rankingDividido[partida.idUsuario2].lider += MatchResultGeneral.DEAD;
       }
     }
@@ -1380,7 +1381,7 @@ const calcularClasificacion = () => {
           ranking[partida.idUsuario2].empates += MatchResultPoint.DRAW;
         } else {
           if (res1 > res2) {
-            if (res1 >= 2 * res2) {
+            if (res1 >= 2 * res2 && res1 >= 6) {
               ranking[partida.idUsuario1].puntosTorneo +=
                 ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               ranking[partida.idUsuario1].victorias += MatchResultPoint.WIN;
@@ -1397,7 +1398,7 @@ const calcularClasificacion = () => {
             }
           }
           if (res2 > res1) {
-            if (res2 >= 2 * res1) {
+            if (res2 >= 2 * res1 && res2 >= 6) {
               ranking[partida.idUsuario2].puntosTorneo +=
                 ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
               ranking[partida.idUsuario2].victorias += MatchResultPoint.WIN;
@@ -1437,7 +1438,8 @@ const calcularClasificacion = () => {
       // Lider muerto primero
       if (liderMuertoUsuario1) {
         ranking[partida.idUsuario1].lider += MatchResultGeneral.DEAD;
-      } else if (liderMuertoUsuario2) {
+      }
+      if (liderMuertoUsuario2) {
         ranking[partida.idUsuario2].lider += MatchResultGeneral.DEAD;
       }
     }

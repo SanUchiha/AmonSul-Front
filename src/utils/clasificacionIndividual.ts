@@ -95,7 +95,8 @@ export function generarClasificacionIndividual({
 
       if (liderMuertoUsuario1) {
         ranking[partida.idUsuario1].lider += MatchResultGeneral.DEAD;
-      } else if (liderMuertoUsuario2) {
+      }
+      if (liderMuertoUsuario2) {
         ranking[partida.idUsuario2].lider += MatchResultGeneral.DEAD;
       }
     }
