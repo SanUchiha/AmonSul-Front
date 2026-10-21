@@ -60,7 +60,7 @@
 
     <!-- Ganadores -->
     <!-- Torneo individual: un podio -->
-    <div v-if="!isTeamTournament && resumen.ganadores.length > 0">
+    <div v-if="resumen.clasificacionVisible && !isTeamTournament && resumen.ganadores.length > 0">
       <v-divider class="mb-3" />
       <p class="text-subtitle-2 mb-2">Podio</p>
       <v-list density="compact">
@@ -77,7 +77,7 @@
     </div>
 
     <!-- Torneo por equipos: podio individual + podio equipos -->
-    <template v-if="isTeamTournament">
+    <template v-if="resumen.clasificacionVisible && isTeamTournament">
       <div v-if="resumen.ganadores.length > 0">
         <v-divider class="mb-3" />
         <p class="text-subtitle-2 mb-2">Podio Individual</p>
