@@ -48,7 +48,8 @@ watch(
       clasificacionEquipos.value = [];
     }
   },
-  { immediate: true }
+  // deep: la gestión actualiza partidas in situ (partidas[i] = ...) al editar o validar
+  { immediate: true, deep: true }
 );
 </script>
 
