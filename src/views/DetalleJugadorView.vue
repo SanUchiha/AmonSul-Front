@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, ComputedRef } from "vue";
+import { ref, onMounted, computed, ComputedRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
 import {
@@ -149,6 +149,14 @@ const initializeComponent = async () => {
 };
 
 onMounted(initializeComponent);
+
+// Ir de un jugador a otro (p. ej. pulsando un nick) reutiliza esta vista: recargar datos
+watch(
+  () => route.params.idUsuario,
+  (nuevoId, anteriorId) => {
+    if (nuevoId && nuevoId !== anteriorId) initializeComponent();
+  }
+);
 
 const goBack = () => {
   router.back();

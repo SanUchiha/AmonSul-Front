@@ -21,37 +21,110 @@
           clearable
         />
       </template>
-      <template #[`item.posicion`]="{ item }">
-        <v-chip
-          v-if="item.posicion !== null"
-          :color="colorPosicion(item.posicion)"
-          size="small"
-        >
-          {{ item.posicion }}
-        </v-chip>
-        <span v-else>-</span>
-      </template>
-      <template #[`item.ved`]="{ item }">
-        <span class="text-success">{{ item.victorias }}</span> -
-        <span>{{ item.empates }}</span> -
-        <span class="text-error">{{ item.derrotas }}</span>
-      </template>
-      <template #[`item.puntos`]="{ item }">
-        {{ item.puntosFavor }} - {{ item.puntosContra }}
+      <template v-slot:item="{ item }">
+        <tr @click="toggleExpand(item.clave)" class="clickable-row">
+          <td class="nombre-torneo">{{ item.nombreTorneo }}</td>
+          <td class="text-center px-1">
+            <v-chip
+              v-if="item.posicion !== null"
+              :color="colorPosicion(item.posicion)"
+              prepend-icon="mdi-trophy"
+              variant="flat"
+              size="small"
+            >
+              {{ item.posicion }}º
+            </v-chip>
+            <span v-else class="text-medium-emphasis">-</span>
+          </td>
+          <td class="text-right px-1">
+            <v-icon>
+              {{
+                expanded.includes(item.clave)
+                  ? "mdi-chevron-up"
+                  : "mdi-chevron-down"
+              }}
+            </v-icon>
+          </td>
+        </tr>
+
+        <!-- Expandido: resultados del jugador en el torneo -->
+        <tr v-if="expanded.includes(item.clave)">
+          <td colspan="3" class="py-3">
+            <div class="d-flex flex-wrap ga-2">
+              <v-chip
+                color="primary"
+                variant="flat"
+                prepend-icon="mdi-sword-cross"
+                append-icon="mdi-chevron-right"
+                @click.stop="abrirPartidas(item)"
+              >
+                {{ item.jugadas }} partidas
+              </v-chip>
+              <v-chip color="success">{{ item.victorias }} V</v-chip>
+              <v-chip color="grey">{{ item.empates }} E</v-chip>
+              <v-chip color="error">{{ item.derrotas }} D</v-chip>
+              <v-chip prepend-icon="mdi-scoreboard">
+                {{ item.puntosFavor }} - {{ item.puntosContra }}
+              </v-chip>
+              <v-chip
+                v-if="item.ejercito !== '-'"
+                color="indigo"
+                prepend-icon="mdi-shield"
+              >
+                {{ item.ejercito }}
+              </v-chip>
+            </div>
+          </td>
+        </tr>
       </template>
     </v-data-table>
   </v-card>
+
+  <!-- Modal partidas del torneo: pantalla completa en móvil -->
+  <v-dialog
+    v-model="showPartidas"
+    :fullscreen="xs"
+    max-width="600"
+    scrollable
+  >
+    <v-card>
+      <v-card-title class="d-flex align-center ga-2">
+        <span class="nombre-torneo flex-grow-1">
+          {{ torneoSeleccionado?.nombreTorneo }}
+        </span>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          aria-label="Cerrar"
+          @click="showPartidas = false"
+        />
+      </v-card-title>
+      <v-divider />
+      <v-card-text class="px-2 px-sm-4">
+        <CardPartidaTorneo
+          v-for="partida in torneoSeleccionado?.partidas"
+          :key="partida.idPartidaTorneo"
+          :match="partida"
+          :idUsuario="idUsuario"
+        />
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { useDisplay } from "vuetify";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { ClasificacionTorneosDTO } from "@/interfaces/Usuario";
+import CardPartidaTorneo from "../PartidasTorneo/CardPartidaTorneo.vue";
 
 interface ResumenTorneo {
   clave: string;
   nombreTorneo: string;
   posicion: number | null;
+  partidas: ViewPartidaTorneoDTO[];
   jugadas: number;
   victorias: number;
   empates: number;
@@ -71,15 +144,37 @@ const props = defineProps<{
 }>();
 
 const search = ref("");
+const expanded = ref<string[]>([]);
+const showPartidas = ref<boolean>(false);
+const torneoSeleccionado = ref<ResumenTorneo | null>(null);
+const { xs } = useDisplay();
+const route = useRoute();
 
 const headers = [
   { title: "Torneo", key: "nombreTorneo" },
-  { title: "Pos", key: "posicion" },
-  { title: "PJ", key: "jugadas" },
-  { title: "V-E-D", key: "ved", sortable: false },
-  { title: "PF-PC", key: "puntos", sortable: false },
-  { title: "Ejército", key: "ejercito" },
+  { title: "Pos", key: "posicion", align: "center" as const },
+  { title: "", key: "expandir", sortable: false },
 ];
+
+const toggleExpand = (clave: string) => {
+  expanded.value = expanded.value.includes(clave)
+    ? expanded.value.filter(c => c !== clave)
+    : [...expanded.value, clave];
+};
+
+const abrirPartidas = (torneo: ResumenTorneo) => {
+  torneoSeleccionado.value = torneo;
+  showPartidas.value = true;
+};
+
+// Al pulsar un nick en una partida se navega a otro jugador: cerrar el modal
+watch(
+  () => route.params.idUsuario,
+  () => {
+    showPartidas.value = false;
+    expanded.value = [];
+  }
+);
 
 // Agrupa por idTorneo; si el back aún no lo envía, por nombre
 const claveTorneo = (idTorneo?: number, nombreTorneo?: string) =>
@@ -89,6 +184,7 @@ const nuevoResumen = (clave: string, nombreTorneo: string): ResumenTorneo => ({
   clave,
   nombreTorneo,
   posicion: null,
+  partidas: [],
   jugadas: 0,
   victorias: 0,
   empates: 0,
@@ -142,6 +238,7 @@ const resumenTorneos = computed<ResumenTorneo[]>(() => {
       ? partida.resultadoUsuario2
       : partida.resultadoUsuario1;
 
+    fila.partidas.push(partida);
     fila.jugadas++;
     fila.puntosFavor += propios;
     fila.puntosContra += rival;
@@ -166,6 +263,16 @@ const resumenTorneos = computed<ResumenTorneo[]>(() => {
     obtenerFila(clave, "-").ejercito = ejercitoMasJugado(lista);
   });
 
+  // En el modal, las partidas en orden de juego
+  const fechaPartida = (p: ViewPartidaTorneoDTO) =>
+    p.fechaPartida ? new Date(p.fechaPartida).getTime() : 0;
+  resumen.forEach(fila =>
+    fila.partidas.sort(
+      (a, b) =>
+        fechaPartida(a) - fechaPartida(b) || a.idPartidaTorneo - b.idPartidaTorneo
+    )
+  );
+
   // La posición viene de la clasificación guardada al cerrar el torneo
   (props.clasificacionTorneos ?? []).forEach(clasificacion => {
     const clave = claveTorneo(clasificacion.idTorneo, clasificacion.nombreTorneo);
@@ -183,3 +290,15 @@ const colorPosicion = (posicion: number) => {
   return "primary";
 };
 </script>
+
+<style scoped>
+.clickable-row {
+  cursor: pointer;
+}
+
+/* La vista padre centra el texto; el nombre se alinea a la izquierda y puede partirse en móvil */
+.nombre-torneo {
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+</style>
