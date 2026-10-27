@@ -60,17 +60,17 @@
               >
                 {{ item.jugadas }} partidas
               </v-chip>
-              <v-chip color="success">{{ item.victorias }} V</v-chip>
-              <v-chip color="grey">{{ item.empates }} E</v-chip>
-              <v-chip color="error">{{ item.derrotas }} D</v-chip>
-              <v-chip prepend-icon="mdi-scoreboard">
-                {{ item.puntosFavor }} - {{ item.puntosContra }}
+              <!-- Fondo sólido y texto blanco: en tonal el texto de color apenas contrasta en tema oscuro -->
+              <v-chip variant="flat" color="green-darken-2">
+                {{ item.victorias }} V
               </v-chip>
-              <v-chip
-                v-if="item.ejercito !== '-'"
-                color="indigo"
-                prepend-icon="mdi-shield"
-              >
+              <v-chip>{{ item.empates }} E</v-chip>
+              <v-chip variant="flat" color="red-darken-2">
+                {{ item.derrotas }} D
+              </v-chip>
+              <v-chip>{{ item.puntosFavor }} pts a favor</v-chip>
+              <v-chip>{{ item.puntosContra }} pts en contra</v-chip>
+              <v-chip v-if="item.ejercito !== '-'" prepend-icon="mdi-shield">
                 {{ item.ejercito }}
               </v-chip>
             </div>
@@ -88,13 +88,18 @@
     scrollable
   >
     <v-card>
-      <v-card-title class="d-flex align-center ga-2">
-        <span class="nombre-torneo flex-grow-1">
+      <!-- text-wrap y min-w-0: un nombre largo se parte en líneas sin empujar el aspa fuera -->
+      <v-card-title class="d-flex align-start ga-2 text-wrap">
+        <span
+          class="nombre-torneo flex-grow-1 min-w-0 text-subtitle-1 text-sm-h6 pt-1"
+        >
           {{ torneoSeleccionado?.nombreTorneo }}
         </span>
         <v-btn
           icon="mdi-close"
           variant="text"
+          density="comfortable"
+          class="flex-shrink-0"
           aria-label="Cerrar"
           @click="showPartidas = false"
         />
@@ -106,8 +111,23 @@
           :key="partida.idPartidaTorneo"
           :match="partida"
           :idUsuario="idUsuario"
+          :mostrarTorneo="false"
+          class="mb-3"
         />
       </v-card-text>
+      <v-divider />
+      <!-- Fijo abajo (diálogo scrollable): a mano del pulgar en móvil -->
+      <v-card-actions class="pa-3">
+        <v-spacer v-if="!xs" />
+        <v-btn
+          :block="xs"
+          variant="tonal"
+          color="secondary"
+          @click="showPartidas = false"
+        >
+          Cerrar
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -300,5 +320,9 @@ const colorPosicion = (posicion: number) => {
 .nombre-torneo {
   text-align: left;
   overflow-wrap: anywhere;
+}
+
+.min-w-0 {
+  min-width: 0;
 }
 </style>

@@ -1,182 +1,122 @@
 <template>
-  <!-- TODO implementar ver detalles cuando haya algo mas que mostrar
-     @click="goToDetallePartida()"
-     -->
-  <v-card
-    ref="matchCards"
-    :class="['match-card', cardColorClass]"
-    :style="{
-      '--border-color':
-        resultado === 'Win'
-          ? '#145c1750'
-          : resultado === 'Lose'
-            ? '#75171050'
-            : '#e6c40050',
-    }"
-  >
-    <!-- Título con los jugadores y avatares -->
-    <v-card-text class="text-center text-wrap text-h5">
-      {{ match.nombreTorneo }}
-    </v-card-text>
+  <!-- div raíz: así la clase que pasan los padres (mb-4...) se aplica aunque haya modales -->
+  <div>
+    <CardPartidaLectura
+      :contexto="contexto"
+      :fecha="formatFechaSpaWhitoutAsync(match.fechaPartida)"
+      :jugador1="{
+        idUsuario: match.idUsuario1,
+        nick: match.nickUsuario1,
+        ejercito: match.ejercitoUsuario1,
+        puntos: match.resultadoUsuario1,
+      }"
+      :jugador2="{
+        idUsuario: match.idUsuario2,
+        nick: match.nickUsuario2,
+        ejercito: match.ejercitoUsuario2,
+        puntos: match.resultadoUsuario2,
+      }"
+      :escenario="match.escenarioPartida"
+      :puntosPartida="match.puntosPartida || match.puntosTorneo"
+      :idGanador="match.ganadorPartidaTorneo"
+      :idUsuarioDestacado="idUsuario"
+      :listasVisibles="!!match.idTorneo && match.mostrarListas === true"
+      @verLista="verLista"
+    />
 
-    <v-divider></v-divider>
+    <!-- Modal lista -->
+    <ModalListaResultadoTorneo
+      v-if="isModalListaVisible"
+      :listaData="listaData"
+      :nickJugador="nickJugador"
+      :ejercito="ejercitoLista"
+      @close="isModalListaVisible = false"
+    />
 
-    <v-card-title class="text-center text-wrap">
-      <v-row align="center" justify="center" class="match-score" no-gutters>
-        <v-col
-          @click="verProfileUser(match.idUsuario1)"
-          cols="5"
-          class="player-name text-center"
+    <ModalError
+      :isVisible="showErrorLista"
+      message="No se ha podido cargar la lista de este jugador."
+      @update:isVisible="showErrorLista = $event"
+    />
+
+    <!-- Spinner carga lista -->
+    <v-dialog v-model="isLoadingLista" persistent width="300">
+      <v-card>
+        <v-card-text
+          class="d-flex justify-center align-center"
+          style="height: 150px"
         >
-          <span class="player-nick text-center" style="cursor: pointer">
-            {{ match.nickUsuario1 }}
-          </span>
-          <v-card-subtitle class="text-wrap">{{
-            match.ejercitoUsuario1
-          }}</v-card-subtitle>
-        </v-col>
-
-        <v-col cols="2" class="score text-center marcador">
-          <p>vs</p>
-          <p>{{ match.resultadoUsuario1 }}-{{ match.resultadoUsuario2 }}</p>
-        </v-col>
-
-        <v-col
-          @click="verProfileUser(match.idUsuario2)"
-          cols="5"
-          class="player-name text-center"
-        >
-          <span class="player-nick text-center" style="cursor: pointer">
-            {{ match.nickUsuario2 }} </span
-          ><br />
-          <v-card-subtitle class="text-wrap">{{
-            match.ejercitoUsuario2
-          }}</v-card-subtitle>
-        </v-col>
-      </v-row>
-    </v-card-title>
-
-    <v-divider></v-divider>
-
-    <!-- Información de la partida -->
-    <v-card-text :class="['text-center', cardColorClass]">
-      <v-row align="center">
-        <v-col cols="4">
-          <v-chip>
-            {{ resultado }}
-          </v-chip>
-        </v-col>
-
-        <v-col cols="4"> {{ match.puntosPartida }} pts </v-col>
-
-        <v-col cols="4" class="player-nick">
-          {{ fechaPartidaFormateada }}
-        </v-col>
-      </v-row>
-
-      <v-row class="mt-3 match-scenario">
-        <v-col cols="12" class="text-center">
-          <strong>{{ match.escenarioPartida || "No disponible" }}</strong>
-        </v-col>
-
-        <!--TODO Implementar detalles, de momento no hay nada que mostrar
-          <v-col cols="6" class="text-center">
-            <v-btn small color="blue lighten-2" @click.stop="goToDetallePartida()">
-              Ver Detalles
-            </v-btn>
-          </v-col>-->
-      </v-row>
-    </v-card-text>
-  </v-card>
-  <v-spacer class="my-3"></v-spacer>
-
-  <div v-if="error" class="error">{{ error }}</div>
-  <ModalDetallePartida
-    v-if="showModalDetallePartida"
-    :partida="match"
-    @close="closeModalDetallePartida"
-  />
+          <v-progress-circular
+            indeterminate
+            color="blue-lighten-3"
+            :size="57"
+          ></v-progress-circular>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { computed, ref } from "vue";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
-import { useRouter } from "vue-router";
-import { formatFechaSpa } from "@/utils/Fecha";
-import ModalDetallePartida from "@/components/PartidaAmistosa/ModalDetallePartida.vue";
-
-const isLoading = ref(true);
-const error = ref<string | null>(null);
-const router = useRouter();
-
-const resultado = ref<string>("");
-const fechaPartidaFormateada = ref<string>("");
+import { formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
+import { getlistaTorneo } from "@/services/ListasService";
+import CardPartidaLectura, {
+  JugadorPartidaLectura,
+} from "@/components/Commons/CardPartidaLectura.vue";
+import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
+import ModalError from "@/components/Commons/ModalError.vue";
 
 //eslint-disable-next-line no-undef
-const props = defineProps<{
-  match: ViewPartidaTorneoDTO;
-  idUsuario: number;
-}>();
+const props = withDefaults(
+  defineProps<{
+    match: ViewPartidaTorneoDTO;
+    idUsuario: number;
+    // En el modal de un torneo el nombre ya está en el título
+    mostrarTorneo?: boolean;
+  }>(),
+  { mostrarTorneo: true }
+);
 
-const showModalDetallePartida = ref(false);
+const isLoadingLista = ref<boolean>(false);
+const isModalListaVisible = ref<boolean>(false);
+const showErrorLista = ref<boolean>(false);
+const listaData = ref<string>("");
+const nickJugador = ref<string>("");
+const ejercitoLista = ref<string>();
 
-const initializeComponent = async () => {
+const contexto = computed(() =>
+  [
+    props.mostrarTorneo ? props.match.nombreTorneo : "",
+    props.match.numeroRonda ? `Ronda ${props.match.numeroRonda}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ")
+);
+
+const verLista = async (jugador: JugadorPartidaLectura) => {
+  if (!props.match.idTorneo) return;
+  isLoadingLista.value = true;
   try {
-    isLoading.value = true;
-    setResultado();
-    fechaPartidaFormateada.value = await formatFechaSpa(
-      props.match.fechaPartida
-    );
-  } catch (err) {
-    error.value = (err as Error).message;
-    router.push({ name: "error" });
+    const response = await getlistaTorneo({
+      idTorneo: props.match.idTorneo,
+      idUsuario: jugador.idUsuario,
+    });
+    // Sin lista el modal se quedaría cargando para siempre: mejor avisar
+    if (!response.data?.listaData) {
+      showErrorLista.value = true;
+      return;
+    }
+    listaData.value = response.data.listaData;
+    nickJugador.value = jugador.nick ?? "";
+    ejercitoLista.value = response.data.ejercito ?? jugador.ejercito ?? "";
+    isModalListaVisible.value = true;
+  } catch (error) {
+    console.error("Error al cargar la lista:", error);
+    showErrorLista.value = true;
   } finally {
-    isLoading.value = false;
+    isLoadingLista.value = false;
   }
 };
-
-const setResultado = () => {
-  if (props.match.ganadorPartidaTorneo == null) {
-    resultado.value = "Draw";
-  } else if (props.match.ganadorPartidaTorneo == props.idUsuario) {
-    resultado.value = "Win";
-  } else {
-    resultado.value = "Lose";
-  }
-};
-
-const cardColorClass = computed(() => {
-  switch (resultado.value) {
-    case "Win":
-      return "victoria-card";
-    case "Lose":
-      return "derrota-card";
-    case "Draw":
-      return "empate-card";
-    default:
-      return "";
-  }
-});
-
-const verProfileUser = (idUser: number) => {
-  router.push({ name: "detalle-jugador", params: { idUsuario: idUser } });
-};
-
-const closeModalDetallePartida = () => {
-  showModalDetallePartida.value = false;
-};
-
-onMounted(initializeComponent);
 </script>
-<style>
-.player-nick {
-  white-space: nowrap;
-  font-size: 1rem;
-}
-
-@media (max-width: 600px) {
-  .player-nick {
-    font-size: 0.85rem;
-  }
-}
-</style>

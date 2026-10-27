@@ -112,6 +112,9 @@ export interface ViewPartidaTorneoDTO {
   ejercitoUsuario1?: string;
   ejercitoUsuario2?: string;
   nombreTorneo?: string;
+  numeroRonda?: number | null;
+  puntosTorneo?: number | null;
+  mostrarListas?: boolean | null;
 }
 
 export interface ActualizarPairingEquiposDTO {
