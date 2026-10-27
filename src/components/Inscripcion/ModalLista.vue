@@ -146,8 +146,15 @@ watch(
   () => props.hasLista,
   async newVal => {
     if (newVal) {
-      const response = await getlista(props.idInscripcion);
-      imageBase64.value = response.data.listaData;
+      isLoading.value = true;
+      try {
+        const response = await getlista(props.idInscripcion);
+        imageBase64.value = response.data.listaData;
+      } catch {
+        console.error("No se ha podido cargar la lista");
+      } finally {
+        isLoading.value = false;
+      }
     }
   }
 );

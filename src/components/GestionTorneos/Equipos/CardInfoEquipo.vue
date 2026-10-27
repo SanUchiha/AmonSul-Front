@@ -518,20 +518,22 @@ numeroMiembrosEquipo.value =
 
 const verLista = async (idLista: number, nombre: string, ejercito: string) => {
   isLoading.value = true;
-  const responseLista = await getListaById(idLista);
-  if (responseLista.status !== 200) {
-    isLoading.value = false;
+  try {
+    const responseLista = await getListaById(idLista);
+    const listaJugadorDTO: ListaJugador = {
+      listaData: responseLista.data.listaData,
+      nick: nombre,
+      nombreEjercito: ejercito,
+    };
+    listaJugador.value = listaJugadorDTO;
+    showVerListaModal.value = true;
+  } catch (error) {
+    // axios lanza en respuestas no 2xx; sin esto el spinner persistente se quedaba abierto
+    console.error("Error al cargar la lista:", error);
     showErrorModal.value = true;
-    return;
+  } finally {
+    isLoading.value = false;
   }
-  isLoading.value = false;
-  const listaJugadorDTO: ListaJugador = {
-    listaData: responseLista.data.listaData,
-    nick: nombre,
-    nombreEjercito: ejercito,
-  };
-  listaJugador.value = listaJugadorDTO;
-  showVerListaModal.value = true;
 };
 
 const enviarCambiarLista = (

@@ -165,6 +165,22 @@
     v-model:isVisible="showVerListaModal"
     :listaJugador="listaJugador!"
   />
+
+  <!-- Spinner carga lista -->
+  <v-dialog v-model="isLoadingLista" persistent width="300">
+    <v-card>
+      <v-card-text
+        class="d-flex justify-center align-center"
+        style="height: 150px"
+      >
+        <v-progress-circular
+          indeterminate
+          color="blue-lighten-3"
+          :size="57"
+        ></v-progress-circular>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -191,6 +207,7 @@ const torneoEquipos = ref<TorneoEquipoGestionInfoDTO>();
 
 const search = ref<string>("");
 const isLoading = ref<boolean>(true);
+const isLoadingLista = ref<boolean>(false);
 const headers = [{ title: "Nick", key: "nick" }];
 const headersEquipos = [{ title: "Nombre del equipo", key: "nombreEquipo" }];
 const expanded = ref<string[]>([]);
@@ -232,14 +249,21 @@ function toggleExpand(nombreEquipo: string) {
 }
 
 const verLista = async (idLista: number, nombre: string, ejercito: string) => {
-  const responseLista = await getListaById(idLista);
-  const listaJugadorDTO: ListaJugador = {
-    listaData: responseLista.data.listaData,
-    nick: nombre,
-    nombreEjercito: ejercito,
-  };
-  listaJugador.value = listaJugadorDTO;
-  showVerListaModal.value = true;
+  isLoadingLista.value = true;
+  try {
+    const responseLista = await getListaById(idLista);
+    const listaJugadorDTO: ListaJugador = {
+      listaData: responseLista.data.listaData,
+      nick: nombre,
+      nombreEjercito: ejercito,
+    };
+    listaJugador.value = listaJugadorDTO;
+    showVerListaModal.value = true;
+  } catch (error) {
+    console.error("Error al cargar la lista:", error);
+  } finally {
+    isLoadingLista.value = false;
+  }
 };
 
 const goToUserDetail = (idUsuario: number) => {

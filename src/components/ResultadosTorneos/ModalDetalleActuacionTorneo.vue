@@ -47,7 +47,10 @@
       </v-card-text>
 
       <v-card-actions class="flex-column align-start">
-        <div v-if="!isLoadingLista" class="w-100">
+        <div v-if="isLoadingLista" class="w-100 d-flex justify-center py-4">
+          <v-progress-circular indeterminate color="primary" />
+        </div>
+        <div v-else class="w-100">
           <v-card class="section-card stats-section pt-0 mt-0">
             <template v-if="listaBase64">
               <div class="image-container">
@@ -63,13 +66,13 @@
             </template></v-card
           >
         </div>
-        <div v-else class="px-4 py-2">
-          <h3>No tienes partidas en torneos</h3>
-        </div>
       </v-card-actions>
 
       <v-card-actions class="flex-column align-start">
-        <div v-if="!isLoadingMatches && matches.length > 0" class="w-100">
+        <div v-if="isLoadingMatches" class="w-100 d-flex justify-center py-4">
+          <v-progress-circular indeterminate color="primary" />
+        </div>
+        <div v-else-if="matches.length > 0" class="w-100">
           <v-card class="section-card stats-section pt-0 mt-0">
             <div class="matches-list">
               <CardPartidaTorneo
