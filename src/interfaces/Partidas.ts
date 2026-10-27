@@ -96,6 +96,7 @@ export interface PartidaTorneoMasDTO {
 
 export interface ViewPartidaTorneoDTO {
   idPartidaTorneo: number;
+  idTorneo?: number;
   idUsuario1: number;
   nickUsuario1?: string;
   idUsuario2: number;

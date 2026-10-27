@@ -124,6 +124,7 @@ export interface UsuarioDataDTO {
 }
 
 export interface ClasificacionTorneosDTO {
+  idTorneo?: number;
   nombreTorneo: string;
   resultado: number;
 }

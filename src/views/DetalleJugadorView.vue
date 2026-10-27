@@ -10,7 +10,7 @@
             <v-tab value="1">Perfil</v-tab>
             <v-tab value="2">Amistosas </v-tab>
             <v-tab value="3">Torneos </v-tab>
-            <v-tab value="4">Inscripciones</v-tab>
+            <v-tab value="4">Resultados</v-tab>
           </v-tabs>
 
           <v-window v-model="tab">
@@ -42,6 +42,9 @@
             <v-window-item value="4">
               <TablaTorneosDisputados
                 :clasificacionTorneos="usuarioData.clasificacionTorneos"
+                :tournamentMatches="tournamentMatches"
+                :idUsuario="usuarioData.idUsuario"
+                :isLoading="isLoadingTournamentMatches"
               />
             </v-window-item>
           </v-window>
