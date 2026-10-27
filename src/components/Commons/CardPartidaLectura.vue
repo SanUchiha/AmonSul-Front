@@ -55,11 +55,10 @@
           <button
             v-if="ejercito(jugador.ejercito) && listasVisibles"
             type="button"
-            class="ejercito-enlace d-flex align-center ga-1 text-caption text-medium-emphasis mw-100"
+            class="ejercito-enlace d-block text-caption text-medium-emphasis text-truncate mw-100"
             @click="emit('verLista', jugador)"
           >
-            <v-icon size="x-small">mdi-file-document-outline</v-icon>
-            <span class="text-truncate">{{ ejercito(jugador.ejercito) }}</span>
+            {{ ejercito(jugador.ejercito) }}
           </button>
           <span
             v-else-if="ejercito(jugador.ejercito)"

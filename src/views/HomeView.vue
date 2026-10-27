@@ -66,6 +66,12 @@ export default {
       novedades: [
         {
           fecha: "Octubre 2026",
+          titulo: "Nuevas tarjetas de partida",
+          descripcion:
+            "Las partidas de torneo y amistosas del perfil tienen un diseño más limpio: el resultado se muestra desde el punto de vista del jugador que estás viendo. Pulsando en el nick del rival vas a su perfil y, en partidas de torneo, pulsando en el ejército se abre la lista de ese jugador si el organizador ha hecho visibles las listas.",
+        },
+        {
+          fecha: "Octubre 2026",
           titulo: "Resultados de torneos en el perfil",
           descripcion:
             "Nueva pestaña 'Resultados' en el detalle de cada jugador con todos los torneos que ha jugado y su posición final. Al pulsar un torneo se despliega su actuación: victorias, empates y derrotas, puntos a favor y en contra y el ejército utilizado. Pulsando en el número de partidas se abre el detalle de cada partida jugada en ese torneo.",
