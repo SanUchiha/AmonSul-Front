@@ -73,7 +73,7 @@
             </div>
 
             <v-btn
-              @click="deleteTournament(item.idTorneo)"
+              @click="pedirConfirmacionBorrado(item)"
               color="error"
               icon="mdi-close"
               elevation="2"
@@ -84,6 +84,42 @@
       </template>
     </v-data-table>
   </v-card>
+
+  <!-- Modal confirmar borrado torneo -->
+  <v-dialog
+    v-model="showConfirmarBorrarModal"
+    :persistent="isDeleting"
+    max-width="400"
+  >
+    <v-card>
+      <v-card-title> Eliminar torneo </v-card-title>
+      <v-card-text>
+        ¿Estás seguro que deseas eliminar el torneo
+        <strong>{{ torneoAEliminar?.nombreTorneo }}</strong>? Esta acción no se
+        puede deshacer.
+      </v-card-text>
+      <v-card-actions>
+        <v-row justify="center" class="my-4 ga-5">
+          <v-btn
+            variant="tonal"
+            color="error"
+            :loading="isDeleting"
+            @click="confirmarBorrado"
+          >
+            Eliminar
+          </v-btn>
+          <v-btn
+            variant="tonal"
+            color="secondary"
+            :disabled="isDeleting"
+            @click="showConfirmarBorrarModal = false"
+          >
+            Cancelar
+          </v-btn>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
   <ModalSuccess
     :isVisible="showSuccessBorrarModal"
@@ -127,6 +163,9 @@ const isLoading = ref<boolean>(true);
 const router = useRouter();
 const showSuccessBorrarModal = ref<boolean>(false);
 const showErrorBorrarModal = ref<boolean>(false);
+const showConfirmarBorrarModal = ref<boolean>(false);
+const torneoAEliminar = ref<TorneoPropioDTO | null>(null);
+const isDeleting = ref<boolean>(false);
 
 const headers = [{ title: "NOMBRE", key: "nombreTorneo" }];
 
@@ -145,14 +184,26 @@ const viewDetailsTorneoIndividualMasDeUnaLista = (idTorneo: number) => {
   });
 };
 
-const deleteTournament = async (idTorneo: number) => {
+const pedirConfirmacionBorrado = (torneo: TorneoPropioDTO) => {
+  torneoAEliminar.value = torneo;
+  showConfirmarBorrarModal.value = true;
+};
+
+const confirmarBorrado = async () => {
+  if (!torneoAEliminar.value) return;
+  const idTorneo = torneoAEliminar.value.idTorneo;
   try {
+    isDeleting.value = true;
     await deleteTorneo(idTorneo);
     items.value = items.value.filter((item) => item.idTorneo !== idTorneo);
     showSuccessBorrarModal.value = true;
   } catch (error) {
     console.error("Error deleting tournament:", error);
     showErrorBorrarModal.value = true;
+  } finally {
+    isDeleting.value = false;
+    showConfirmarBorrarModal.value = false;
+    torneoAEliminar.value = null;
   }
 };
 
