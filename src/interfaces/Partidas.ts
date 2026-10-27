@@ -115,6 +115,8 @@ export interface ViewPartidaTorneoDTO {
   numeroRonda?: number | null;
   puntosTorneo?: number | null;
   mostrarListas?: boolean | null;
+  eloVariacionUsuario1?: number | null;
+  eloVariacionUsuario2?: number | null;
 }
 
 export interface ActualizarPairingEquiposDTO {

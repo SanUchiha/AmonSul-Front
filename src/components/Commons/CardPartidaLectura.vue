@@ -95,6 +95,14 @@
       >
         {{ resultado.etiqueta }}
       </span>
+      <template v-if="eloVariacion != null">
+        <span>·</span>
+        <span
+          :class="['font-weight-bold text-no-wrap', `text-${colorElo}`]"
+        >
+          {{ eloVariacion > 0 ? "+" : "" }}{{ eloVariacion }} ELO
+        </span>
+      </template>
       <template v-if="escenario">
         <span>·</span>
         <span class="flex-grow-1 min-w-0 text-truncate">{{ escenario }}</span>
@@ -131,6 +139,8 @@ const props = defineProps<{
   idUsuarioDestacado?: number;
   // Si es true el ejército es pulsable y emite verLista
   listasVisibles?: boolean;
+  // ELO ganado o perdido por el jugador destacado; null si no contó o no se sabe
+  eloVariacion?: number | null;
 }>();
 
 //eslint-disable-next-line no-undef
@@ -157,6 +167,11 @@ const resultado = computed(() => {
   return props.idGanador === props.idUsuarioDestacado
     ? { etiqueta: "Victoria", color: "success" }
     : { etiqueta: "Derrota", color: "error" };
+});
+
+const colorElo = computed(() => {
+  if (!props.eloVariacion) return "medium-emphasis";
+  return props.eloVariacion > 0 ? "success" : "error";
 });
 </script>
 

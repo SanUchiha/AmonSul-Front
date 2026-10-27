@@ -21,6 +21,7 @@
       :idGanador="match.ganadorPartidaTorneo"
       :idUsuarioDestacado="idUsuario"
       :listasVisibles="!!match.idTorneo && match.mostrarListas === true"
+      :eloVariacion="eloVariacion"
       @verLista="verLista"
     />
 
@@ -94,6 +95,15 @@ const contexto = computed(() =>
     .filter(Boolean)
     .join(" · ")
 );
+
+// ELO del jugador del perfil en esta partida
+const eloVariacion = computed(() => {
+  if (props.idUsuario === props.match.idUsuario1)
+    return props.match.eloVariacionUsuario1 ?? null;
+  if (props.idUsuario === props.match.idUsuario2)
+    return props.match.eloVariacionUsuario2 ?? null;
+  return null;
+});
 
 const verLista = async (jugador: JugadorPartidaLectura) => {
   if (!props.match.idTorneo) return;
