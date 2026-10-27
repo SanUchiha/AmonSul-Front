@@ -1,6 +1,7 @@
 <template>
   <v-container>
-    <v-card>
+    <LoadingGandalf v-if="isLoading" />
+    <v-card v-else>
       <!-- Tabs -->
       <v-tabs v-model="tab" color="primary" grow>
         <v-tab value="one" aria-label="Información del Torneo"> Detalle </v-tab>
@@ -457,6 +458,7 @@ import {
 } from "@/interfaces/Inscripcion";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
+import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
 
 const { getidUsuario } = useAuth();
@@ -667,70 +669,74 @@ const eliminarInscripcionEquipo = async (
 // Montaje y obtención de datos
 onMounted(async () => {
   isLoading.value = true;
-  if (idUsuario.value != null) {
-    idTorneo.value = Number(route.params.idTorneo);
+  try {
+    if (idUsuario.value != null) {
+      idTorneo.value = Number(route.params.idTorneo);
 
-    //TODO Cambiar getInscripcionesUser por servicio que devuelva el estado de la inscripción al torneo.
-    // No es necesario tener una lista de inscripciones, es mas optimo solo la inscripción al torneo.
-    // Paralelizar las solicitudes
-    const [responseTorneo, responseInscripcion, responseInscriptionesUser] =
-      await Promise.all([
-        getTorneo(idTorneo.value),
-        getInscripcionesTorneo(idTorneo.value),
-        getInscripcionesIndividualByUser(idUsuario.value),
-      ]);
+      //TODO Cambiar getInscripcionesUser por servicio que devuelva el estado de la inscripción al torneo.
+      // No es necesario tener una lista de inscripciones, es mas optimo solo la inscripción al torneo.
+      // Paralelizar las solicitudes
+      const [responseTorneo, responseInscripcion, responseInscriptionesUser] =
+        await Promise.all([
+          getTorneo(idTorneo.value),
+          getInscripcionesTorneo(idTorneo.value),
+          getInscripcionesIndividualByUser(idUsuario.value),
+        ]);
 
-    torneo.value = responseTorneo.data;
-    participantes.value = responseInscripcion.data;
-    torneosApuntado.value = responseInscriptionesUser.data;
+      torneo.value = responseTorneo.data;
+      participantes.value = responseInscripcion.data;
+      torneosApuntado.value = responseInscriptionesUser.data;
 
-    // Verificar si el usuario ya está apuntado
-    if (torneosApuntado.value != null) {
-      torneosApuntado.value.forEach(element => {
-        if (element.idTorneo === idTorneo.value) {
-          idInscripcion.value = element.idInscripcion;
-          estaApuntado.value = true;
-          if (element.idEquipo != null) idEquipo.value = element.idEquipo;
-        }
-      });
+      // Verificar si el usuario ya está apuntado
+      if (torneosApuntado.value != null) {
+        torneosApuntado.value.forEach(element => {
+          if (element.idTorneo === idTorneo.value) {
+            idInscripcion.value = element.idInscripcion;
+            estaApuntado.value = true;
+            if (element.idEquipo != null) idEquipo.value = element.idEquipo;
+          }
+        });
 
-      // Verificar si el torneo está completo
-      if (torneo.value && torneo.value.limiteParticipantes) {
-        if (participantes.value.length >= torneo.value.limiteParticipantes) {
-          isTorneoCompletado.value = true;
+        // Verificar si el torneo está completo
+        if (torneo.value && torneo.value.limiteParticipantes) {
+          if (participantes.value.length >= torneo.value.limiteParticipantes) {
+            isTorneoCompletado.value = true;
+          }
         }
       }
     }
-  }
 
-  if (torneo.value) tipoTorneo.value = torneo.value.tipoTorneo;
+    if (torneo.value) tipoTorneo.value = torneo.value.tipoTorneo;
 
-  if (idTorneo.value) {
-    const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
+    if (idTorneo.value) {
+      const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
 
-    infoEquipos.value = responseEquipos.data;
-  }
-  try {
-    if (torneo.value)
-      if (isValidCoordinates(torneo.value.lugarTorneo)) {
-        getAddress(
-          parseFloat(torneo.value.lugarTorneo.split(", ")[0]),
-          parseFloat(torneo.value.lugarTorneo.split(", ")[1])
-        );
-      }
+      infoEquipos.value = responseEquipos.data;
+    }
+    try {
+      if (torneo.value)
+        if (isValidCoordinates(torneo.value.lugarTorneo)) {
+          getAddress(
+            parseFloat(torneo.value.lugarTorneo.split(", ")[0]),
+            parseFloat(torneo.value.lugarTorneo.split(", ")[1])
+          );
+        }
+    } catch (err) {
+      console.error("Error al obtener coordenadas del torneo:", err);
+    }
+    if (idTorneo.value && idUsuario.value) {
+      const responseEstaApuntado = await estaApuntadoTorneoAsync(
+        idTorneo.value,
+        parseInt(idUsuario.value)
+      );
+
+      if (responseEstaApuntado.data) estaApuntado.value = true;
+    }
   } catch (err) {
-    console.error("Error al obtener coordenadas del torneo:", err);
+    console.error("Error al cargar el torneo:", err);
+  } finally {
+    isLoading.value = false;
   }
-  if (idTorneo.value && idUsuario.value) {
-    const responseEstaApuntado = await estaApuntadoTorneoAsync(
-      idTorneo.value,
-      parseInt(idUsuario.value)
-    );
-
-    if (responseEstaApuntado.data) estaApuntado.value = true;
-  }
-
-  isLoading.value = false;
 });
 
 watch(
