@@ -985,6 +985,7 @@ const handleModificarPartidaTorneoConfirm = async (
       showErrorModal.value = true;
     } finally {
       isGenerating.value = false;
+      closeModificarPartidaTorneoModal();
     }
   }
 };
