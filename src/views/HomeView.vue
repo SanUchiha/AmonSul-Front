@@ -65,6 +65,12 @@ export default {
     return {
       novedades: [
         {
+          fecha: "Octubre 2026",
+          titulo: "Resultados de torneos en el perfil",
+          descripcion:
+            "Nueva pestaña 'Resultados' en el detalle de cada jugador con todos los torneos que ha jugado y su posición final. Al pulsar un torneo se despliega su actuación: victorias, empates y derrotas, puntos a favor y en contra y el ejército utilizado. Pulsando en el número de partidas se abre el detalle de cada partida jugada en ese torneo.",
+        },
+        {
           fecha: "Agosto 2026",
           titulo: "Estadísticas de ejércitos",
           descripcion:
