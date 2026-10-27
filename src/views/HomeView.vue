@@ -66,6 +66,12 @@ export default {
       novedades: [
         {
           fecha: "Octubre 2026",
+          titulo: "ELO ganado y perdido en torneos",
+          descripcion:
+            "Las partidas de torneo del perfil muestran cuánto ELO se ganó o se perdió en cada una, en verde o en rojo junto al resultado. Se ha recuperado también el ELO de la mayoría de torneos ya jugados. Los torneos que no cuentan para el ELO, con 7 partidas o menos en la primera ronda, no lo muestran.",
+        },
+        {
+          fecha: "Octubre 2026",
           titulo: "Nuevas tarjetas de partida",
           descripcion:
             "Las partidas de torneo y amistosas del perfil tienen un diseño más limpio: el resultado se muestra desde el punto de vista del jugador que estás viendo. Pulsando en el nick del rival vas a su perfil y, en partidas de torneo, pulsando en el ejército se abre la lista de ese jugador si el organizador ha hecho visibles las listas.",
