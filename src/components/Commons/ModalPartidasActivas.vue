@@ -4,7 +4,7 @@
       <v-card-title class="headline">Partidas de hoy</v-card-title>
       <v-card-text>
         <div v-if="estaJugando.partidas && estaJugando.partidas.length > 0">
-          <div v-if="estaJugando.tipoTorneo == 'Individual'">
+          <div v-if="estaJugando.torneoType == 'Individual'">
             <CardPartidaTorneoLive
               v-for="(partida, idx) in estaJugando.partidas"
               :key="partida.idPartidaTorneo || idx"

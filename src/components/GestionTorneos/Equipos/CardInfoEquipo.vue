@@ -253,8 +253,14 @@
                       <v-divider class="my-2" />
                       <v-list-item
                         @click.stop="
-                          eliminarMiembro(item.idInscripcion);
                           isOpenMenuAcciones[item.idInscripcion] = false;
+                          abrirModalConfirmacion(
+                            esParejas
+                              ? `¿Quitar a ${item.nick} de la pareja?`
+                              : `¿Quitar a ${item.nick} del equipo?`,
+                            'Se borran su inscripción y su lista en este torneo. Esta acción no se puede deshacer.',
+                            () => eliminarMiembro(item.idInscripcion)
+                          );
                         "
                       >
                         <v-list-item-title>

@@ -544,25 +544,25 @@ const cambiarPairing = () => {
 };
 
 const actualizarPairing = async (payload: ActualizarPairingEquiposDTO) => {
-  // enviar al backend
-  const isUpdate: boolean = await sendUpdateBack(
-    payload.idJugador1,
-    payload.idJugador2
-  );
+  const partida = await sendUpdateBack(payload.idJugador1, payload.idJugador2);
 
-  if (isUpdate) {
-    // Actualizas localMatch según el nuevo pairing
-    localMatch.idUsuario1 = payload.idJugador1;
-    localMatch.idUsuario2 = payload.idJugador2;
-    localMatch.ejercitoUsuario1 = payload.ejercitoEquipo1;
-    localMatch.ejercitoUsuario2 = payload.ejercitoEquipo2;
-    localMatch.nick1 = payload.nick1;
-    localMatch.nick2 = payload.nick2;
-
-    // Si necesitas actualizar también nombres o algo más, hazlo aquí
-  } else {
-    // manejar error
-  }
+  // Como ha quedado en el back: los jugadores nuevos con sus ejércitos y la partida sin resultado
+  if (partida)
+    Object.assign(localMatch, {
+      idUsuario1: partida.idUsuario1,
+      idUsuario2: partida.idUsuario2,
+      nick1: partida.nick1,
+      nick2: partida.nick2,
+      ejercitoUsuario1: partida.ejercitoUsuario1,
+      ejercitoUsuario2: partida.ejercitoUsuario2,
+      resultadoUsuario1: partida.resultadoUsuario1,
+      resultadoUsuario2: partida.resultadoUsuario2,
+      ganadorPartidaTorneo: partida.ganadorPartidaTorneo,
+      partidaValidadaUsuario1: partida.partidaValidadaUsuario1,
+      partidaValidadaUsuario2: partida.partidaValidadaUsuario2,
+      liderMuertoUsuario1: partida.liderMuertoUsuario1,
+      liderMuertoUsuario2: partida.liderMuertoUsuario2,
+    });
   showModalCambiarPairing.value = false;
 };
 
@@ -576,12 +576,11 @@ const sendUpdateBack = async (idJugador1: number, idJugador2: number) => {
       idUsuario2: idJugador2,
     };
 
-    await updatePairingTorneoAsync(body);
-    return true;
+    return await updatePairingTorneoAsync(body);
   } catch (error) {
     console.error(error);
     showErrorCambiarPairingModal.value = true;
-    return false;
+    return null;
   } finally {
     isLoading.value = false;
   }
