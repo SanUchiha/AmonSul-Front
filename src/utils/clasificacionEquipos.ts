@@ -54,13 +54,14 @@ function clasificacionNormal(
       if (equipo1) equipo1.puntos += ResultMatchMatchedPlayType.DRAW;
       if (equipo2) equipo2.puntos += ResultMatchMatchedPlayType.DRAW;
     } else {
-      if (equipo1 && equipo2 && res1 > res2) {
-        equipo1.puntos += ResultMatchMatchedPlayType.WIN;
-        equipo2.puntos += ResultMatchMatchedPlayType.LOSS;
+      // Cada lado por separado: el bye no está en la clasificación y ganarle también suma
+      if (res1 > res2) {
+        if (equipo1) equipo1.puntos += ResultMatchMatchedPlayType.WIN;
+        if (equipo2) equipo2.puntos += ResultMatchMatchedPlayType.LOSS;
       }
-      if (equipo1 && equipo2 && res2 > res1) {
-        equipo2.puntos += ResultMatchMatchedPlayType.WIN;
-        equipo1.puntos += ResultMatchMatchedPlayType.LOSS;
+      if (res2 > res1) {
+        if (equipo2) equipo2.puntos += ResultMatchMatchedPlayType.WIN;
+        if (equipo1) equipo1.puntos += ResultMatchMatchedPlayType.LOSS;
       }
     }
     if (equipo1) {
