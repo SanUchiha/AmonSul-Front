@@ -66,6 +66,45 @@
           >
             {{ ejercito(jugador.ejercito) }}
           </span>
+          <!-- En Parejas, el compañero juega en el mismo lado -->
+          <template v-if="jugador.companero">
+            <router-link
+              v-if="jugador.companero.idUsuario !== idUsuarioDestacado"
+              :to="{
+                name: 'detalle-jugador',
+                params: { idUsuario: jugador.companero.idUsuario },
+              }"
+              :class="[
+                'nick-enlace d-block text-truncate',
+                esGanador(jugador) ? 'font-weight-bold' : 'text-medium-emphasis',
+              ]"
+            >
+              {{ jugador.companero.nick }}
+            </router-link>
+            <span
+              v-else
+              :class="[
+                'd-block text-truncate',
+                esGanador(jugador) ? 'font-weight-bold' : 'text-medium-emphasis',
+              ]"
+            >
+              {{ jugador.companero.nick }}
+            </span>
+            <button
+              v-if="ejercito(jugador.companero.ejercito) && listasVisibles"
+              type="button"
+              class="ejercito-enlace d-block text-caption text-medium-emphasis text-truncate mw-100"
+              @click="emit('verLista', jugador.companero)"
+            >
+              {{ ejercito(jugador.companero.ejercito) }}
+            </button>
+            <span
+              v-else-if="ejercito(jugador.companero.ejercito)"
+              class="d-block text-caption text-medium-emphasis text-truncate"
+            >
+              {{ ejercito(jugador.companero.ejercito) }}
+            </span>
+          </template>
         </div>
         <span
           :class="[
@@ -122,6 +161,8 @@ export interface JugadorPartidaLectura {
   nick?: string;
   ejercito?: string | null;
   puntos?: number | null;
+  // Solo en Parejas: compañero del jugador, en su mismo lado
+  companero?: JugadorPartidaLectura | null;
 }
 
 //eslint-disable-next-line no-undef
@@ -148,11 +189,22 @@ const emit = defineEmits<{
   (e: "verLista", jugador: JugadorPartidaLectura): void;
 }>();
 
+// En Parejas el destacado puede ser el compañero: cuenta su lado entero
+const esDelLado = (jugador: JugadorPartidaLectura) =>
+  props.idUsuarioDestacado !== undefined &&
+  (jugador.idUsuario === props.idUsuarioDestacado ||
+    jugador.companero?.idUsuario === props.idUsuarioDestacado);
+
 const jugadores = computed(() => {
   const lista = [props.jugador1, props.jugador2];
-  return props.jugador2.idUsuario === props.idUsuarioDestacado
-    ? lista.reverse()
-    : lista;
+  return esDelLado(props.jugador2) ? lista.reverse() : lista;
+});
+
+// El ganador de la partida es el jugador de cada lado, no el compañero
+const idLadoDestacado = computed(() => {
+  if (esDelLado(props.jugador2)) return props.jugador2.idUsuario;
+  if (esDelLado(props.jugador1)) return props.jugador1.idUsuario;
+  return props.idUsuarioDestacado;
 });
 
 const esGanador = (jugador: JugadorPartidaLectura) =>
@@ -164,7 +216,7 @@ const ejercito = (nombre?: string | null) =>
 // Colores del tema como texto: se leen bien sobre fondo oscuro
 const resultado = computed(() => {
   if (!props.idGanador) return { etiqueta: "Empate", color: "warning" };
-  return props.idGanador === props.idUsuarioDestacado
+  return props.idGanador === idLadoDestacado.value
     ? { etiqueta: "Victoria", color: "success" }
     : { etiqueta: "Derrota", color: "error" };
 });

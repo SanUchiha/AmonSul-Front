@@ -31,6 +31,8 @@ export interface Torneo {
   tieneBases: boolean;
   inicioInscripciones: string; // Fecha límite de inscripción
   listasPorJugador: number;
+  // Solo en Parejas: true si cada pareja entrega una lista conjunta
+  listaPorPareja?: boolean;
   mostrarListas: boolean;
   mostrarClasificacion: boolean;
   classificationType: ClassificationType;
@@ -146,6 +148,7 @@ export interface CrearTorneoDTO {
   horaInicioTorneo: string; // formato de hora "HH:mm:ss"
   horaFinTorneo: string; // formato de hora "HH:mm:ss"
   listasPorJugador: number;
+  listaPorPareja: boolean;
   classificationType: ClassificationType;
   contacto?: string;
 }
@@ -175,6 +178,7 @@ export interface ModificarTorneoDTO {
   horaFinTorneo?: string; // formato de hora "HH:mm:ss"
   inicioInscripciones?: string; // Fecha límite de inscripción
   listasPorJugador: number;
+  listaPorPareja?: boolean;
   classificationType: ClassificationType;
   contacto?: string;
 }

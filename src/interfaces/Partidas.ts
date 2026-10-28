@@ -71,6 +71,14 @@ export interface PartidaTorneoDTO {
   listasJugador1: ListaDTO[] | null;
   listasJugador2: ListaDTO[] | null;
   numeroMesa: number | null;
+  // Solo en Parejas: compañeros de los capitanes idUsuario1 e idUsuario2
+  idCompanero1?: number | null;
+  idCompanero2?: number | null;
+  nickCompanero1?: string | null;
+  nickCompanero2?: string | null;
+  // Vacíos si la pareja juega con una lista conjunta
+  ejercitoCompanero1?: string | null;
+  ejercitoCompanero2?: string | null;
 }
 
 export interface PartidaTorneoMasDTO {
@@ -117,6 +125,13 @@ export interface ViewPartidaTorneoDTO {
   mostrarListas?: boolean | null;
   eloVariacionUsuario1?: number | null;
   eloVariacionUsuario2?: number | null;
+  // Solo en Parejas: compañeros de los capitanes idUsuario1 e idUsuario2
+  idCompanero1?: number | null;
+  nickCompanero1?: string | null;
+  ejercitoCompanero1?: string | null;
+  idCompanero2?: number | null;
+  nickCompanero2?: string | null;
+  ejercitoCompanero2?: string | null;
 }
 
 export interface ActualizarPairingEquiposDTO {

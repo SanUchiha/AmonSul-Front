@@ -30,7 +30,9 @@
           :value="tabClasificacion"
         ></v-tab>
 
+        <!-- En Parejas el ranking individual solo tendría a los capitanes -->
         <v-tab
+          v-if="torneo?.tipoTorneo !== 'Parejas'"
           :key="tabClasificacionIndividual"
           :text="`Individual`"
           :value="tabClasificacionIndividual"

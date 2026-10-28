@@ -107,6 +107,9 @@
             label="¿Cúantas listas necesitará un jugador?"
             required
             type="number"
+            :disabled="esListaConjunta"
+            :hint="esListaConjunta ? 'Con lista conjunta cada pareja entrega una' : ''"
+            persistent-hint
             :rules="[
               (v: number) => !isNaN(v) || 'Debe ser un número',
               (v: number) => v > 0 || 'Debe ser mayor que 0',
@@ -132,9 +135,25 @@
             v-model="tipoTorneo"
             label="¿De qué tipo es el torneo?"
             required
-            :items="['Individual', 'Equipos de 2', 'Equipos de 4', 'Equipos de 6']"
+            :items="tipoTorneoOptions"
+            item-title="label"
+            item-value="value"
             :rules="[(v: string) => !!v || 'Campo obligatorio']"
             :error="missingFieldsSet.has('Tipo de torneo')"
+          >
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props" :subtitle="item.raw.subtitle" />
+            </template>
+          </v-select>
+
+          <!-- Modo de listas, solo en Parejas -->
+          <v-select
+            v-if="tipoTorneo === 'Parejas'"
+            v-model="listaPorPareja"
+            label="¿Cómo entregan las listas las parejas?"
+            :items="modoListasParejaOptions"
+            item-title="label"
+            item-value="value"
           />
 
           <!-- Tipo de clasificación -->
@@ -359,11 +378,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { CrearTorneoDTO } from "@/interfaces/Torneo";
 import { crearTorneo } from "@/services/TorneosService";
+import {
+  modoListasParejaOptions,
+  tipoTorneoOptions,
+} from "@/Constant/TiposTorneo";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
@@ -490,6 +513,14 @@ const listasPorJugador = ref<number>();
 const estadoTorneo = ref<number>(1);
 const lugarTorneo = ref<string>();
 const tipoTorneo = ref<string>("");
+const listaPorPareja = ref<boolean>(false);
+const esListaConjunta = computed(
+  () => tipoTorneo.value === "Parejas" && listaPorPareja.value
+);
+// Con lista conjunta cada pareja entrega una sola lista
+watch(esListaConjunta, conjunta => {
+  if (conjunta) listasPorJugador.value = 1;
+});
 const esLiga = ref<boolean>(false);
 const idRangoTorneo = ref<number>(1);
 const esMatchedPlayTorneo = ref<boolean>(false);
@@ -690,10 +721,6 @@ const confirmarConfiguracion = async () => {
       )
     : null;
 
-  if (tipoTorneo.value == "Equipos de 2") tipoTorneo.value = "Equipos_2";
-  if (tipoTorneo.value == "Equipos de 4") tipoTorneo.value = "Equipos_4";
-  if (tipoTorneo.value == "Equipos de 6") tipoTorneo.value = "Equipos_6";
-
   const nuevoTorneo: CrearTorneoDTO = {
     idUsuario: props.idUsuario,
     nombreTorneo: nombreTorneo.value ?? "",
@@ -718,6 +745,7 @@ const confirmarConfiguracion = async () => {
     descripcionTorneo: descripcionTorneo.value,
     inicioInscripciones: fechaInicioInscripcion.value ?? "",
     listasPorJugador: listasPorJugador.value ?? 1,
+    listaPorPareja: esListaConjunta.value,
     classificationType: classificationType.value ?? ClassificationType.NORMAL,
     contacto: contacto.value || undefined,
   };
@@ -755,6 +783,7 @@ const resetElement = () => {
   descripcionTorneo.value = "";
   fechaInicioInscripcion.value = "";
   listasPorJugador.value = 1;
+  listaPorPareja.value = false;
   contacto.value = undefined;
 };
 

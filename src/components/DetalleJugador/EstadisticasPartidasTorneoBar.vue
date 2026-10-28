@@ -91,6 +91,7 @@
 <script setup lang="ts">
 import type { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { ref, computed } from "vue";
+import { ejercitoDelJugador, idJugadorDelLado } from "@/utils/partidaParejas";
 
 // eslint-disable-next-line no-undef
 const props = defineProps<{
@@ -108,7 +109,7 @@ const partidasFiltradas = computed(() => {
   if (!filtroActivo.value) return props.tournamentMatches;
   if (filtroActivo.value === "win") {
     return props.tournamentMatches.filter(
-      p => p.ganadorPartidaTorneo === props.idUsuario
+      p => p.ganadorPartidaTorneo === idJugadorDelLado(p, props.idUsuario)
     );
   }
   if (filtroActivo.value === "draw") {
@@ -118,7 +119,7 @@ const partidasFiltradas = computed(() => {
     return props.tournamentMatches.filter(
       p =>
         p.ganadorPartidaTorneo !== null &&
-        p.ganadorPartidaTorneo !== props.idUsuario
+        p.ganadorPartidaTorneo !== idJugadorDelLado(p, props.idUsuario)
     );
   }
   return props.tournamentMatches;
@@ -127,12 +128,7 @@ const partidasFiltradas = computed(() => {
 const ejercitoMasUsado = computed(() => {
   const counts: { [key: string]: number } = {};
   for (const partida of partidasFiltradas.value) {
-    let ejercito = null;
-    if (partida.idUsuario1 === props.idUsuario) {
-      ejercito = partida.ejercitoUsuario1;
-    } else if (partida.idUsuario2 === props.idUsuario) {
-      ejercito = partida.ejercitoUsuario2;
-    }
+    const ejercito = ejercitoDelJugador(partida, props.idUsuario);
     if (ejercito) {
       counts[ejercito] = (counts[ejercito] || 0) + 1;
     }
@@ -151,7 +147,7 @@ const ejercitoMasUsado = computed(() => {
 const partidasGanadas = computed(
   () =>
     props.tournamentMatches.filter(
-      p => p.ganadorPartidaTorneo === props.idUsuario
+      p => p.ganadorPartidaTorneo === idJugadorDelLado(p, props.idUsuario)
     ).length
 );
 const partidasEmpatadas = computed(
@@ -163,7 +159,7 @@ const partidasPerdidas = computed(
     props.tournamentMatches.filter(
       p =>
         p.ganadorPartidaTorneo !== null &&
-        p.ganadorPartidaTorneo !== props.idUsuario
+        p.ganadorPartidaTorneo !== idJugadorDelLado(p, props.idUsuario)
     ).length
 );
 const total = computed(() => props.tournamentMatches.length);

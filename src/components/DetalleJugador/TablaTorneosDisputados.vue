@@ -137,6 +137,11 @@ import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useDisplay } from "vuetify";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
+import {
+  ejercitoDelJugador,
+  idJugadorDelLado,
+  juegaEnLado1,
+} from "@/utils/partidaParejas";
 import { ClasificacionTorneosDTO } from "@/interfaces/Usuario";
 import CardPartidaTorneo from "../PartidasTorneo/CardPartidaTorneo.vue";
 
@@ -250,7 +255,7 @@ const resumenTorneos = computed<ResumenTorneo[]>(() => {
     const clave = claveTorneo(partida.idTorneo, partida.nombreTorneo);
     const fila = obtenerFila(clave, partida.nombreTorneo ?? "-");
 
-    const esJugador1 = partida.idUsuario1 === props.idUsuario;
+    const esJugador1 = juegaEnLado1(partida, props.idUsuario);
     const propios = esJugador1
       ? partida.resultadoUsuario1
       : partida.resultadoUsuario2;
@@ -262,7 +267,8 @@ const resumenTorneos = computed<ResumenTorneo[]>(() => {
     fila.jugadas++;
     fila.puntosFavor += propios;
     fila.puntosContra += rival;
-    if (partida.ganadorPartidaTorneo === props.idUsuario) fila.victorias++;
+    if (partida.ganadorPartidaTorneo === idJugadorDelLado(partida, props.idUsuario))
+      fila.victorias++;
     else if (!partida.ganadorPartidaTorneo) fila.empates++;
     else fila.derrotas++;
 
@@ -271,9 +277,7 @@ const resumenTorneos = computed<ResumenTorneo[]>(() => {
       : 0;
     fila.ultimaFecha = Math.max(fila.ultimaFecha, fecha);
 
-    const ejercito = esJugador1
-      ? partida.ejercitoUsuario1
-      : partida.ejercitoUsuario2;
+    const ejercito = ejercitoDelJugador(partida, props.idUsuario);
     if (ejercito && ejercito !== "N/A") {
       ejercitos.set(clave, [...(ejercitos.get(clave) ?? []), ejercito]);
     }

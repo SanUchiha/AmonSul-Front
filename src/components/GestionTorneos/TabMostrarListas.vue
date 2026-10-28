@@ -4,7 +4,10 @@
       <p v-if="torneo?.tipoTorneo == 'Individual'">
         <v-icon left>mdi-account-group</v-icon> Participantes
       </p>
-      <p v-else><v-icon left>mdi-account-group</v-icon> Equipos</p>
+      <p v-else>
+        <v-icon left>mdi-account-group</v-icon>
+        {{ torneo?.tipoTorneo == "Parejas" ? "Parejas" : "Equipos" }}
+      </p>
       <v-spacer />
       <v-text-field
         v-model="search"

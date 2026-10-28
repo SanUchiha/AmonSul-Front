@@ -21,6 +21,13 @@
               :class="{ highlight: match.idUsuario1 === idUsuario }"
               >{{ match.nick1 }}</span
             >
+            <!-- compañero, solo en Parejas -->
+            <span
+              v-if="match.nickCompanero1"
+              class="text-wrap d-block"
+              :class="{ highlight: match.idCompanero1 === idUsuario }"
+              >{{ match.nickCompanero1 }}</span
+            >
           </v-col>
 
           <v-col cols="2" class="score text-center marcador">
@@ -37,6 +44,13 @@
               class="text-wrap"
               :class="{ highlight: match.idUsuario2 === idUsuario }"
               >{{ match.nick2 }}</span
+            >
+            <!-- compañero, solo en Parejas -->
+            <span
+              v-if="match.nickCompanero2"
+              class="text-wrap d-block"
+              :class="{ highlight: match.idCompanero2 === idUsuario }"
+              >{{ match.nickCompanero2 }}</span
             >
           </v-col>
         </v-row>
@@ -56,6 +70,23 @@
                 <span class="text-wrap">{{ match.ejercitoUsuario1 }}</span>
               </v-btn>
             </div>
+            <div v-if="match.idCompanero1 && match.ejercitoCompanero1" class="mt-1">
+              <v-btn
+                block
+                class="army-btn"
+                @click="
+                  verLista(
+                    match.idCompanero1,
+                    match.idTorneo,
+                    match.nickCompanero1 ?? ''
+                  )
+                "
+                style="font-size: 10px"
+                variant="tonal"
+              >
+                <span class="text-wrap">{{ match.ejercitoCompanero1 }}</span>
+              </v-btn>
+            </div>
           </v-col>
           <v-col cols="6" class="text-right">
             <div>
@@ -67,6 +98,23 @@
                 variant="tonal"
               >
                 <span class="text-wrap">{{ match.ejercitoUsuario2 }}</span>
+              </v-btn>
+            </div>
+            <div v-if="match.idCompanero2 && match.ejercitoCompanero2" class="mt-1">
+              <v-btn
+                block
+                class="army-btn"
+                @click="
+                  verLista(
+                    match.idCompanero2,
+                    match.idTorneo,
+                    match.nickCompanero2 ?? ''
+                  )
+                "
+                style="font-size: 10px"
+                variant="tonal"
+              >
+                <span class="text-wrap">{{ match.ejercitoCompanero2 }}</span>
               </v-btn>
             </div>
           </v-col>

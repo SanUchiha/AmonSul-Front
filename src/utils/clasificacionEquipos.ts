@@ -4,6 +4,7 @@ import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
 import {
   MatchResultGeneral,
+  ResultMatchMatchedPlayExtendedIndividualType,
   ResultMatchMatchedPlayExtendedTeamType,
   ResultMatchMatchedPlayType,
 } from "@/Constant/TipoClasificacion";
@@ -87,7 +88,10 @@ function clasificacionNormal(
 
 function clasificacionExtendida(
   equipos: EquipoDTO[],
-  partidas: PartidaTorneoDTO[]
+  partidas: PartidaTorneoDTO[],
+  escala:
+    | typeof ResultMatchMatchedPlayExtendedTeamType
+    | typeof ResultMatchMatchedPlayExtendedIndividualType
 ): ClasificacionEquipo[] {
   const clasificacionMap = crearClasificacionBase(equipos);
   partidas.forEach(partida => {
@@ -109,34 +113,34 @@ function clasificacionExtendida(
     const res2 = resultadoUsuario2 ?? 0;
     if (res1 === res2) {
       if (equipo1)
-        equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.DRAW;
+        equipo1.puntos += escala.DRAW;
       if (equipo2)
-        equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.DRAW;
+        equipo2.puntos += escala.DRAW;
     } else {
       if (res1 > res2) {
         if (res1 >= 2 * res2 && res1 >= 6) {
           if (equipo1)
-            equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
+            equipo1.puntos += escala.MAJOR_WIN;
           if (equipo2)
-            equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
+            equipo2.puntos += escala.MAJOR_LOSS;
         } else {
           if (equipo1)
-            equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
+            equipo1.puntos += escala.MINOR_WIN;
           if (equipo2)
-            equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
+            equipo2.puntos += escala.MINOR_LOSS;
         }
       }
       if (res2 > res1) {
         if (res2 >= 2 * res1 && res2 >= 6) {
           if (equipo2)
-            equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.MAJOR_WIN;
+            equipo2.puntos += escala.MAJOR_WIN;
           if (equipo1)
-            equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.MAJOR_LOSS;
+            equipo1.puntos += escala.MAJOR_LOSS;
         } else {
           if (equipo2)
-            equipo2.puntos += ResultMatchMatchedPlayExtendedTeamType.MINOR_WIN;
+            equipo2.puntos += escala.MINOR_WIN;
           if (equipo1)
-            equipo1.puntos += ResultMatchMatchedPlayExtendedTeamType.MINOR_LOSS;
+            equipo1.puntos += escala.MINOR_LOSS;
         }
       }
     }
@@ -222,7 +226,14 @@ export function generarClasificacionEquipos({
 }): ClasificacionEquipo[] {
   switch (torneo?.classificationType) {
     case 2: // EXTENDED
-      return clasificacionExtendida(equipos, partidas);
+      // En Parejas cada partida es un enfrentamiento entero: puntúa con la escala individual
+      return clasificacionExtendida(
+        equipos,
+        partidas,
+        torneo?.tipoTorneo === "Parejas"
+          ? ResultMatchMatchedPlayExtendedIndividualType
+          : ResultMatchMatchedPlayExtendedTeamType
+      );
     case 3: // ALEMAN
       return clasificacionAleman(equipos, partidas);
     case 1:

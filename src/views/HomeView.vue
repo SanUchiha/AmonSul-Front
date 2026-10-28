@@ -66,6 +66,12 @@ export default {
       novedades: [
         {
           fecha: "Octubre 2026",
+          titulo: "Torneos a Parejas",
+          descripcion:
+            "Nuevo tipo de torneo: dos contra dos en la misma mesa, con un único resultado por partida que mete el capitán. El organizador elige si cada pareja entrega una lista por jugador o una lista conjunta. Las partidas cuentan para el ELO con 16 jugadores o más: se usa la media de ELO de cada pareja y los dos jugadores ganan o pierden lo mismo. Los antiguos torneos de Parejas pasan a llamarse Equipos de 2, porque cada miembro juega su propia partida.",
+        },
+        {
+          fecha: "Octubre 2026",
           titulo: "ELO ganado y perdido en torneos",
           descripcion:
             "Las partidas de torneo del perfil muestran cuánto ELO se ganó o se perdió en cada una, en verde o en rojo junto al resultado. Se ha recuperado también el ELO de la mayoría de torneos ya jugados. Los torneos que no cuentan para el ELO, con 7 partidas o menos en la primera ronda, no lo muestran.",

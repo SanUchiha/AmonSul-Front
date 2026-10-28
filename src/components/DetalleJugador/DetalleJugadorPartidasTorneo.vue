@@ -43,6 +43,7 @@ import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import CardPartidaTorneo from "../PartidasTorneo/CardPartidaTorneo.vue";
 import EstadisticasPartidasTorneoBar from "./EstadisticasPartidasTorneoBar.vue";
 import { computed, ref } from "vue";
+import { idJugadorDelLado } from "@/utils/partidaParejas";
 
 // eslint-disable-next-line no-undef
 const props = defineProps<{
@@ -57,7 +58,7 @@ const partidasFiltradas = computed(() => {
   if (!filtroActivo.value) return props.tournamentMatches;
   if (filtroActivo.value === "win") {
     return props.tournamentMatches.filter(
-      p => p.ganadorPartidaTorneo === props.idUsuario
+      p => p.ganadorPartidaTorneo === idJugadorDelLado(p, props.idUsuario)
     );
   }
   if (filtroActivo.value === "draw") {
@@ -70,7 +71,7 @@ const partidasFiltradas = computed(() => {
       p =>
         p.ganadorPartidaTorneo !== null &&
         p.ganadorPartidaTorneo !== 0 &&
-        p.ganadorPartidaTorneo !== props.idUsuario
+        p.ganadorPartidaTorneo !== idJugadorDelLado(p, props.idUsuario)
     );
   }
   return props.tournamentMatches;

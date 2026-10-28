@@ -98,6 +98,9 @@
             label="¿Cúantas listas necesitará un jugador?"
             required
             type="number"
+            :disabled="esListaConjunta"
+            :hint="esListaConjunta ? 'Con lista conjunta cada pareja entrega una' : ''"
+            persistent-hint
             :rules="[
               (v: number) => !isNaN(v) || 'Debe ser un número',
               (v: number) => v > 0 || 'Debe ser mayor que 0',
@@ -125,6 +128,20 @@
             item-title="label"
             item-value="value"
             :rules="[(v: string) => !!v || 'Campo obligatorio']"
+          >
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props" :subtitle="item.raw.subtitle" />
+            </template>
+          </v-select>
+
+          <!-- Modo de listas, solo en Parejas -->
+          <v-select
+            v-if="tipoTorneo === 'Parejas'"
+            v-model="listaPorPareja"
+            label="¿Cómo entregan las listas las parejas?"
+            :items="modoListasParejaOptions"
+            item-title="label"
+            item-value="value"
           />
 
           <!-- Tipo de clasificación -->
@@ -350,7 +367,12 @@ import { ModificarTorneoDTO, Torneo } from "@/interfaces/Torneo";
 import { modificarTorneo } from "@/services/TorneosService";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
-import { torneoType, TorneoType } from "@/Constant/TiposTorneo";
+import {
+  modoListasParejaOptions,
+  tipoTorneoOptions,
+  torneoType,
+  TorneoType,
+} from "@/Constant/TiposTorneo";
 import {
   ClassificationType,
   ClassificationTypeLabels,
@@ -367,13 +389,6 @@ const emit = defineEmits(["close", "confirm"]);
 
 const internalIsVisible = ref(props.isVisible);
 const isValid = ref(true);
-
-const tipoTorneoOptions = [
-  { label: "Individual", value: "Individual" },
-  { label: "Equipos de 2", value: "Equipos_2" },
-  { label: "Equipos de 4", value: "Equipos_4" },
-  { label: "Equipos de 6", value: "Equipos_6" },
-];
 
 const classificationTypeOptions = [
   {
@@ -486,6 +501,10 @@ const puntosTorneo = ref<number>();
 const estadoTorneo = ref<number>(1);
 const lugarTorneo = ref<string>();
 const tipoTorneo = ref<string>("");
+const listaPorPareja = ref<boolean>(false);
+const esListaConjunta = computed(
+  () => tipoTorneo.value === "Parejas" && listaPorPareja.value
+);
 const classificationType = ref<ClassificationType>();
 const esLiga = ref<boolean>(false);
 const idRangoTorneo = ref<number>(1);
@@ -505,6 +524,10 @@ const isGenerating = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const listasPorJugador = ref<number>();
+// Con lista conjunta cada pareja entrega una sola lista
+watch(esListaConjunta, conjunta => {
+  if (conjunta) listasPorJugador.value = 1;
+});
 const form = ref();
 
 watch(
@@ -536,6 +559,7 @@ watch(
       fechaInicioInscripcion.value = newTorneo.inicioInscripciones;
       listasPorJugador.value = newTorneo.listasPorJugador;
       tipoTorneo.value = newTorneo.tipoTorneo;
+      listaPorPareja.value = newTorneo.listaPorPareja ?? false;
       classificationType.value = newTorneo.classificationType;
       contacto.value = newTorneo.contacto || undefined;
     }
@@ -705,6 +729,7 @@ const confirmarConfiguracion = async () => {
     idTorneo: props.torneo?.idTorneo,
     inicioInscripciones: fechaInicioInscripcion.value,
     listasPorJugador: listasPorJugador.value ?? 1,
+    listaPorPareja: esListaConjunta.value,
     classificationType: classificationType.value ?? ClassificationType.NORMAL,
     contacto: contacto.value || undefined,
   };

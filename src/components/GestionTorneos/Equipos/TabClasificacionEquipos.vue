@@ -1,7 +1,13 @@
 <template>
   <v-window-item :value="tabClasificacion" :key="tabClasificacion">
     <template v-if="mostrarClasificacion !== false">
-      <h3 class="text-h6 my-2">Clasificación por Equipos</h3>
+      <h3 class="text-h6 my-2">
+        {{
+          torneo?.tipoTorneo === "Parejas"
+            ? "Clasificación por Parejas"
+            : "Clasificación por Equipos"
+        }}
+      </h3>
       <TablaClasificacionEquipos :clasificacion="clasificacionEquipos" />
     </template>
     <v-alert v-else type="info" variant="tonal" class="ma-4">La clasificación está oculta</v-alert>

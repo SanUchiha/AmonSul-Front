@@ -85,6 +85,7 @@ import CardTitleMisTorneos from "@/components/PartidasTorneo/CardTitleMisTorneos
 import { useAuth } from "@/composables/useAuth";
 import { FaccionDTO } from "@/interfaces/Faccion";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
+import { idJugadorDelLado } from "@/utils/partidaParejas";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { getFaccionByIdUser } from "@/services/FaccionesService";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
@@ -132,11 +133,12 @@ const partidasFiltradas = computed(() => {
   if (!filtroActivo.value) return matches.value;
 
   return matches.value.filter((partida) => {
-    const esVictoria = partida.ganadorPartidaTorneo === idUsuarioLogger.value;
+    const idLado = idJugadorDelLado(partida, idUsuarioLogger.value);
+    const esVictoria = partida.ganadorPartidaTorneo === idLado;
     const esEmpate = partida.ganadorPartidaTorneo === null;
     const esDerrota =
       partida.ganadorPartidaTorneo &&
-      partida.ganadorPartidaTorneo !== idUsuarioLogger.value;
+      partida.ganadorPartidaTorneo !== idLado;
 
     return (
       (filtroActivo.value === "win" && esVictoria) ||
@@ -178,10 +180,11 @@ const loadResume = async (matches: ViewPartidaTorneoDTO[]) => {
   let contadorPerdidas = 0;
 
   matches.forEach((element) => {
-    if (element.ganadorPartidaTorneo == idUsuarioLogger.value)
+    const idLado = idJugadorDelLado(element, idUsuarioLogger.value);
+    if (element.ganadorPartidaTorneo == idLado)
       contadorGanadas++;
     else if (
-      element.ganadorPartidaTorneo != idUsuarioLogger.value &&
+      element.ganadorPartidaTorneo != idLado &&
       element.ganadorPartidaTorneo != null
     )
       contadorPerdidas++;

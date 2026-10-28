@@ -9,12 +9,14 @@
         nick: match.nickUsuario1,
         ejercito: match.ejercitoUsuario1,
         puntos: match.resultadoUsuario1,
+        companero: companero1,
       }"
       :jugador2="{
         idUsuario: match.idUsuario2,
         nick: match.nickUsuario2,
         ejercito: match.ejercitoUsuario2,
         puntos: match.resultadoUsuario2,
+        companero: companero2,
       }"
       :escenario="match.escenarioPartida"
       :puntosPartida="match.puntosPartida || match.puntosTorneo"
@@ -96,11 +98,37 @@ const contexto = computed(() =>
     .join(" · ")
 );
 
-// ELO del jugador del perfil en esta partida
+// Solo en Parejas: compañeros de los capitanes
+const companero1 = computed<JugadorPartidaLectura | null>(() =>
+  props.match.idCompanero1
+    ? {
+        idUsuario: props.match.idCompanero1,
+        nick: props.match.nickCompanero1 ?? undefined,
+        ejercito: props.match.ejercitoCompanero1,
+      }
+    : null
+);
+const companero2 = computed<JugadorPartidaLectura | null>(() =>
+  props.match.idCompanero2
+    ? {
+        idUsuario: props.match.idCompanero2,
+        nick: props.match.nickCompanero2 ?? undefined,
+        ejercito: props.match.ejercitoCompanero2,
+      }
+    : null
+);
+
+// ELO del jugador del perfil en esta partida; en Parejas los dos de un lado ganan o pierden lo mismo
 const eloVariacion = computed(() => {
-  if (props.idUsuario === props.match.idUsuario1)
+  if (
+    props.idUsuario === props.match.idUsuario1 ||
+    props.idUsuario === props.match.idCompanero1
+  )
     return props.match.eloVariacionUsuario1 ?? null;
-  if (props.idUsuario === props.match.idUsuario2)
+  if (
+    props.idUsuario === props.match.idUsuario2 ||
+    props.idUsuario === props.match.idCompanero2
+  )
     return props.match.eloVariacionUsuario2 ?? null;
   return null;
 });

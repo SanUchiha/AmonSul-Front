@@ -66,6 +66,7 @@
                       <v-list-item-title>
                         <div class="flex-column align-items-center">
                           <v-btn
+                            v-if="!esParejas"
                             class="mt-2"
                             variant="tonal"
                             color="secondary"
@@ -140,6 +141,7 @@
                         <v-list-item-title>
                           <div class="flex-column align-items-center">
                             <v-btn
+                              v-if="!esParejas"
                               class="mt-2"
                               variant="tonal"
                               color="secondary"
@@ -162,6 +164,7 @@
                           <v-list-item-title>
                             <div class="flex-column align-items-center">
                               <v-btn
+                                v-if="!esParejas"
                                 class="mt-2"
                                 variant="tonal"
                                 color="secondary"
@@ -247,6 +250,16 @@
                               {{ partida.nick1 }}
                             </span>
                           </div>
+                          <!-- compañero 1, solo en Parejas -->
+                          <div v-if="partida.idCompanero1" class="player-info">
+                            <span
+                              :class="{
+                                highlight: partida.idCompanero1 === idUsuario,
+                              }"
+                            >
+                              {{ partida.nickCompanero1 }}
+                            </span>
+                          </div>
                           <!-- resultado 1 -->
                           <div class="player-info">
                             <span v-if="partida.resultadoUsuario1 != null"
@@ -278,6 +291,13 @@
                             <v-icon>mdi-shield-outline</v-icon>
                             <span>{{ partida.ejercitoUsuario1 ?? null }}</span>
                           </div>
+                          <div
+                            v-if="partida.ejercitoCompanero1"
+                            class="player-info"
+                          >
+                            <v-icon>mdi-shield-outline</v-icon>
+                            <span>{{ partida.ejercitoCompanero1 }}</span>
+                          </div>
                           <!-- lista 1 -->
                           <div class="player-info">
                             <v-btn
@@ -294,6 +314,27 @@
                               "
                             >
                               Lista
+                            </v-btn>
+                          </div>
+                          <!-- con una lista por jugador, también la del compañero -->
+                          <div
+                            v-if="partida.idCompanero1 && !torneo?.listaPorPareja"
+                            class="player-info"
+                          >
+                            <v-btn
+                              class="mt-2"
+                              variant="tonal"
+                              color="primary"
+                              size="small"
+                              @click="
+                                verLista(
+                                  partida.idCompanero1,
+                                  partida.idTorneo,
+                                  partida.nickCompanero1 ?? ''
+                                )
+                              "
+                            >
+                              Lista {{ partida.nickCompanero1 }}
                             </v-btn>
                           </div>
                         </div>
@@ -337,6 +378,16 @@
                               {{ partida.nick2 }}
                             </span>
                           </div>
+                          <!-- compañero 2, solo en Parejas -->
+                          <div v-if="partida.idCompanero2" class="player-info">
+                            <span
+                              :class="{
+                                highlight: partida.idCompanero2 === idUsuario,
+                              }"
+                            >
+                              {{ partida.nickCompanero2 }}
+                            </span>
+                          </div>
                           <!-- resultado 2 -->
                           <div class="player-info">
                             <span v-if="partida.resultadoUsuario2 != null"
@@ -368,6 +419,13 @@
                             <v-icon>mdi-shield-outline</v-icon>
                             <span>{{ partida.ejercitoUsuario2 ?? null }}</span>
                           </div>
+                          <div
+                            v-if="partida.ejercitoCompanero2"
+                            class="player-info"
+                          >
+                            <v-icon>mdi-shield-outline</v-icon>
+                            <span>{{ partida.ejercitoCompanero2 }}</span>
+                          </div>
                           <!-- lista 2 -->
                           <div class="player-info">
                             <v-btn
@@ -384,6 +442,27 @@
                               "
                             >
                               Lista
+                            </v-btn>
+                          </div>
+                          <!-- con una lista por jugador, también la del compañero -->
+                          <div
+                            v-if="partida.idCompanero2 && !torneo?.listaPorPareja"
+                            class="player-info"
+                          >
+                            <v-btn
+                              class="mt-2"
+                              variant="tonal"
+                              color="primary"
+                              size="small"
+                              @click="
+                                verLista(
+                                  partida.idCompanero2,
+                                  partida.idTorneo,
+                                  partida.nickCompanero2 ?? ''
+                                )
+                              "
+                            >
+                              Lista {{ partida.nickCompanero2 }}
                             </v-btn>
                           </div>
                         </div>
@@ -432,7 +511,7 @@
                                 </v-btn>
                               </div>
                             </v-list-item-title>
-                            <v-list-item-title>
+                            <v-list-item-title v-if="!esParejas">
                               <div class="flex-column align-items-center">
                                 <v-btn
                                   class="mt-2"
@@ -779,6 +858,7 @@ const currentEjercito = ref<string>();
 const listaDTO = ref<ListaDTO>();
 const clasificacionEquipos = ref<ClasificacionEquipo[]>([]);
 const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
+const esParejas = computed(() => torneo.value?.tipoTorneo === "Parejas");
 
 //Variables para el buscador
 const busquedaEquipo = ref<string>("");
@@ -875,15 +955,27 @@ onMounted(async () => {
 const resultados = async (ronda: number) => {
   try {
     isGenerating.value = true;
-    const ganadores: ResultadoJugador[] = clasificacion.value.map(
-      (clasi, index) => {
-        return {
-          idUsuario: clasi.idUsuario,
-          idTorneo: torneo.value?.idTorneo,
-          resultado: index + 1,
-        };
-      }
-    );
+    // En Parejas va una fila por pareja con su capitán: el back pone al compañero en la misma posición
+    const ganadores: ResultadoJugador[] = esParejas.value
+      ? clasificacionEquipos.value
+          .map((clasi, index) => {
+            return {
+              idUsuario:
+                torneoGestion.value?.equipos.find(
+                  e => e.idEquipo === clasi.idEquipo
+                )?.idCapitan ?? 0,
+              idTorneo: torneo.value?.idTorneo,
+              resultado: index + 1,
+            };
+          })
+          .filter(ganador => ganador.idUsuario !== 0)
+      : clasificacion.value.map((clasi, index) => {
+          return {
+            idUsuario: clasi.idUsuario,
+            idTorneo: torneo.value?.idTorneo,
+            resultado: index + 1,
+          };
+        });
     const idTorneo: number | undefined = torneo.value?.idTorneo;
 
     if (idTorneo == undefined) return;

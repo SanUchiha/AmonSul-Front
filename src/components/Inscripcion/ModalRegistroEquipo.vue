@@ -1,18 +1,29 @@
 <template>
   <v-dialog v-model="dialogVisible" max-width="600px">
     <v-card>
-      <v-card-title class="text-h5">Registrar Equipo</v-card-title>
-      <v-card-text>
-        <p>Registra a tu equipo para el torneo.</p>
-        <p>Debes añadir un máximo de {{ maxPlayers - 1 }} participantes.</p>
+      <v-card-title class="text-h5">{{
+        esParejas ? "Registrar pareja" : "Registrar Equipo"
+      }}</v-card-title>
+      <v-card-text v-if="esParejas">
+        <p>Registra a tu pareja para el torneo eligiendo a tu compañero.</p>
         <p>
-          Tu serás el capitán del equipo, Amon Sûl te añadirá automáticamente a
-          tu equipo.
+          Tú serás el capitán de la pareja y quien meta los resultados. Amon Sûl
+          te añadirá automáticamente a tu pareja.
         </p>
+      </v-card-text>
+      <v-card-text :class="{ 'pt-0': esParejas }">
+        <template v-if="!esParejas">
+          <p>Registra a tu equipo para el torneo.</p>
+          <p>Debes añadir un máximo de {{ maxPlayers - 1 }} participantes.</p>
+          <p>
+            Tu serás el capitán del equipo, Amon Sûl te añadirá automáticamente
+            a tu equipo.
+          </p>
+        </template>
 
         <v-text-field
           v-model="teamName"
-          label="Nombre del equipo"
+          :label="esParejas ? 'Nombre de la pareja' : 'Nombre del equipo'"
           tonal
           required
         ></v-text-field>
@@ -23,7 +34,7 @@
             :items="jugadores"
             item-title="nick"
             item-value="idUsuario"
-            label="Selecciona un jugador"
+            :label="esParejas ? 'Selecciona a tu compañero' : 'Selecciona un jugador'"
             tonal
             required
             @update:modelValue="addPlayer"
@@ -40,7 +51,7 @@
           />
 
           <div v-show="selectedPlayers.length">
-            <p>Jugadores seleccionados:</p>
+            <p>{{ esParejas ? "Compañero:" : "Jugadores seleccionados:" }}</p>
             <v-chip
               v-for="(player, index) in selectedPlayers"
               :key="player.idUsuario"
@@ -61,7 +72,7 @@
           color="primary"
           @click="submitForm"
           :disabled="isRegistering"
-          >Registrar equipo</v-btn
+          >{{ esParejas ? "Registrar pareja" : "Registrar equipo" }}</v-btn
         >
         <v-btn variant="tonal" color="secondary" @click="closeDialog"
           >Cerrar</v-btn
@@ -72,12 +83,12 @@
 
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Equipo registrado con éxito."
+    :message="esParejas ? 'Pareja registrada con éxito.' : 'Equipo registrado con éxito.'"
     @update:isVisible="showSuccessModal = $event"
   />
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido registrar el equipo. Contacta con el administrador."
+    :message="`No se ha podido registrar ${esParejas ? 'la pareja' : 'el equipo'}. Contacta con el administrador.`"
     @update:isVisible="showErrorModal = $event"
   />
 
@@ -138,6 +149,8 @@ const loading = ref<boolean>(false);
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 
+const esParejas = computed(() => props.tipoTorneo === "Parejas");
+
 const maxPlayers = computed(() => {
   return props.tipoTorneo === "Parejas" || props.tipoTorneo === "Equipos_2"
     ? 2
@@ -169,9 +182,9 @@ const addPlayer = (player: UsuarioSinEquipoDTO) => {
     !selectedPlayers.value.some((p) => p.idUsuario === player.idUsuario)
   ) {
     if (selectedPlayers.value.length >= maxPlayers.value - 1) {
-      snackBarMessage.value = `Solo puedes añadir un máximo de ${
-        maxPlayers.value - 1
-      } jugadores.`;
+      snackBarMessage.value = esParejas.value
+        ? "Una pareja solo tiene un compañero."
+        : `Solo puedes añadir un máximo de ${maxPlayers.value - 1} jugadores.`;
       snackBarShow.value = true;
       jugadorSelected.value = null;
       return;
@@ -189,7 +202,9 @@ const removePlayer = (index: number) => {
 
 const validateForm = () => {
   if (!teamName.value.trim()) {
-    snackBarMessage.value = "El nombre del equipo es obligatorio";
+    snackBarMessage.value = esParejas.value
+      ? "El nombre de la pareja es obligatorio"
+      : "El nombre del equipo es obligatorio";
     snackBarShow.value = true;
     return false;
   }

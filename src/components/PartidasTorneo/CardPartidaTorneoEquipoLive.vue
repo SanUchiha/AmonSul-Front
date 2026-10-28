@@ -12,7 +12,11 @@
       >
         <!-- Botón a la izquierda si es Capitán1 -->
         <v-btn
-          v-if="localMatch.idCapitan1 === idUsuario && !partidaCompleta"
+          v-if="
+            localMatch.idCapitan1 === idUsuario &&
+            !partidaCompleta &&
+            !esPartidaParejas
+          "
           size="small"
           color="primary"
           variant="tonal"
@@ -34,7 +38,11 @@
 
         <!-- Botón a la derecha si es Capitán2 -->
         <v-btn
-          v-if="localMatch.idCapitan2 === idUsuario && !partidaCompleta"
+          v-if="
+            localMatch.idCapitan2 === idUsuario &&
+            !partidaCompleta &&
+            !esPartidaParejas
+          "
           size="small"
           color="primary"
           variant="tonal"
@@ -68,7 +76,10 @@
               class="text-wrap"
               :class="{ highlight: localMatch.idEquipo1 === idEquipo }"
             >
-              ({{ localMatch.nick1 }})</span
+              ({{ localMatch.nick1
+              }}<template v-if="localMatch.nickCompanero1">
+                y {{ localMatch.nickCompanero1 }}</template
+              >)</span
             >
           </v-col>
 
@@ -95,7 +106,10 @@
               class="text-wrap"
               :class="{ highlight: localMatch.idEquipo2 === idEquipo }"
             >
-              ({{ localMatch.nick2 }})</span
+              ({{ localMatch.nick2
+              }}<template v-if="localMatch.nickCompanero2">
+                y {{ localMatch.nickCompanero2 }}</template
+              >)</span
             >
           </v-col>
         </v-row>
@@ -123,6 +137,24 @@
                 }}</span>
               </v-btn>
             </div>
+            <!-- con una lista por jugador, la del compañero -->
+            <div v-if="localMatch.idCompanero1 && localMatch.ejercitoCompanero1" class="mt-1">
+              <v-btn
+                block
+                class="army-btn"
+                @click="
+                  verLista(
+                    localMatch.idCompanero1,
+                    localMatch.idTorneo,
+                    localMatch.nickCompanero1 ?? ''
+                  )
+                "
+                style="font-size: 10px"
+                variant="tonal"
+              >
+                <span class="text-wrap">{{ localMatch.ejercitoCompanero1 }}</span>
+              </v-btn>
+            </div>
           </v-col>
           <v-col cols="6" class="text-right">
             <div>
@@ -142,6 +174,23 @@
                 <span class="text-wrap">{{
                   localMatch.ejercitoUsuario2 ?? "Lista"
                 }}</span>
+              </v-btn>
+            </div>
+            <div v-if="localMatch.idCompanero2 && localMatch.ejercitoCompanero2" class="mt-1">
+              <v-btn
+                block
+                class="army-btn"
+                @click="
+                  verLista(
+                    localMatch.idCompanero2,
+                    localMatch.idTorneo,
+                    localMatch.nickCompanero2 ?? ''
+                  )
+                "
+                style="font-size: 10px"
+                variant="tonal"
+              >
+                <span class="text-wrap">{{ localMatch.ejercitoCompanero2 }}</span>
               </v-btn>
             </div>
           </v-col>
@@ -379,6 +428,10 @@ const props = defineProps<{
 }>();
 
 const localMatch = reactive({ ...props.match });
+// En Parejas hay una partida por cruce: no se elige qué miembro juega contra cuál
+const esPartidaParejas = computed(
+  () => localMatch.idCompanero1 != null || localMatch.idCompanero2 != null
+);
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);

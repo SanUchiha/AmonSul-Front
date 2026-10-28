@@ -30,7 +30,8 @@
                   numeroMiembrosEquipo
                 }}
                 jugadores <br />
-                {{ listasOk }}/{{ numeroMiembrosEquipo }} listas OK
+                {{ listasOk }}/{{ listasNecesarias }}
+                {{ esListaConjunta ? "lista conjunta OK" : "listas OK" }}
               </span>
             </div>
             <div class="d-flex align-center">
@@ -91,7 +92,7 @@
             @click.stop="
               () =>
                 abrirModalConfirmacion(
-                  'Marcar equipo como pagado?',
+                  esParejas ? 'Marcar pareja como pagada?' : 'Marcar equipo como pagado?',
                   '¿Seguro que quieres actualizar el estado de pago a SI?',
                   confirmarActualizarPago
                 )
@@ -107,7 +108,7 @@
             size="small"
             @click.stop="
               abrirModalConfirmacion(
-                '¿Deseas borrar el equipo?',
+                esParejas ? '¿Deseas borrar la pareja?' : '¿Deseas borrar el equipo?',
                 'Esta acción no se puede deshacer.',
                 confirmarEliminarEquipo
               )
@@ -115,7 +116,7 @@
             block
           >
             <v-icon class="me-1">mdi-trash-can</v-icon>
-            Borrar equipo
+            {{ esParejas ? "Borrar pareja" : "Borrar equipo" }}
           </v-btn>
         </v-col>
       </v-row>
@@ -226,7 +227,12 @@
                           Estado
                         </v-list-item-title>
                       </v-list-item>
+                      <!-- Con lista conjunta solo se envía en la inscripción que la guarda -->
                       <v-list-item
+                        v-if="
+                          !esListaConjunta ||
+                          item.idInscripcion === idInscripcionListaPareja
+                        "
                         @click.stop="
                           enviarCambiarLista(
                             item.idInscripcion,
@@ -255,7 +261,7 @@
                           <v-icon color="red" class="me-2"
                             >mdi-account-remove</v-icon
                           >
-                          Eliminar del equipo
+                          {{ esParejas ? "Eliminar de la pareja" : "Eliminar del equipo" }}
                         </v-list-item-title>
                       </v-list-item>
                     </v-list>
@@ -332,7 +338,7 @@
   <!-- Modal response estado pago -->
   <ModalSuccess
     :isVisible="showSuccessModalEliminarEquipo"
-    message="Equipo eliminado."
+    :message="esParejas ? 'Pareja eliminada.' : 'Equipo eliminado.'"
     @update:isVisible="showSuccessModalEliminarEquipo = $event"
   />
 
@@ -500,11 +506,34 @@ const equipoConHuecos = computed(() => {
   );
   return [...miembros, ...Array(faltantes).fill(null)];
 });
+const esParejas = computed(() => props.torneo.tipoTorneo === "Parejas");
+const esListaConjunta = computed(
+  () => esParejas.value && props.torneo.listaPorPareja === true
+);
+// La lista conjunta va en la inscripción del capitán, o en la que ya la tenga
+const idInscripcionListaPareja = computed(
+  () =>
+    (
+      inscripcionesEquipo.value.find((i) => i.idLista) ??
+      inscripcionesEquipo.value.find((i) => i.idUsuario === props.equipo.idCapitan)
+    )?.idInscripcion
+);
+const listasNecesarias = computed(() =>
+  esListaConjunta.value ? 1 : numeroMiembrosEquipo.value
+);
 const listasOk = computed(() => {
+  if (esListaConjunta.value)
+    return inscripcionesEquipo.value.some(
+      (i) =>
+        i.idInscripcion === idInscripcionListaPareja.value &&
+        i.estadoLista === "OK"
+    )
+      ? 1
+      : 0;
   return inscripcionesEquipo.value.filter((i) => i.estadoLista === "OK").length;
 });
 const equipoIncompleto = computed(() => {
-  return listasOk.value < numeroMiembrosEquipo.value;
+  return listasOk.value < listasNecesarias.value;
 });
 
 const miembrosPorTipo: Record<string, number> = {

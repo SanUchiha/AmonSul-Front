@@ -33,7 +33,8 @@
               :editarPartidaPJ="editarPartidaPJ(partida)"
               :soloValidarPJ="soloValidarPJ(partida)"
               :idEquipo="
-                partida.idUsuario1 === idUsuario
+                partida.idUsuario1 === idUsuario ||
+                partida.idCompanero1 === idUsuario
                   ? partida.idEquipo1
                   : partida.idEquipo2
               "

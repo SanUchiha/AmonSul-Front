@@ -8,7 +8,9 @@
         <v-card-title
           class="modal-title d-flex align-center justify-space-between px-4 py-3"
         >
-          <h3 class="text-h5 font-weight-bold">Detalle del equipo</h3>
+          <h3 class="text-h5 font-weight-bold">
+            {{ esParejas ? "Detalle de la pareja" : "Detalle del equipo" }}
+          </h3>
           <v-btn icon @click="close" class="close-button">
             <v-icon color="grey darken-1">mdi-close</v-icon>
           </v-btn>
@@ -21,7 +23,9 @@
           <v-row>
             <v-col cols="12" sm="6" class="align-center pt-1 pb-1">
               <v-icon color="blue" class="mr-2">mdi-shield-account</v-icon>
-              <span class="font-weight-bold">Equipo:</span>
+              <span class="font-weight-bold">{{
+                esParejas ? "Pareja:" : "Equipo:"
+              }}</span>
               <span class="ml-2">{{ inscripcionData?.nombreEquipo }}</span>
             </v-col>
             <v-col cols="12" sm="6" class="align-center pt-1 pb-1">
@@ -58,8 +62,67 @@
 
         <v-divider class="my-4"></v-divider>
 
+        <!-- Parejas con lista conjunta: una sola lista para los dos -->
+        <v-card v-if="esListaConjunta" class="info-card pa-4 mb-4 mx-3">
+          <div class="d-flex flex-wrap align-center ga-2">
+            <span class="font-weight-bold">Lista de la pareja</span>
+            <v-chip
+              :color="
+                listaPareja?.estadoLista === 'OK'
+                  ? 'green'
+                  : listaPareja?.listaData
+                  ? 'blue'
+                  : 'red'
+              "
+              variant="tonal"
+              size="small"
+            >
+              {{ listaPareja?.listaData ? listaPareja.estadoLista : "Sin entregar" }}
+            </v-chip>
+          </div>
+          <p v-if="listaPareja?.ejercito" class="mt-2 mb-0">
+            <v-icon size="small" class="mr-1">mdi-shield-outline</v-icon>
+            {{ listaPareja.ejercito }}
+          </p>
+          <div v-if="listaPareja" class="d-flex flex-wrap ga-2 mt-3">
+            <v-btn
+              v-if="listaPareja.listaData"
+              variant="tonal"
+              color="primary"
+              size="small"
+              @click="
+                verLista(
+                  listaPareja.listaData,
+                  inscripcionData.nombreEquipo,
+                  listaPareja.ejercito!
+                )
+              "
+            >
+              <v-icon class="me-1">mdi-eye</v-icon> Ver lista
+            </v-btn>
+            <v-btn
+              v-if="inscripcionData?.idCapitan == idUsuario"
+              variant="tonal"
+              color="primary"
+              size="small"
+              @click="
+                enviarCambiarLista(
+                  listaPareja.idInscripcion,
+                  listaPareja.listaData!,
+                  listaPareja.idUsuario,
+                  listaPareja.nick,
+                  listaPareja.idLista
+                )
+              "
+            >
+              <v-icon class="me-1">mdi-pencil</v-icon>
+              {{ listaPareja.listaData ? "Modificar lista" : "Enviar lista" }}
+            </v-btn>
+          </div>
+        </v-card>
+
         <h4 class="text-h6 font-weight-bold text-center">
-          Miembros del equipo
+          {{ esParejas ? "Miembros de la pareja" : "Miembros del equipo" }}
         </h4>
         <v-card-text>
           <v-row>
@@ -69,7 +132,7 @@
                 <thead>
                   <tr>
                     <th>Jugador</th>
-                    <th>Lista</th>
+                    <th v-if="!esListaConjunta">Lista</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -88,7 +151,7 @@
                         >
                         {{ miembro.nick }}
                       </td>
-                      <td>
+                      <td v-if="!esListaConjunta">
                         <span v-if="miembro.listaData">
                           <v-icon
                             v-if="miembro.estadoLista === 'OK'"
@@ -114,7 +177,7 @@
                           </template>
                           <v-list>
                             <v-list-item
-                              v-if="miembro.listaData"
+                              v-if="miembro.listaData && !esListaConjunta"
                               @click.stop="
                                 verLista(
                                   miembro.listaData,
@@ -129,7 +192,7 @@
                             </v-list-item>
                             <!--TODO  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"-->
                             <v-list-item
-                              v-if="inscripcionData?.idCapitan == idUsuario"
+                              v-if="inscripcionData?.idCapitan == idUsuario && !esListaConjunta"
                               @click.stop="enviarCambiarLista(miembro.idInscripcion,miembro.listaData!,miembro.idUsuario,miembro.nick,miembro.idLista)"
                             >
                               <v-list-item-title>
@@ -146,7 +209,7 @@
                                 <v-icon color="red" class="me-2"
                                   >mdi-account-remove</v-icon
                                 >
-                                Eliminar del equipo
+                                {{ esParejas ? "Eliminar de la pareja" : "Eliminar del equipo" }}
                               </v-list-item-title>
                             </v-list-item>
                           </v-list>
@@ -155,7 +218,7 @@
                     </template>
                     <!--Slot vacios-->
                     <template v-else>
-                      <td colspan="3">
+                      <td :colspan="esListaConjunta ? 2 : 3">
                         <v-btn variant="tonal" v-if="inscripcionData?.idCapitan == idUsuario" color="primary" @click="handlerModalRegistrarMiembroEquipo()" class="elevated-btn" block>
                           <v-icon class="mr-1">mdi-menu</v-icon> Añadir jugador
                         </v-btn>
@@ -188,7 +251,7 @@
 
                   <v-divider></v-divider>
 
-                  <v-card-text>
+                  <v-card-text v-if="!esListaConjunta">
                     <p v-if="miembro.ejercito">{{ miembro.ejercito }}</p>
                     <p v-else>Estado de la lista:</p>
                     <v-chip
@@ -216,7 +279,7 @@
                       </template>
                       <v-list>
                         <v-list-item
-                          v-if="miembro.listaData"
+                          v-if="miembro.listaData && !esListaConjunta"
                           @click.stop="
                             verLista(
                               miembro.listaData,
@@ -231,7 +294,7 @@
                         </v-list-item>
                         <!--TODO  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"-->
                         <v-list-item
-                          v-if="inscripcionData?.idCapitan == idUsuario"
+                          v-if="inscripcionData?.idCapitan == idUsuario && !esListaConjunta"
                           @click.stop="
                             enviarCambiarLista(
                               miembro.idInscripcion,
@@ -253,7 +316,7 @@
                             <v-icon color="red" class="me-2"
                               >mdi-account-remove</v-icon
                             >
-                            Eliminar del equipo
+                            {{ esParejas ? "Eliminar de la pareja" : "Eliminar del equipo" }}
                           </v-list-item-title>
                         </v-list-item>
                       </v-list>
@@ -306,7 +369,7 @@
                   class="elevated-btn"
                   block
                 >
-                  Dar de baja al equipo
+                  {{ esParejas ? "Dar de baja a la pareja" : "Dar de baja al equipo" }}
                 </v-btn>
               </div>
             </v-col>
@@ -462,6 +525,19 @@ const isLoading = ref<boolean>(true);
 const isCaptain = ref<boolean>(false);
 const idCaptain = ref<number>();
 const detalleTorneo = ref<Torneo>();
+const esParejas = computed(() => detalleTorneo.value?.tipoTorneo === "Parejas");
+const esListaConjunta = computed(
+  () => esParejas.value && detalleTorneo.value?.listaPorPareja === true
+);
+// La lista conjunta está en la inscripción del capitán; si se subió antes en la del compañero, se usa esa
+const listaPareja = computed(() => {
+  const miembros = inscripcionData.value?.componentesEquipoDTO ?? [];
+  return (
+    miembros.find(m => m.listaData) ??
+    miembros.find(m => m.idUsuario === inscripcionData.value?.idCapitan) ??
+    null
+  );
+});
 const inscripcionData = ref<InscripcionEquipoDTO>({
   idTorneo: 0,
   idCapitan: 0,
