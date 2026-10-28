@@ -20,7 +20,10 @@ export const formatFechaDB = async (fecha: string): Promise<string> => {
   return formattedDate;
 };
 
-export const convertirFecha = (dateString: string) => {
+// Sin fecha devuelve "": hay usuarios sin fecha de nacimiento y el split rompía su perfil
+export const convertirFecha = (dateString: string | null | undefined) => {
+  if (!dateString) return "";
+
   const dateParts = dateString.split("-");
 
   if (dateParts.length !== 3) {

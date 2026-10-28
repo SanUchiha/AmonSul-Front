@@ -38,7 +38,12 @@
         <!-- Equipos inscritos -->
         <v-col cols="12" sm="6" class="d-flex align-center">
           <v-icon class="me-2" color="yellow">mdi-account-group</v-icon>
-          <span><strong>Equipos inscritos:</strong> {{ totalEquipos }}</span>
+          <span
+            ><strong>{{
+              esParejas ? "Parejas inscritas:" : "Equipos inscritos:"
+            }}</strong>
+            {{ totalEquipos }}</span
+          >
         </v-col>
 
         <!-- Plazas restantes -->
@@ -62,7 +67,7 @@
           <v-icon class="me-2" color="blue">mdi-file-document</v-icon>
           <span
             ><strong>Listas entregadas:</strong> {{ listasEntregadas }}/{{
-              totalJugadores
+              totalListas
             }}</span
           >
         </v-col>
@@ -72,7 +77,7 @@
           <v-icon class="me-2" color="purple">mdi-file-check</v-icon>
           <span
             ><strong>Listas legales:</strong> {{ listasLegales }}/{{
-              totalJugadores
+              totalListas
             }}</span
           >
         </v-col>
@@ -296,6 +301,16 @@ const totalJugadores = computed(() => {
   return totalEquipos.value * jugadoresXEquipo.value;
 });
 
+const esParejas = computed(() => props.torneo?.torneo.tipoTorneo === "Parejas");
+// Con lista conjunta cada pareja entrega una sola lista, aunque marque entregada a los dos
+const esListaConjunta = computed(
+  () => esParejas.value && props.torneo?.torneo.listaPorPareja === true
+);
+
+const totalListas = computed(() =>
+  esListaConjunta.value ? totalEquipos.value : totalJugadores.value
+);
+
 const pagosRealizados = computed(() => {
   if (!props.torneo) return 0;
   return props.torneo.equipos.filter(equipo => equipo.esPago === "SI").length;
@@ -308,6 +323,8 @@ const listasLegales = computed(() => {
     const listas = equipo.inscripciones.filter(
       lista => lista.estadoLista === "OK"
     ).length;
+
+    if (esListaConjunta.value) return contador + (listas > 0 ? 1 : 0);
 
     // Sumamos el número de listas válidas al contador
     return contador + listas;
@@ -325,6 +342,8 @@ const listasEntregadas = computed(() => {
         lista.estadoLista === "ENTREGADA" ||
         lista.estadoLista === "ILEGAL"
     ).length;
+
+    if (esListaConjunta.value) return contador + (listas > 0 ? 1 : 0);
 
     // Sumamos el número de listas válidas al contador
     return contador + listas;

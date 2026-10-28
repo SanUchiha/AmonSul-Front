@@ -18,7 +18,7 @@
           <v-radio-group
             v-if="isImpares"
             v-model="opcionImpares"
-            label="Los equipos son impares. ¿Cómo quieres gestionarlo?"
+            :label="`${esParejas ? 'Las parejas' : 'Los equipos'} son impares. ¿Cómo quieres gestionarlo?`"
           >
             <v-radio label="Hacer un bye" value="SI"></v-radio>
             <v-radio label="Nada" value="NO"></v-radio>
@@ -93,6 +93,8 @@ const props = defineProps<{
   ronda: number;
   partidas: PartidaTorneoDTO[];
 }>();
+
+const esParejas = computed(() => props.torneo?.torneo.tipoTorneo === "Parejas");
 
 const emit = defineEmits(["close", "confirm"]);
 

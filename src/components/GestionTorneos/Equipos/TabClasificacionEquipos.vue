@@ -8,7 +8,10 @@
             : "Clasificación por Equipos"
         }}
       </h3>
-      <TablaClasificacionEquipos :clasificacion="clasificacionEquipos" />
+      <TablaClasificacionEquipos
+        :clasificacion="clasificacionEquipos"
+        :esParejas="torneo?.tipoTorneo === 'Parejas'"
+      />
     </template>
     <v-alert v-else type="info" variant="tonal" class="ma-4">La clasificación está oculta</v-alert>
   </v-window-item>

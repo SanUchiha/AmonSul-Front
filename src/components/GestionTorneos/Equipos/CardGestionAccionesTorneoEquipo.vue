@@ -6,7 +6,7 @@
       <v-row dense>
         <v-col cols="12" sm="4">
           <v-btn block variant="tonal" color="secondary" @click="openAddEquipo">
-            Añadir Equipo
+            {{ esParejas ? "Añadir pareja" : "Añadir Equipo" }}
           </v-btn>
         </v-col>
         <v-col cols="12" sm="4">
@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineProps } from "vue";
+import { computed, ref, watch, defineProps } from "vue";
 import ModalSorteo from "../ModalSorteo.vue";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import ModalAddEquipo from "./ModalAddEquipo.vue";
@@ -60,6 +60,8 @@ const props = defineProps<{
   torneo: TorneoEquipoGestionInfoDTO | null;
   rondaGenerada: boolean;
 }>();
+
+const esParejas = computed(() => props.torneo?.torneo.tipoTorneo === "Parejas");
 const isLoading = ref<boolean>(true);
 const isGenerating = ref<boolean>(false);
 const showConfigModal = ref<boolean>(false);

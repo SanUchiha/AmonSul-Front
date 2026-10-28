@@ -1,14 +1,15 @@
 <template>
+  <!-- En móvil solo las columnas que deciden la posición: sin scroll horizontal -->
   <v-table v-if="clasificacion.length > 0" density="compact">
     <thead>
       <tr>
         <th class="text-center">#</th>
-        <th class="text-center">Equipo</th>
+        <th class="text-center">{{ esParejas ? "Pareja" : "Equipo" }}</th>
         <th class="text-center">Puntos</th>
-        <th class="text-center">Puntos a favor</th>
-        <th class="text-center">Puntos en contra</th>
+        <th class="text-center d-none d-sm-table-cell">Puntos a favor</th>
+        <th class="text-center d-none d-sm-table-cell">Puntos en contra</th>
         <th class="text-center">Diferencia</th>
-        <th class="text-center">G. Muertos</th>
+        <th class="text-center d-none d-sm-table-cell">G. Muertos</th>
       </tr>
     </thead>
     <tbody>
@@ -16,10 +17,16 @@
         <td class="text-center">{{ index + 1 }}</td>
         <td class="text-center">{{ equipo.nombreEquipo }}</td>
         <td class="text-center">{{ equipo.puntos }}</td>
-        <td class="text-center">{{ equipo.puntosFavor }}</td>
-        <td class="text-center">{{ equipo.puntosContra }}</td>
+        <td class="text-center d-none d-sm-table-cell">
+          {{ equipo.puntosFavor }}
+        </td>
+        <td class="text-center d-none d-sm-table-cell">
+          {{ equipo.puntosContra }}
+        </td>
         <td class="text-center">{{ equipo.diferencia }}</td>
-        <td class="text-center">{{ equipo.lideresMatados }}</td>
+        <td class="text-center d-none d-sm-table-cell">
+          {{ equipo.lideresMatados }}
+        </td>
       </tr>
     </tbody>
   </v-table>
@@ -34,5 +41,6 @@ import { defineProps } from "vue";
 
 defineProps<{
   clasificacion: ClasificacionEquipo[];
+  esParejas?: boolean;
 }>();
 </script>

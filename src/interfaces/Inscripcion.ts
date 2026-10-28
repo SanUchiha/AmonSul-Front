@@ -111,6 +111,9 @@ export interface TorneoCreadoDTO {
   jugadoresXEquipo: number;
   mostrarListas: boolean;
   mostrarClasificacion: boolean;
+  tipoTorneo?: string;
+  // Solo en Parejas: true si cada pareja entrega una lista conjunta
+  listaPorPareja?: boolean;
 }
 
 export interface EquipoDTO {

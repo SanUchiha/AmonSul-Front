@@ -1,14 +1,22 @@
 <template>
   <v-dialog v-model="dialogVisible" max-width="600px">
     <v-card>
-      <v-card-title class="text-h5">Registrar Equipo</v-card-title>
+      <v-card-title class="text-h5">{{
+        esParejas ? "Registrar pareja" : "Registrar Equipo"
+      }}</v-card-title>
       <v-card-text>
-        <p>Registra a un equipo para el torneo.</p>
-        <p>Debes añadir un máximo de {{ maxPlayers }} jugadores.</p>
+        <template v-if="esParejas">
+          <p>Registra a una pareja para el torneo.</p>
+          <p>El capitán es quien mete los resultados de la pareja.</p>
+        </template>
+        <template v-else>
+          <p>Registra a un equipo para el torneo.</p>
+          <p>Debes añadir un máximo de {{ maxPlayers }} jugadores.</p>
+        </template>
 
         <v-text-field
           v-model="teamName"
-          label="Nombre del equipo"
+          :label="esParejas ? 'Nombre de la pareja' : 'Nombre del equipo'"
           tonal
           required
         ></v-text-field>
@@ -30,7 +38,7 @@
               :items="getJugadoresDisponibles(index)"
               item-title="nick"
               item-value="idUsuario"
-              label="Selecciona a un jugador"
+              :label="esParejas ? 'Selecciona al compañero' : 'Selecciona a un jugador'"
               tonal
               required
               :return-object="true"
@@ -46,7 +54,7 @@
           color="primary"
           @click="submitForm"
           :disabled="isRegistering"
-          >Registrar equipo</v-btn
+          >{{ esParejas ? "Registrar pareja" : "Registrar equipo" }}</v-btn
         >
         <v-btn variant="tonal" color="secondary" @click="closeDialog"
           >Cerrar</v-btn
@@ -57,12 +65,12 @@
 
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Equipo registrado con éxito."
+    :message="esParejas ? 'Pareja registrada con éxito.' : 'Equipo registrado con éxito.'"
     @update:isVisible="showSuccessModal = $event"
   />
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido registrar el equipo. Contacta con el administrador."
+    :message="`No se ha podido registrar ${esParejas ? 'la pareja' : 'el equipo'}. Contacta con el administrador.`"
     @update:isVisible="showErrorModal = $event"
   />
 
@@ -125,6 +133,8 @@ const maxPlayers = computed(() => {
   return props.torneo.torneo.jugadoresXEquipo;
 });
 
+const esParejas = computed(() => props.torneo.torneo.tipoTorneo === "Parejas");
+
 const dialogVisible = computed({
   get: () => props.isVisible,
   set: (value) => emit("close", value),
@@ -148,7 +158,9 @@ const getJugadoresDisponibles = (index: number) => {
 const validateForm = () => {
   // Comprueba nombre equipo
   if (!teamName.value.trim()) {
-    snackBarMessage.value = "El nombre del equipo es obligatorio";
+    snackBarMessage.value = esParejas.value
+      ? "El nombre de la pareja es obligatorio"
+      : "El nombre del equipo es obligatorio";
     snackBarShow.value = true;
     return false;
   }

@@ -6,16 +6,16 @@
         <v-form ref="form" v-model="isFormValid">
           <!-- Puntos del jugador 1 -->
           <v-text-field
-            :label="`Puntos de ${props.partida.nick1}`"
-            v-model="partidaEditada.resultadoUsuario1"
+            :label="`Puntos de ${lado1}`"
+            v-model.number="partidaEditada.resultadoUsuario1"
             type="number"
             :rules="[rules.required, rules.isNumber]"
           ></v-text-field>
 
           <!-- Puntos del jugador 2 -->
           <v-text-field
-            :label="`Puntos de ${props.partida.nick2}`"
-            v-model="partidaEditada.resultadoUsuario2"
+            :label="`Puntos de ${lado2}`"
+            v-model.number="partidaEditada.resultadoUsuario2"
             type="number"
             :rules="[rules.required, rules.isNumber]"
           ></v-text-field>
@@ -31,7 +31,7 @@
           <!-- Líder del jugador 1 -->
           <v-radio-group
             v-model="partidaEditada.liderMuertoUsuario1"
-            :label="`¿${props.partida.nick1} ha matado al general?`"
+            :label="`¿${lado1} ${companero1 ? 'han' : 'ha'} matado al general?`"
             :rules="[rules.isBool]"
           >
             <v-radio label="Sí" :value="true"></v-radio>
@@ -41,7 +41,7 @@
           <!-- Líder del jugador 2 -->
           <v-radio-group
             v-model="partidaEditada.liderMuertoUsuario2"
-            :label="`¿${props.partida.nick2} ha matado al general?`"
+            :label="`¿${lado2} ${companero2 ? 'han' : 'ha'} matado al general?`"
             :rules="[rules.isBool]"
           >
             <v-radio label="Sí" :value="true"></v-radio>
@@ -51,7 +51,7 @@
           <!-- Validar 1 -->
           <v-radio-group
             v-model="partidaEditada.partidaValidadaUsuario1"
-            :label="`¿Validar la partida de ${props.partida.nick1}?`"
+            :label="`¿Validar la partida de ${lado1}?`"
             :rules="[rules.isBool]"
           >
             <v-radio label="Sí" :value="true"></v-radio>
@@ -61,7 +61,7 @@
           <!-- Validar 2 -->
           <v-radio-group
             v-model="partidaEditada.partidaValidadaUsuario2"
-            :label="`¿Validar la partida de ${props.partida.nick2}?`"
+            :label="`¿Validar la partida de ${lado2}?`"
             :rules="[rules.isBool]"
           >
             <v-radio label="Sí" :value="true"></v-radio>
@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { appsettings } from "@/settings/appsettings";
 import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
@@ -101,6 +101,24 @@ const props = defineProps<{
 
 //eslint-disable-next-line no-undef
 const emit = defineEmits(["confirm", "cerrar"]);
+
+// En Parejas cada lado son el capitán y su compañero
+const companero1 = computed(
+  () => (props.partida as PartidaTorneoDTO).nickCompanero1 ?? null
+);
+const companero2 = computed(
+  () => (props.partida as PartidaTorneoDTO).nickCompanero2 ?? null
+);
+const lado1 = computed(() =>
+  companero1.value
+    ? `${props.partida.nick1} y ${companero1.value}`
+    : props.partida.nick1
+);
+const lado2 = computed(() =>
+  companero2.value
+    ? `${props.partida.nick2} y ${companero2.value}`
+    : props.partida.nick2
+);
 
 // Variables reactivas
 const isModalEditarPartidaVisible = ref<boolean>(props.isVisible);

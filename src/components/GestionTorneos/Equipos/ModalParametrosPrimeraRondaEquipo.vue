@@ -41,7 +41,7 @@
                 <v-row>
                   <v-col cols="12" md="6">
                     <v-select
-                      label="Equipo 1"
+                      :label="esParejas ? 'Pareja 1' : 'Equipo 1'"
                       :items="equiposDisponiblesParaSlot(mesaIndex, 0)"
                       v-model="emparejamientos[mesaIndex][0]"
                       item-title="nombreEquipo"
@@ -55,7 +55,7 @@
 
                   <v-col cols="12" md="6">
                     <v-select
-                      label="Equipo 2"
+                      :label="esParejas ? 'Pareja 2' : 'Equipo 2'"
                       :items="equiposDisponiblesParaSlot(mesaIndex, 1)"
                       v-model="emparejamientos[mesaIndex][1]"
                       item-title="nombreEquipo"
@@ -133,7 +133,8 @@
     <v-card>
       <v-card-title class="text-h6">Confirmar Bye</v-card-title>
       <v-card-text>
-        Los equipos son impares. ¿Quieres proceder con un bye?
+        {{ esParejas ? "Las parejas" : "Los equipos" }} son impares. ¿Quieres
+        proceder con un bye?
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -163,7 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, watch, onMounted } from "vue";
+import { ref, computed, defineProps, defineEmits, watch, onMounted } from "vue";
 import {
   EquipoDTO,
   TorneoEquipoGestionInfoDTO,
@@ -180,6 +181,8 @@ const props = defineProps<{
   isVisible: boolean;
   torneo: TorneoEquipoGestionInfoDTO | null;
 }>();
+
+const esParejas = computed(() => props.torneo?.torneo.tipoTorneo === "Parejas");
 const emit = defineEmits(["close", "confirm"]);
 
 const internalIsVisible = ref(props.isVisible);
