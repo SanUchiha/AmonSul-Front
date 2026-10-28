@@ -236,6 +236,13 @@
     :ejercito="currentEjercito"
     @close="isModalListaVisible = false"
   />
+  <!-- Sin lista o con las listas ocultas -->
+  <ModalError
+    :isVisible="showErrorLista"
+    titulo="Aviso"
+    :message="mensajeErrorLista"
+    @update:isVisible="showErrorLista = $event"
+  />
 
   <!-- Modal editar -->
   <ModalEditarPartida
@@ -278,6 +285,8 @@ import { ref, onMounted } from "vue";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { useRouter } from "vue-router";
 import { formatFechaSpa } from "@/utils/Fecha";
+import { motivoSinLista, SIN_LISTA } from "@/utils/avisoLista";
+import ModalError from "@/components/Commons/ModalError.vue";
 import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
 import { getlistaTorneo } from "@/services/ListasService";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
@@ -294,6 +303,8 @@ const listaData = ref<string>("");
 const listaDTO = ref<ListaDTO>();
 const nickJugador = ref<string>("");
 const isModalListaVisible = ref<boolean>(false);
+const showErrorLista = ref<boolean>(false);
+const mensajeErrorLista = ref<string>("");
 const currentEjercito = ref<string>();
 
 const fechaPartidaFormateada = ref<string>("");
@@ -372,8 +383,13 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
     try {
       const listaResponse = await getlistaTorneo(body);
       listaDTO.value = listaResponse.data;
-      if (listaDTO.value != undefined)
-        listaData.value = listaDTO.value.listaData ?? "";
+      // Sin lista el modal saldría vacío: mejor avisar
+      if (!listaDTO.value?.listaData) {
+        mensajeErrorLista.value = SIN_LISTA;
+        showErrorLista.value = true;
+        return;
+      }
+      listaData.value = listaDTO.value.listaData;
       nickJugador.value = nick;
       currentEjercito.value = listaDTO.value?.ejercito;
       isModalListaVisible.value = true;
@@ -381,6 +397,9 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
       console.error(error);
       isModalListaVisible.value = false;
       isLoading.value = false;
+      // Sin lista o con las listas ocultas: se dice por qué en vez de no hacer nada
+      mensajeErrorLista.value = motivoSinLista(error);
+      showErrorLista.value = true;
     } finally {
       isLoading.value = false;
     }

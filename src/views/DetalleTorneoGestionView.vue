@@ -591,6 +591,13 @@
       :ejercito="currentEjercito"
       @close="isModalListaVisible = false"
     />
+    <!-- Sin lista o con las listas ocultas -->
+    <ModalError
+      :isVisible="showErrorLista"
+      titulo="Aviso"
+      :message="mensajeErrorLista"
+      @update:isVisible="showErrorLista = $event"
+    />
 
     <!-- Spinner Modal -->
     <v-dialog v-model="isLoadingImage" persistent width="300">
@@ -782,6 +789,7 @@ import {
   ResultMatchMatchedPlayType,
 } from "@/Constant/TipoClasificacion";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
+import { motivoSinLista, SIN_LISTA } from "@/utils/avisoLista";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -791,6 +799,8 @@ const activeTab = ref<number>(2);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const idUsuario = ref<number>();
 const isModalListaVisible = ref<boolean>(false);
+const showErrorLista = ref<boolean>(false);
+const mensajeErrorLista = ref<string>("");
 const listaData = ref<string>("");
 const listaDTO = ref<ListaDTO>();
 const currentEjercito = ref<string>();
@@ -1635,8 +1645,13 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
     try {
       const listaResponse = await getlistaTorneo(body);
       listaDTO.value = listaResponse.data;
-      if (listaDTO.value != undefined)
-        listaData.value = listaDTO.value.listaData ?? "";
+      // Sin lista el modal saldría vacío: mejor avisar
+      if (!listaDTO.value?.listaData) {
+        mensajeErrorLista.value = SIN_LISTA;
+        showErrorLista.value = true;
+        return;
+      }
+      listaData.value = listaDTO.value.listaData;
       nickJugador.value = nick;
       currentEjercito.value = listaDTO.value?.ejercito;
       isModalListaVisible.value = true;
@@ -1644,6 +1659,9 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
       console.error(error);
       isModalListaVisible.value = false;
       isLoadingImage.value = false;
+      // Sin lista o con las listas ocultas: se dice por qué en vez de no hacer nada
+      mensajeErrorLista.value = motivoSinLista(error);
+      showErrorLista.value = true;
     } finally {
       isLoadingImage.value = false;
     }

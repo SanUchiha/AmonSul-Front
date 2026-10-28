@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title class="text-center">
         <v-icon color="red" icon="mdi-dice-1"></v-icon>
-        Error
+        {{ titulo || "Error" }}
         <v-icon color="red" icon="mdi-dice-1"></v-icon>
       </v-card-title>
 
@@ -24,6 +24,7 @@ import { defineProps, defineEmits, ref, watch } from "vue";
 const props = defineProps<{
   isVisible: boolean;
   message: string;
+  titulo?: string;
 }>();
 const internalIsVisible = ref(props.isVisible);
 

@@ -38,7 +38,8 @@
 
     <ModalError
       :isVisible="showErrorLista"
-      message="No se ha podido cargar la lista de este jugador."
+      titulo="Aviso"
+      :message="mensajeErrorLista"
       @update:isVisible="showErrorLista = $event"
     />
 
@@ -64,6 +65,7 @@
 import { computed, ref } from "vue";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
+import { motivoSinLista, SIN_LISTA } from "@/utils/avisoLista";
 import { getlistaTorneo } from "@/services/ListasService";
 import CardPartidaLectura, {
   JugadorPartidaLectura,
@@ -85,6 +87,7 @@ const props = withDefaults(
 const isLoadingLista = ref<boolean>(false);
 const isModalListaVisible = ref<boolean>(false);
 const showErrorLista = ref<boolean>(false);
+const mensajeErrorLista = ref<string>("");
 const listaData = ref<string>("");
 const nickJugador = ref<string>("");
 const ejercitoLista = ref<string>();
@@ -143,6 +146,7 @@ const verLista = async (jugador: JugadorPartidaLectura) => {
     });
     // Sin lista el modal se quedaría cargando para siempre: mejor avisar
     if (!response.data?.listaData) {
+      mensajeErrorLista.value = SIN_LISTA;
       showErrorLista.value = true;
       return;
     }
@@ -152,6 +156,7 @@ const verLista = async (jugador: JugadorPartidaLectura) => {
     isModalListaVisible.value = true;
   } catch (error) {
     console.error("Error al cargar la lista:", error);
+    mensajeErrorLista.value = motivoSinLista(error);
     showErrorLista.value = true;
   } finally {
     isLoadingLista.value = false;
