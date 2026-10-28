@@ -161,7 +161,7 @@ const progressPDF = ref(0);
 const showErrorModal = ref(false);
 
 const isTeamTournament = computed(() =>
-  ["Parejas", "Equipos_4", "Equipos_6"].includes(props.tipoTorneo ?? "")
+  ["Parejas", "Equipos_2", "Equipos_4", "Equipos_6"].includes(props.tipoTorneo ?? "")
 );
 
 function medalIcon(index: number): string {

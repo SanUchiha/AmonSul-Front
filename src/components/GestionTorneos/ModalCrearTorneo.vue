@@ -132,7 +132,7 @@
             v-model="tipoTorneo"
             label="¿De qué tipo es el torneo?"
             required
-            :items="['Individual', 'Parejas', 'Equipos de 4', 'Equipos de 6']"
+            :items="['Individual', 'Equipos de 2', 'Equipos de 4', 'Equipos de 6']"
             :rules="[(v: string) => !!v || 'Campo obligatorio']"
             :error="missingFieldsSet.has('Tipo de torneo')"
           />
@@ -690,6 +690,7 @@ const confirmarConfiguracion = async () => {
       )
     : null;
 
+  if (tipoTorneo.value == "Equipos de 2") tipoTorneo.value = "Equipos_2";
   if (tipoTorneo.value == "Equipos de 4") tipoTorneo.value = "Equipos_4";
   if (tipoTorneo.value == "Equipos de 6") tipoTorneo.value = "Equipos_6";
 

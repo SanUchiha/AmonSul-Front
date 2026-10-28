@@ -678,6 +678,7 @@ onMounted(async () => {
         const miembrosPorTipo: Record<string, number> = {
           Individual: 1,
           Parejas: 2,
+          Equipos_2: 2,
           Equipos_4: 4,
           Equipos_6: 6,
         };

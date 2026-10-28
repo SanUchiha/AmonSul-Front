@@ -139,7 +139,7 @@ const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
 
 const maxPlayers = computed(() => {
-  return props.tipoTorneo === "Parejas"
+  return props.tipoTorneo === "Parejas" || props.tipoTorneo === "Equipos_2"
     ? 2
     : props.tipoTorneo === "Equipos_4"
     ? 4

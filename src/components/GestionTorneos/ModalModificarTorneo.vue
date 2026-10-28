@@ -370,7 +370,7 @@ const isValid = ref(true);
 
 const tipoTorneoOptions = [
   { label: "Individual", value: "Individual" },
-  { label: "Parejas", value: "Parejas" },
+  { label: "Equipos de 2", value: "Equipos_2" },
   { label: "Equipos de 4", value: "Equipos_4" },
   { label: "Equipos de 6", value: "Equipos_6" },
 ];
