@@ -9,7 +9,7 @@ export const torneoType = [
 
 export type TorneoType = (typeof torneoType)[number];
 
-// Opciones del selector de tipo al crear o modificar un torneo
+// Opciones del selector de tipo al crear o modificar un torneo. Subtítulos cortos: en móvil se cortan
 export const tipoTorneoOptions: {
   label: string;
   value: TorneoType;
@@ -18,27 +18,27 @@ export const tipoTorneoOptions: {
   {
     label: "Individual",
     value: "Individual",
-    subtitle: "Cada jugador juega sus propias partidas",
+    subtitle: "Cada jugador juega sus partidas",
   },
   {
     label: "Parejas",
     value: "Parejas",
-    subtitle: "Dos contra dos en la misma mesa, un resultado por partida",
+    subtitle: "2 contra 2 en la misma mesa",
   },
   {
     label: "Equipos de 2",
     value: "Equipos_2",
-    subtitle: "Cada miembro juega su partida contra uno del otro equipo",
+    subtitle: "Cada miembro juega su propia partida",
   },
   {
     label: "Equipos de 4",
     value: "Equipos_4",
-    subtitle: "Cada miembro juega su partida contra uno del otro equipo",
+    subtitle: "Cada miembro juega su propia partida",
   },
   {
     label: "Equipos de 6",
     value: "Equipos_6",
-    subtitle: "Cada miembro juega su partida contra uno del otro equipo",
+    subtitle: "Cada miembro juega su propia partida",
   },
 ];
 

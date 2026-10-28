@@ -78,7 +78,8 @@
 
     <!-- Torneo por equipos: podio individual + podio equipos -->
     <template v-if="resumen.clasificacionVisible && isTeamTournament">
-      <div v-if="resumen.ganadores.length > 0">
+      <!-- En Parejas los dos miembros comparten posición: solo tiene sentido el podio de parejas -->
+      <div v-if="resumen.ganadores.length > 0 && tipoTorneo !== 'Parejas'">
         <v-divider class="mb-3" />
         <p class="text-subtitle-2 mb-2">Podio Individual</p>
         <v-list density="compact">
@@ -95,7 +96,9 @@
       </div>
 
       <v-divider class="mb-3 mt-2" />
-      <p class="text-subtitle-2 mb-2">Podio Equipos</p>
+      <p class="text-subtitle-2 mb-2">
+        {{ tipoTorneo === "Parejas" ? "Podio Parejas" : "Podio Equipos" }}
+      </p>
       <div v-if="isLoadingPartidas" class="d-flex align-center ga-2">
         <v-progress-circular indeterminate color="primary" size="20" width="2" />
         <span class="text-body-2 text-medium-emphasis">Cargando clasificación...</span>
