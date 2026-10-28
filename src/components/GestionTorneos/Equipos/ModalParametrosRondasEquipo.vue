@@ -9,7 +9,7 @@
         <v-form>
           <v-radio-group
             v-model="esRepetirRivalCheck"
-            label="¿Se puede repetir rival de la ronda anterior?"
+            label="¿Se pueden repetir emparejamientos?"
           >
             <v-radio label="SI" value="SI"></v-radio>
             <v-radio label="NO" value="NO"></v-radio>
@@ -64,7 +64,11 @@
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido generarla ronda. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    :message="
+      esRepetirRivalCheck === 'NO'
+        ? 'No se ha podido generar la ronda sin repetir emparejamientos. Prueba a permitir que se repitan.'
+        : 'No se ha podido generar la ronda. Inténtalo de nuevo y si el error persiste contacta con el administrador.'
+    "
     @update:isVisible="showErrorModal = $event"
   />
 </template>
@@ -166,7 +170,8 @@ watch(
   { immediate: true }
 );
 
-function getPairingsRondaAnterior(): PairingDTO[] {
+// Emparejamientos de todas las rondas anteriores, bye incluido: así no se repite ninguno en todo el torneo
+function getPairingsRondasAnteriores(): PairingDTO[] {
   if (!props.partidas || props.ronda <= 1) return [];
 
   const vistos = new Set<string>();
@@ -174,7 +179,7 @@ function getPairingsRondaAnterior(): PairingDTO[] {
   return props.partidas
     .filter(
       (p) =>
-        p.numeroRonda === props.ronda - 1 &&
+        p.numeroRonda < props.ronda &&
         typeof p.idEquipo1 === "number" &&
         typeof p.idEquipo2 === "number"
     )
@@ -203,7 +208,7 @@ const confirmarConfiguracion = async () => {
   if (esRepetirRivalCheck.value == "SI") repetirRival = true;
   else repetirRival = false;
 
-  const pairingsPrevios = getPairingsRondaAnterior();
+  const pairingsPrevios = getPairingsRondasAnteriores();
 
   if (
     clasififacionEquipo.value != undefined &&

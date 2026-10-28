@@ -28,7 +28,7 @@
             <v-radio-group
               inline
               v-model="esRepetirRivalCheck"
-              label="¿Se puede repetir rival de la ronda anterior?"
+              label="¿Se pueden repetir emparejamientos?"
             >
               <v-radio label="SI" value="SI"></v-radio>
               <v-radio label="NO" value="NO"></v-radio>
@@ -109,7 +109,7 @@
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido generarla ronda. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    :message="mensajeError"
     @update:isVisible="showErrorModal = $event"
   />
 </template>
@@ -127,7 +127,8 @@ import {
 } from "@/interfaces/Torneo";
 import { generarRonda } from "@/services/PartidaTorneoService";
 import { ref, defineProps, defineEmits, watch, onMounted, computed } from "vue";
-import { getPartidasTorneoByRonda } from "@/services/TorneosService";
+import { getPartidasTorneo } from "@/services/TorneosService";
+import { emparejarSinRepetir } from "@/utils/emparejamientoSinRepetir";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
@@ -174,6 +175,11 @@ const clasificacionZona1 = ref<Clasificacion[]>([]);
 const clasificacionZona2 = ref<Clasificacion[]>([]);
 const errorRonda = ref<string | null>(null);
 const showErrorModal = ref<boolean>(false);
+const MENSAJE_ERROR_GENERAL =
+  "No se ha podido generar la ronda. Inténtalo de nuevo y si el error persiste contacta con el administrador.";
+const MENSAJE_ERROR_SIN_REPETIR =
+  "No se ha podido generar la ronda sin repetir emparejamientos. Prueba a permitir que se repitan.";
+const mensajeError = ref<string>(MENSAJE_ERROR_GENERAL);
 const showSuccessModal = ref<boolean>(false);
 const emparejamientos = ref<
   { jugador1: JugadorParaEmparejamiento; jugador2: JugadorParaEmparejamiento }[]
@@ -421,268 +427,45 @@ const generarEmparejamientosLuzVsOscuridad = (
   return emparejamientos;
 };
 
+// Sin repetir ningún emparejamiento de las rondas anteriores, bye incluido
 const generarEmparejamientosSinRepetir = (
   clasificacion: Clasificacion[],
-  rondaAnterior: PartidaTorneoDTO[]
-): Emparejamiento[] => {
-  const emparejamientos: Emparejamiento[] = [];
-
-  const emparejamientosPrevios = new Set<string>();
-
-  rondaAnterior.forEach((partida) => {
-    const emparejamiento1 = `${partida.idUsuario1}-${partida.idUsuario2}`;
-    const emparejamiento2 = `${partida.idUsuario2}-${partida.idUsuario1}`;
-    emparejamientosPrevios.add(emparejamiento1);
-    emparejamientosPrevios.add(emparejamiento2);
-  });
-
-  const yaEmparejados = new Set<number>();
-
+  partidasAnteriores: PartidaTorneoDTO[],
+  luzVsOscuridad: boolean
+): Emparejamiento[] | null => {
+  // Hardcode para domadores: cada zona por separado
   if (props.torneo?.torneo.idTorneo == 7 && props.ronda > 2) {
     dividirClasificacionEnZonas();
-    const zona1 = clasificacionZona1.value;
-    const zona2 = clasificacionZona2.value;
-
-    const jugadoresZona1 = props.clasificacion.filter((jugador) =>
-      zona1.some((z) => z.idUsuario === jugador.idUsuario)
-    );
-    emparejarSinRepetir(
-      jugadoresZona1,
-      emparejamientos,
-      emparejamientosPrevios,
-      yaEmparejados
-    );
-
-    const jugadoresZona2 = props.clasificacion.filter((jugador) =>
-      zona2.some((z) => z.idUsuario === jugador.idUsuario)
-    );
-    emparejarSinRepetir(
-      jugadoresZona2,
-      emparejamientos,
-      emparejamientosPrevios,
-      yaEmparejados
-    );
-  } else {
-    emparejarSinRepetir(
-      clasificacion,
-      emparejamientos,
-      emparejamientosPrevios,
-      yaEmparejados
-    );
-  }
-
-  return emparejamientos;
-};
-
-const generarEmparejamientosSinRepetirLuzVsOsc = (
-  clasificacion: Clasificacion[],
-  rondaAnterior: PartidaTorneoDTO[]
-): Emparejamiento[] => {
-  let emparejamientos: Emparejamiento[] = [];
-
-  // Emparejar en formato suizo luz vs osc
-  var clasificacionLuz: Clasificacion[] = [];
-  var clasificacionOsc: Clasificacion[] = [];
-
-  clasificacion.forEach((element) => {
-    if (element.bando == "evil") clasificacionOsc.push(element);
-    else clasificacionLuz.push(element);
-  });
-
-  const emparejamientosPrevios = new Set<string>();
-
-  rondaAnterior.forEach((partida) => {
-    const emparejamiento1 = `${partida.idUsuario1}-${partida.idUsuario2}`;
-    const emparejamiento2 = `${partida.idUsuario2}-${partida.idUsuario1}`;
-    emparejamientosPrevios.add(emparejamiento1);
-    emparejamientosPrevios.add(emparejamiento2);
-  });
-
-  const yaEmparejados = new Set<number>();
-
-  // Hardcode para domadores2
-  if (props.torneo?.torneo.idTorneo == 7 && props.ronda > 2) {
-    dividirClasificacionEnZonas();
-    const zona1 = clasificacionZona1.value;
-    const zona2 = clasificacionZona2.value;
-
-    const jugadoresZona1 = props.clasificacion.filter((jugador) =>
-      zona1.some((z) => z.idUsuario === jugador.idUsuario)
-    );
-    emparejarSinRepetir(
-      jugadoresZona1,
-      emparejamientos,
-      emparejamientosPrevios,
-      yaEmparejados
-    );
-
-    const jugadoresZona2 = props.clasificacion.filter((jugador) =>
-      zona2.some((z) => z.idUsuario === jugador.idUsuario)
-    );
-    emparejarSinRepetir(
-      jugadoresZona2,
-      emparejamientos,
-      emparejamientosPrevios,
-      yaEmparejados
-    );
-  }
-  // Para todos los demas torneos
-  else {
-    do {
-      const jugador1 = clasificacionLuz[0];
-      const jugador2 = clasificacionOsc[0];
-      emparejamientos.push({
-        jugador1: {
-          idUsuario: jugador1.idUsuario,
-          nick: jugador1.nick,
-          bando: jugador1.bando,
-        },
-        jugador2: {
-          idUsuario: jugador2.idUsuario,
-          nick: jugador2.nick,
-          bando: jugador2.bando,
-        },
-      });
-
-      clasificacionLuz.shift();
-      clasificacionOsc.shift();
-
-      clasificacion = clasificacion.filter(
-        (element) =>
-          element.idUsuario !== jugador1.idUsuario &&
-          element.idUsuario !== jugador2.idUsuario
+    const emparejamientos: Emparejamiento[] = [];
+    for (const zona of [clasificacionZona1.value, clasificacionZona2.value]) {
+      const jugadoresZona = props.clasificacion.filter((jugador) =>
+        zona.some((z) => z.idUsuario === jugador.idUsuario)
       );
-    } while (clasificacionLuz.length > 0 && clasificacionOsc.length > 0);
-
-    if (clasificacion.length > 1) {
-      do {
-        const jugador1 = clasificacion[0];
-        const jugador2 = clasificacion[1];
-        emparejamientos.push({
-          jugador1: {
-            idUsuario: jugador1.idUsuario,
-            nick: jugador1.nick,
-            bando: jugador1.bando,
-          },
-          jugador2: {
-            idUsuario: jugador2.idUsuario,
-            nick: jugador2.nick,
-            bando: jugador2.bando,
-          },
-        });
-
-        clasificacion.shift();
-        clasificacion.shift();
-      } while (clasificacion.length > 1);
+      const emparejamientosZona = emparejarSinRepetir(
+        jugadoresZona,
+        partidasAnteriores
+      );
+      if (!emparejamientosZona) return null;
+      emparejamientos.push(...emparejamientosZona);
     }
-
-    emparejamientos = emparejarSinRepetirLuzVsOscuridad(
-      emparejamientos,
-      emparejamientosPrevios,
-      yaEmparejados
-    );
+    return emparejamientos;
   }
 
-  return emparejamientos;
+  return emparejarSinRepetir(clasificacion, partidasAnteriores, luzVsOscuridad);
 };
 
-const emparejarSinRepetir = (
-  jugadores: Clasificacion[],
-  emparejamientos: Emparejamiento[],
-  emparejamientosPrevios: Set<string>,
-  yaEmparejados: Set<number>
-) => {
-  for (let i = 0; i < jugadores.length; i++) {
-    const jugador1 = jugadores[i];
-
-    if (yaEmparejados.has(jugador1.idUsuario)) {
-      continue;
-    }
-
-    for (let j = i + 1; j < jugadores.length; j++) {
-      const jugador2 = jugadores[j];
-
-      if (yaEmparejados.has(jugador2.idUsuario)) {
-        continue;
-      }
-
-      const emparejamiento = `${jugador1.idUsuario}-${jugador2.idUsuario}`;
-      const emparejamientoInverso = `${jugador2.idUsuario}-${jugador1.idUsuario}`;
-
-      if (
-        !emparejamientosPrevios.has(emparejamiento) &&
-        !emparejamientosPrevios.has(emparejamientoInverso)
-      ) {
-        emparejamientos.push({
-          jugador1: { idUsuario: jugador1.idUsuario, nick: jugador1.nick },
-          jugador2: { idUsuario: jugador2.idUsuario, nick: jugador2.nick },
-        });
-
-        yaEmparejados.add(jugador1.idUsuario);
-        yaEmparejados.add(jugador2.idUsuario);
-        break;
-      }
-    }
-  }
-};
-
-const emparejarSinRepetirLuzVsOscuridad = (
-  emparejamientos: Emparejamiento[],
-  emparejamientosPrevios: Set<string>,
-  yaEmparejados: Set<number>
-) => {
-  const nuevosEmparejamientos: Emparejamiento[] = [];
-
-  emparejamientos.forEach((emparejamiento) => {
-    const jugador1Id = emparejamiento.jugador1.idUsuario;
-    const jugador2Id = emparejamiento.jugador2.idUsuario;
-
-    // Generar el identificador único de este emparejamiento
-    const emparejamientoId = `${jugador1Id}-${jugador2Id}`;
-    const emparejamientoReversoId = `${jugador2Id}-${jugador1Id}`;
-
-    // Verificar si este emparejamiento ya ocurrió o si los jugadores están emparejados
-    if (
-      emparejamientosPrevios.has(emparejamientoId) ||
-      emparejamientosPrevios.has(emparejamientoReversoId) ||
-      yaEmparejados.has(jugador1Id) ||
-      yaEmparejados.has(jugador2Id)
-    ) {
-      // Intentar encontrar un nuevo jugador del bando contrario
-      const nuevoJugador = emparejamientos.find((nuevo) => {
-        const nuevoJugadorId = nuevo.jugador2.idUsuario;
-        return (
-          nuevo.jugador2.bando !== emparejamiento.jugador1.bando &&
-          !yaEmparejados.has(nuevoJugadorId) &&
-          nuevoJugadorId !== jugador1Id &&
-          !emparejamientosPrevios.has(`${jugador1Id}-${nuevoJugadorId}`) &&
-          !emparejamientosPrevios.has(`${nuevoJugadorId}-${jugador1Id}`)
-        );
-      });
-
-      if (nuevoJugador) {
-        // Emparejar con el nuevo jugador
-        nuevosEmparejamientos.push({
-          jugador1: emparejamiento.jugador1,
-          jugador2: nuevoJugador.jugador2,
-        });
-
-        // Marcar jugadores como emparejados
-        yaEmparejados.add(jugador1Id);
-        yaEmparejados.add(nuevoJugador.jugador2.idUsuario);
-      }
-    } else {
-      // Emparejamiento válido, agregarlo
-      nuevosEmparejamientos.push(emparejamiento);
-      yaEmparejados.add(jugador1Id);
-      yaEmparejados.add(jugador2Id);
-    }
-  });
-
-  return nuevosEmparejamientos;
+// Partidas de todas las rondas anteriores: así no se repite ningún emparejamiento en todo el torneo
+const getPartidasRondasAnteriores = async (
+  idTorneo: number
+): Promise<PartidaTorneoDTO[]> => {
+  const response = await getPartidasTorneo(idTorneo);
+  return (response.data as PartidaTorneoDTO[]).filter(
+    (partida) => partida.numeroRonda < props.ronda
+  );
 };
 
 const confirmarConfiguracion = async () => {
+  mensajeError.value = MENSAJE_ERROR_GENERAL;
   numeroRonda.value = props.ronda;
   if (!numeroRonda.value) {
     errorRonda.value = "El número de ronda es obligatorio.";
@@ -706,17 +489,20 @@ const confirmarConfiguracion = async () => {
   // Guerra civil
   if (!goodVsEvilCheck.value) {
     //Si no se puede repetir el rival
-    if (esRepetirRivalCheck.value == "NO") {
-      const response = await getPartidasTorneoByRonda(
-        props.torneo.torneo.idTorneo,
-        numeroRonda.value - 1
-      );
-      const rondaAnterior = response.data;
-
+    if (esRepetirRivalCheck.value == "NO" && !isNarsil) {
       errorRonda.value = null;
 
-      const emparejamientosGenerados: Emparejamiento[] =
-        generarEmparejamientosSinRepetir(props.clasificacion, rondaAnterior);
+      const emparejamientosGenerados = generarEmparejamientosSinRepetir(
+        props.clasificacion,
+        await getPartidasRondasAnteriores(props.torneo.torneo.idTorneo),
+        false
+      );
+      // Sin forma de emparejar a todos sin repetir: mejor no generar la ronda
+      if (!emparejamientosGenerados) {
+        mensajeError.value = MENSAJE_ERROR_SIN_REPETIR;
+        showErrorModal.value = true;
+        return;
+      }
 
       const configuracion: GenerarRonda = {
         mismaComunidadCheck: mismaComunidadCheck.value,
@@ -783,21 +569,20 @@ const confirmarConfiguracion = async () => {
   else {
     //Si no se puede repetir el rival
 
-    if (esRepetirRivalCheck.value == "NO") {
-      const response = await getPartidasTorneoByRonda(
-        props.torneo.torneo.idTorneo,
-        numeroRonda.value - 1
-      );
-
-      const rondaAnterior = response.data;
-
+    if (esRepetirRivalCheck.value == "NO" && !isNarsil) {
       errorRonda.value = null;
 
-      const emparejamientosGenerados: Emparejamiento[] =
-        generarEmparejamientosSinRepetirLuzVsOsc(
-          props.clasificacion,
-          rondaAnterior
-        );
+      const emparejamientosGenerados = generarEmparejamientosSinRepetir(
+        props.clasificacion,
+        await getPartidasRondasAnteriores(props.torneo.torneo.idTorneo),
+        true
+      );
+      // Sin forma de emparejar a todos sin repetir: mejor no generar la ronda
+      if (!emparejamientosGenerados) {
+        mensajeError.value = MENSAJE_ERROR_SIN_REPETIR;
+        showErrorModal.value = true;
+        return;
+      }
 
       const configuracion: GenerarRonda = {
         mismaComunidadCheck: mismaComunidadCheck.value,

@@ -227,6 +227,7 @@ export interface GenerarOtraRondaEquiposRequestDTO {
   clasificacion: EquipoDTO[];
   permiteRepetirRival: boolean;
   necesitaBye: boolean;
+  // Emparejamientos de todas las rondas anteriores, aunque el nombre diga la anterior
   pairingRondaAnterior: PairingDTO[];
 }
 export interface PairingDTO {
