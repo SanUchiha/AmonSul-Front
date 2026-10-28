@@ -295,7 +295,7 @@
         <v-row v-if="!partidaCompleta && editarPartidaPJ && esCapitan">
           <v-col cols="12" class="text-center">
             <v-btn color="success" @click="editPartida(localMatch, idUsuario)">
-              Validar Resultadoo
+              Validar Resultado
             </v-btn>
           </v-col>
         </v-row>
