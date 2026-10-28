@@ -100,6 +100,7 @@
                   :editarPartidaPJ="false"
                   :soloValidarPJ="false"
                   :idEquipo="idEquipo"
+                  :listaPorJugador="torneo?.listaPorPareja === false"
                   :misPartidas="true"
                 />
               </div>
@@ -113,6 +114,7 @@
                   :editarPartidaPJ="editarPartidaCapitan(partida)"
                   :soloValidarPJ="soloValidarCapitan(partida)"
                   :idEquipo="idEquipo"
+                  :listaPorJugador="torneo?.listaPorPareja === false"
                   :misPartidas="true"
                 />
               </div>
@@ -157,6 +159,7 @@
                   :editarPartidaPJ="false"
                   :soloValidarPJ="false"
                   :idEquipo="idEquipo"
+                  :listaPorJugador="torneo?.listaPorPareja === false"
                   :misPartidas="false"
                 />
               </div>
@@ -170,6 +173,7 @@
                   :editarPartidaPJ="editarPartidaCapitan(partida)"
                   :soloValidarPJ="soloValidarCapitan(partida)"
                   :idEquipo="idEquipo"
+                  :listaPorJugador="torneo?.listaPorPareja === false"
                   :misPartidas="false"
                 />
               </div>

@@ -301,7 +301,7 @@
                           <!-- lista 1 -->
                           <div class="player-info">
                             <v-btn
-                              class="mt-2"
+                              class="mt-2 btn-lista"
                               variant="tonal"
                               color="primary"
                               size="small"
@@ -313,7 +313,12 @@
                                 )
                               "
                             >
-                              Lista
+                              <!-- con una lista por jugador, cada botón lleva el nick de su dueño -->
+                              {{
+                                partida.idCompanero1 && !torneo?.listaPorPareja
+                                  ? `Lista ${partida.nick1}`
+                                  : "Lista"
+                              }}
                             </v-btn>
                           </div>
                           <!-- con una lista por jugador, también la del compañero -->
@@ -322,7 +327,7 @@
                             class="player-info"
                           >
                             <v-btn
-                              class="mt-2"
+                              class="mt-2 btn-lista"
                               variant="tonal"
                               color="primary"
                               size="small"
@@ -429,7 +434,7 @@
                           <!-- lista 2 -->
                           <div class="player-info">
                             <v-btn
-                              class="mt-2"
+                              class="mt-2 btn-lista"
                               variant="tonal"
                               color="primary"
                               size="small"
@@ -441,7 +446,12 @@
                                 )
                               "
                             >
-                              Lista
+                              <!-- con una lista por jugador, cada botón lleva el nick de su dueño -->
+                              {{
+                                partida.idCompanero2 && !torneo?.listaPorPareja
+                                  ? `Lista ${partida.nick2}`
+                                  : "Lista"
+                              }}
                             </v-btn>
                           </div>
                           <!-- con una lista por jugador, también la del compañero -->
@@ -450,7 +460,7 @@
                             class="player-info"
                           >
                             <v-btn
-                              class="mt-2"
+                              class="mt-2 btn-lista"
                               variant="tonal"
                               color="primary"
                               size="small"
@@ -1883,6 +1893,20 @@ const actualizarPairing = async (payload: ActualizarPairingEquiposDTO) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Con nicks largos el botón de lista ocupa varias líneas en vez de salirse de la tarjeta */
+.player-info .btn-lista {
+  max-width: 100%;
+  height: auto;
+  min-height: 28px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.player-info .btn-lista :deep(.v-btn__content) {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .divider {

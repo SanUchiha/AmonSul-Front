@@ -38,6 +38,7 @@
                   ? partida.idEquipo1
                   : partida.idEquipo2
               "
+              :listaPorJugador="estaJugando.listaPorPareja === false"
             />
           </div>
         </div>

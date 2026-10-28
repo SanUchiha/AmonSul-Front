@@ -133,12 +133,21 @@
                 variant="tonal"
               >
                 <span class="text-wrap">{{
-                  localMatch.ejercitoUsuario1 ?? "Lista"
+                  localMatch.ejercitoUsuario1 ||
+                  (dosListas && localMatch.idCompanero1
+                    ? `Lista ${localMatch.nick1}`
+                    : "Lista")
                 }}</span>
               </v-btn>
             </div>
-            <!-- con una lista por jugador, la del compañero -->
-            <div v-if="localMatch.idCompanero1 && localMatch.ejercitoCompanero1" class="mt-1">
+            <!-- con una lista por jugador, la del compañero aunque aún no la haya entregado -->
+            <div
+              v-if="
+                localMatch.idCompanero1 &&
+                (dosListas || localMatch.ejercitoCompanero1)
+              "
+              class="mt-1"
+            >
               <v-btn
                 block
                 class="army-btn"
@@ -152,7 +161,10 @@
                 style="font-size: 10px"
                 variant="tonal"
               >
-                <span class="text-wrap">{{ localMatch.ejercitoCompanero1 }}</span>
+                <span class="text-wrap">{{
+                  localMatch.ejercitoCompanero1 ||
+                  `Lista ${localMatch.nickCompanero1}`
+                }}</span>
               </v-btn>
             </div>
           </v-col>
@@ -172,11 +184,20 @@
                 variant="tonal"
               >
                 <span class="text-wrap">{{
-                  localMatch.ejercitoUsuario2 ?? "Lista"
+                  localMatch.ejercitoUsuario2 ||
+                  (dosListas && localMatch.idCompanero2
+                    ? `Lista ${localMatch.nick2}`
+                    : "Lista")
                 }}</span>
               </v-btn>
             </div>
-            <div v-if="localMatch.idCompanero2 && localMatch.ejercitoCompanero2" class="mt-1">
+            <div
+              v-if="
+                localMatch.idCompanero2 &&
+                (dosListas || localMatch.ejercitoCompanero2)
+              "
+              class="mt-1"
+            >
               <v-btn
                 block
                 class="army-btn"
@@ -190,7 +211,10 @@
                 style="font-size: 10px"
                 variant="tonal"
               >
-                <span class="text-wrap">{{ localMatch.ejercitoCompanero2 }}</span>
+                <span class="text-wrap">{{
+                  localMatch.ejercitoCompanero2 ||
+                  `Lista ${localMatch.nickCompanero2}`
+                }}</span>
               </v-btn>
             </div>
           </v-col>
@@ -425,12 +449,18 @@ const props = defineProps<{
   soloValidarPJ: boolean;
   idEquipo: number | null;
   misPartidas?: boolean;
+  // Parejas con una lista por jugador; sin él, el botón del compañero sale cuando ya tiene ejército
+  listaPorJugador?: boolean;
 }>();
 
 const localMatch = reactive({ ...props.match });
 // En Parejas hay una partida por cruce: no se elige qué miembro juega contra cuál
 const esPartidaParejas = computed(
   () => localMatch.idCompanero1 != null || localMatch.idCompanero2 != null
+);
+// Parejas con una lista por jugador: cada pareja tiene dos listas
+const dosListas = computed(
+  () => esPartidaParejas.value && props.listaPorJugador
 );
 
 const isLoading = ref(true);

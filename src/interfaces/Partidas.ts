@@ -149,4 +149,6 @@ export interface EstaJugandoDTO {
   tienePartidas: boolean;
   partidas: PartidaTorneoDTO[];
   tipoTorneo: string | null;
+  // Solo en Parejas: una lista por pareja en vez de una por jugador
+  listaPorPareja?: boolean;
 }
