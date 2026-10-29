@@ -13,23 +13,22 @@
     </v-row>
 
     <!-- Novedades -->
-    <v-row class="mt-8 mb-2">
+    <v-row class="mt-8 mb-2" justify="center">
       <v-col cols="12" class="text-center">
         <h2 class="text-h5 font-weight-bold mb-4">Últimas novedades</h2>
       </v-col>
-      <v-col cols="12">
-        <v-timeline align="start" side="end">
+      <v-col cols="12" md="10" lg="8">
+        <!-- Compacta: la fecha va dentro de la tarjeta y el texto usa todo el ancho, también en móvil -->
+        <v-timeline align="start" side="end" density="compact" truncate-line="start">
           <v-timeline-item
             v-for="novedad in novedades"
             :key="novedad.titulo"
             dot-color="primary"
             size="small"
           >
-            <template v-slot:opposite>
-              <span class="text-caption font-weight-bold">{{ novedad.fecha }}</span>
-            </template>
             <v-card class="pa-3" elevation="2">
-              <h3 class="text-h6">{{ novedad.titulo }}</h3>
+              <span class="text-caption font-weight-bold text-primary">{{ novedad.fecha }}</span>
+              <h3 class="text-h6 novedad-titulo">{{ novedad.titulo }}</h3>
               <p class="text-body-2">{{ novedad.descripcion }}</p>
             </v-card>
           </v-timeline-item>
@@ -64,6 +63,12 @@ export default {
   data() {
     return {
       novedades: [
+        {
+          fecha: "Octubre 2026",
+          titulo: "Las Ligas ahora se llaman Circuitos",
+          descripcion:
+            "Lo que hasta ahora llamábamos Ligas, como Amon Sûl 2026 o Catalana 2026, pasa a llamarse Circuitos: agrupan varios torneos en una clasificación conjunta. Están en el menú, en Circuitos, con los mismos torneos y clasificaciones de siempre. Así dejamos el nombre de Liga para un nuevo formato de torneo que llegará pronto.",
+        },
         {
           fecha: "Octubre 2026",
           titulo: "Torneos a Parejas",
@@ -156,3 +161,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* El mismo dorado que los títulos de las mesas en el directo */
+.novedad-titulo {
+  color: #ffcc00;
+}
+</style>
