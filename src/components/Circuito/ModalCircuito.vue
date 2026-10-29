@@ -2,7 +2,7 @@
   <v-dialog v-model="show" max-width="800px">
     <v-card class="elevation-2 rounded">
       <v-card-title class="d-flex justify-space-between align-center">
-        <span class="headline">{{ props.liga?.nombreLiga }}</span>
+        <span class="headline">{{ props.circuito?.nombreCircuito }}</span>
         <v-btn 
           icon 
           size="small" 
@@ -15,12 +15,12 @@
       </v-card-title>
 
       <v-card-text>
-        <LigaTorneosList :torneos="torneos" />
+        <CircuitoTorneosList :torneos="torneos" />
       </v-card-text>
       
       <v-divider class="my-3"></v-divider>
 
-      <LigaModalActions 
+      <CircuitoModalActions 
         @ver-clasificacion="abrirModalClasificacion"
         @close="close"
       />
@@ -30,22 +30,22 @@
   <!-- Modal de clasificación -->
   <ModalClasificacion 
     v-model="showModalClasificacion"
-    :liga-nombre="props.liga?.nombreLiga || ''"
+    :circuito-nombre="props.circuito?.nombreCircuito || ''"
     :clasificacion="clasificacion"
     :loading="loadingClasificacion"
   />
 </template>
 <script lang="ts" setup>
 import { ref, defineProps, defineEmits, watch } from "vue";
-import { LigaDTO } from "@/interfaces/Liga";
-import { useLigaData } from "@/composables/useLigaData";
-import LigaTorneosList from "./components/LigaTorneosList.vue";
-import LigaModalActions from "./components/LigaModalActions.vue";
+import { CircuitoDTO } from "@/interfaces/Circuito";
+import { useCircuitoData } from "@/composables/useCircuitoData";
+import CircuitoTorneosList from "./components/CircuitoTorneosList.vue";
+import CircuitoModalActions from "./components/CircuitoModalActions.vue";
 import ModalClasificacion from "./components/ModalClasificacion.vue";
 
 const props = defineProps<{
-  liga: LigaDTO | null;
-  showModalLiga: boolean;
+  circuito: CircuitoDTO | null;
+  showModalCircuito: boolean;
 }>();
 
 const emit = defineEmits<{ (event: "close"): void }>();
@@ -55,7 +55,7 @@ const showModalClasificacion = ref<boolean>(false);
 const loadingClasificacion = ref<boolean>(false);
 
 // Usar el composable para la lógica de datos
-const { torneos, clasificacion, loadTorneos, prepareClasificacion } = useLigaData();
+const { torneos, clasificacion, loadTorneos, prepareClasificacion } = useCircuitoData();
 
 const close = () => {
   show.value = false;
@@ -80,12 +80,12 @@ watch(show, (newValue) => {
   }
 });
 
-// Observa los cambios en props.liga para recargar torneos
+// Observa los cambios en props.circuito para recargar torneos
 watch(
-  () => props.liga,
-  (newLiga) => {
-    if (newLiga) {
-      loadTorneos(newLiga);
+  () => props.circuito,
+  (newCircuito) => {
+    if (newCircuito) {
+      loadTorneos(newCircuito);
     }
   },
   { immediate: true }

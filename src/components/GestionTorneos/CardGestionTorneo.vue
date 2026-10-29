@@ -79,7 +79,7 @@
           >
         </v-col>
         <v-col>
-          <CardAddTorneoLiga :idTorneo="props.torneo?.torneo.idTorneo!" />
+          <CardAddTorneoCircuito :idTorneo="props.torneo?.torneo.idTorneo!" />
         </v-col>
       </v-row>
     </v-card-actions>
@@ -147,7 +147,7 @@ import { computed, ref } from "vue";
 import ModalModificarTorneo from "./ModalModificarTorneo.vue";
 import { getListasTorneoAsync, getTorneo } from "@/services/TorneosService";
 import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
-import CardAddTorneoLiga from "./CardAddTorneoLiga.vue";
+import CardAddTorneoCircuito from "./CardAddTorneoCircuito.vue";
 import ModalHandlerMostrarListas from "./ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "./ModalHandlerMostrarClasificacion.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";

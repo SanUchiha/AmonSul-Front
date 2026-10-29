@@ -506,7 +506,6 @@ const esListaConjunta = computed(
   () => tipoTorneo.value === "Parejas" && listaPorPareja.value
 );
 const classificationType = ref<ClassificationType>();
-const esLiga = ref<boolean>(false);
 const idRangoTorneo = ref<number>(1);
 const esMatchedPlayTorneo = ref<boolean>(false);
 const metodosPago = ref<string[]>([]);
@@ -716,7 +715,6 @@ const confirmarConfiguracion = async () => {
     estadoTorneo: estadoTorneo.value,
     lugarTorneo: lugarTorneo.value,
     tipoTorneo: torneoTypeSelected.value,
-    esLiga: esLiga.value,
     idRangoTorneo: idRangoTorneo.value,
     esMatchedPlayTorneo: esMatchedPlayTorneo.value,
     fechaEntregaListas: fechaFinEntregaListas.value,

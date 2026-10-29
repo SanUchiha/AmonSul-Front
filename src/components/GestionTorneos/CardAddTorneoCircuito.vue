@@ -2,21 +2,21 @@
   <v-card class="border" elevation="2">
     <v-card-text>
       <v-select
-        label="Selecciona una liga"
-        :items="ligasDisponibles"
-        v-model="ligaSelected"
-        item-title="nombreLiga"
-        item-value="idLiga"
+        label="Selecciona un circuito"
+        :items="circuitosDisponibles"
+        v-model="circuitoSelected"
+        item-title="nombreCircuito"
+        item-value="idCircuito"
         return-object
         variant="outlined"
         single-line
         clearable
-        :disabled="ligasDisponibles.length === 0"
+        :disabled="circuitosDisponibles.length === 0"
       />
       <v-card-actions>
         <v-spacer class="my-4"></v-spacer>
         <v-btn
-          :disabled="isGenerating || !ligaSelected"
+          :disabled="isGenerating || !circuitoSelected"
           @click="confirmar"
           color="primary"
           variant="tonal"
@@ -27,28 +27,28 @@
 
       <v-divider class="my-4" />
 
-      <div v-if="ligasAsociadas.length > 0">
-        <h4 class="text-subtitle-1 font-weight-medium">Ligas asociadas:</h4>
+      <div v-if="circuitosAsociados.length > 0">
+        <h4 class="text-subtitle-1 font-weight-medium">Circuitos asociados:</h4>
         <v-list density="compact">
-          <v-list-item v-for="liga in ligasAsociadas" :key="liga.idLiga">
+          <v-list-item v-for="circuito in circuitosAsociados" :key="circuito.idCircuito">
             <template #prepend>
               <v-icon icon="mdi-trophy" />
             </template>
-            <v-list-item-title>{{ liga.nombreLiga }}</v-list-item-title>
+            <v-list-item-title>{{ circuito.nombreCircuito }}</v-list-item-title>
             <template #append>
               <v-btn
                 icon="mdi-close"
                 size="small"
                 color="red"
                 variant="text"
-                @click="eliminarLiga(liga.idLiga)"
+                @click="eliminarCircuito(circuito.idCircuito)"
               />
             </template>
           </v-list-item>
         </v-list>
       </div>
       <div v-else class="text-medium-emphasis text-body-2">
-        No hay ligas asociadas aún.
+        No hay circuitos asociados aún.
       </div>
     </v-card-text>
   </v-card>
@@ -63,7 +63,7 @@
   <!-- Modal éxito -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Torneo añadido a la liga con éxito."
+    message="Torneo añadido al circuito con éxito."
     @update:isVisible="showSuccessModal = $event"
   />
 
@@ -80,54 +80,54 @@ import { ref, defineProps, onMounted } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import {
-  addTorneoToLigaAsync,
-  deleteLigaTorneoAsync,
-  getLigasAsocidasATorneoAsync,
-  getLigasNoTorneoAsync,
-} from "@/services/LigasService";
-import { AddLigaTorneoDTO, LigaDTO } from "@/interfaces/Liga";
+  addTorneoToCircuitoAsync,
+  deleteCircuitoTorneoAsync,
+  getCircuitosAsociadosATorneoAsync,
+  getCircuitosNoTorneoAsync,
+} from "@/services/CircuitosService";
+import { AddCircuitoTorneoDTO, CircuitoDTO } from "@/interfaces/Circuito";
 
 const props = defineProps<{
   idTorneo: number;
 }>();
 
-const ligasDisponibles = ref<LigaDTO[]>([]);
-const ligasAsociadas = ref<LigaDTO[]>([]);
+const circuitosDisponibles = ref<CircuitoDTO[]>([]);
+const circuitosAsociados = ref<CircuitoDTO[]>([]);
 const isGenerating = ref(false);
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
-const ligaSelected = ref<LigaDTO>();
+const circuitoSelected = ref<CircuitoDTO>();
 
-const cargarLigas = async () => {
+const cargarCircuitos = async () => {
   try {
-    const [noAsociadasRes, asociadasRes] = await Promise.all([
-      getLigasNoTorneoAsync(props.idTorneo),
-      getLigasAsocidasATorneoAsync(props.idTorneo),
+    const [noAsociadosRes, asociadosRes] = await Promise.all([
+      getCircuitosNoTorneoAsync(props.idTorneo),
+      getCircuitosAsociadosATorneoAsync(props.idTorneo),
     ]);
 
-    ligasDisponibles.value = noAsociadasRes.data;
-    ligasAsociadas.value = asociadasRes.data;
+    circuitosDisponibles.value = noAsociadosRes.data;
+    circuitosAsociados.value = asociadosRes.data;
   } catch (error) {
-    console.error("Error al cargar ligas:", error);
+    console.error("Error al cargar circuitos:", error);
     showErrorModal.value = true;
   }
 };
 
 const confirmar = async () => {
-  if (!ligaSelected.value || props.idTorneo === 0) return;
+  if (!circuitoSelected.value || props.idTorneo === 0) return;
 
   try {
     isGenerating.value = true;
 
-    const request: AddLigaTorneoDTO = {
-      idLiga: ligaSelected.value.idLiga,
+    const request: AddCircuitoTorneoDTO = {
+      idCircuito: circuitoSelected.value.idCircuito,
       idTorneo: props.idTorneo,
     };
 
-    await addTorneoToLigaAsync(request);
+    await addTorneoToCircuitoAsync(request);
     showSuccessModal.value = true;
-    ligaSelected.value = undefined;
-    await cargarLigas();
+    circuitoSelected.value = undefined;
+    await cargarCircuitos();
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;
@@ -136,13 +136,13 @@ const confirmar = async () => {
   }
 };
 
-const eliminarLiga = async (idLiga: number) => {
+const eliminarCircuito = async (idCircuito: number) => {
   try {
     isGenerating.value = true;
-    await deleteLigaTorneoAsync(props.idTorneo, idLiga);
-    await cargarLigas();
+    await deleteCircuitoTorneoAsync(props.idTorneo, idCircuito);
+    await cargarCircuitos();
   } catch (error) {
-    console.error("Error al eliminar liga del torneo", error);
+    console.error("Error al eliminar circuito del torneo", error);
     showErrorModal.value = true;
   } finally {
     isGenerating.value = false;
@@ -151,7 +151,7 @@ const eliminarLiga = async (idLiga: number) => {
 
 onMounted(async () => {
   if (props.idTorneo !== 0) {
-    await cargarLigas();
+    await cargarCircuitos();
   }
 });
 </script>

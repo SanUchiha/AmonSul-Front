@@ -26,17 +26,17 @@
       icon="mdi-information-outline"
       class="my-2"
     >
-      No hay torneos asociados a esta liga.
+      No hay torneos asociados a este circuito.
     </v-alert>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, defineProps } from "vue";
-import { LigaTorneosDTO } from "@/interfaces/Liga";
+import { CircuitoTorneosDTO } from "@/interfaces/Circuito";
 
 const props = defineProps<{
-  torneos: LigaTorneosDTO[];
+  torneos: CircuitoTorneosDTO[];
 }>();
 
 const numeroTorneos = computed(() => props.torneos.length);

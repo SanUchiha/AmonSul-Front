@@ -1,6 +1,6 @@
 import { ref, computed } from "vue";
-import { LigaDTO, LigaTorneosDTO } from "@/interfaces/Liga";
-import { getTorneosOfLiga } from "@/services/LigasService";
+import { CircuitoDTO, CircuitoTorneosDTO } from "@/interfaces/Circuito";
+import { getTorneosOfCircuito } from "@/services/CircuitosService";
 import { getGanadores } from "@/services/GanadoresService";
 import { GanadorDTO } from "@/interfaces/Ganadores";
 
@@ -12,8 +12,8 @@ export interface ClasificacionItem {
   posicion: number;
 }
 
-export function useLigaData() {
-  const torneos = ref<LigaTorneosDTO[]>([]);
+export function useCircuitoData() {
+  const torneos = ref<CircuitoTorneosDTO[]>([]);
   const loading = ref<boolean>(false);
   const ganadores = ref<GanadorDTO[]>([]);
   const topGanadores = ref<GanadorDTO[]>([]);
@@ -78,14 +78,14 @@ export function useLigaData() {
     }));
   });
 
-  const loadTorneos = async (liga: LigaDTO) => {
-    if (!liga) return;
+  const loadTorneos = async (circuito: CircuitoDTO) => {
+    if (!circuito) return;
     loading.value = true;
     try {
-      const response = await getTorneosOfLiga(liga.idLiga);
+      const response = await getTorneosOfCircuito(circuito.idCircuito);
       torneos.value = response.data;
     } catch (error) {
-      console.error("Error al cargar torneos para la liga:", error);
+      console.error("Error al cargar torneos paral circuito:", error);
     } finally {
       loading.value = false;
     }
@@ -106,7 +106,7 @@ export function useLigaData() {
   const mergeGanadoresXTorneo = () => {
     if (!torneos.value.length || !ganadores.value.length) return;
     
-    const idTorneosLiga = torneos.value.map((torneo) => torneo.idTorneo);
+    const idTorneosCircuito = torneos.value.map((torneo) => torneo.idTorneo);
 
     const ganadoresPorTorneo = ganadores.value.reduce((acc, ganador) => {
       if (!acc[ganador.idTorneo]) {
@@ -120,11 +120,11 @@ export function useLigaData() {
       (ganadoresTorneo) => ganadoresTorneo.slice(0, 10)
     );
 
-    const soloGanadoresTorneosLiga = top10PorTorneo.filter((ganador) =>
-      idTorneosLiga.includes(ganador.idTorneo)
+    const soloGanadoresTorneosCircuito = top10PorTorneo.filter((ganador) =>
+      idTorneosCircuito.includes(ganador.idTorneo)
     );
 
-    topGanadores.value = soloGanadoresTorneosLiga;
+    topGanadores.value = soloGanadoresTorneosCircuito;
   };
 
   const prepareClasificacion = async () => {

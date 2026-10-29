@@ -4,7 +4,7 @@
       <v-card-title class="d-flex justify-space-between align-center">
         <span class="headline">
           <v-icon color="primary" class="mr-2">mdi-podium</v-icon>
-          Clasificación - {{ ligaNombre }}
+          Clasificación - {{ circuitoNombre }}
         </span>
         <v-btn 
           icon 
@@ -91,7 +91,7 @@
           icon="mdi-information-outline"
           class="my-2"
         >
-          No hay datos de clasificación disponibles para esta liga.
+          No hay datos de clasificación disponibles para este circuito.
         </v-alert>
         
         <div v-if="loading" class="text-center py-6">
@@ -117,11 +117,11 @@
 
 <script lang="ts" setup>
 import { ref, defineProps, defineEmits, watch, computed } from "vue";
-import type { ClasificacionItem } from "@/composables/useLigaData";
+import type { ClasificacionItem } from "@/composables/useCircuitoData";
 
 const props = defineProps<{
   modelValue: boolean;
-  ligaNombre: string;
+  circuitoNombre: string;
   clasificacion: ClasificacionItem[];
   loading?: boolean;
 }>();

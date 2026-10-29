@@ -3,24 +3,24 @@
     <v-card class="elevation-2 rounded">
       <v-card-title>
         <v-icon color="primary" class="mr-2">mdi-trophy-variant</v-icon>
-        Ligas
+        Circuitos
       </v-card-title>
       
       <v-card-text>
-        <div class="ligas-header">
+        <div class="circuitos-header">
           <v-icon size="small" color="primary" class="mr-1">mdi-format-list-bulleted</v-icon>
-          <span class="ligas-count">{{ numeroLigas }} {{ numeroLigas === 1 ? 'liga disponible' : 'ligas disponibles' }}</span>
+          <span class="circuitos-count">{{ numeroCircuitos }} {{ numeroCircuitos === 1 ? 'circuito disponible' : 'circuitos disponibles' }}</span>
         </div>
         
-        <div v-if="ligas.length > 0" class="ligas-container">
+        <div v-if="circuitos.length > 0" class="circuitos-container">
           <div 
-            v-for="liga in ligas" 
-            :key="liga.idLiga"
-            class="liga-item"
-            @click="openDialog(liga)"
+            v-for="circuito in circuitos" 
+            :key="circuito.idCircuito"
+            class="circuito-item"
+            @click="openDialog(circuito)"
           >
             <v-icon x-small color="secondary" class="mr-1">mdi-shield-crown</v-icon>
-            <span class="liga-name">{{ liga.nombreLiga }}</span>
+            <span class="circuito-name">{{ circuito.nombreCircuito }}</span>
             <v-icon x-small color="grey" class="ml-auto">mdi-chevron-right</v-icon>
           </div>
         </div>
@@ -33,7 +33,7 @@
           icon="mdi-information-outline"
           class="my-2"
         >
-          No hay ligas disponibles en este momento.
+          No hay circuitos disponibles en este momento.
         </v-alert>
         
         <div v-if="loading" class="text-center py-4">
@@ -42,69 +42,69 @@
       </v-card-text>
     </v-card>
 
-    <ModalLiga v-if="showModalLiga" :liga="selectedLiga" :showModalLiga="showModalLiga" @close="closeModal" />
+    <ModalCircuito v-if="showModalCircuito" :circuito="selectedCircuito" :showModalCircuito="showModalCircuito" @close="closeModal" />
   </v-container>
 </template>
 
 <script lang="ts" setup>
-import ModalLiga from "@/components/Liga/ModalLiga.vue";
-import { LigaDTO } from "@/interfaces/Liga";
-import { getLigas } from "@/services/LigasService";
+import ModalCircuito from "@/components/Circuito/ModalCircuito.vue";
+import { CircuitoDTO } from "@/interfaces/Circuito";
+import { getCircuitos } from "@/services/CircuitosService";
 import { ref, onMounted, computed } from "vue";
 
-const showModalLiga = ref<boolean>(false);
-const selectedLiga = ref<LigaDTO | null>(null);
+const showModalCircuito = ref<boolean>(false);
+const selectedCircuito = ref<CircuitoDTO | null>(null);
 
-// Referencia para almacenar las ligas
-const ligas = ref<LigaDTO[]>([]);
+// Referencia para almacenar los circuitos
+const circuitos = ref<CircuitoDTO[]>([]);
 const loading = ref<boolean>(false);
 
-// Computed para el número de ligas
-const numeroLigas = computed(() => ligas.value.length);
+// Computed para el número de circuitos
+const numeroCircuitos = computed(() => circuitos.value.length);
 
-// Función para cargar las ligas
-const loadLigas = async () => {
+// Función para cargar los circuitos
+const loadCircuitos = async () => {
   loading.value = true;
   try {
-    const response = await getLigas();
-    ligas.value = response.data;
+    const response = await getCircuitos();
+    circuitos.value = response.data;
   } catch (error) {
-    console.error("Error al cargar ligas:", error);
+    console.error("Error al cargar circuitos:", error);
   } finally {
     loading.value = false;
   }
 };
 
-// Función para abrir el modal con los detalles de la liga seleccionada
-const openDialog = (liga: LigaDTO) => {
-  selectedLiga.value = liga;
-  showModalLiga.value = true;
+// Función para abrir el modal con los detalles del circuito seleccionado
+const openDialog = (circuito: CircuitoDTO) => {
+  selectedCircuito.value = circuito;
+  showModalCircuito.value = true;
 };
 
 const closeModal = () => {
-  showModalLiga.value = false;
+  showModalCircuito.value = false;
 };
 
-// Cargar ligas cuando el componente esté montado
+// Cargar circuitos cuando el componente esté montado
 onMounted(() => {
-  loadLigas();
+  loadCircuitos();
 });
 </script>
 
 <style lang="scss" scoped>
-.ligas-header {
+.circuitos-header {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
   padding: 4px 0;
 }
 
-.ligas-count {
+.circuitos-count {
   font-size: 0.9rem;
   font-weight: 600;
 }
 
-.ligas-container {
+.circuitos-container {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -116,7 +116,7 @@ onMounted(() => {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
-.liga-item {
+.circuito-item {
   display: flex;
   align-items: center;
   padding: 8px 12px;
@@ -133,7 +133,7 @@ onMounted(() => {
   }
 }
 
-.liga-name {
+.circuito-name {
   font-weight: 500;
   flex: 1;
   white-space: nowrap;

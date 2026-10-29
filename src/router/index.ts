@@ -19,7 +19,7 @@ import DetalleTorneoLiveMasView from "@/views/DetalleTorneoLiveMasView.vue";
 import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
 import MisPartidasView from "@/views/MisPartidasView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
-import LigasView from "@/views/LigasView.vue";
+import CircuitosView from "@/views/CircuitosView.vue";
 import DetalleTorneoGestionIndividualMasView from "@/views/DetalleTorneoGestionIndividualMasView.vue";
 import HomeView from "@/views/HomeView.vue";
 import EstadisticasEjercitoView from "@/views/EstadisticasEjercitoView.vue";
@@ -140,11 +140,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/ligas",
-    name: "ligas",
-    component: LigasView,
+    path: "/circuitos",
+    name: "circuitos",
+    component: CircuitosView,
     meta: { requiresAuth: true },
   },
+  // Lo que antes se llamaba ligas: los enlaces guardados siguen funcionando
+  { path: "/ligas", redirect: "/circuitos" },
   {
     path: "/error",
     name: "error",

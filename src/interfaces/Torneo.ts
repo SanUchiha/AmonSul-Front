@@ -15,7 +15,6 @@ export interface Torneo {
   puntosTorneo: number; // Puntos asignados al torneo
   estadoTorneo: "ESPERANDO" | "LIVE" | "TERMINADO" | "CANCELADO"; // Estado del torneo (enum)
   lugarTorneo: string; // Lugar donde se llevará a cabo el torneo
-  esLiga?: boolean;
   tipoTorneo: "Individual" | "Parejas" | "Equipos_2" | "Equipos_4" | "Equipos_6";
   esPrivadoTorneo: boolean; // Indica si el torneo es privado o no
   idRangoTorneo: number; // ID del rango del torneo (FK)
@@ -136,7 +135,6 @@ export interface CrearTorneoDTO {
   estadoTorneo: number;
   lugarTorneo: string;
   tipoTorneo: string;
-  esLiga: boolean;
   idRangoTorneo: number;
   esMatchedPlayTorneo: boolean;
   fechaEntregaListas: string; // formato de fecha "YYYY-MM-DD"
@@ -166,7 +164,6 @@ export interface ModificarTorneoDTO {
   estadoTorneo: number; // Estado del torneo (enum)
   lugarTorneo?: string;
   tipoTorneo: "Individual" | "Parejas" | "Equipos_2" | "Equipos_4" | "Equipos_6";
-  esLiga?: boolean;
   idRangoTorneo?: number;
   esMatchedPlayTorneo?: boolean;
   fechaEntregaListas?: string; // formato de fecha "YYYY-MM-DD"
