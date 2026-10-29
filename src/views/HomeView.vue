@@ -67,7 +67,7 @@ export default {
           fecha: "Octubre 2026",
           titulo: "Las Ligas ahora se llaman Circuitos",
           descripcion:
-            "Lo que hasta ahora llamábamos Ligas, como Amon Sûl 2026 o Catalana 2026, pasa a llamarse Circuitos: agrupan varios torneos en una clasificación conjunta. Están en el menú, en Circuitos, con los mismos torneos y clasificaciones de siempre. Así dejamos el nombre de Liga para un nuevo formato de torneo que llegará pronto.",
+            "Lo que hasta ahora llamábamos Ligas, como Amon Sûl 2026, pasa a llamarse Circuitos: agrupan varios torneos en una clasificación conjunta. Están en el menú, en Circuitos, con los mismos torneos y clasificaciones de siempre. Así dejamos el nombre de Liga para un nuevo formato de torneo que llegará pronto.",
         },
         {
           fecha: "Octubre 2026",
