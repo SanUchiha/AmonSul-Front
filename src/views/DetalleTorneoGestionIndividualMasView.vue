@@ -504,7 +504,8 @@ const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
-const activeTab = ref<number>(1);
+// Al entrar, la pestaña Gestión: como en la gestión por equipos
+const activeTab = ref<number>(0);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const tabClasificacion = ref<number>();
 const route = useRoute();
