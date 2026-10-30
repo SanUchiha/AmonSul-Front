@@ -10,7 +10,7 @@
           <!-- Nombre del torneo -->
           <v-text-field
             v-model="nombreTorneo"
-            label="Nombre del torneo"
+            :label="`Nombre ${textos.del}`"
             required
             type="text"
             :rules="[(v: string) => !!v || 'Campo obligatorio']"
@@ -19,7 +19,7 @@
           <!-- Descripción del torneo -->
           <v-textarea
             v-model="descripcionTorneo"
-            label="Descripción del torneo (opcional)"
+            :label="`Descripción ${textos.del} (opcional)`"
             type="text"
             clearable
           ></v-textarea>
@@ -28,7 +28,7 @@
           <!-- Campo de búsqueda de dirección -->
           <v-text-field
             v-model="searchQuery"
-            label="¿Dónde se celebra el torneo?"
+            :label="`¿Dónde se celebra ${textos.el}?`"
             placeholder="Ej: Calle Gran Vía, Madrid"
             @keyup.enter="searchLocation"
           >
@@ -83,7 +83,7 @@
           <!-- puntosTorneo -->
           <v-text-field
             v-model="puntosTorneo"
-            label="¿A cuantos puntos es el torneo?"
+            :label="`¿A cuántos puntos es ${textos.el}?`"
             required
             type="number"
             :rules="[
@@ -184,7 +184,7 @@
           <!-- fecha de inicio -->
           <v-text-field
             v-model="fechaInicioTorneo"
-            label="Inicio del torneo"
+            :label="`Inicio ${textos.del}`"
             type="date"
             :rules="[
               validateRequired,
@@ -199,7 +199,7 @@
           <!-- Fecha de fin del torneo -->
           <v-text-field
             v-model="fechaFinTorneo"
-            label="Fin del torneo"
+            :label="`Fin ${textos.del}`"
             type="date"
             :rules="[validateRequired, validateFechaFinInicioTorneo]"
             required
@@ -210,7 +210,7 @@
           <!-- Precio del torneo -->
           <v-text-field
             v-model="precioTorneo"
-            label="¿Cuál es el precio del torneo?"
+            :label="`¿Cuál es el precio ${textos.del}?`"
             required
             type="number"
             :rules="[(v: number) => !isNaN(v) || 'Debe ser un número']"
@@ -237,7 +237,7 @@
               ),
               validateAntesDe(
                 fechaInicioTorneo,
-                'Debe ser antes de la fecha de inicio del torneo'
+                `Debe ser antes de la fecha de inicio ${textos.del}`
               ),
             ]"
             required
@@ -248,7 +248,7 @@
           <!-- Último día para apuntarse -->
           <v-text-field
             v-model="fechaFinInscripcion"
-            label="Último día para apuntarse al torneo"
+            :label="`Último día para apuntarse ${textos.al}`"
             type="date"
             :rules="[
               validateRequired,
@@ -258,7 +258,7 @@
               ),
               validateAntesDe(
                 fechaInicioTorneo,
-                'Debe ser antes del inicio del torneo'
+                `Debe ser antes del inicio ${textos.del}`
               ),
             ]"
             required
@@ -273,13 +273,17 @@
           <!-- Último día para entregar las listas -->
           <v-text-field
             v-model="fechaFinEntregaListas"
-            label="Último día para entregar las listas"
+            :label="
+              esLiga
+                ? 'Último día para entregar la primera lista'
+                : 'Último día para entregar las listas'
+            "
             type="date"
             :rules="[
               validateRequired,
               validateAntesDe(
                 fechaInicioTorneo,
-                'Debe ser antes del inicio del torneo'
+                `Debe ser antes del inicio ${textos.del}`
               ),
             ]"
             required
@@ -290,7 +294,7 @@
           <!-- bases del torneo -->
           <v-file-input
             clearable
-            label="Bases del torneo"
+            :label="`Bases ${textos.del}`"
             required
             accept="application/pdf"
             @change="onFileChange"
@@ -306,8 +310,9 @@
             show-size
           ></v-file-input>
 
-          <!-- hora del comienza del torneo -->
+          <!-- hora del comienza del torneo: la liga no tiene horario -->
           <v-text-field
+            v-if="!esLiga"
             v-model="horaInicioTorneo"
             label="Hora de inicio del torneo (HH:MM)"
             clearable
@@ -320,6 +325,7 @@
 
           <!-- hora a la que acaba del torneo -->
           <v-text-field
+            v-if="!esLiga"
             v-model="horaFinTorneo"
             label="Hora de finalización del torneo (HH:MM)"
             clearable
@@ -373,14 +379,14 @@
   <!-- Modal response eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Torneo modificado correctamente."
+    :message="`${esLiga ? 'Liga modificada' : 'Torneo modificado'} correctamente.`"
     @update:isVisible="showSuccessModal = $event"
   />
 
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido modificar el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    :message="`No se ha podido modificar ${textos.el}. Intentalo de nuevo y si el error persiste contacta con el administrador.`"
     @update:isVisible="showErrorModal = $event"
   />
 </template>
@@ -538,6 +544,12 @@ const esListaConjunta = computed(
 );
 // El formato no se cambia al modificar: solo sus opciones, en Liga
 const esLiga = computed(() => props.torneo?.formatoTorneo === FORMATO_LIGA);
+// Los textos del formulario hablan del tipo de evento
+const textos = computed(() =>
+  esLiga.value
+    ? { el: "la liga", del: "de la liga", al: "a la liga" }
+    : { el: "el torneo", del: "del torneo", al: "al torneo" }
+);
 const cuentaElo = ref<boolean>(false);
 const idaYVuelta = ref<boolean>(false);
 const classificationType = ref<ClassificationType>();

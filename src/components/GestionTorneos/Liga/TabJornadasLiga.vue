@@ -104,16 +104,30 @@
             >
               Falta una validación
             </v-chip>
-            <v-spacer />
-            <v-btn
-              v-if="editable"
-              size="small"
-              variant="tonal"
-              color="primary"
-              @click="editar(partida)"
-            >
-              Resultado
-            </v-btn>
+            <!-- Los botones van juntos: si no caben, bajan los dos a la derecha -->
+            <div class="d-flex ga-1 ms-auto">
+              <!-- Con el resultado ya metido basta con validarla, sin abrir el formulario -->
+              <v-btn
+                v-if="editable && puedeValidar(partida)"
+                size="small"
+                variant="tonal"
+                color="success"
+                prepend-icon="mdi-check-all"
+                :loading="validando === partida.idPartidaTorneo"
+                @click="validar(partida)"
+              >
+                Validar
+              </v-btn>
+              <v-btn
+                v-if="editable"
+                size="small"
+                variant="tonal"
+                color="primary"
+                @click="editar(partida)"
+              >
+                Resultado
+              </v-btn>
+            </div>
           </div>
         </v-card-text>
       </v-card>
@@ -147,6 +161,9 @@
     message="Resultado guardado."
     @update:isVisible="showSuccess = $event"
   />
+  <v-snackbar v-model="showValidada" color="success" timeout="2000">
+    Partida validada.
+  </v-snackbar>
   <ModalError
     :isVisible="showError"
     :titulo="tituloError"
@@ -254,6 +271,42 @@ async function guardar(partidaEditada: PartidaTorneoDTO) {
     showError.value = true;
   } finally {
     isCargando.value = false;
+  }
+}
+
+// Validar de un toque: el organizador da por buenos los datos que ya hay
+const validando = ref<number | null>(null);
+const showValidada = ref(false);
+
+function puedeValidar(partida: PartidaTorneoDTO) {
+  return (
+    !partidaJugada(partida) &&
+    (partida.resultadoUsuario1 != null || partida.resultadoUsuario2 != null)
+  );
+}
+
+async function validar(partida: PartidaTorneoDTO) {
+  validando.value = partida.idPartidaTorneo;
+  try {
+    await updatePartidaTorneo({
+      idPartidaTorneo: partida.idPartidaTorneo,
+      partidaValidadaUsuario1: true,
+      partidaValidadaUsuario2: true,
+    });
+    // La respuesta no trae los nicks: se cambia solo lo validado
+    emit("partidaActualizada", {
+      ...partida,
+      partidaValidadaUsuario1: true,
+      partidaValidadaUsuario2: true,
+    });
+    showValidada.value = true;
+  } catch (error) {
+    console.error(error);
+    tituloError.value = undefined;
+    mensajeError.value = "No se ha podido validar la partida.";
+    showError.value = true;
+  } finally {
+    validando.value = null;
   }
 }
 

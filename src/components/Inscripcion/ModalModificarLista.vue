@@ -8,7 +8,12 @@
           v-model="ejercitoSelected"
           :items="listadoEjercitos"
           item-title="name"
-          label="¿Cuál es tu ejército principal?"
+          :label="
+            ejercitoFijo ? 'Ejército de la liga' : '¿Cuál es tu ejército principal?'
+          "
+          :disabled="!!ejercitoFijo"
+          :hint="ejercitoFijo ? 'En la liga juegas siempre con este ejército' : ''"
+          :persistent-hint="!!ejercitoFijo"
           @click="loadEjercitos"
           :rules="[rules.required]"
           required
@@ -75,6 +80,7 @@
 import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
 import { appsettings } from "@/settings/appsettings";
+import { ejercitoPorNombre } from "@/utils/ejercitoLiga";
 import { uploadImageToCloudinary } from "@/services/CloudinaryService";
 import { ref, watch, computed } from "vue";
 
@@ -82,6 +88,8 @@ import { ref, watch, computed } from "vue";
 const props = defineProps<{
   isVisible: boolean;
   idLista: number;
+  // Liga: el ejército no se elige, es el de la inscripción
+  ejercitoFijo?: string | null;
 }>();
 
 const internalIsVisible = ref(props.isVisible);
@@ -89,7 +97,9 @@ const isLoading = ref<boolean>(false);
 
 const imageBase64 = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const ejercitoSelected = ref<ArmyDTO>();
+const ejercitoSelected = ref<ArmyDTO | undefined>(
+  props.ejercitoFijo ? ejercitoPorNombre(props.ejercitoFijo) : undefined
+);
 const listadoEjercitos = ref<ArmyDTO[]>([]);
 const loadingEjercitos = ref<boolean>(false);
 const isSendButtonDisabled = computed(() => {
@@ -132,6 +142,14 @@ const cambiarImagen = () => {
   internalIsVisible.value = true;
 };
 
+// Llega cuando el modal padre ha cargado el torneo
+watch(
+  () => props.ejercitoFijo,
+  fijo => {
+    if (fijo) ejercitoSelected.value = ejercitoPorNombre(fijo);
+  }
+);
+
 watch(
   () => props.isVisible,
   newVal => {
@@ -158,7 +176,9 @@ const enviarLista = () => {
   emit("modificarListaMasDeUna", newLista);
 
   imageBase64.value = "";
-  ejercitoSelected.value = undefined;
+  ejercitoSelected.value = props.ejercitoFijo
+    ? ejercitoPorNombre(props.ejercitoFijo)
+    : undefined;
 };
 </script>
 <style scoped>

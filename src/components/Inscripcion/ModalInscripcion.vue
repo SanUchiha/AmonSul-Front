@@ -18,6 +18,17 @@
         <!-- Lista por jugador = 1 -->
         <v-card-text v-if="torneo.listasPorJugador == 1" class="px-6 py-4">
           <v-list>
+            <v-list-item v-if="ejercitoFijo">
+              <v-list-item-title class="list-item-title text-wrap">
+                <v-icon color="primary" class="mr-2">mdi-shield</v-icon>
+                <strong>Ejército de la liga:</strong>&nbsp;{{ ejercitoFijo }}
+              </v-list-item-title>
+              <!-- El subtítulo de Vuetify corta a una línea: en móvil no se leería -->
+              <p class="text-caption text-medium-emphasis mt-1">
+                Puedes cambiar de lista antes de cada partida, siempre de este
+                ejército.
+              </p>
+            </v-list-item>
             <v-list-item>
               <v-list-item-title class="list-item-title">
                 <v-icon color="primary" class="mr-2">mdi-file-document</v-icon>
@@ -91,7 +102,11 @@
               </v-list-item-title>
             </v-list-item>
 
-            <v-list-item v-if="new Date(torneo!.fechaFinTorneo) >= new Date()">
+            <v-list-item
+              v-if="
+                new Date(torneo!.fechaFinTorneo) >= new Date() && !ligaEnMarcha
+              "
+            >
               <v-btn
                 color="red-darken-3"
                 variant="tonal"
@@ -101,6 +116,12 @@
               >
                 <v-icon left>mdi-delete</v-icon> Darse de baja del torneo
               </v-btn>
+            </v-list-item>
+            <v-list-item v-else-if="ligaEnMarcha">
+              <p class="text-caption text-medium-emphasis">
+                La liga ya está en marcha: si tienes que dejarla, habla con el
+                organizador.
+              </p>
             </v-list-item>
           </v-list>
         </v-card-text>
@@ -261,6 +282,7 @@
     :isVisible="showVerListaModal"
     :hasLista="hasLista"
     :idInscripcion="currentInscripcionId"
+    :ejercitoFijo="ejercitoFijo"
     @update:isVisible="showVerListaModal = $event"
     @enviarLista="handleEnviarLista"
     @modificarLista="handleModificarLista"
@@ -283,6 +305,7 @@
   <ModalModificarLista
     :isVisible="showModificarListaModal"
     :idLista="currentIdLista!"
+    :ejercitoFijo="ejercitoFijo"
     @update:isVisible="showModificarListaModal = $event"
     @modificarListaMasDeUna="modificarLista"
   />
@@ -302,7 +325,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, defineEmits, onMounted, watch } from "vue";
+import { computed, defineProps, ref, defineEmits, onMounted, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
@@ -326,12 +349,15 @@ import { ListaDTO } from "@/interfaces/Usuario";
 import ModalModificarLista from "./ModalModificarLista.vue";
 import ModalEnviarLista from "./ModalEnviarLista.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 
 const props = defineProps<{
   idInscripcion: number;
   idUsuario: number;
   idTorneo: number;
   idOrganizador: number;
+  // Liga: el ejército elegido al inscribirse
+  ejercitoElegido?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -412,6 +438,14 @@ const torneo = ref<Torneo>({
   mostrarClasificacion: false,
   classificationType: ClassificationType.NORMAL
 });
+const esLiga = computed(() => torneo.value.formatoTorneo === FORMATO_LIGA);
+const ejercitoFijo = computed(() =>
+  esLiga.value ? props.ejercitoElegido ?? null : null
+);
+// Al generar las jornadas el torneo pasa a tener tantas partidas como jornadas
+const ligaEnMarcha = computed(
+  () => esLiga.value && torneo.value.numeroPartidas > 1
+);
 const currentInscripcionId = ref<number>();
 const currentIdLista = ref<number>();
 

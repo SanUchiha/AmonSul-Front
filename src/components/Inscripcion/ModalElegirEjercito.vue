@@ -4,8 +4,10 @@
       <v-card-title class="text-wrap">{{ titulo }}</v-card-title>
       <v-card-text>
         <p class="text-body-2 mb-3">
-          En la liga llevas este ejército en todas tus partidas. Puedes cambiar
-          de lista en cada jornada, pero siempre de este ejército.
+          {{
+            texto ??
+            "En la liga llevas este ejército en todas tus partidas. Puedes cambiar de lista en cada jornada, pero siempre de este ejército."
+          }}
         </p>
         <v-autocomplete
           v-model="ejercito"
@@ -49,6 +51,8 @@ const props = defineProps<{
   isVisible: boolean;
   titulo: string;
   ejercitoActual?: string | null;
+  // Si lo usa el organizador, el texto no le habla al jugador
+  texto?: string;
 }>();
 
 const emit = defineEmits<{

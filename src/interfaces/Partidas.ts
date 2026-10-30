@@ -151,4 +151,5 @@ export interface EstaJugandoDTO {
   torneoType: string | null;
   // Solo en Parejas: una lista por pareja en vez de una por jugador
   listaPorPareja?: boolean;
+  formatoTorneo?: string | null;
 }

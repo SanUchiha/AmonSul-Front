@@ -12,15 +12,15 @@
         {{ formatDate(torneo.torneo.fechaFinInscripcion) }}
       </p>
       <p>
-        <strong>Pagos: :</strong>
+        <strong>Pagos:</strong>
         {{ pagosRealizados }}/{{ totalInscripciones }}
       </p>
       <p>
-        <strong>Listas entregadas: :</strong>
+        <strong>Listas entregadas:</strong>
         {{ listasEntregadas }}/{{ totalInscripciones }}
       </p>
       <p>
-        <strong>Listas legales: :</strong>
+        <strong>Listas legales:</strong>
         {{ listasLegales }}/{{ totalInscripciones }}
       </p>
       <p><strong>Listas de luz:</strong> {{ listasLuz }}</p>
@@ -34,7 +34,7 @@
             color="secondary"
             @click="modificarTorneo"
             block
-            >Modificar torneo</v-btn
+            >{{ esLiga ? "Modificar liga" : "Modificar torneo" }}</v-btn
           >
         </v-col>
         <v-col>
@@ -78,8 +78,12 @@
             Descargar Listas</v-btn
           >
         </v-col>
-        <v-col>
-          <CardAddTorneoCircuito :idTorneo="props.torneo?.torneo.idTorneo!" />
+        <!-- Ancho completo: en una columna estrecha el selector no se lee -->
+        <v-col cols="12">
+          <CardAddTorneoCircuito
+            :idTorneo="props.torneo?.torneo.idTorneo!"
+            :esLiga="esLiga"
+          />
         </v-col>
       </v-row>
     </v-card-actions>
@@ -118,13 +122,13 @@
   <!-- modal torneo modificado con exito -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Torneo modificado con exito."
+    :message="`${esLiga ? 'Liga modificada' : 'Torneo modificado'} con éxito.`"
     @update:isVisible="showSuccessModal = $event"
   />
   <!-- modal Error al modificar el torneo -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se han podido modificar el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    :message="`No se ha podido modificar ${esLiga ? 'la liga' : 'el torneo'}. Intentalo de nuevo y si el error persiste contacta con el administrador.`"
     @update:isVisible="showErrorModal = $event"
   />
   <LoadingLOTR
@@ -148,6 +152,7 @@ import ModalModificarTorneo from "./ModalModificarTorneo.vue";
 import { getListasTorneoAsync, getTorneo } from "@/services/TorneosService";
 import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
 import CardAddTorneoCircuito from "./CardAddTorneoCircuito.vue";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import ModalHandlerMostrarListas from "./ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "./ModalHandlerMostrarClasificacion.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
@@ -160,6 +165,9 @@ import { descargarListasPDF } from "@/utils/descargarListas";
 
 // eslint-disable-next-line
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
+const esLiga = computed(
+  () => props.torneo?.torneo.formatoTorneo === FORMATO_LIGA
+);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const showModificarTorneoModal = ref<boolean>(false);

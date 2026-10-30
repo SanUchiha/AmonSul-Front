@@ -70,7 +70,7 @@
                 @click="pedirEjercito(inscripcion)"
               />
               <v-list-item
-                v-if="ligaGenerada && !esRetirado(inscripcion)"
+                v-if="ligaGenerada && !ligaCerrada && !esRetirado(inscripcion)"
                 prepend-icon="mdi-account-remove"
                 base-color="error"
                 title="Retirar de la liga"
@@ -103,6 +103,7 @@
   <ModalElegirEjercito
     :isVisible="showEjercito"
     titulo="Ejército en la liga"
+    texto="El jugador lleva este ejército en todas sus partidas de la liga. Se puede cambiar hasta que se generen las jornadas."
     :ejercitoActual="inscripcionEjercito?.ejercitoElegido"
     @update:isVisible="showEjercito = $event"
     @confirm="cambiarEjercito"
@@ -166,6 +167,7 @@ const RETIRADO = "RETIRADO";
 const props = defineProps<{
   torneo: TorneoGestionInfoDTO;
   ligaGenerada: boolean;
+  ligaCerrada: boolean;
 }>();
 
 const emit = defineEmits<{ (e: "actualizado"): void }>();

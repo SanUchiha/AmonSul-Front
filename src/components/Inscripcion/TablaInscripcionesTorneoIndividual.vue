@@ -50,6 +50,14 @@
           >
             <v-list-item-title class="text-wrap text-left pl-2">
               {{ torneo.torneo.nombreTorneo }}
+              <v-chip
+                v-if="esLiga(torneo)"
+                size="x-small"
+                color="primary"
+                class="ml-1"
+              >
+                Liga
+              </v-chip>
             </v-list-item-title>
             <template v-slot:append>
               <v-menu>
@@ -79,7 +87,9 @@
                         : VerResultadoTorneo(torneo.idTorneo)
                     "
                   >
-                    <v-list-item-title>Ver resultados</v-list-item-title>
+                    <v-list-item-title>{{
+                      esLiga(torneo) ? "Ver la liga" : "Ver resultados"
+                    }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -118,6 +128,7 @@
     :idUsuario="parseInt(idUsuarioLogger!)"
     :idTorneo="currentTorneoId!"
     :idOrganizador="currentIdOrganizador!"
+    :ejercitoElegido="currentEjercitoElegido"
     @eliminar-inscripcion="eliminarInscripcion"
     @close="closeModal"
   />
@@ -151,6 +162,10 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useAuth } from "@/composables/useAuth";
 import ModalInscripcion from "./ModalInscripcion.vue";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+
+const esLiga = (inscripcion: InscripcionUsuarioIndividualDTO) =>
+  inscripcion.torneo.formatoTorneo === FORMATO_LIGA;
 
 const props = defineProps<{
   isLoading: boolean;
@@ -164,6 +179,7 @@ const isRegistering = ref<boolean>(false);
 const currentInscripcionId = ref<number | null>(null);
 const currentTorneoId = ref<number | null>(null);
 const currentIdOrganizador = ref<number | null>(null);
+const currentEjercitoElegido = ref<string | null>(null);
 const listaTorneos = ref<InscripcionUsuarioIndividualDTO[]>([]);
 
 const showSuccessModal = ref<boolean>(false);
@@ -185,6 +201,9 @@ const verDetalleInscripcion = (idInscripcion: number) => {
     listaTorneos.value.find(
       (i) => i.idInscripcion == currentInscripcionId.value
     )?.idOrganizador ?? null;
+  currentEjercitoElegido.value =
+    listaTorneos.value.find(i => i.idInscripcion == idInscripcion)
+      ?.ejercitoElegido ?? null;
 
   showModalInscripcion.value = true;
 };

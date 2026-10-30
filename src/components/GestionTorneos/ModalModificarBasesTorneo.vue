@@ -9,7 +9,11 @@
         <v-form ref="form" v-model="isValid" lazy-validation>
           <v-file-input
             clearable
-            label="Bases del torneo"
+            :label="
+              torneo?.formatoTorneo === FORMATO_LIGA
+                ? 'Bases de la liga'
+                : 'Bases del torneo'
+            "
             required
             accept="application/pdf"
             @change="onFileChange"
@@ -64,6 +68,7 @@ import { ref, defineProps, defineEmits, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { ModificarBasesTorneoDTO, Torneo } from "@/interfaces/Torneo";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import { ModificarBasesTorneoAsync } from "@/services/TorneosService";
 
 const props = defineProps<{

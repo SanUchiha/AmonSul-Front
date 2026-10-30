@@ -8,7 +8,12 @@
           v-model="ejercitoSelected"
           :items="listadoEjercitos"
           item-title="name"
-          label="¿Cuál es tu ejército principal?"
+          :label="
+            ejercitoFijo ? 'Ejército de la liga' : '¿Cuál es tu ejército principal?'
+          "
+          :disabled="!!ejercitoFijo"
+          :hint="ejercitoFijo ? 'En la liga juegas siempre con este ejército' : ''"
+          :persistent-hint="!!ejercitoFijo"
           @click="loadEjercitos"
           :rules="[rules.required]"
           required
@@ -76,6 +81,7 @@ import { ArmyDTO } from "@/interfaces/Army";
 import { RequesListaDTO } from "@/interfaces/Lista";
 import { getlista } from "@/services/ListasService";
 import { appsettings } from "@/settings/appsettings";
+import { ejercitoPorNombre } from "@/utils/ejercitoLiga";
 import { uploadImageToCloudinary } from "@/services/CloudinaryService";
 import { ref, watch, onMounted, computed } from "vue";
 
@@ -84,6 +90,8 @@ const props = defineProps<{
   isVisible: boolean;
   hasLista: boolean;
   idInscripcion: number;
+  // Liga: el ejército no se elige, es el de la inscripción
+  ejercitoFijo?: string | null;
 }>();
 
 const internalIsVisible = ref(props.isVisible);
@@ -179,7 +187,9 @@ const enviarLista = () => {
   else emit("enviarLista", newLista);
 
   imageBase64.value = "";
-  ejercitoSelected.value = undefined;
+  ejercitoSelected.value = props.ejercitoFijo
+    ? ejercitoPorNombre(props.ejercitoFijo)
+    : undefined;
 };
 
 onMounted(async () => {
@@ -193,6 +203,8 @@ onMounted(async () => {
   } catch {
     console.error("No se ha podido cargar la lista");
   } finally {
+    if (props.ejercitoFijo)
+      ejercitoSelected.value = ejercitoPorNombre(props.ejercitoFijo);
     isLoading.value = false;
   }
 });

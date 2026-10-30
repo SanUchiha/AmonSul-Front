@@ -63,7 +63,7 @@
               <v-btn
                 block
                 class="army-btn"
-                @click="verLista(match.idUsuario1, match.idTorneo, match.nick1)"
+                @click="verLista(match.idUsuario1, match.idTorneo, match.nick1, 1)"
                 style="font-size: 10px"
                 variant="tonal"
               >
@@ -93,7 +93,7 @@
               <v-btn
                 block
                 class="army-btn"
-                @click="verLista(match.idUsuario2, match.idTorneo, match.nick2)"
+                @click="verLista(match.idUsuario2, match.idTorneo, match.nick2, 2)"
                 style="font-size: 10px"
                 variant="tonal"
               >
@@ -288,7 +288,10 @@ import { formatFechaSpa } from "@/utils/Fecha";
 import { motivoSinLista, SIN_LISTA } from "@/utils/avisoLista";
 import ModalError from "@/components/Commons/ModalError.vue";
 import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
-import { getlistaTorneo } from "@/services/ListasService";
+import {
+  getListaPartidaAsync,
+  getlistaTorneo,
+} from "@/services/ListasService";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
 import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
@@ -355,6 +358,8 @@ const props = defineProps<{
   completa: boolean;
   editarPartidaPJ: boolean;
   soloValidarPJ: boolean;
+  // Liga: cada partida guarda la lista con la que se jugó
+  listaDePartida?: boolean;
 }>();
 
 const initializeComponent = async () => {
@@ -372,7 +377,12 @@ const initializeComponent = async () => {
   }
 };
 
-const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
+const verLista = async (
+  idUsuario: number,
+  idTorneo: number,
+  nick: string,
+  lado?: 1 | 2
+) => {
   isLoading.value = true;
   if (idTorneo && idUsuario && nick) {
     const body: ListaTorneoRequestDTO = {
@@ -381,7 +391,10 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
     };
 
     try {
-      const listaResponse = await getlistaTorneo(body);
+      const listaResponse =
+        props.listaDePartida && lado
+          ? await getListaPartidaAsync(props.match.idPartidaTorneo, lado)
+          : await getlistaTorneo(body);
       listaDTO.value = listaResponse.data;
       // Sin lista el modal saldría vacío: mejor avisar
       if (!listaDTO.value?.listaData) {

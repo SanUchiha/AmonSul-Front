@@ -42,6 +42,12 @@
             <v-card-title class="text-wrap justify-center text-center">
               {{ torneo.nombreTorneo }}
             </v-card-title>
+            <div
+              v-if="torneo.formatoTorneo === FORMATO_LIGA"
+              class="d-flex justify-center pb-3"
+            >
+              <v-chip size="small" color="primary">Liga</v-chip>
+            </div>
           </v-card>
         </v-col>
       </v-row>
@@ -73,6 +79,7 @@
 import { ref, computed, onMounted } from "vue";
 import router from "@/router";
 import { getTorneos } from "@/services/TorneosService";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 import { Torneo } from "@/interfaces/Torneo";
 

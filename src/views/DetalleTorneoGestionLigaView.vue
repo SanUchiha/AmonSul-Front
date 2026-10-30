@@ -33,6 +33,9 @@
                       : "No cuenta para el ELO"
                   }}
                 </v-chip>
+                <v-chip v-if="ligaCerrada" size="small" color="success">
+                  Cerrada
+                </v-chip>
               </div>
               <p v-if="!ligaGenerada">
                 Con {{ cuenta(jugadoresActivos, "jugador", "jugadores") }} salen
@@ -77,6 +80,7 @@
           <TablaInscritosLiga
             :torneo="torneoGestion"
             :ligaGenerada="ligaGenerada"
+            :ligaCerrada="ligaCerrada"
             @actualizado="cargar"
           />
         </v-tabs-window-item>
@@ -113,44 +117,21 @@
               La clasificación aparece cuando la liga está generada.
             </v-alert>
             <template v-else>
-              <v-table density="compact" class="text-caption">
-                <thead>
-                  <tr>
-                    <th class="px-1">#</th>
-                    <th class="px-1 text-left">Jugador</th>
-                    <th class="px-1 text-center">PJ</th>
-                    <th class="px-1 text-center">V-E-D</th>
-                    <th class="px-1 text-center">Pts</th>
-                    <th class="px-1 text-center">Dif</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="fila in clasificacion" :key="fila.idUsuario">
-                    <td class="px-1">{{ fila.posicion }}</td>
-                    <td class="px-1 text-left">
-                      <div class="font-weight-bold">{{ fila.nick }}</div>
-                      <div class="text-medium-emphasis">{{ fila.ejercito }}</div>
-                    </td>
-                    <td class="px-1 text-center">{{ fila.jugadas }}</td>
-                    <td class="px-1 text-center text-no-wrap">
-                      {{ fila.victorias }}-{{ fila.empates }}-{{ fila.derrotas }}
-                    </td>
-                    <td class="px-1 text-center font-weight-bold">
-                      {{ fila.puntos }}
-                    </td>
-                    <td class="px-1 text-center">{{ fila.diferencia }}</td>
-                  </tr>
-                </tbody>
-              </v-table>
-              <p class="text-caption text-medium-emphasis mt-2 text-left">
-                Solo cuentan las partidas validadas por los dos jugadores.
-                Desempate: puntos, diferencia, puntos a favor y generales.
-              </p>
-              <div class="d-flex justify-center my-3">
+              <TablaClasificacionLiga :filas="clasificacion" />
+              <div v-if="!ligaCerrada" class="d-flex justify-center my-3">
                 <v-btn color="primary" variant="tonal" @click="pedirGuardar">
                   Cerrar liga y guardar resultados
                 </v-btn>
               </div>
+              <v-alert
+                v-else
+                type="success"
+                variant="tonal"
+                density="compact"
+                class="my-3 text-left"
+              >
+                Liga cerrada: los resultados ya están guardados.
+              </v-alert>
             </template>
           </div>
         </v-tabs-window-item>
@@ -212,6 +193,7 @@ import {
   getPartidasTorneo,
   getTorneo,
   guardarResultados,
+  isSaveTournament,
 } from "@/services/TorneosService";
 import {
   eliminarJornadasLigaAsync,
@@ -230,6 +212,7 @@ import CardGestionTorneo from "@/components/GestionTorneos/CardGestionTorneo.vue
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import TablaInscritosLiga from "@/components/GestionTorneos/Liga/TablaInscritosLiga.vue";
 import TabJornadasLiga from "@/components/GestionTorneos/Liga/TabJornadasLiga.vue";
+import TablaClasificacionLiga from "@/components/GestionTorneos/Liga/TablaClasificacionLiga.vue";
 
 const route = useRoute();
 const idTorneo = Number(route.params.idTorneo);
@@ -239,6 +222,8 @@ const isLoading = ref(true);
 const torneo = ref<Torneo>();
 const torneoGestion = ref<TorneoGestionInfoDTO>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
+// Con los resultados guardados ya no se retira a nadie ni se vuelve a cerrar
+const ligaCerrada = ref(false);
 
 const ligaGenerada = computed(() => partidas.value.length > 0);
 const cuenta = (n: number, singular: string, plural: string) =>
@@ -266,14 +251,17 @@ const clasificacion = computed(() =>
 
 async function cargar() {
   try {
-    const [respTorneo, respGestion, respPartidas] = await Promise.all([
-      getTorneo(idTorneo),
-      getInfoTorneoCreado(idTorneo),
-      getPartidasTorneo(idTorneo),
-    ]);
+    const [respTorneo, respGestion, respPartidas, respCerrada] =
+      await Promise.all([
+        getTorneo(idTorneo),
+        getInfoTorneoCreado(idTorneo),
+        getPartidasTorneo(idTorneo),
+        isSaveTournament(idTorneo),
+      ]);
     torneo.value = respTorneo.data;
     torneoGestion.value = respGestion.data;
     partidas.value = respPartidas.data;
+    ligaCerrada.value = respCerrada.data === true;
   } catch (error) {
     console.error("Error al cargar la liga:", error);
   } finally {

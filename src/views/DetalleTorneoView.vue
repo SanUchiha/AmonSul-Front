@@ -28,6 +28,19 @@
                   >
                     {{ torneo.nombreTorneo }}
                   </v-card-title>
+                  <div v-if="esLiga" class="d-flex flex-wrap justify-center ga-1 mb-2">
+                    <v-chip size="small" color="primary">Liga</v-chip>
+                    <v-chip size="small">
+                      {{ torneo.idaYVuelta ? "Ida y vuelta" : "Solo ida" }}
+                    </v-chip>
+                    <v-chip size="small">
+                      {{
+                        torneo.cuentaElo
+                          ? "Cuenta para el ELO"
+                          : "No cuenta para el ELO"
+                      }}
+                    </v-chip>
+                  </div>
                   <v-card-subtitle class="text-center mb-3">
                     <p class="text-wrap" v-if="formattedAddress.trim()">
                       <v-icon left class="location-icon">mdi-map-marker</v-icon>
@@ -71,9 +84,17 @@
                       <v-col cols="12" sm="6">
                         <p>
                           <v-icon left color="green">mdi-calendar</v-icon>
-                          <strong>Fecha:</strong>
-                          {{ formatDate(torneo.fechaInicioTorneo) }} a las
-                          {{ torneo.horaInicioTorneo }}
+                          <!-- La liga no tiene horario: va de una fecha a otra -->
+                          <template v-if="esLiga">
+                            <strong>Fechas:</strong>
+                            {{ formatDate(torneo.fechaInicioTorneo) }} al
+                            {{ formatDate(torneo.fechaFinTorneo) }}
+                          </template>
+                          <template v-else>
+                            <strong>Fecha:</strong>
+                            {{ formatDate(torneo.fechaInicioTorneo) }} a las
+                            {{ torneo.horaInicioTorneo }}
+                          </template>
                         </p>
                         <p>
                           <v-icon left color="red">mdi-calendar-clock</v-icon>
@@ -87,7 +108,9 @@
                         </p>
                         <p>
                           <v-icon left color="orange">mdi-list-status</v-icon>
-                          <strong>Entrega de Listas:</strong>
+                          <strong>{{
+                            esLiga ? "Primera lista:" : "Entrega de Listas:"
+                          }}</strong>
                           {{ formatDate(torneo.fechaEntregaListas) }}
                         </p>
                       </v-col>
@@ -105,7 +128,19 @@
                         </p>
                         <p>
                           <v-icon left color="pink">mdi-dice-multiple</v-icon>
-                          <strong>Partidas:</strong> {{ torneo.numeroPartidas }}
+                          <!-- Antes de generar la liga aún no hay jornadas -->
+                          <template v-if="esLiga">
+                            <strong>Jornadas:</strong>
+                            {{
+                              torneo.numeroPartidas > 1
+                                ? torneo.numeroPartidas
+                                : "al cerrar las inscripciones"
+                            }}
+                          </template>
+                          <template v-else>
+                            <strong>Partidas:</strong>
+                            {{ torneo.numeroPartidas }}
+                          </template>
                         </p>
                       </v-col>
                     </v-row>
@@ -484,6 +519,7 @@ const router = useRouter();
 const idTorneo = ref<number>(parseInt(route.params.idTorneo as string));
 
 const torneo = ref<Torneo>();
+const esLiga = computed(() => torneo.value?.formatoTorneo === FORMATO_LIGA);
 const participantes = ref<InscripcionUsuarioIndividualDTO[]>([]);
 const idUsuario = ref<string | null>(getidUsuario.value);
 const estaApuntado = ref<boolean>(false);

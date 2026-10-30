@@ -10,13 +10,18 @@
               :key="partida.idPartidaTorneo || idx"
               :idUsuario="idUsuario"
               :match="partida"
-              :mesa="`Mesa ${partida.numeroMesa}`"
+              :mesa="
+                esLiga
+                  ? `Jornada ${partida.numeroRonda}`
+                  : `Mesa ${partida.numeroMesa}`
+              "
               :completa="
                 partida.partidaValidadaUsuario1 === true &&
                 partida.partidaValidadaUsuario2 === true
               "
               :editarPartidaPJ="editarPartidaPJ(partida)"
               :soloValidarPJ="soloValidarPJ(partida)"
+              :listaDePartida="esLiga"
             />
           </div>
           <div v-else>
@@ -55,6 +60,8 @@
 <script setup lang="ts">
 import { EstaJugandoDTO, PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { computed } from "vue";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import CardPartidaTorneoEquipoLive from "@/components/PartidasTorneo/CardPartidaTorneoEquipoLive.vue";
 
 // eslint-disable-next-line no-undef
@@ -80,6 +87,10 @@ const modelValueProxy = computed({
   get: () => props.modelValue,
   set: (val: boolean) => emit("update:modelValue", val),
 });
+
+const esLiga = computed(
+  () => props.estaJugando?.formatoTorneo === FORMATO_LIGA
+);
 
 function close() {
   emit("update:modelValue", false);

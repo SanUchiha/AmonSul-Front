@@ -5,7 +5,6 @@ import {
   ResultMatchMatchedPlayType,
 } from "@/Constant/TipoClasificacion";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
-import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
 import { calcularPuntosAleman } from "./sistemaAleman";
 
 export interface FilaClasificacionLiga {
@@ -59,7 +58,8 @@ function puntosDePartida(
  */
 export function generarClasificacionLiga(
   partidas: PartidaTorneoDTO[],
-  inscripciones: InscripcionTorneoCreadoDTO[],
+  // Solo hacen falta los puntos extra que da el organizador
+  inscripciones: { idUsuario: number; puntosExtra?: number | null }[],
   tipo: ClassificationType | undefined
 ): FilaClasificacionLiga[] {
   const filas = new Map<number, FilaClasificacionLiga>();

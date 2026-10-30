@@ -20,6 +20,9 @@ export interface InscripcionUsuarioIndividualDTO {
   esPago: boolean;
   torneo: TorneoReducidoDTO;
   idEquipo?: number;
+  puntosExtra?: number;
+  // Liga: el ejército que lleva toda la liga
+  ejercitoElegido?: string | null;
 }
 
 export interface InscripcionUsuarioEquipoDTO {

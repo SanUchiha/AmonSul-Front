@@ -3,6 +3,8 @@
     <div v-if="isLoading">
       <LoadingGandalf />
     </div>
+    <!-- La liga tiene su propia vista: jornadas y no rondas -->
+    <LigaEnVivo v-else-if="esLiga && torneo" :torneo="torneo" :idUsuario="idUsuario" />
     <div v-else>
       <!-- TABS -->
       <v-tabs v-model="activeTab" fixed-tabs>
@@ -176,6 +178,8 @@ import TabClasificacionEquiposIndividual from "@/components/GestionTorneos/Equip
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import TabResumenTorneo from "@/components/GestionTorneos/TabResumenTorneo.vue";
 import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
+import LigaEnVivo from "@/components/ResultadosTorneos/LigaEnVivo.vue";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import { useAuth } from "@/composables/useAuth";
 import {
   ResultMatchMatchedPlayType,
@@ -232,6 +236,7 @@ const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 const resumen = ref<ResumenTorneoDTO | null>(null);
 const TAB_RESUMEN = -1;
 const isLoadingPartidas = ref(true);
+const esLiga = computed(() => torneo.value?.formatoTorneo === FORMATO_LIGA);
 const podioEquipos = computed(() =>
   clasificacionEquipos.value.slice(0, 3).map(e => e.nombreEquipo)
 );
@@ -267,6 +272,8 @@ onMounted(async () => {
 
   activeTab.value = TAB_RESUMEN;
   isLoading.value = false;
+  // La liga carga lo suyo
+  if (esLiga.value) return;
 
   // Llamadas secundarias en background — actualizan reactivamente
   Promise.allSettled([
