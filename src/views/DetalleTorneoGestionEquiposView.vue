@@ -40,8 +40,28 @@
               <!-- tab Gestion -->
               <v-window-item :value="0" :key="0">
                 <div>
-                  <CardGestionInfoTorneoEquipo :torneo="torneoGestion" />
+                  <CardGestionInfoTorneoEquipo :torneo="torneoGestion">
+                    <template #acciones>
+                      <v-col>
+                        <v-btn
+                          variant="tonal"
+                          color="primary"
+                          block
+                          :disabled="estaRondaUnoGenerada"
+                          @click="accionesEquipo?.abrirGenerarRonda1()"
+                        >
+                          Generar ronda 1
+                        </v-btn>
+                      </v-col>
+                      <v-col>
+                        <v-btn variant="tonal" color="primary" block @click="accionesEquipo?.abrirSorteo()">
+                          Sorteo
+                        </v-btn>
+                      </v-col>
+                    </template>
+                  </CardGestionInfoTorneoEquipo>
                   <CardGestionAccionesTorneoEquipo
+                    ref="accionesEquipo"
                     :torneo="torneoGestion"
                     :rondaGenerada="estaRondaUnoGenerada"
                   />
@@ -464,6 +484,8 @@ const showEliminarPartidaModal = ref<boolean>(false);
 const showEliminarRondaModal = ref<boolean>(false);
 const idRondaAEliminar = ref<number>(0);
 const estaRondaUnoGenerada = ref<boolean>(false);
+// Generar la ronda 1 y el sorteo están en la tarjeta de gestión; sus modales, en las acciones de los equipos
+const accionesEquipo = ref<{ abrirGenerarRonda1: () => void; abrirSorteo: () => void }>();
 const partidaActual = ref<PartidaTorneoDTO>({
   ejercitoUsuario1: null,
   ejercitoUsuario2: null,

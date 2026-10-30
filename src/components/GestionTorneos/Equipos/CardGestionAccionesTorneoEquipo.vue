@@ -1,33 +1,10 @@
 <template>
-  <v-card v-if="torneo" class="mb-4 pa-4">
-    <v-card-title class="text-h6 font-weight-bold">Acciones</v-card-title>
-
-    <v-card-text>
-      <v-row dense>
-        <v-col cols="12" sm="4">
-          <v-btn block variant="tonal" color="secondary" @click="openAddEquipo">
-            {{ esParejas ? "Añadir pareja" : "Añadir Equipo" }}
-          </v-btn>
-        </v-col>
-        <v-col cols="12" sm="4">
-          <!-- TODO: controlar que si esta la ronda generada no pueda generarla otra vez -->
-          <v-btn
-            block
-            variant="tonal"
-            color="primary"
-            @click="openConfigModal"
-            :disabled="rondaGenerada || isGenerating"
-          >
-            Generar Ronda 1
-          </v-btn>
-        </v-col>
-        <v-col cols="12" sm="4">
-          <v-btn block variant="tonal" color="primary" @click="openSorteo">
-            Sorteo
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card-text>
+  <!-- Justo encima de los equipos, como Añadir jugador en individual. Generar la ronda 1 y el sorteo se piden
+       desde la tarjeta de gestión, debajo de Descargar listas -->
+  <div v-if="torneo" class="px-3 pt-3">
+    <v-btn block variant="tonal" color="secondary" @click="openAddEquipo">
+      {{ esParejas ? "Añadir pareja" : "Añadir equipo" }}
+    </v-btn>
 
     <ModalParametrosPrimeraRondaEquipo
       :isVisible="showConfigModal"
@@ -46,11 +23,11 @@
       :participantes="nicks"
       @close="closeSorteoModal"
     />
-  </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, defineProps } from "vue";
+import { computed, ref, watch, defineProps, defineExpose } from "vue";
 import ModalSorteo from "../ModalSorteo.vue";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
 import ModalAddEquipo from "./ModalAddEquipo.vue";
@@ -71,8 +48,9 @@ const showSuccessModal = ref<boolean>(false);
 const nicks = ref<string[]>([]);
 
 const openConfigModal = async () => {
+  // Con la ronda 1 ya generada no se vuelve a generar
+  if (!props.torneo || props.rondaGenerada || isGenerating.value) return;
   isGenerating.value = true;
-  if (!props.torneo) return;
 
   showConfigModal.value = true;
 };
@@ -117,6 +95,8 @@ const handleAddEquipoConfirm = () => {
   showSuccessModal.value = false;
   window.location.reload();
 };
+
+defineExpose({ abrirGenerarRonda1: openConfigModal, abrirSorteo: openSorteo });
 
 watch(
   () => showSuccessModal.value,

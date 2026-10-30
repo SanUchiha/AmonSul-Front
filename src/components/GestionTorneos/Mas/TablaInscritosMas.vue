@@ -91,9 +91,15 @@
           <!-- El correo como texto: pulsarlo despliega las listas como el resto de la tarjeta -->
           <div v-if="item.email" class="text-caption text-medium-emphasis texto-largo">{{ item.email }}</div>
           <div class="text-body-2">
-            <span :class="item.countListasEntregadas >= torneo.torneo.listasPorJugador ? 'text-success' : 'text-warning'">
+            <span :class="`text-${colorListas(item)}`">
               {{ item.countListasEntregadas }}/{{ torneo.torneo.listasPorJugador }} listas entregadas
             </span>
+            <template v-if="listasIlegales(item) > 0">
+              <span class="text-medium-emphasis"> · </span>
+              <span class="text-error">
+                {{ listasIlegales(item) }} {{ listasIlegales(item) === 1 ? "ilegal" : "ilegales" }}
+              </span>
+            </template>
             <span class="text-medium-emphasis"> · </span>
             <span :class="item.esPago === 'SI' ? 'text-success' : 'text-warning'">
               {{ item.esPago === "SI" ? "Pagado" : "Sin pagar" }}
@@ -625,6 +631,14 @@ defineExpose({ abrirGenerarRonda1: () => handlerModalGenerarRonda1(), abrirSorte
 
 // Filtros: a quien le faltan listas y quien no ha pagado, sin contar al bye
 const filtro = ref<"todos" | "faltanListas" | "sinPagar">("todos");
+// Las listas que el organizador ha marcado como ilegales: hay que cambiarlas aunque estén entregadas
+const listasIlegales = (item: InscripcionTorneoCreadoMasDTO) =>
+  item.lista.filter(l => (l.estadoLista ?? "").toUpperCase() === "ILEGAL").length;
+// Rojo si alguna es ilegal, amarillo si faltan por entregar y verde solo con todas entregadas y legales
+const colorListas = (item: InscripcionTorneoCreadoMasDTO) => {
+  if (listasIlegales(item) > 0) return "error";
+  return item.countListasEntregadas >= props.torneo.torneo.listasPorJugador ? "success" : "warning";
+};
 const esBye = (item: InscripcionTorneoCreadoMasDTO) =>
   item.idUsuario === 568 || /^bye\d*$/i.test((item.nick ?? "").trim());
 const reales = computed(() => localInscripciones.value.filter(i => !esBye(i)));

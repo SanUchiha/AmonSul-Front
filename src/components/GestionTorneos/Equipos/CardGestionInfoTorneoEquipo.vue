@@ -137,6 +137,8 @@
             Descargar Listas</v-btn
           >
         </v-col>
+        <!-- Acciones propias de la gestión, justo debajo: generar la ronda 1 y el sorteo -->
+        <slot name="acciones" />
       </v-row>
     </v-card-actions>
     <v-card-text>
