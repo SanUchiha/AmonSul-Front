@@ -6,7 +6,7 @@
     </div>
     <p class="text-caption text-medium-emphasis mb-3">
       {{ capitalizar(textos.el) }} suma para la clasificación de los
-      circuitos en los que esté.
+      circuitos en los que esté. Al Amon Sûl de su año va solo y no se quita.
     </p>
 
     <!-- Los asociados como chips. La x es propia: la de "closable" esconde el chip aunque se cancele -->
@@ -19,8 +19,17 @@
         prepend-icon="mdi-trophy"
       >
         {{ circuito.nombreCircuito }}
+        <!-- El Amon Sûl de su año no se quita: candado en vez de x -->
         <template #append>
           <v-icon
+            v-if="esCircuitoAmonSul(circuito.nombreCircuito)"
+            icon="mdi-lock"
+            size="small"
+            class="ms-1"
+            :aria-label="`${circuito.nombreCircuito}: no se puede quitar`"
+          />
+          <v-icon
+            v-else
             icon="mdi-close-circle"
             size="small"
             class="ms-1"
@@ -117,6 +126,7 @@ import {
 } from "@/services/CircuitosService";
 import { AddCircuitoTorneoDTO, CircuitoDTO } from "@/interfaces/Circuito";
 import { textosEvento } from "@/Constant/FormatoTorneo";
+import { esCircuitoAmonSul } from "@/utils/circuitoAmonSul";
 
 const props = defineProps<{
   idTorneo: number;
@@ -149,7 +159,10 @@ const cargarCircuitos = async () => {
       getCircuitosAsociadosATorneoAsync(props.idTorneo),
     ]);
 
-    circuitosDisponibles.value = [...noAsociadosRes.data].sort(masNuevoPrimero);
+    // A un Amon Sûl no se añade a mano: cada evento va solo al de su año
+    circuitosDisponibles.value = [...noAsociadosRes.data]
+      .filter((c: CircuitoDTO) => !esCircuitoAmonSul(c.nombreCircuito))
+      .sort(masNuevoPrimero);
     circuitosAsociados.value = [...asociadosRes.data].sort(masNuevoPrimero);
   } catch (error) {
     console.error("Error al cargar circuitos:", error);

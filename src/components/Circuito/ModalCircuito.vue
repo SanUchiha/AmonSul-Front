@@ -84,6 +84,7 @@ import { useCircuitoData } from "@/composables/useCircuitoData";
 import { useAuth } from "@/composables/useAuth";
 import { borrarCircuitoAsync, renombrarCircuitoAsync } from "@/services/CircuitosService";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
+import { esCircuitoAmonSul } from "@/utils/circuitoAmonSul";
 import CircuitoTorneosList from "./components/CircuitoTorneosList.vue";
 import CircuitoModalActions from "./components/CircuitoModalActions.vue";
 import ModalClasificacion from "./components/ModalClasificacion.vue";
@@ -101,8 +102,12 @@ const emit = defineEmits<{
 }>();
 
 const { getidUsuario } = useAuth();
+// Los Amon Sûl son de la web: aunque estén a nombre de la administración, no se renombran ni se borran
 const esCreador = computed(
-  () => props.circuito?.idUsuario != null && props.circuito.idUsuario === Number(getidUsuario.value)
+  () =>
+    props.circuito?.idUsuario != null &&
+    props.circuito.idUsuario === Number(getidUsuario.value) &&
+    !esCircuitoAmonSul(props.circuito.nombreCircuito)
 );
 
 const guardando = ref(false);
