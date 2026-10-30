@@ -75,11 +75,6 @@
                   :href="`mailto:${item.email}`"
                 />
                 <v-list-item
-                  prepend-icon="mdi-cash-sync"
-                  :title="item.esPago === 'SI' ? 'Marcar como no pagado' : 'Marcar como pagado'"
-                  @click="updatePago(item.idInscripcion, item.esPago)"
-                />
-                <v-list-item
                   prepend-icon="mdi-delete"
                   base-color="error"
                   title="Eliminar inscripción"
@@ -90,20 +85,23 @@
           </div>
           <!-- El correo como texto: pulsarlo despliega las listas como el resto de la tarjeta -->
           <div v-if="item.email" class="text-caption text-medium-emphasis texto-largo">{{ item.email }}</div>
-          <div class="text-body-2">
-            <span :class="`text-${colorListas(item)}`">
-              {{ item.countListasEntregadas }}/{{ torneo.torneo.listasPorJugador }} listas entregadas
-            </span>
-            <template v-if="listasIlegales(item) > 0">
-              <span class="text-medium-emphasis"> · </span>
-              <span class="text-error">
-                {{ listasIlegales(item) }} {{ listasIlegales(item) === 1 ? "ilegal" : "ilegales" }}
+          <div class="d-flex align-center ga-2">
+            <div class="text-body-2 flex-grow-1">
+              <span :class="`text-${colorListas(item)}`">
+                {{ item.countListasEntregadas }}/{{ torneo.torneo.listasPorJugador }} listas entregadas
               </span>
-            </template>
-            <span class="text-medium-emphasis"> · </span>
-            <span :class="item.esPago === 'SI' ? 'text-success' : 'text-warning'">
-              {{ item.esPago === "SI" ? "Pagado" : "No pagado" }}
-            </span>
+              <template v-if="listasIlegales(item) > 0">
+                <span class="text-medium-emphasis"> · </span>
+                <span class="text-error">
+                  {{ listasIlegales(item) }} {{ listasIlegales(item) === 1 ? "ilegal" : "ilegales" }}
+                </span>
+              </template>
+            </div>
+            <InterruptorPago
+              :esPago="item.esPago"
+              :idInscripcion="item.idInscripcion"
+              @cambiado="esPago => handleUpdatePago(item.idInscripcion, esPago)"
+            />
           </div>
           <!-- Las fechas, en amarillo si llegaron fuera de plazo -->
           <div class="text-caption text-medium-emphasis">
@@ -230,13 +228,6 @@
     @update:isVisible="showSuccessModal = $event"
   />
 
-  <!-- Modal response estado pago -->
-  <ModalSuccess
-    :isVisible="showSuccessModalPago"
-    message="Estado del pago actualizado."
-    @update:isVisible="showSuccessModalPago = $event"
-  />
-
   <!-- Modal response success subir la lista pago -->
   <ModalSuccess
     :isVisible="showSuccessAddLista"
@@ -348,10 +339,7 @@ import {
 } from "@/interfaces/Torneo";
 import { getInfoTorneoCreadoMasAsync } from "@/services/TorneosService";
 import { ListaDTO } from "@/interfaces/Usuario";
-import {
-  cancelarInscripcion,
-  updateEstadoPago,
-} from "@/services/InscripcionesService";
+import { cancelarInscripcion } from "@/services/InscripcionesService";
 import {
   CrearListaTorneoRequestDTO,
   ModificarListaTorneoRequestDTO,
@@ -372,6 +360,7 @@ import ModalModificarLista from "@/components/Inscripcion/ModalModificarLista.vu
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalParametrosPrimeraRondaMas from "./ModalParametrosPrimeraRondaMas.vue";
 import PuntosExtra from "../PuntosExtra.vue";
+import InterruptorPago from "../InterruptorPago.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoMasDTO }>();
 const localInscripciones = ref<InscripcionTorneoCreadoMasDTO[]>([]);
@@ -381,7 +370,6 @@ const showAddJugadorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const localTorneo = ref<TorneoGestionInfoMasDTO>();
 const nicks = ref<string[]>();
-const showSuccessModalPago = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const currentInscripcionId = ref<number>();
 const currentLista = ref<ListaDTO>();
@@ -427,28 +415,6 @@ const updateEstado = async (
   } catch {
     console.error("Error actualizando el estado de la lista");
     showErrorUpdateEstadoLista.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const updatePago = async (idInscripcion: number, estado: string) => {
-  isLoading.value = true;
-
-  try {
-    if (estado == "NO") estado = "SI";
-    else if (estado == "SI") estado = "NO";
-    await updateEstadoPago({
-      idInscripcion: idInscripcion,
-      esPago: estado,
-    });
-    showSuccessModalPago.value = true;
-    isLoading.value = false;
-
-    handleUpdatePago(idInscripcion, estado);
-  } catch {
-    console.error("Error actualizando el pago");
-    showErrorModal.value = true;
   } finally {
     isLoading.value = false;
   }

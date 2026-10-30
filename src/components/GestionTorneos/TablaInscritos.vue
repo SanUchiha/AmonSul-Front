@@ -56,18 +56,21 @@
           </div>
           <!-- El correo como texto: pulsarlo abre el detalle como el resto de la tarjeta; en el detalle se le escribe -->
           <div v-if="item.email" class="text-caption text-medium-emphasis email">{{ item.email }}</div>
-          <div class="text-body-2">
-            <span :class="`text-${estadoLista(item.estadoLista).color}`">
-              {{ estadoLista(item.estadoLista).texto }}
-            </span>
-            <!-- Con la lista entregada, su bando -->
-            <span v-if="bandoLista(item.bando)" class="text-medium-emphasis text-no-wrap">
-              · {{ bandoLista(item.bando)!.texto }}
-            </span>
-            <span class="text-medium-emphasis"> · </span>
-            <span :class="estaPagado(item) ? 'text-success' : 'text-warning'">
-              {{ estaPagado(item) ? "Pagado" : "No pagado" }}
-            </span>
+          <div class="d-flex align-center ga-2">
+            <div class="text-body-2 flex-grow-1">
+              <span :class="`text-${estadoLista(item.estadoLista).color}`">
+                {{ estadoLista(item.estadoLista).texto }}
+              </span>
+              <!-- Con la lista entregada, su bando -->
+              <span v-if="bandoLista(item.bando)" class="text-medium-emphasis text-no-wrap">
+                · {{ bandoLista(item.bando)!.texto }}
+              </span>
+            </div>
+            <InterruptorPago
+              :esPago="item.esPago"
+              :idInscripcion="item.idInscripcion"
+              @cambiado="esPago => (item.esPago = esPago)"
+            />
           </div>
           <!-- Las fechas, en amarillo si llegaron fuera de plazo -->
           <div class="text-caption text-medium-emphasis">
@@ -136,6 +139,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import { getInfoTorneoCreado } from "@/services/TorneosService";
 import ModalSorteo from "./ModalSorteo.vue";
 import PuntosExtra from "./PuntosExtra.vue";
+import InterruptorPago from "./InterruptorPago.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO }>();

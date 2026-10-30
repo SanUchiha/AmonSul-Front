@@ -120,17 +120,20 @@
               · {{ inscripcion.grupo ? `Grupo ${inscripcion.grupo}` : "Sin grupo" }}
             </template>
           </div>
-          <div class="text-body-2">
-            <span :class="`text-${estadoLista(inscripcion.estadoLista).color}`">
-              {{ estadoLista(inscripcion.estadoLista).texto }}
-            </span>
-            <span v-if="bandoLista(inscripcion.bando)" class="text-medium-emphasis text-no-wrap">
-              · {{ bandoLista(inscripcion.bando)!.texto }}
-            </span>
-            <span class="text-medium-emphasis"> · </span>
-            <span :class="inscripcion.esPago === 'SI' ? 'text-success' : 'text-warning'">
-              {{ inscripcion.esPago === "SI" ? "Pagado" : "No pagado" }}
-            </span>
+          <div class="d-flex align-center ga-2">
+            <div class="text-body-2 flex-grow-1">
+              <span :class="`text-${estadoLista(inscripcion.estadoLista).color}`">
+                {{ estadoLista(inscripcion.estadoLista).texto }}
+              </span>
+              <span v-if="bandoLista(inscripcion.bando)" class="text-medium-emphasis text-no-wrap">
+                · {{ bandoLista(inscripcion.bando)!.texto }}
+              </span>
+            </div>
+            <InterruptorPago
+              :esPago="inscripcion.esPago"
+              :idInscripcion="inscripcion.idInscripcion"
+              @cambiado="esPago => (inscripcion.esPago = esPago)"
+            />
           </div>
         </v-card>
       </v-col>
@@ -221,6 +224,7 @@ import { FORMATO_COPA, textosEvento } from "@/Constant/FormatoTorneo";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import ModalAddJugadorTorneo from "@/components/GestionTorneos/ModalAddJugadorTorneo.vue";
 import PuntosExtra from "@/components/GestionTorneos/PuntosExtra.vue";
+import InterruptorPago from "@/components/GestionTorneos/InterruptorPago.vue";
 import ModalDetalleInscripcion from "@/components/GestionTorneos/ModalDetalleInscripcion.vue";
 import ModalElegirEjercito from "@/components/Inscripcion/ModalElegirEjercito.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";

@@ -28,20 +28,6 @@
           />
         </template>
         <v-list density="compact">
-          <!-- En los dos sentidos, como en varias listas: pagado y no pagado -->
-          <v-list-item
-            prepend-icon="mdi-cash-sync"
-            :title="equipo.esPago === 'SI' ? 'Marcar como no pagado' : 'Marcar como pagado'"
-            @click="
-              abrirModalConfirmacion(
-                equipo.esPago === 'SI'
-                  ? esParejas ? '¿Marcar la pareja como no pagada?' : '¿Marcar el equipo como no pagado?'
-                  : esParejas ? '¿Marcar la pareja como pagada?' : '¿Marcar el equipo como pagado?',
-                'Se cambia el pago de todos sus miembros y se avisa al capitán por correo.',
-                confirmarActualizarPago
-              )
-            "
-          />
           <v-list-item
             prepend-icon="mdi-trash-can"
             base-color="error"
@@ -65,18 +51,22 @@
     <div v-if="equipo.emailCapitan" class="text-caption text-medium-emphasis texto-largo">
       {{ equipo.emailCapitan }}
     </div>
-    <div class="text-body-2">
-      <span :class="inscripcionesEquipo.length < numeroMiembrosEquipo ? 'text-warning' : 'text-medium-emphasis'">
-        {{ inscripcionesEquipo.length }}/{{ numeroMiembrosEquipo }} jugadores
-      </span>
-      <span class="text-medium-emphasis"> · </span>
-      <span :class="equipoIncompleto ? 'text-warning' : 'text-success'">
-        {{ listasOk }}/{{ listasNecesarias }} {{ esListaConjunta ? "lista conjunta validada" : "listas validadas" }}
-      </span>
-      <span class="text-medium-emphasis"> · </span>
-      <span :class="equipo.esPago === 'SI' ? 'text-success' : 'text-warning'">
-        {{ equipo.esPago === "SI" ? "Pagado" : "No pagado" }}
-      </span>
+    <div class="d-flex align-center ga-2">
+      <div class="text-body-2 flex-grow-1">
+        <!-- Cada parte entera: junto al interruptor, si no cabe, salta de línea por el punto -->
+        <span
+          class="text-no-wrap"
+          :class="inscripcionesEquipo.length < numeroMiembrosEquipo ? 'text-warning' : 'text-medium-emphasis'"
+        >
+          {{ inscripcionesEquipo.length }}/{{ numeroMiembrosEquipo }} jugadores
+        </span>
+        <span class="text-medium-emphasis"> · </span>
+        <span class="text-no-wrap" :class="equipoIncompleto ? 'text-warning' : 'text-success'">
+          {{ listasOk }}/{{ listasNecesarias }} {{ esListaConjunta ? "lista conjunta validada" : "listas validadas" }}
+        </span>
+      </div>
+      <!-- El pago es del equipo: se cambia en todos sus miembros y se avisa al capitán -->
+      <InterruptorPago :esPago="equipo.esPago" :idEquipo="equipo.idEquipo" @cambiado="pagoCambiado" />
     </div>
     <div class="text-caption text-medium-emphasis mt-1">
       {{ isExpanded ? "Ocultar miembros" : "Ver miembros" }}
@@ -221,13 +211,6 @@
 
   <!-- Modal response estado pago -->
   <ModalSuccess
-    :isVisible="showSuccessModalPago"
-    message="Estado del pago actualizado."
-    @update:isVisible="showSuccessModalPago = $event"
-  />
-
-  <!-- Modal response estado pago -->
-  <ModalSuccess
     :isVisible="showSuccessModalEliminarEquipo"
     :message="esParejas ? 'Pareja eliminada.' : 'Equipo eliminado.'"
     @update:isVisible="showSuccessModalEliminarEquipo = $event"
@@ -319,7 +302,6 @@ import {
 import {
   eliminarEquipoAsync,
   eliminarMiembroEquipoAsync,
-  updateEstadoPagoEquipo,
 } from "@/services/InscripcionesService";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
@@ -342,13 +324,13 @@ import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { UsuarioSinEquipoDTO } from "@/interfaces/Usuario";
 import ModalAddMiembroEquipo from "@/components/GestionTorneos/Equipos/ModalAddMiembroEquipo.vue";
 import PuntosExtra from "@/components/GestionTorneos/PuntosExtra.vue";
+import InterruptorPago from "@/components/GestionTorneos/InterruptorPago.vue";
 
 const props = defineProps<{ equipo: EquipoDTO; torneo: Torneo }>();
 
 const isOpenMenuAcciones = ref<{ [id: number]: boolean }>({});
 const isExpanded = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
-const showSuccessModalPago = ref<boolean>(false);
 const showSuccessModalEliminarEquipo = ref<boolean>(false);
 const showVerListaModal = ref<boolean>(false);
 const showEnviarCambiarListaModal = ref<boolean>(false);
@@ -376,6 +358,9 @@ const inscripcionesEquipo = ref<InscripcionTorneoDTO[]>([
   ...props.equipo.inscripciones,
 ]);
 const esPago = toRef(props.equipo, "esPago");
+const pagoCambiado = (nuevo: "SI" | "NO") => {
+  esPago.value = nuevo;
+};
 
 const emit = defineEmits<{
   (e: "delete-team"): void;
@@ -602,33 +587,6 @@ const abrirModalConfirmacion = (
     accion();
   };
   showConfirmModal.value = true;
-};
-
-const confirmarActualizarPago = async () => {
-  isLoading.value = true;
-  try {
-    const nuevoPago = esPago.value === "SI" ? "NO" : "SI";
-    const response = await updateEstadoPagoEquipo({
-      idEquipo: props.equipo.idEquipo,
-      esPago: nuevoPago,
-    });
-    if (response.status >= 200 && response.status < 300) {
-      showSuccessModalPago.value = true;
-      esPago.value = nuevoPago;
-    } else {
-      console.error("error:", response);
-      showErrorModal.value = true;
-    }
-
-    showSuccessModalPago.value = true;
-    isLoading.value = false;
-  } catch (error) {
-    console.error("error:", error);
-    showErrorModal.value = true;
-    isLoading.value = false;
-  } finally {
-    isLoading.value = false;
-  }
 };
 
 const confirmarEliminarEquipo = async () => {
