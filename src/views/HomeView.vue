@@ -65,6 +65,12 @@ export default {
       novedades: [
         {
           fecha: "Octubre 2026",
+          titulo: "Llegan las Ligas",
+          descripcion:
+            "Nuevo formato de evento: todos contra todos por jornadas. Al crear un evento, elige Liga como tipo y decide si es solo ida o ida y vuelta y si cuenta para el ELO. Cada jugador elige su ejército al inscribirse y lo lleva toda la liga, pero puede cambiar de lista antes de cada partida: cada partida guarda la lista con la que se jugó. Las jornadas se generan todas a la vez y el calendario es abierto: quedáis con vuestro rival y metéis el resultado en Mis partidas, dentro de la liga. Si la liga cuenta para el ELO, cada partida suma en cuanto la validan los dos jugadores.",
+        },
+        {
+          fecha: "Octubre 2026",
           titulo: "Las Ligas ahora se llaman Circuitos",
           descripcion:
             "Lo que hasta ahora llamábamos Ligas, como Amon Sûl 2026, pasa a llamarse Circuitos: agrupan varios torneos en una clasificación conjunta. Están en el menú, en Circuitos, con los mismos torneos y clasificaciones de siempre. Así dejamos el nombre de Liga para un nuevo formato de torneo que llegará pronto.",
@@ -129,13 +135,13 @@ export default {
           icon: gestionTorneos,
           title: "Gestión de torneos",
           description:
-            "Crea y administra torneos individuales o por equipos con emparejamientos automáticos.",
+            "Crea y administra torneos individuales, por parejas o por equipos con emparejamientos automáticos, y ligas de todos contra todos por jornadas.",
         },
         {
           icon: ELO,
           title: "Sistema ELO",
           description:
-            "Ranking competitivo actualizado tras cada torneo de mas de 16 jugadores para reflejar el nivel actual de cada jugador.",
+            "Ranking competitivo que se actualiza tras cada torneo de 16 jugadores o más, y partida a partida en las ligas que cuentan para el ELO, para reflejar el nivel actual de cada jugador.",
         },
         {
           icon: clasificacion,
