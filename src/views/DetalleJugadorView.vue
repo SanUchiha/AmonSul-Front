@@ -9,12 +9,14 @@
           <!-- Lo esencial, siempre a la vista -->
           <CabeceraJugador :usuario="usuarioData" :partidas="partidas" />
 
-          <v-tabs v-model="tab" color="primary" grow show-arrows>
-            <v-tab value="1">Resumen</v-tab>
-            <v-tab value="2">Amistosas</v-tab>
-            <v-tab value="3">Eventos</v-tab>
-            <v-tab value="4">Resultados</v-tab>
-          </v-tabs>
+          <div ref="pestanas">
+            <v-tabs v-model="tab" color="primary" grow show-arrows>
+              <v-tab value="1">Resumen</v-tab>
+              <v-tab value="2">Amistosas</v-tab>
+              <v-tab value="3">Eventos</v-tab>
+              <v-tab value="4">Resultados</v-tab>
+            </v-tabs>
+          </div>
 
           <v-window v-model="tab">
             <v-window-item value="1">
@@ -23,6 +25,7 @@
                   :usuario="usuarioData"
                   :partidas="partidas"
                   :idUsuarioQueMira="idUsuarioQueMira"
+                  @filtrar="verPartidasFiltradas"
                 />
               </div>
             </v-window-item>
@@ -33,6 +36,7 @@
                   :partidas="partidas"
                   origen="amistosa"
                   :idUsuario="usuarioData.idUsuario"
+                  v-model:filtro="filtroPartidas"
                 />
               </div>
             </v-window-item>
@@ -43,6 +47,7 @@
                   :partidas="partidas"
                   origen="torneo"
                   :idUsuario="usuarioData.idUsuario"
+                  v-model:filtro="filtroPartidas"
                 />
               </div>
             </v-window-item>
@@ -77,11 +82,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, ComputedRef, watch } from "vue";
+import { ref, onMounted, computed, ComputedRef, nextTick, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CabeceraJugador from "@/components/DetalleJugador/CabeceraJugador.vue";
 import ResumenJugador from "@/components/DetalleJugador/ResumenJugador.vue";
-import { partidasJugadas } from "@/utils/historialJugador";
+import { FiltroPartidas, partidasJugadas } from "@/utils/historialJugador";
 import { useAuth } from "@/composables/useAuth";
 import {
   ViewPartidaAmistosaDTO,
@@ -95,6 +100,19 @@ import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import TablaTorneosDisputados from "@/components/DetalleJugador/TablaTorneosDisputados.vue";
 
 const tab = ref<string>("1");
+const pestanas = ref<HTMLElement>();
+
+// Un ejército o un rival pulsado en el resumen: sus partidas, en eventos o en amistosas, con las pestañas a la vista
+const filtroPartidas = ref<FiltroPartidas | null>(null);
+const verPartidasFiltradas = async (filtro: FiltroPartidas, origen: "torneo" | "amistosa") => {
+  filtroPartidas.value = filtro;
+  tab.value = origen === "amistosa" ? "2" : "3";
+  await nextTick();
+  // Por debajo de la barra de arriba, que es fija
+  const arriba = pestanas.value?.getBoundingClientRect().top;
+  if (arriba !== undefined)
+    window.scrollTo({ top: window.scrollY + arriba - 72, behavior: "smooth" });
+};
 const usuariosStore = useUsuariosStore();
 
 const isLoading = ref(true);
@@ -177,7 +195,10 @@ onMounted(initializeComponent);
 watch(
   () => route.params.idUsuario,
   (nuevoId, anteriorId) => {
-    if (nuevoId && nuevoId !== anteriorId) initializeComponent();
+    if (nuevoId && nuevoId !== anteriorId) {
+      filtroPartidas.value = null;
+      initializeComponent();
+    }
   }
 );
 

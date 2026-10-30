@@ -17,6 +17,8 @@ export interface PartidaJugada {
   rival: number;
   // Todos los del otro lado: en Dobles, el capitán y su compañero
   idsRivales: number[];
+  // El nick de cada uno de idsRivales, en el mismo orden
+  nicksRivales: string[];
   nickRival: string;
   ejercito: string | null;
   // El del otro lado: en Dobles, el del capitán rival
@@ -45,17 +47,20 @@ function torneoJugada(partida: ViewPartidaTorneoDTO) {
 function desdeTorneo(partida: ViewPartidaTorneoDTO, idUsuario: number): PartidaJugada | null {
   if (!torneoJugada(partida)) return null;
   const lado1 = juegaEnLado1(partida, idUsuario);
-  const idsRivales = (
+  const rivales = (
     lado1
-      ? [partida.idUsuario2, partida.idCompanero2]
-      : [partida.idUsuario1, partida.idCompanero1]
-  ).filter((id): id is number => id != null);
-  const nickRival = [
-    lado1 ? partida.nickUsuario2 : partida.nickUsuario1,
-    lado1 ? partida.nickCompanero2 : partida.nickCompanero1,
-  ]
-    .filter(Boolean)
-    .join(" y ");
+      ? [
+          { id: partida.idUsuario2, nick: partida.nickUsuario2 },
+          { id: partida.idCompanero2, nick: partida.nickCompanero2 },
+        ]
+      : [
+          { id: partida.idUsuario1, nick: partida.nickUsuario1 },
+          { id: partida.idCompanero1, nick: partida.nickCompanero1 },
+        ]
+  ).filter(r => r.id != null);
+  const idsRivales = rivales.map(r => r.id as number);
+  const nicksRivales = rivales.map(r => r.nick ?? "");
+  const nickRival = nicksRivales.filter(Boolean).join(" y ");
   if (esBye(idsRivales[0], nickRival)) return null;
   const propios = (lado1 ? partida.resultadoUsuario1 : partida.resultadoUsuario2) ?? 0;
   const rival = (lado1 ? partida.resultadoUsuario2 : partida.resultadoUsuario1) ?? 0;
@@ -78,6 +83,7 @@ function desdeTorneo(partida: ViewPartidaTorneoDTO, idUsuario: number): PartidaJ
     propios,
     rival,
     idsRivales,
+    nicksRivales,
     nickRival,
     ejercito: ejercitoDelJugador(partida, idUsuario) ?? null,
     ejercitoRival: (lado1 ? partida.ejercitoUsuario2 : partida.ejercitoUsuario1) ?? null,
@@ -102,6 +108,7 @@ function desdeAmistosa(partida: ViewPartidaAmistosaDTO, idUsuario: number): Part
     propios: (lado1 ? partida.resultadoUsuario1 : partida.resultadoUsuario2) ?? 0,
     rival: (lado1 ? partida.resultadoUsuario2 : partida.resultadoUsuario1) ?? 0,
     idsRivales: [idRival],
+    nicksRivales: [nickRival],
     nickRival,
     ejercito: (lado1 ? partida.ejercitoUsuario1 : partida.ejercitoUsuario2) || null,
     ejercitoRival: (lado1 ? partida.ejercitoUsuario2 : partida.ejercitoUsuario1) || null,
@@ -152,6 +159,30 @@ export function partidasJugadas(
     .filter((p): p is PartidaJugada => p !== null)
     .sort((a, b) => compararJugadas(b, a));
 }
+
+// Los nombres de ejército no siempre se escriben igual: sin mayúsculas, tildes ni "The" delante para agruparlos y
+// buscar su bando
+export const normalizarEjercito = (nombre: string) =>
+  nombre
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/^the\s+/, "");
+
+// Desde el resumen: las partidas con un ejército o contra un rival
+export interface FiltroPartidas {
+  ejercito?: string;
+  idRival?: number;
+  nickRival?: string;
+}
+
+export const cumpleFiltro = (partida: PartidaJugada, filtro?: FiltroPartidas | null) =>
+  !filtro ||
+  ((!filtro.ejercito ||
+    (!!partida.ejercito &&
+      normalizarEjercito(partida.ejercito) === normalizarEjercito(filtro.ejercito))) &&
+    (filtro.idRival == null || partida.idsRivales.includes(filtro.idRival)));
 
 // «3/45» si se sabe cuántos había en la clasificación; si no, «3.º»
 export const textoPosicion = (posicion: number, total?: number | null) =>

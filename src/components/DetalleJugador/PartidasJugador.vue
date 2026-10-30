@@ -4,6 +4,20 @@
       {{ origen === "torneo" ? "Aún no tiene partidas de eventos." : "Aún no tiene partidas amistosas." }}
     </p>
     <template v-else>
+      <!-- Lo que se ha pulsado en el resumen: un ejército o un rival. Se quita con la x -->
+      <v-chip
+        v-if="filtro?.ejercito || filtro?.nickRival"
+        color="primary"
+        variant="flat"
+        size="small"
+        closable
+        :prepend-icon="filtro.nickRival ? 'mdi-account' : 'mdi-shield'"
+        class="mb-2"
+        @click:close="emit('update:filtro', null)"
+      >
+        {{ filtro.nickRival ? `Contra ${filtro.nickRival}` : `Con ${filtro.ejercito}` }}
+      </v-chip>
+
       <!-- Balance de estas partidas, con los filtros aplicados -->
       <v-card class="pa-3 mb-3" variant="outlined">
         <BarraBalance :titulo="titulo" :balance="balance" />
@@ -65,13 +79,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, ref, watch } from "vue";
+import { computed, defineEmits, defineProps, ref, watch } from "vue";
 import {
   ViewPartidaAmistosaDTO,
   ViewPartidaTorneoDTO,
 } from "@/interfaces/Partidas";
 import { nombreEvento } from "@/Constant/FormatoTorneo";
-import { balanceDe, PartidaJugada, ResultadoPartida } from "@/utils/historialJugador";
+import {
+  balanceDe,
+  cumpleFiltro,
+  FiltroPartidas,
+  PartidaJugada,
+  ResultadoPartida,
+} from "@/utils/historialJugador";
 import BarraBalance from "@/components/DetalleJugador/BarraBalance.vue";
 import CardPartidaTorneo from "@/components/PartidasTorneo/CardPartidaTorneo.vue";
 import ValidadasMatchCard from "@/components/PartidaAmistosa/ValidadasMatchCard.vue";
@@ -82,6 +102,12 @@ const props = defineProps<{
   partidas: PartidaJugada[];
   origen: "torneo" | "amistosa";
   idUsuario: number;
+  // Un ejército o un rival pulsado en el resumen; lo comparten las dos pestañas de partidas
+  filtro?: FiltroPartidas | null;
+}>();
+
+const emit = defineEmits<{
+  (e: "update:filtro", filtro: FiltroPartidas | null): void;
 }>();
 
 const TANDA = 12;
@@ -114,6 +140,7 @@ const sinResultado = computed(() => {
   const texto = normalizar(busqueda.value ?? "").trim();
   return propias.value.filter(
     p =>
+      cumpleFiltro(p, props.filtro) &&
       (filtroFormato.value === "todos" || formatoDe(p) === filtroFormato.value) &&
       (!texto ||
         normalizar(p.nickRival).includes(texto) ||
@@ -132,10 +159,19 @@ const filtradas = computed(() =>
 );
 const visibles = computed(() => filtradas.value.slice(0, cuantasVer.value));
 const balance = computed(() => balanceDe(sinResultado.value));
-const titulo = computed(() => (props.origen === "torneo" ? "En eventos" : "En amistosas"));
+// Con un rival pulsado, el balance es el cara a cara con él
+const titulo = computed(() =>
+  props.filtro?.nickRival
+    ? `Contra ${props.filtro.nickRival}`
+    : props.filtro?.ejercito
+      ? `Con ${props.filtro.ejercito}`
+      : props.origen === "torneo"
+        ? "En eventos"
+        : "En amistosas"
+);
 
 // Al cambiar un filtro se vuelve a la primera tanda; al pasar a otro jugador, todo de cero
-watch([filtroResultado, filtroFormato, busqueda], () => {
+watch([filtroResultado, filtroFormato, busqueda, () => props.filtro], () => {
   cuantasVer.value = TANDA;
 });
 watch(

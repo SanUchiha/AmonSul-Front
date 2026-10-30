@@ -39,11 +39,16 @@
         <p v-if="ejercitos.length === 0" class="text-body-2 text-medium-emphasis">
           No tiene {{ origenEjercitos === "torneo" ? "partidas de eventos" : "amistosas" }} con ejército.
         </p>
-        <!-- Los tres más jugados siempre; el resto, al desplegar -->
+        <!-- Los tres más jugados siempre; el resto, al desplegar. Pulsando uno se ven sus partidas -->
         <div
           v-for="ejercito in ejercitosVisibles"
           :key="ejercito.nombre"
-          class="d-flex align-center ga-2 mb-2"
+          v-ripple
+          role="button"
+          tabindex="0"
+          class="d-flex align-center ga-2 fila-pulsable"
+          @click="verPartidas({ ejercito: ejercito.nombre }, ejercito.partidas, origenEjercitos)"
+          @keydown.enter="verPartidas({ ejercito: ejercito.nombre }, ejercito.partidas, origenEjercitos)"
         >
           <v-icon
             size="small"
@@ -59,6 +64,7 @@
             </div>
           </div>
           <span class="text-body-2 font-weight-bold">{{ ejercito.balance.porcentaje }}%</span>
+          <v-icon size="small" icon="mdi-chevron-right" class="text-medium-emphasis" />
         </div>
         <v-btn
           v-if="ejercitos.length > 3"
@@ -72,6 +78,62 @@
             verTodosEjercitos
               ? "Ver solo los tres más jugados"
               : `Ver ${ejercitos.length - 3 === 1 ? "el otro" : `los otros ${ejercitos.length - 3}`}`
+          }}
+        </v-btn>
+      </v-card>
+    </template>
+
+    <!-- Rivales: pulsando uno se ven las partidas contra él y su cara a cara -->
+    <template v-if="partidas.length > 0">
+      <h2 class="text-subtitle-1 font-weight-bold mt-4 mb-1">Rivales más habituales</h2>
+      <v-card class="pa-3 mb-2" variant="outlined">
+        <v-chip-group
+          v-model="origenRivales"
+          mandatory
+          column
+          selected-class="text-primary"
+          class="mb-1"
+        >
+          <v-chip v-for="o in ORIGENES" :key="o.valor" :value="o.valor" size="small" filter>
+            {{ o.titulo }}
+          </v-chip>
+        </v-chip-group>
+        <p v-if="rivales.length === 0" class="text-body-2 text-medium-emphasis">
+          No tiene {{ origenRivales === "torneo" ? "partidas de eventos" : "amistosas" }}.
+        </p>
+        <div
+          v-for="rival in rivalesVisibles"
+          :key="rival.id"
+          v-ripple
+          role="button"
+          tabindex="0"
+          class="d-flex align-center ga-2 fila-pulsable"
+          @click="verPartidas({ idRival: rival.id, nickRival: rival.nick }, rival.partidas, origenRivales)"
+          @keydown.enter="verPartidas({ idRival: rival.id, nickRival: rival.nick }, rival.partidas, origenRivales)"
+        >
+          <v-icon size="small" icon="mdi-account" class="text-medium-emphasis" />
+          <div class="flex-grow-1 min-w-0">
+            <div class="text-body-2 font-weight-bold text-wrap">{{ rival.nick }}</div>
+            <div class="text-caption text-medium-emphasis">
+              {{ rival.balance.total }} {{ rival.balance.total === 1 ? "partida" : "partidas" }} ·
+              {{ rival.balance.victorias }}-{{ rival.balance.empates }}-{{ rival.balance.derrotas }}
+            </div>
+          </div>
+          <span class="text-body-2 font-weight-bold">{{ rival.balance.porcentaje }}%</span>
+          <v-icon size="small" icon="mdi-chevron-right" class="text-medium-emphasis" />
+        </div>
+        <v-btn
+          v-if="rivales.length > 3"
+          variant="text"
+          size="small"
+          class="px-0"
+          :append-icon="verTodosRivales ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+          @click="verTodosRivales = !verTodosRivales"
+        >
+          {{
+            verTodosRivales
+              ? "Ver solo los tres más habituales"
+              : `Ver ${rivales.length - 3 === 1 ? "el otro" : `los otros ${rivales.length - 3}`}`
           }}
         </v-btn>
       </v-card>
@@ -203,11 +265,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, ref, watch } from "vue";
+import { computed, defineEmits, defineProps, ref, watch } from "vue";
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import { appsettings } from "@/settings/appsettings";
 import {
   balanceDe,
+  FiltroPartidas,
+  normalizarEjercito,
   PartidaJugada,
   ResultadoPartida,
   textoPosicion,
@@ -223,6 +287,11 @@ const props = defineProps<{
   idUsuarioQueMira?: number | null;
 }>();
 
+const emit = defineEmits<{
+  // Ver las partidas de un ejército o contra un rival, en la pestaña de eventos o en la de amistosas
+  (e: "filtrar", filtro: FiltroPartidas, origen: "torneo" | "amistosa"): void;
+}>();
+
 
 // Qué partidas cuentan en los ejércitos y en el cara a cara: las de eventos, las amistosas o todas
 type Origen = "todas" | "torneo" | "amistosa";
@@ -232,6 +301,7 @@ const ORIGENES: { valor: Origen; titulo: string }[] = [
   { valor: "amistosa", titulo: "Amistosas" },
 ];
 const origenEjercitos = ref<Origen>("todas");
+const origenRivales = ref<Origen>("todas");
 const origenCara = ref<Origen>("todas");
 const deOrigen = (partidas: PartidaJugada[], origen: Origen) =>
   origen === "todas" ? partidas : partidas.filter(p => p.origen === origen);
@@ -244,15 +314,7 @@ const filasBalance = computed(() => [
   { titulo: "Amistosas", balance: balanceDe(props.partidas.filter(p => p.origen === "amistosa")) },
 ]);
 
-// Los nombres de ejército no siempre se escriben igual: sin mayúsculas, tildes ni "The" delante para agruparlos y
-// buscar su bando
-const normalizar = (nombre: string) =>
-  nombre
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim()
-    .replace(/^the\s+/, "");
+const normalizar = normalizarEjercito;
 const ejercitosApp = new Map(appsettings.armies.map(a => [normalizar(a.name), a]));
 
 // Todos, del más jugado al menos; a igual número de partidas, el de más victorias
@@ -273,9 +335,36 @@ const ejercitos = computed(() => {
       nombre,
       bando: ejercitosApp.get(clave)?.band,
       balance: balanceDe(partidas),
+      partidas,
     }))
     .sort((a, b) => b.balance.total - a.balance.total || b.balance.porcentaje - a.balance.porcentaje);
 });
+
+// Los rivales, del más habitual al menos; en Dobles cuentan los dos de la otra pareja
+const rivales = computed(() => {
+  const porRival = new Map<number, { nick: string; partidas: PartidaJugada[] }>();
+  deOrigen(props.partidas, origenRivales.value).forEach(p =>
+    p.idsRivales.forEach((id, i) => {
+      const grupo = porRival.get(id) ?? { nick: p.nicksRivales[i] || "Sin nick", partidas: [] };
+      grupo.partidas.push(p);
+      porRival.set(id, grupo);
+    })
+  );
+  return [...porRival.entries()]
+    .map(([id, { nick, partidas }]) => ({ id, nick, balance: balanceDe(partidas), partidas }))
+    .sort((a, b) => b.balance.total - a.balance.total || b.balance.porcentaje - a.balance.porcentaje);
+});
+const rivalesVisibles = computed(() =>
+  verTodosRivales.value ? rivales.value : rivales.value.slice(0, 3)
+);
+
+// Con Todas elegido, a la pestaña donde tiene más de esas partidas
+function verPartidas(filtro: FiltroPartidas, partidas: PartidaJugada[], origen: Origen) {
+  const amistosas = partidas.filter(p => p.origen === "amistosa").length;
+  const destino =
+    origen !== "todas" ? origen : amistosas > partidas.length - amistosas ? "amistosa" : "torneo";
+  emit("filtrar", filtro, destino);
+}
 
 // Los eventos con posición final, del mejor puesto al peor; a igual puesto, el más reciente primero
 const resultados = computed(() =>
@@ -307,12 +396,14 @@ const caraACara = computed(() => {
 const verPartidasCara = ref(false);
 const verTodosResultados = ref(false);
 const verTodosEjercitos = ref(false);
+const verTodosRivales = ref(false);
 watch(
   () => props.usuario.idUsuario,
   () => {
     verPartidasCara.value = false;
     verTodosResultados.value = false;
     verTodosEjercitos.value = false;
+    verTodosRivales.value = false;
   }
 );
 const ejercitosVisibles = computed(() =>
@@ -325,6 +416,16 @@ const colorResultado = (resultado: ResultadoPartida) =>
 <style scoped>
 .min-w-0 {
   min-width: 0;
+}
+/* Ejércitos y rivales: toda la fila se pulsa, con un poco de aire para el dedo */
+.fila-pulsable {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 6px 4px;
+  margin: 0 -4px;
+}
+.fila-pulsable:hover {
+  background: rgba(var(--v-theme-on-surface), 0.06);
 }
 .partida-cara + .partida-cara {
   border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
