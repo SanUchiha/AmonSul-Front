@@ -28,7 +28,7 @@
         <!-- A quién falta reclamarle algo, de un toque -->
         <v-chip-group v-model="filtro" mandatory column selected-class="text-primary" class="mb-1">
           <v-chip value="todos" size="small" filter>Todos ({{ inscripciones.length }})</v-chip>
-          <v-chip value="sinLista" size="small" filter>Sin lista ({{ sinLista.length }})</v-chip>
+          <v-chip value="faltanListas" size="small" filter>Faltan listas ({{ faltanListas.length }})</v-chip>
           <v-chip value="sinPagar" size="small" filter>Sin pagar ({{ sinPagar.length }})</v-chip>
         </v-chip-group>
       </template>
@@ -270,22 +270,21 @@ async function moverAGrupo(inscripcion: InscripcionTorneoCreadoDTO, grupo: numbe
     isGuardando.value = false;
   }
 }
-// Buscador y filtros: los que no han entregado la lista y los que no han pagado, sin contar a los retirados
+// Buscador y filtros: a quien le falta la lista (sin entregar o ilegal, que hay que cambiar) y los que no han pagado,
+// sin contar a los retirados
 const search = ref<string | null>("");
-const filtro = ref<"todos" | "sinLista" | "sinPagar">("todos");
+const filtro = ref<"todos" | "faltanListas" | "sinPagar">("todos");
 const enJuego = computed(() => inscripciones.value.filter(i => !esRetirado(i)));
-const sinLista = computed(() =>
-  enJuego.value.filter(
-    i => !["ENTREGADA", "OK", "ILEGAL"].includes((i.estadoLista ?? "").toUpperCase())
-  )
+const faltanListas = computed(() =>
+  enJuego.value.filter(i => !["ENTREGADA", "OK"].includes((i.estadoLista ?? "").toUpperCase()))
 );
 const sinPagar = computed(() => enJuego.value.filter(i => i.esPago !== "SI"));
 const normalizar = (texto: string) =>
   texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const visibles = computed(() => {
   const base =
-    filtro.value === "sinLista"
-      ? sinLista.value
+    filtro.value === "faltanListas"
+      ? faltanListas.value
       : filtro.value === "sinPagar"
         ? sinPagar.value
         : inscripciones.value;

@@ -629,7 +629,8 @@ const emit = defineEmits(["inscripcionEliminada", "cambios", "puntosExtra"]);
 // Generar la ronda 1 y el sorteo se piden desde la tarjeta de gestión, debajo de Descargar listas
 defineExpose({ abrirGenerarRonda1: () => handlerModalGenerarRonda1(), abrirSorteo: () => openSorteo() });
 
-// Filtros: a quien le faltan listas y quien no ha pagado, sin contar al bye
+// Filtros: a quien le faltan listas (sin entregar o alguna ilegal, que hay que cambiar) y quien no ha pagado, sin
+// contar al bye
 const filtro = ref<"todos" | "faltanListas" | "sinPagar">("todos");
 // Las listas que el organizador ha marcado como ilegales: hay que cambiarlas aunque estén entregadas
 const listasIlegales = (item: InscripcionTorneoCreadoMasDTO) =>
@@ -643,7 +644,9 @@ const esBye = (item: InscripcionTorneoCreadoMasDTO) =>
   item.idUsuario === 568 || /^bye\d*$/i.test((item.nick ?? "").trim());
 const reales = computed(() => localInscripciones.value.filter(i => !esBye(i)));
 const faltanListas = computed(() =>
-  reales.value.filter(i => i.countListasEntregadas < props.torneo.torneo.listasPorJugador)
+  reales.value.filter(
+    i => i.countListasEntregadas < props.torneo.torneo.listasPorJugador || listasIlegales(i) > 0
+  )
 );
 const sinPagar = computed(() => reales.value.filter(i => i.esPago !== "SI"));
 const normalizar = (texto: string) =>

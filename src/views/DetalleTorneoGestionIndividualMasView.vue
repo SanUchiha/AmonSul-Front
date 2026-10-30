@@ -36,12 +36,15 @@
               <v-tabs-window-item :value="0" :key="0">
                 <div>
                   <CardGestionTorneoMas :torneo="torneoGestion">
+                    <!-- Como los demás botones de la tarjeta: uno debajo de otro y a lo ancho -->
                     <template #acciones>
-                      <div class="d-flex ga-2">
-                        <v-btn variant="tonal" color="primary" class="flex-grow-1" @click="tablaInscritos?.abrirGenerarRonda1()">
+                      <div class="text-wrap text-sm">
+                        <v-btn variant="tonal" color="primary" block @click="tablaInscritos?.abrirGenerarRonda1()">
                           Generar ronda 1
                         </v-btn>
-                        <v-btn variant="tonal" color="primary" class="flex-grow-1" @click="tablaInscritos?.abrirSorteo()">
+                      </div>
+                      <div class="text-wrap text-sm">
+                        <v-btn variant="tonal" color="primary" block @click="tablaInscritos?.abrirSorteo()">
                           Sorteo
                         </v-btn>
                       </div>

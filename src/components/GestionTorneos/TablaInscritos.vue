@@ -19,7 +19,7 @@
       <!-- A quién falta reclamarle algo, de un toque -->
       <v-chip-group v-model="filtro" mandatory column selected-class="text-primary" class="mb-1">
         <v-chip value="todos" size="small" filter>Todos ({{ localInscripciones.length }})</v-chip>
-        <v-chip value="sinLista" size="small" filter>Sin lista ({{ sinLista.length }})</v-chip>
+        <v-chip value="faltanListas" size="small" filter>Faltan listas ({{ faltanListas.length }})</v-chip>
         <v-chip v-if="ilegales.length > 0" value="ilegal" size="small" filter>
           Lista ilegal ({{ ilegales.length }})
         </v-chip>
@@ -271,16 +271,17 @@ const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
   puntosExtra: 0,
 });
 
-// Filtros: los que no han entregado la lista, los que la tienen ilegal y los que no han pagado
-const filtro = ref<"todos" | "sinLista" | "ilegal" | "sinPagar">("todos");
+// Filtros: a quien le falta la lista (sin entregar o ilegal, que hay que cambiar), solo los de lista ilegal y los que
+// no han pagado
+const filtro = ref<"todos" | "faltanListas" | "ilegal" | "sinPagar">("todos");
 const estaPagado = (item: InscripcionTorneoCreadoDTO) => (item.esPago ?? "").toUpperCase() === "SI";
-const sinEntregar = (item: InscripcionTorneoCreadoDTO) =>
-  !["ENTREGADA", "OK", "ILEGAL"].includes((item.estadoLista ?? "").toUpperCase());
+const faltaLista = (item: InscripcionTorneoCreadoDTO) =>
+  !["ENTREGADA", "OK"].includes((item.estadoLista ?? "").toUpperCase());
 // El bye lo inscribe el sistema con números impares: no es nadie a quien reclamar nada
 const esBye = (item: InscripcionTorneoCreadoDTO) =>
   item.idUsuario === 568 || /^bye\d*$/i.test((item.nick ?? "").trim());
 const reales = computed(() => localInscripciones.value.filter(i => !esBye(i)));
-const sinLista = computed(() => reales.value.filter(sinEntregar));
+const faltanListas = computed(() => reales.value.filter(faltaLista));
 const ilegales = computed(() =>
   reales.value.filter(i => (i.estadoLista ?? "").toUpperCase() === "ILEGAL")
 );
@@ -289,8 +290,8 @@ const normalizar = (texto: string) =>
   texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const visibles = computed(() => {
   const base =
-    filtro.value === "sinLista"
-      ? sinLista.value
+    filtro.value === "faltanListas"
+      ? faltanListas.value
       : filtro.value === "ilegal"
         ? ilegales.value
         : filtro.value === "sinPagar"
