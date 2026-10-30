@@ -346,6 +346,5 @@ const closeModal = () => {
 }
 .email {
   overflow-wrap: anywhere;
-  text-decoration: none;
 }
 </style>

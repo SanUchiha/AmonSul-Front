@@ -69,6 +69,12 @@
               </template>
               <v-list density="compact">
                 <v-list-item
+                  v-if="item.email"
+                  prepend-icon="mdi-email-outline"
+                  title="Escribir correo"
+                  :href="`mailto:${item.email}`"
+                />
+                <v-list-item
                   prepend-icon="mdi-cash-sync"
                   :title="item.esPago === 'SI' ? 'Marcar como sin pagar' : 'Marcar como pagado'"
                   @click="updatePago(item.idInscripcion, item.esPago)"
@@ -83,7 +89,7 @@
             </v-menu>
           </div>
           <!-- El correo como texto: pulsarlo despliega las listas como el resto de la tarjeta -->
-          <div v-if="item.email" class="text-caption text-medium-emphasis texto-largo email">{{ item.email }}</div>
+          <div v-if="item.email" class="text-caption text-medium-emphasis texto-largo">{{ item.email }}</div>
           <div class="text-body-2">
             <span :class="item.countListasEntregadas >= torneo.torneo.listasPorJugador ? 'text-success' : 'text-warning'">
               {{ item.countListasEntregadas }}/{{ torneo.torneo.listasPorJugador }} listas entregadas
@@ -699,9 +705,6 @@ const verLista = (lista: ListaDTO, nick: string) => {
 }
 .texto-largo {
   overflow-wrap: anywhere;
-}
-.email {
-  text-decoration: none;
 }
 .accion {
   flex: 1 1 0;

@@ -81,6 +81,12 @@
                   @click="verDetalle(inscripcion)"
                 />
                 <v-list-item
+                  v-if="inscripcion.email"
+                  prepend-icon="mdi-email-outline"
+                  title="Escribir correo"
+                  :href="`mailto:${inscripcion.email}`"
+                />
+                <v-list-item
                   v-if="!ligaGenerada"
                   prepend-icon="mdi-shield-edit"
                   title="Cambiar ejército"
@@ -373,8 +379,5 @@ async function retirar() {
 .nick,
 .email {
   overflow-wrap: anywhere;
-}
-.email {
-  text-decoration: none;
 }
 </style>

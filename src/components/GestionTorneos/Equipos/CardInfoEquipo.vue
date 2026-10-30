@@ -59,8 +59,8 @@
       Capitán: {{ equipo.nickCapitan }}
       <template v-if="equipo.fechaInscripcion"> · Inscrito {{ convertirFecha(equipo.fechaInscripcion) }}</template>
     </div>
-    <!-- El correo del capitán como texto: pulsarlo despliega los miembros; en su tarjeta de miembro se le escribe -->
-    <div v-if="equipo.emailCapitan" class="text-caption text-medium-emphasis texto-largo email">
+    <!-- El correo del capitán como texto: pulsarlo despliega los miembros; se le escribe desde su menú de miembro -->
+    <div v-if="equipo.emailCapitan" class="text-caption text-medium-emphasis texto-largo">
       {{ equipo.emailCapitan }}
     </div>
     <div class="text-body-2">
@@ -111,6 +111,12 @@
                 </template>
                 <v-list density="compact">
                   <v-list-item
+                    v-if="item.email"
+                    prepend-icon="mdi-email-outline"
+                    title="Escribir correo"
+                    :href="`mailto:${item.email}`"
+                  />
+                  <v-list-item
                     v-if="item.idLista"
                     prepend-icon="mdi-eye"
                     title="Ver lista"
@@ -145,13 +151,8 @@
                 </v-list>
               </v-menu>
             </div>
-            <a
-              v-if="item.email"
-              :href="`mailto:${item.email}`"
-              class="d-block text-caption text-medium-emphasis texto-largo email"
-            >
-              {{ item.email }}
-            </a>
+            <!-- Como en el resto de tarjetas, el correo es texto; se le escribe desde su menú -->
+            <div v-if="item.email" class="text-caption text-medium-emphasis texto-largo">{{ item.email }}</div>
             <div class="text-body-2">
               <span v-if="item.ejercito" class="text-medium-emphasis">{{ item.ejercito }} · </span>
               <span :class="`text-${estadoLista(item.estadoLista).color}`">
@@ -706,9 +707,6 @@ const eliminarMiembro = async (idInscripcion: number) => {
 }
 .texto-largo {
   overflow-wrap: anywhere;
-}
-.email {
-  text-decoration: none;
 }
 @media (max-width: 600px) {
   .hide-on-mobile {
