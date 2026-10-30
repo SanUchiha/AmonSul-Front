@@ -1,300 +1,178 @@
 <template>
-  <div class="card-equipo" @click="toggleExpand">
-    <v-card
-      elevation="15"
-      class="ma-2 pa-3"
-      :class="{
-        'border-warning': equipoIncompleto,
-        'border-green': esPago === 'SI' && !equipoIncompleto,
-      }"
-    >
-      <v-row class="align-center">
-        <!-- Avatar + Nombre del equipo + Estado de Pago -->
-        <v-col cols="12" sm="5" class="d-flex align-center justify-start">
-          <v-avatar size="40">
-            <img
-              src="@/assets/icons/equipos.png"
-              alt="Equipo"
-              width="40"
-              height="40"
-            />
-          </v-avatar>
-          <div class="ms-2">
-            <div class="d-flex align-center">
-              <span class="text-subtitle-1 font-weight-bold ringbearer">
-                {{ equipo.nombreEquipo }}
-              </span>
-              <v-spacer class="d-none d-sm-flex" />
-              <span class="ms-2 text-caption text-grey-lighten-1">
-                {{ inscripcionesEquipo.length }}/{{
-                  numeroMiembrosEquipo
-                }}
-                jugadores <br />
-                {{ listasOk }}/{{ listasNecesarias }}
-                {{ esListaConjunta ? "lista conjunta OK" : "listas OK" }}
-              </span>
-            </div>
-            <div class="d-flex align-center">
-              <v-chip
-                class="mt-1"
-                :color="equipo.esPago === 'SI' ? 'green' : 'red'"
-                variant="tonal"
-                x-small
-              >
-                <v-icon size="16" class="me-1">mdi-cash</v-icon>
-                Pago: {{ equipo.esPago }}
-              </v-chip>
-            </div>
-            <div
-              v-if="equipoIncompleto"
-              class="text-red text-caption mt-1 d-flex align-center"
-            >
-              <v-icon size="16" class="me-1">mdi-alert-circle</v-icon>
-              ATENCIÓN: Faltan listas por validar
-            </div>
-          </div>
-        </v-col>
-
-        <!-- Datos del Capitán con iconos -->
-        <v-col cols="12" sm="4" class="text-caption text-md-left text-center">
-          <div class="d-flex align-center">
-            <v-icon size="18" class="me-1">mdi-account-star</v-icon>
-            {{ equipo.nickCapitan }}
-          </div>
-          <div class="d-flex align-center">
-            <v-icon size="18" class="me-1">mdi-email</v-icon>
-            <a
-              :href="`mailto:${equipo.emailCapitan}`"
-              class="text-decoration-none"
-              target="_blank"
-            >
-              {{ equipo.emailCapitan }}
-            </a>
-          </div>
-          <div class="d-flex align-center">
-            <v-icon size="18" class="me-1">mdi-calendar</v-icon>
-            {{ convertirFecha(equipo.fechaInscripcion!) }}
-          </div>
-        </v-col>
-
-        <!-- Botones -->
-        <v-col
-          cols="12"
-          sm="3"
-          class="d-flex flex-column align-end justify-center mt-2 mt-sm-0"
-        >
+  <!-- Un equipo o pareja como las tarjetas de inscritos: sus datos y, al desplegar, sus miembros -->
+  <v-card
+    v-ripple
+    variant="outlined"
+    class="ma-1 pa-3 text-left tarjeta"
+    role="button"
+    tabindex="0"
+    @click="toggleExpand"
+    @keydown.enter="toggleExpand"
+  >
+    <div class="d-flex align-center ga-2">
+      <span class="text-body-1 font-weight-bold flex-grow-1 texto-largo">{{ equipo.nombreEquipo }}</span>
+      <v-menu>
+        <template #activator="{ props: menuProps }">
           <v-btn
-            v-show="equipo.esPago === 'NO'"
-            variant="tonal"
-            color="warning"
+            icon="mdi-dots-vertical"
+            variant="text"
             size="small"
-            class="mb-1"
-            @click.stop="
-              () =>
-                abrirModalConfirmacion(
-                  esParejas ? 'Marcar pareja como pagada?' : 'Marcar equipo como pagado?',
-                  '¿Seguro que quieres actualizar el estado de pago a SI?',
-                  confirmarActualizarPago
-                )
+            density="comfortable"
+            aria-label="Más acciones"
+            v-bind="menuProps"
+            @click.stop
+          />
+        </template>
+        <v-list density="compact">
+          <v-list-item
+            v-if="equipo.esPago !== 'SI'"
+            prepend-icon="mdi-cash-check"
+            title="Marcar como pagado"
+            @click="
+              abrirModalConfirmacion(
+                esParejas ? '¿Marcar la pareja como pagada?' : '¿Marcar el equipo como pagado?',
+                '¿Seguro que quieres actualizar el estado de pago a SI?',
+                confirmarActualizarPago
+              )
             "
-            block
-          >
-            <v-icon class="me-1">mdi-credit-card-edit</v-icon>
-            Modificar Pago
-          </v-btn>
-          <v-btn
-            color="red"
-            variant="tonal"
-            size="small"
-            @click.stop="
+          />
+          <v-list-item
+            prepend-icon="mdi-trash-can"
+            base-color="error"
+            :title="esParejas ? 'Borrar pareja' : 'Borrar equipo'"
+            @click="
               abrirModalConfirmacion(
                 esParejas ? '¿Deseas borrar la pareja?' : '¿Deseas borrar el equipo?',
                 'Esta acción no se puede deshacer.',
                 confirmarEliminarEquipo
               )
             "
-            block
-          >
-            <v-icon class="me-1">mdi-trash-can</v-icon>
-            {{ esParejas ? "Borrar pareja" : "Borrar equipo" }}
-          </v-btn>
-        </v-col>
-      </v-row>
+          />
+        </v-list>
+      </v-menu>
+    </div>
+    <div class="text-caption text-medium-emphasis">
+      Capitán: {{ equipo.nickCapitan }}
+      <template v-if="equipo.fechaInscripcion"> · Inscrito {{ convertirFecha(equipo.fechaInscripcion) }}</template>
+    </div>
+    <!-- El correo del capitán, para escribirle: se abre la aplicación de correo sin desplegar -->
+    <a
+      v-if="equipo.emailCapitan"
+      :href="`mailto:${equipo.emailCapitan}`"
+      class="d-block text-caption text-medium-emphasis texto-largo email"
+      @click.stop
+    >
+      {{ equipo.emailCapitan }}
+    </a>
+    <div class="text-body-2">
+      <span :class="inscripcionesEquipo.length < numeroMiembrosEquipo ? 'text-warning' : 'text-medium-emphasis'">
+        {{ inscripcionesEquipo.length }}/{{ numeroMiembrosEquipo }} jugadores
+      </span>
+      <span class="text-medium-emphasis"> · </span>
+      <span :class="equipoIncompleto ? 'text-warning' : 'text-success'">
+        {{ listasOk }}/{{ listasNecesarias }} {{ esListaConjunta ? "lista conjunta validada" : "listas validadas" }}
+      </span>
+      <span class="text-medium-emphasis"> · </span>
+      <span :class="equipo.esPago === 'SI' ? 'text-success' : 'text-warning'">
+        {{ equipo.esPago === "SI" ? "Pagado" : "Sin pagar" }}
+      </span>
+    </div>
+    <div class="text-caption text-medium-emphasis mt-1">
+      {{ isExpanded ? "Ocultar miembros" : "Ver miembros" }}
+      <v-icon size="small" :icon="isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+    </div>
 
-      <!-- Expand contenido -->
-      <v-expand-transition>
-        <div v-if="isExpanded" class="mt-4">
-          <v-divider class="mb-2" />
-          <v-data-table :items="equipoConHuecos" class="styled-table" dense>
-            <template v-slot:headers>
-              <tr>
-                <th class="compact-header text-center">Nombre</th>
-                <th class="hide-on-mobile compact-header text-center">
-                  Ejército
-                </th>
-                <th class="compact-header text-center">Lista</th>
-                <th class="hide-on-mobile compact-header text-center">
-                  Entrega
-                </th>
-                <th class="compact-header text-center">Acciones</th>
-              </tr>
-            </template>
-            <template v-slot:item="{ item }">
-              <tr v-if="item">
-                <td class="compact-cell text-left">
-                  <!-- Avatar -->
-                  <v-avatar size="40" class="hide-on-mobile">
-                    <img
-                      src="@/assets/icons/teamLeader.png"
-                      v-if="item.idUsuario === equipo.idCapitan"
-                      alt="Capitan"
-                      width="45"
-                      height="45"
-                    />
-                    <img
-                      src="@/assets/icons/verdetalle.png"
-                      v-else
-                      alt="Participante"
-                      width="40"
-                      height="40"
-                    />
-                  </v-avatar>
-                  <!-- Nick -->
-                  &nbsp;{{ item.nick || "Desconocido" }}
-                </td>
-                <!-- ejercito -->
-                <td class="hide-on-mobile compact-cell">
-                  {{ item.ejercito || "No asignado" }}
-                </td>
-                <!-- estado lista -->
-                <td class="compact-cell">
-                  <v-chip
-                    :color="
-                      item.estadoLista === 'OK'
-                        ? 'green'
-                        : item.estadoLista === 'ENTREGADA'
-                        ? 'yellow'
-                        : 'red'
-                    "
-                    variant="tonal"
-                  >
-                    {{ item.estadoLista }}
-                  </v-chip>
-                </td>
-                <!-- fecha entrega -->
-                <td class="hide-on-mobile compact-cell">
-                  {{
-                    formatFechaSpaWhitoutAsync(item.fechaEntregaLista) || "N/A"
-                  }}
-                </td>
-                <!-- menu acciones -->
-                <td class="compact-cell">
-                  <v-menu
-                    v-model="isOpenMenuAcciones[item.idInscripcion]"
-                    offset-y
-                  >
-                    <template v-slot:activator="{ props }">
-                      <v-btn color="primary" variant="tonal" v-bind="props">
-                        <v-icon>mdi-dots-vertical</v-icon>
-                      </v-btn>
-                    </template>
-                    <!-- lista acciones -->
-                    <v-list>
-                      <v-list-item
-                        v-if="item.idLista"
-                        @click.stop="
-                          verLista(item.idLista, item.nick, item.ejercito);
-                          isOpenMenuAcciones[item.idInscripcion] = false;
-                        "
-                      >
-                        <v-list-item-title>
-                          <v-icon class="me-2">mdi-eye</v-icon> Ver Lista
-                        </v-list-item-title>
-                      </v-list-item>
-                      <v-list-item
-                        v-if="item.idLista"
-                        @click.stop="
-                          cambiarEstadoLista(
-                            item.idInscripcion!,
-                            item.estadoLista,
-                            item.nick
-                          );
-                          isOpenMenuAcciones[item.idInscripcion] = false;
-                        "
-                      >
-                        <v-list-item-title>
-                          <v-icon class="me-2">mdi-refresh</v-icon> Cambiar
-                          Estado
-                        </v-list-item-title>
-                      </v-list-item>
-                      <!-- Con lista conjunta solo se envía en la inscripción que la guarda -->
-                      <v-list-item
-                        v-if="
-                          !esListaConjunta ||
-                          item.idInscripcion === idInscripcionListaPareja
-                        "
-                        @click.stop="
-                          enviarCambiarLista(
-                            item.idInscripcion,
-                            item.listaData!,
-                            item.idUsuario,
-                            item.nick,
-                            item.idLista
-                          );
-                          isOpenMenuAcciones[item.idInscripcion] = false;
-                        "
-                      >
-                        <v-list-item-title>
-                          <v-icon class="me-2">mdi-pencil</v-icon>
-                          <span v-if="item.listaData">Modificar lista</span>
-                          <span v-else>Enviar lista</span>
-                        </v-list-item-title>
-                      </v-list-item>
-                      <v-divider class="my-2" />
-                      <v-list-item
-                        @click.stop="
-                          isOpenMenuAcciones[item.idInscripcion] = false;
-                          abrirModalConfirmacion(
-                            esParejas
-                              ? `¿Quitar a ${item.nick} de la pareja?`
-                              : `¿Quitar a ${item.nick} del equipo?`,
-                            'Se borran su inscripción y su lista en este torneo. Esta acción no se puede deshacer.',
-                            () => eliminarMiembro(item.idInscripcion)
-                          );
-                        "
-                      >
-                        <v-list-item-title>
-                          <v-icon color="red" class="me-2"
-                            >mdi-account-remove</v-icon
-                          >
-                          {{ esParejas ? "Eliminar de la pareja" : "Eliminar del equipo" }}
-                        </v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </td>
-              </tr>
-
-              <!-- Fila vacía con botón de añadir -->
-              <tr v-else>
-                <td :colspan="5" class="text-center py-4">
+    <!-- Los miembros: cada uno con su correo, su lista y sus acciones -->
+    <v-expand-transition>
+      <div v-if="isExpanded" @click.stop>
+        <template v-for="(item, index) in equipoConHuecos" :key="item?.idInscripcion ?? `hueco-${index}`">
+          <v-card v-if="item" variant="tonal" class="pa-2 mt-2">
+            <div class="d-flex align-center ga-2">
+              <span class="text-body-2 font-weight-bold flex-grow-1 texto-largo">
+                {{ item.nick || "Desconocido" }}
+                <span v-if="item.idUsuario === equipo.idCapitan" class="font-weight-regular text-medium-emphasis">
+                  (capitán)
+                </span>
+              </span>
+              <v-menu v-model="isOpenMenuAcciones[item.idInscripcion]">
+                <template #activator="{ props: menuProps }">
                   <v-btn
-                    color="primary"
-                    variant="tonal"
+                    icon="mdi-dots-vertical"
+                    variant="text"
                     size="small"
-                    @click.stop="handlerModalRegistrarMiembroEquipo()"
-                  >
-                    <v-icon class="me-1">mdi-account-plus</v-icon>
-                    Añadir jugador
-                  </v-btn>
-                </td>
-              </tr>
-            </template>
-          </v-data-table>
-        </div>
-      </v-expand-transition>
-    </v-card>
-  </div>
+                    density="comfortable"
+                    aria-label="Acciones del jugador"
+                    v-bind="menuProps"
+                  />
+                </template>
+                <v-list density="compact">
+                  <v-list-item
+                    v-if="item.idLista"
+                    prepend-icon="mdi-eye"
+                    title="Ver lista"
+                    @click="verLista(item.idLista, item.nick, item.ejercito)"
+                  />
+                  <v-list-item
+                    v-if="item.idLista"
+                    prepend-icon="mdi-refresh"
+                    title="Cambiar estado"
+                    @click="cambiarEstadoLista(item.idInscripcion!, item.estadoLista, item.nick)"
+                  />
+                  <!-- Con lista conjunta solo se envía en la inscripción que la guarda -->
+                  <v-list-item
+                    v-if="!esListaConjunta || item.idInscripcion === idInscripcionListaPareja"
+                    prepend-icon="mdi-pencil"
+                    :title="item.listaData ? 'Modificar lista' : 'Enviar lista'"
+                    @click="enviarCambiarLista(item.idInscripcion, item.listaData!, item.idUsuario, item.nick, item.idLista)"
+                  />
+                  <v-divider class="my-1" />
+                  <v-list-item
+                    prepend-icon="mdi-account-remove"
+                    base-color="error"
+                    :title="esParejas ? 'Quitar de la pareja' : 'Quitar del equipo'"
+                    @click="
+                      abrirModalConfirmacion(
+                        esParejas ? `¿Quitar a ${item.nick} de la pareja?` : `¿Quitar a ${item.nick} del equipo?`,
+                        'Se borran su inscripción y su lista en este torneo. Esta acción no se puede deshacer.',
+                        () => eliminarMiembro(item.idInscripcion)
+                      )
+                    "
+                  />
+                </v-list>
+              </v-menu>
+            </div>
+            <a
+              v-if="item.email"
+              :href="`mailto:${item.email}`"
+              class="d-block text-caption text-medium-emphasis texto-largo email"
+            >
+              {{ item.email }}
+            </a>
+            <div class="text-body-2">
+              <span v-if="item.ejercito" class="text-medium-emphasis">{{ item.ejercito }} · </span>
+              <span :class="`text-${estadoLista(item.estadoLista).color}`">
+                {{ estadoLista(item.estadoLista).texto }}
+              </span>
+              <span v-if="bandoLista(item.bando)" class="text-medium-emphasis text-no-wrap">
+                · {{ bandoLista(item.bando)!.texto }}
+              </span>
+            </div>
+            <div v-if="item.fechaEntregaLista" class="text-caption text-medium-emphasis">
+              Lista {{ formatFechaSpaWhitoutAsync(item.fechaEntregaLista) }}
+            </div>
+          </v-card>
+
+          <!-- Hueco libre: se puede completar -->
+          <v-card v-else variant="tonal" class="pa-2 mt-2 d-flex align-center ga-2">
+            <span class="text-body-2 text-warning flex-grow-1">Hueco libre</span>
+            <v-btn size="small" variant="tonal" class="text-none" @click="handlerModalRegistrarMiembroEquipo()">
+              Añadir jugador
+            </v-btn>
+          </v-card>
+        </template>
+      </div>
+    </v-expand-transition>
+  </v-card>
 
   <!-- Modales de respuesta a la subida de la lista -->
   <ModalCambiarEstadoListaEquipos
@@ -425,6 +303,7 @@
 import { computed, ref, defineEmits, toRef } from "vue";
 import { defineProps } from "vue";
 import type { EquipoDTO, InscripcionTorneoDTO } from "@/interfaces/Inscripcion";
+import { bandoLista, estadoLista } from "@/utils/estadoLista";
 import {
   convertirFecha,
   obtenerFechaActual,
@@ -811,6 +690,15 @@ const eliminarMiembro = async (idInscripcion: number) => {
 </script>
 
 <style scoped>
+.tarjeta {
+  cursor: pointer;
+}
+.texto-largo {
+  overflow-wrap: anywhere;
+}
+.email {
+  text-decoration: none;
+}
 @media (max-width: 600px) {
   .hide-on-mobile {
     display: none;

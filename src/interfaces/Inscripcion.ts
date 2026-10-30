@@ -147,6 +147,10 @@ export interface InscripcionTorneoDTO {
   ejercito?: string | null;
   idLista: number;
   nick: string;
+  // Solo para el organizador, en la gestión por equipos
+  email?: string | null;
+  // good o evil: el bando de su lista, si la ha entregado
+  bando?: string | null;
 }
 
 export interface JugadoresEquipoParaCambioDTO {
