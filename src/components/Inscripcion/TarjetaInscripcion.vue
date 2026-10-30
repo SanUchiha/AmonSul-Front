@@ -49,8 +49,8 @@ import { computed, defineEmits, defineProps } from "vue";
 import { esPorJornadas, nombreEvento, textosEvento } from "@/Constant/FormatoTorneo";
 import { tipoTorneoOptions } from "@/Constant/TiposTorneo";
 import { formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
+import { estadoLista } from "@/utils/estadoLista";
 import {
-  estadoLista,
   estaEnCurso,
   haTerminado,
   MiInscripcion,

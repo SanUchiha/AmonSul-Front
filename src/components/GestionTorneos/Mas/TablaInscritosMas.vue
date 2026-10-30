@@ -181,10 +181,10 @@
                       <td>
                         <v-select
                           v-if="item.lista[n - 1]"
-                          :items="estadoListaOptions"
+                          :items="ESTADOS_LISTA"
                           v-model="item.lista[n - 1].estadoLista"
-                          item-title="text"
-                          item-value="text"
+                          item-title="corto"
+                          item-value="valor"
                           @update:modelValue="
                             (value: string) =>
                               updateEstado(
@@ -391,6 +391,7 @@
 </template>
 
 <script setup lang="ts">
+import { ESTADOS_LISTA } from "@/utils/estadoLista";
 import { ref, computed, watch, defineEmits } from "vue";
 import { defineProps } from "vue";
 import {
@@ -455,12 +456,6 @@ const showModalEditLista = ref<boolean>(false);
 const listaData = ref<string>("");
 const search = ref<string>("");
 const expandedRows = ref<{ [key: number]: boolean }>({});
-const estadoListaOptions = [
-  { text: "NO ENTREGADA", color: "red" },
-  { text: "ENTREGADA", color: "blue" },
-  { text: "ILEGAL", color: "red" },
-  { text: "OK", color: "green" },
-];
 const showModalGenerarRonda1 = ref<boolean>(false);
 
 const updateEstado = async (

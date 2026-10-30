@@ -104,6 +104,7 @@
 </template>
 
 <script setup lang="ts">
+import { estadoLista } from "@/utils/estadoLista";
 import { ref, computed, watch, defineEmits } from "vue";
 import { defineProps } from "vue";
 import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
@@ -162,19 +163,10 @@ const formattedEstadoPago = (estado: string) => {
   return { text: "Desconocido", color: "gray" };
 };
 
+// Los textos y colores de Mis eventos: sin entregar en amarillo, entregada y validada en verde, ilegal en rojo
 const formattedEstadoLista = (estado: string) => {
-  switch (estado) {
-    case "NO ENTREGADA":
-      return { text: "NO ENTREGADA", color: "red" };
-    case "ENTREGADA":
-      return { text: "ENTREGADA", color: "blue" };
-    case "ILEGAL":
-      return { text: "ILEGAL", color: "red" };
-    case "OK":
-      return { text: "OK", color: "blue" };
-    default:
-      return { text: "Desconocido", color: "gray" };
-  }
+  const { corto, color } = estadoLista(estado);
+  return { text: corto, color };
 };
 
 const handleRowClick = (item: InscripcionTorneoCreadoDTO) => {

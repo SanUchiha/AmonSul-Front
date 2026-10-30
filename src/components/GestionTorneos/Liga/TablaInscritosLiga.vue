@@ -38,8 +38,8 @@
           <v-chip v-if="esRetirado(inscripcion)" size="x-small" color="error">
             Retirado
           </v-chip>
-          <v-chip size="x-small" :color="colorLista(inscripcion.estadoLista)">
-            Lista: {{ inscripcion.estadoLista ?? "NO ENTREGADA" }}
+          <v-chip size="x-small" :color="estadoLista(inscripcion.estadoLista).color">
+            {{ estadoLista(inscripcion.estadoLista).texto }}
           </v-chip>
           <v-chip
             size="x-small"
@@ -165,6 +165,7 @@
 </template>
 
 <script setup lang="ts">
+import { estadoLista } from "@/utils/estadoLista";
 import { computed, defineEmits, defineProps, ref } from "vue";
 import {
   InscripcionTorneoCreadoDTO,
@@ -245,12 +246,6 @@ const mensaje = ref("");
 
 function esRetirado(inscripcion: InscripcionTorneoCreadoDTO) {
   return inscripcion.estadoInscripcion === RETIRADO;
-}
-
-function colorLista(estado?: string | null) {
-  if (estado === "OK") return "success";
-  if (estado === "ENTREGADA") return "info";
-  return "warning";
 }
 
 function verDetalle(inscripcion: InscripcionTorneoCreadoDTO) {

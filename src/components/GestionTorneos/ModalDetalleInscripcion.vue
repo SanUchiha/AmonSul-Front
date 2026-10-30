@@ -20,7 +20,9 @@
               </v-list-item-title>
               <v-select
                 v-model="localInscripcion.estadoLista"
-                :items="estadoListaOptions"
+                :items="ESTADOS_LISTA"
+                item-title="corto"
+                item-value="valor"
                 label="Estado"
                 dense
                 hide-details
@@ -162,6 +164,7 @@
 </template>
 
 <script setup lang="ts">
+import { ESTADOS_LISTA } from "@/utils/estadoLista";
 import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
 import {
   cancelarInscripcion,
@@ -208,12 +211,6 @@ const listaBase64 = ref<string>();
 const listaText = ref<string>("");
 const ejercito = ref<ArmyDTO>();
 
-const estadoListaOptions = [
-  "NO ENTREGADA",
-  "ENTREGADA",
-  "ILEGAL",
-  "OK",
-] as const;
 const pagoOptions = ["NO", "SI"] as const;
 
 const showSuccessModalPago = ref<boolean>(false);

@@ -133,7 +133,7 @@ import { ListaDTO } from "@/interfaces/Usuario";
 import { esPorJornadas, FORMATO_COPA } from "@/Constant/FormatoTorneo";
 import { useToast } from "@/composables/useToast";
 import { diaDeHoy, ultimoDiaEvento } from "@/utils/Fecha";
-import { estadoLista } from "@/utils/misEventos";
+import { estadoLista } from "@/utils/estadoLista";
 import ModalLista from "./ModalLista.vue";
 import ModalModificarLista from "./ModalModificarLista.vue";
 import ModalEnviarLista from "./ModalEnviarLista.vue";
