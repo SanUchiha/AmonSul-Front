@@ -1,6 +1,6 @@
 <template>
-  <!-- Tu inscripción: pago, listas y darse de baja. En móvil, a pantalla completa para ver bien la lista -->
-  <v-dialog v-model="show" max-width="560" :fullscreen="xs" scrollable @update:model-value="alCambiarVisible">
+  <!-- Tu inscripción: pago, listas y darse de baja -->
+  <v-dialog v-model="show" max-width="560" scrollable @update:model-value="alCambiarVisible">
     <v-card>
       <v-card-title class="d-flex align-start ga-2 text-wrap pt-3">
         <div class="flex-grow-1 min-w-0">
@@ -18,19 +18,12 @@
           <v-progress-circular indeterminate color="primary" />
         </div>
         <template v-else>
-          <!-- De un vistazo: el pago y, en ligas y copas, el ejército de todo el evento -->
-          <div class="d-flex flex-wrap ga-1 mb-2">
-            <v-chip
-              size="small"
-              variant="tonal"
-              :color="pagado ? 'success' : 'warning'"
-              prepend-icon="mdi-cash"
-            >
-              {{ pagado ? "Pagado" : "Sin pagar" }}
-            </v-chip>
-            <v-chip v-if="ejercitoFijo" size="small" variant="tonal" prepend-icon="mdi-shield">
-              {{ ejercitoFijo }}
-            </v-chip>
+          <!-- De un vistazo, como en Mis eventos: el pago y, en ligas y copas, el ejército de todo el evento -->
+          <div class="text-body-2 mb-1">
+            <span :class="pagado ? 'text-success' : 'text-warning'">{{ pagado ? "Pagado" : "Sin pagar" }}</span>
+            <template v-if="ejercitoFijo">
+              <span class="text-medium-emphasis"> · {{ ejercitoFijo }}</span>
+            </template>
           </div>
           <p v-if="ejercitoFijo" class="text-caption text-medium-emphasis mb-3">
             Puedes cambiar de lista antes de cada partida, siempre de este ejército.
@@ -41,32 +34,28 @@
             {{ listas.length > 1 ? "Tus listas" : "Tu lista" }}
           </h3>
           <v-card v-for="lista in listas" :key="lista.indice" variant="outlined" class="pa-3 mb-2">
-            <div class="d-flex flex-wrap align-center ga-2">
-              <span v-if="listas.length > 1" class="text-body-2 font-weight-bold">
-                Lista {{ lista.indice }}
-              </span>
-              <v-chip size="small" variant="tonal" :color="estadoLista(lista.estado).color">
-                {{ estadoLista(lista.estado).texto }}
-              </v-chip>
-              <span v-if="lista.ejercito" class="text-body-2 text-medium-emphasis">{{ lista.ejercito }}</span>
+            <div v-if="listas.length > 1" class="text-body-2 font-weight-bold">Lista {{ lista.indice }}</div>
+            <div class="text-body-2">
+              <span :class="`text-${estadoLista(lista.estado).color}`">{{ estadoLista(lista.estado).texto }}</span>
+              <span v-if="lista.ejercito" class="text-medium-emphasis"> · {{ lista.ejercito }}</span>
             </div>
-            <div v-if="lista.tieneLista || abierta" class="d-flex flex-wrap ga-2 mt-3">
+            <!-- Los botones en una fila, a partes iguales y del mismo color -->
+            <div v-if="lista.tieneLista || abierta" class="d-flex ga-1 mt-3">
               <v-btn
                 v-if="lista.tieneLista"
                 size="small"
                 variant="tonal"
-                :prepend-icon="listaVisible === lista.indice ? 'mdi-eye-off' : 'mdi-eye'"
+                class="accion text-none"
                 :loading="cargandoLista === lista.indice"
                 @click="alternarLista(lista.indice)"
               >
-                {{ listaVisible === lista.indice ? "Ocultar" : "Ver lista" }}
+                {{ listaVisible === lista.indice ? "Ocultar lista" : "Ver lista" }}
               </v-btn>
               <v-btn
                 v-if="abierta"
                 size="small"
-                color="primary"
-                variant="flat"
-                prepend-icon="mdi-upload"
+                variant="tonal"
+                class="accion text-none"
                 @click="enviarOCambiar(lista.indice)"
               >
                 {{ lista.tieneLista ? "Cambiar lista" : "Enviar lista" }}
@@ -81,7 +70,7 @@
 
           <!-- Darse de baja: solo antes del evento; en una liga o copa en marcha, con el organizador -->
           <div v-if="abierta && !ligaEnMarcha" class="text-center mt-4">
-            <v-btn variant="text" color="error" prepend-icon="mdi-account-remove" @click="eliminarInscripcion">
+            <v-btn variant="text" color="error" size="small" class="text-none" @click="eliminarInscripcion">
               Darme de baja
             </v-btn>
           </div>
@@ -127,7 +116,6 @@
 
 <script setup lang="ts">
 import { computed, defineEmits, defineProps, onMounted, ref } from "vue";
-import { useDisplay } from "vuetify";
 import { getIncripcionById } from "@/services/InscripcionesService";
 import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
 import {
@@ -166,7 +154,6 @@ const emit = defineEmits<{
   (e: "actualizada"): void;
 }>();
 
-const { xs } = useDisplay();
 const { triggerToast } = useToast();
 
 const show = ref(true);
@@ -356,5 +343,10 @@ onMounted(cargar);
 <style scoped>
 .nombre {
   overflow-wrap: anywhere;
+}
+.accion {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 4px;
 }
 </style>
