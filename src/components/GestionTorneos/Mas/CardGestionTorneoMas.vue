@@ -12,15 +12,15 @@
         {{ formatDate(torneo.torneo.fechaFinInscripcion) }}
       </p>
       <p>
-        <strong>Pagos: :</strong>
+        <strong>Pagos:</strong>
         {{ pagosRealizados }}/{{ totalInscripciones }}
       </p>
       <p>
-        <strong>Listas entregadas: :</strong>
+        <strong>Listas entregadas:</strong>
         {{ listasEntregadas }}/{{ listasTotales }}
       </p>
       <p>
-        <strong>Listas legales: :</strong>
+        <strong>Listas legales:</strong>
         {{ listasLegales }}/{{ listasTotales }}
       </p>
       <p><strong>Listas de luz:</strong> {{ listasLuz }}</p>

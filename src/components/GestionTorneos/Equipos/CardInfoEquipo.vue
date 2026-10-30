@@ -11,6 +11,10 @@
   >
     <div class="d-flex align-center ga-2">
       <span class="text-body-1 font-weight-bold flex-grow-1 texto-largo">{{ equipo.nombreEquipo }}</span>
+      <!-- Lo que suma el equipo por sus miembros: en la cabecera, para que al aparecer no mueva los botones -->
+      <v-chip v-if="puntosExtraEquipo !== 0" size="x-small" variant="tonal" class="flex-shrink-0">
+        {{ puntosExtraEquipo > 0 ? "+" : "" }}{{ puntosExtraEquipo }} {{ Math.abs(puntosExtraEquipo) === 1 ? "punto extra" : "puntos extra" }}
+      </v-chip>
       <v-menu>
         <template #activator="{ props: menuProps }">
           <v-btn
@@ -76,12 +80,6 @@
       <span :class="equipo.esPago === 'SI' ? 'text-success' : 'text-warning'">
         {{ equipo.esPago === "SI" ? "Pagado" : "Sin pagar" }}
       </span>
-      <template v-if="puntosExtraEquipo !== 0">
-        <span class="text-medium-emphasis"> · </span>
-        <span class="text-medium-emphasis">
-          {{ puntosExtraEquipo > 0 ? "+" : "" }}{{ puntosExtraEquipo }} {{ Math.abs(puntosExtraEquipo) === 1 ? "punto extra" : "puntos extra" }}
-        </span>
-      </template>
     </div>
     <div class="text-caption text-medium-emphasis mt-1">
       {{ isExpanded ? "Ocultar miembros" : "Ver miembros" }}
