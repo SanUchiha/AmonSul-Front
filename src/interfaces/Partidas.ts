@@ -79,6 +79,9 @@ export interface PartidaTorneoDTO {
   // Vacíos si la pareja juega con una lista conjunta
   ejercitoCompanero1?: string | null;
   ejercitoCompanero2?: string | null;
+  // ELO ganado o perdido en la partida; null si no ha contado
+  eloVariacionUsuario1?: number | null;
+  eloVariacionUsuario2?: number | null;
 }
 
 export interface PartidaTorneoMasDTO {
@@ -123,6 +126,8 @@ export interface ViewPartidaTorneoDTO {
   numeroRonda?: number | null;
   puntosTorneo?: number | null;
   mostrarListas?: boolean | null;
+  // En una liga la partida se nombra por su jornada
+  formatoTorneo?: string | null;
   eloVariacionUsuario1?: number | null;
   eloVariacionUsuario2?: number | null;
   // Solo en Parejas: compañeros de los capitanes idUsuario1 e idUsuario2

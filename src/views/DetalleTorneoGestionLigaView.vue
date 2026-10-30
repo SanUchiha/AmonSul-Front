@@ -271,11 +271,19 @@ async function cargar() {
 
 onMounted(cargar);
 
-function actualizarPartida(actualizada: PartidaTorneoDTO) {
+async function actualizarPartida(actualizada: PartidaTorneoDTO) {
   const i = partidas.value.findIndex(
     p => p.idPartidaTorneo === actualizada.idPartidaTorneo
   );
   if (i !== -1) partidas.value[i] = { ...partidas.value[i], ...actualizada };
+  // Con ELO, la variación la calcula el servidor al guardar: se recargan para verla
+  if (torneo.value?.cuentaElo) {
+    try {
+      partidas.value = (await getPartidasTorneo(idTorneo)).data;
+    } catch (error) {
+      console.error("Error al recargar las partidas:", error);
+    }
+  }
 }
 
 // Confirmaciones

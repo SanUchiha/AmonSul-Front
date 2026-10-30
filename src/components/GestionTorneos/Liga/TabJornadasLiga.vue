@@ -63,6 +63,14 @@
               <div class="text-caption text-medium-emphasis text-wrap">
                 {{ partida.ejercitoUsuario1 }}
               </div>
+              <!-- Solo en ligas que cuentan para el ELO, cuando la partida ya ha contado -->
+              <div
+                v-if="partida.eloVariacionUsuario1 != null"
+                class="text-caption"
+                :class="colorElo(partida.eloVariacionUsuario1)"
+              >
+                {{ textoElo(partida.eloVariacionUsuario1) }}
+              </div>
               <v-btn
                 size="x-small"
                 variant="tonal"
@@ -80,6 +88,13 @@
               <div class="font-weight-bold text-wrap">{{ partida.nick2 }}</div>
               <div class="text-caption text-medium-emphasis text-wrap">
                 {{ partida.ejercitoUsuario2 }}
+              </div>
+              <div
+                v-if="partida.eloVariacionUsuario2 != null"
+                class="text-caption"
+                :class="colorElo(partida.eloVariacionUsuario2)"
+              >
+                {{ textoElo(partida.eloVariacionUsuario2) }}
               </div>
               <v-btn
                 size="x-small"
@@ -235,6 +250,11 @@ const grupos = computed(() => {
     .sort(([a], [b]) => a - b)
     .map(([numero, partidas]) => ({ jornada: numero, partidas }));
 });
+
+const textoElo = (variacion: number) =>
+  `${variacion > 0 ? "+" : ""}${variacion} ELO`;
+const colorElo = (variacion: number) =>
+  variacion > 0 ? "text-success" : variacion < 0 ? "text-error" : "text-medium-emphasis";
 
 function validadaPorUno(partida: PartidaTorneoDTO) {
   return (

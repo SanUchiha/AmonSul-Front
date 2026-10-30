@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import { computed, ref } from "vue";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
@@ -95,7 +96,9 @@ const ejercitoLista = ref<string>();
 const contexto = computed(() =>
   [
     props.mostrarTorneo ? props.match.nombreTorneo : "",
-    props.match.numeroRonda ? `Ronda ${props.match.numeroRonda}` : "",
+    props.match.numeroRonda
+      ? `${props.match.formatoTorneo === FORMATO_LIGA ? "Jornada" : "Ronda"} ${props.match.numeroRonda}`
+      : "",
   ]
     .filter(Boolean)
     .join(" · ")
