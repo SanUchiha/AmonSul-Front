@@ -11,6 +11,18 @@
           <v-icon size="small" color="primary" class="mr-1">mdi-format-list-bulleted</v-icon>
           <span class="circuitos-count">{{ numeroCircuitos }} {{ numeroCircuitos === 1 ? 'circuito disponible' : 'circuitos disponibles' }}</span>
         </div>
+
+        <!-- Cualquiera puede crear uno: los organizadores meten sus torneos desde la gestión -->
+        <v-btn
+          color="primary"
+          variant="tonal"
+          prepend-icon="mdi-plus"
+          block
+          class="my-3"
+          @click="abrirCrear"
+        >
+          Crear circuito
+        </v-btn>
         
         <div v-if="circuitos.length > 0" class="circuitos-container">
           <div 
@@ -42,14 +54,39 @@
       </v-card-text>
     </v-card>
 
-    <ModalCircuito v-if="showModalCircuito" :circuito="selectedCircuito" :showModalCircuito="showModalCircuito" @close="closeModal" />
+    <ModalCircuito
+      v-if="showModalCircuito"
+      :circuito="selectedCircuito"
+      :showModalCircuito="showModalCircuito"
+      @close="closeModal"
+      @renombrado="onRenombrado"
+      @borrado="onBorrado"
+    />
+
+    <ModalNombreCircuito
+      v-model="showCrear"
+      titulo="Crear circuito"
+      textoBoton="Crear"
+      :guardando="creando"
+      :error="errorCrear"
+      @guardar="crear"
+    />
+
+    <ModalSuccess
+      :isVisible="showSuccess"
+      :message="mensajeExito"
+      @update:isVisible="showSuccess = $event"
+    />
   </v-container>
 </template>
 
 <script lang="ts" setup>
 import ModalCircuito from "@/components/Circuito/ModalCircuito.vue";
+import ModalNombreCircuito from "@/components/Circuito/components/ModalNombreCircuito.vue";
+import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import { CircuitoDTO } from "@/interfaces/Circuito";
-import { getCircuitos } from "@/services/CircuitosService";
+import { crearCircuitoAsync, getCircuitos } from "@/services/CircuitosService";
+import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import { ref, onMounted, computed } from "vue";
 
 const showModalCircuito = ref<boolean>(false);
@@ -84,6 +121,47 @@ const openDialog = (circuito: CircuitoDTO) => {
 
 const closeModal = () => {
   showModalCircuito.value = false;
+};
+
+// Crear un circuito: queda a nombre de quien lo crea
+const showCrear = ref(false);
+const creando = ref(false);
+const errorCrear = ref<string | null>(null);
+const showSuccess = ref(false);
+const mensajeExito = ref("");
+
+const abrirCrear = () => {
+  errorCrear.value = null;
+  showCrear.value = true;
+};
+
+const crear = async (nombre: string) => {
+  creando.value = true;
+  errorCrear.value = null;
+  try {
+    await crearCircuitoAsync(nombre);
+    showCrear.value = false;
+    await loadCircuitos();
+    mensajeExito.value = `Circuito «${nombre}» creado. Los organizadores pueden añadir sus torneos desde la gestión.`;
+    showSuccess.value = true;
+  } catch (error) {
+    errorCrear.value = mensajeDelBack(error, "No se ha podido crear el circuito. Inténtalo de nuevo.");
+  } finally {
+    creando.value = false;
+  }
+};
+
+// El creador lo ha renombrado o borrado desde su ventana
+const onRenombrado = async (nombre: string) => {
+  if (selectedCircuito.value) selectedCircuito.value = { ...selectedCircuito.value, nombreCircuito: nombre };
+  await loadCircuitos();
+};
+
+const onBorrado = async (nombre: string) => {
+  showModalCircuito.value = false;
+  await loadCircuitos();
+  mensajeExito.value = `Circuito «${nombre}» borrado.`;
+  showSuccess.value = true;
 };
 
 // Cargar circuitos cuando el componente esté montado

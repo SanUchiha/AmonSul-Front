@@ -8,6 +8,8 @@ export interface CircuitoTorneosDTO {
 export interface CircuitoDTO {
   idCircuito: number;
   nombreCircuito: string;
+  // Quien lo creó desde la web, el único que lo renombra o lo borra. Los antiguos no tienen
+  idUsuario?: number | null;
 }
 
 export interface AddCircuitoTorneoDTO {
