@@ -6,7 +6,7 @@
     <!-- Cabecera: qué hay aquí -->
     <h1 class="text-h5 font-weight-bold mb-1">Mis eventos</h1>
     <p class="text-body-2 text-medium-emphasis mb-3">
-      Los eventos en los que estás inscrito. Tus partidas y resultados están en
+      Tus partidas y resultados, en
       <router-link :to="`/detalle-jugador/${idUsuario}`">tu ficha de jugador</router-link>.
     </p>
 

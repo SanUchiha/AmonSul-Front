@@ -1,50 +1,45 @@
 <template>
   <!-- Un evento en el que estás inscrito: qué es, cuándo, cómo va tu inscripción y a dónde ir -->
   <v-card variant="outlined" class="pa-3 h-100 d-flex flex-column text-left">
-    <div class="text-body-1 font-weight-bold nombre">{{ inscripcion.torneo.nombreTorneo }}</div>
-    <div class="text-caption text-medium-emphasis">{{ fechas }}</div>
-
-    <div class="d-flex flex-wrap ga-1 mt-2">
-      <v-chip size="small" variant="tonal">{{ nombreEvento(inscripcion.torneo.formatoTorneo) }}</v-chip>
-      <v-chip size="small" variant="tonal">{{ tipo }}</v-chip>
-      <v-chip
-        v-if="enCurso"
-        size="small"
-        color="success"
-        variant="flat"
-        prepend-icon="mdi-sword-cross"
-      >
+    <div class="d-flex align-start ga-2">
+      <div class="text-body-1 font-weight-bold nombre flex-grow-1">
+        {{ inscripcion.torneo.nombreTorneo }}
+      </div>
+      <v-chip v-if="enCurso" size="x-small" color="success" variant="tonal" class="flex-shrink-0 mt-1">
         En curso
       </v-chip>
     </div>
-
-    <!-- Cómo va la inscripción: lo que aún se puede arreglar antes de jugar -->
-    <div v-if="!terminado && inscripcion.estadoLista" class="d-flex flex-wrap ga-1 mt-2">
-      <v-chip size="small" variant="tonal" :color="lista.color" prepend-icon="mdi-file-document-outline">
-        {{ lista.texto }}
-      </v-chip>
-      <v-chip
-        size="small"
-        variant="tonal"
-        :color="pagado ? 'success' : 'warning'"
-        prepend-icon="mdi-cash"
-      >
-        {{ pagado ? "Pagado" : "Sin pagar" }}
-      </v-chip>
+    <div class="text-caption text-medium-emphasis">
+      {{ fechas }} · {{ nombreEvento(inscripcion.torneo.formatoTorneo) }} · {{ tipo }}
     </div>
-    <div v-if="inscripcion.ejercitoElegido" class="text-caption mt-2">
-      <v-icon size="x-small" icon="mdi-shield" /> {{ inscripcion.ejercitoElegido }}
+
+    <!-- Cómo va la inscripción, solo mientras se puede arreglar -->
+    <div v-if="!terminado && inscripcion.estadoLista" class="text-caption mt-1">
+      <span :class="`text-${lista.color}`">{{ lista.texto }}</span>
+      <span class="text-medium-emphasis"> · </span>
+      <span :class="pagado ? 'text-success' : 'text-warning'">{{ pagado ? "Pagado" : "Sin pagar" }}</span>
+    </div>
+    <div v-if="inscripcion.ejercitoElegido" class="text-caption text-medium-emphasis mt-1">
+      {{ inscripcion.ejercitoElegido }}
     </div>
 
     <v-spacer />
-    <div class="d-flex flex-wrap ga-2 mt-3">
-      <v-btn size="small" variant="tonal" color="primary" :to="`/detalle-torneo/${inscripcion.idTorneo}`">
+    <!-- Los tres en una fila, a partes iguales: sin mayúsculas caben en el móvil -->
+    <div class="d-flex ga-1 mt-3">
+      <v-btn
+        size="small"
+        variant="tonal"
+        class="accion text-none"
+        :to="`/detalle-torneo/${inscripcion.idTorneo}`"
+      >
         Ver evento
       </v-btn>
-      <v-btn size="small" variant="tonal" @click="emit('verInscripcion', inscripcion)">
-        Mi inscripción
+      <v-btn size="small" variant="tonal" class="accion text-none" @click="emit('verInscripcion', inscripcion)">
+        Inscripción
       </v-btn>
-      <v-btn size="small" variant="tonal" :to="rutaResultados">{{ textoResultados }}</v-btn>
+      <v-btn size="small" variant="tonal" class="accion text-none" :to="rutaResultados">
+        {{ textoResultados }}
+      </v-btn>
     </div>
   </v-card>
 </template>
@@ -109,5 +104,10 @@ const rutaResultados = computed(() => {
 <style scoped>
 .nombre {
   overflow-wrap: anywhere;
+}
+.accion {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 4px;
 }
 </style>

@@ -40,6 +40,8 @@ export { primerDia };
 export const estadoLista = (estado?: string | null) => {
   const valor = (estado ?? "").toUpperCase();
   if (valor === "OK") return { texto: "Lista validada", color: "success" };
-  if (valor === "ENTREGADA") return { texto: "Lista entregada", color: "info" };
+  if (valor === "ENTREGADA") return { texto: "Lista entregada", color: "success" };
+  // La ha marcado el organizador: hay que cambiarla
+  if (valor === "ILEGAL") return { texto: "Lista ilegal", color: "error" };
   return { texto: "Lista sin entregar", color: "warning" };
 };
