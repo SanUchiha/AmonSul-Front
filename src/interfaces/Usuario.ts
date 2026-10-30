@@ -38,6 +38,7 @@ export interface EditarUsuarioDTO {
   telefono?: string;
   nickLGDA?: string;
   imagen?: string;
+  permiteNotificaciones?: boolean;
 }
 
 export interface UsuarioViewDTO {
@@ -55,6 +56,8 @@ export interface UsuarioViewDTO {
   telefono?: string;
   nickLGDA?: string;
   imagen?: string;
+  // Si quiere recibir correos de avisos
+  permiteNotificaciones?: boolean;
 }
 
 export interface Jugador {

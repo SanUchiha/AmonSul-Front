@@ -20,6 +20,10 @@ export const formatFechaDB = async (fecha: string): Promise<string> => {
   return formattedDate;
 };
 
+// "AAAA-MM-DD" de una fecha del back; "" si no la hay o es la vacía (0001-01-01) de un DateOnly
+export const fechaConocida = (fecha: string | null | undefined) =>
+  fecha && Number(fecha.slice(0, 4)) > 1900 ? fecha.slice(0, 10) : "";
+
 // Sin fecha devuelve "": hay usuarios sin fecha de nacimiento y el split rompía su perfil
 export const convertirFecha = (dateString: string | null | undefined) => {
   if (!dateString) return "";

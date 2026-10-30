@@ -114,7 +114,8 @@ import { useToast } from "@/composables/useToast";
 import { EstaJugandoDTO } from "./interfaces/Partidas";
 
 const usuariosStore = useUsuariosStore();
-const user = ref<UsuarioViewDTO>({} as UsuarioViewDTO);
+// El del store: si el perfil cambia el avatar, la barra lo ve al momento
+const user = computed<UsuarioViewDTO>(() => usuariosStore.usuario ?? ({} as UsuarioViewDTO));
 const { showToast, toastMessage, toastColor } = useToast();
 
 const { logout, getUser, getidUsuario } = useAuth();
@@ -136,7 +137,6 @@ const handleLogout = async () => {
 const cargarUsuario = async () => {
   try {
     await usuariosStore.requestUsuario(getUser.value);
-    user.value = usuariosStore.usuario;
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
   }
@@ -148,7 +148,7 @@ watch(
     if (nuevoUsuario) {
       cargarUsuario();
     } else {
-      user.value = {} as UsuarioViewDTO;
+      usuariosStore.usuario = {} as UsuarioViewDTO;
     }
   },
   { immediate: true }
