@@ -9,7 +9,7 @@
             :label="`Puntos de ${lado1}`"
             v-model.number="partidaEditada.resultadoUsuario1"
             type="number"
-            :rules="[rules.required, rules.isNumber]"
+            :rules="[rules.required, rules.isNumber, rules.noNegativo]"
           ></v-text-field>
 
           <!-- Puntos del jugador 2 -->
@@ -17,7 +17,7 @@
             :label="`Puntos de ${lado2}`"
             v-model.number="partidaEditada.resultadoUsuario2"
             type="number"
-            :rules="[rules.required, rules.isNumber]"
+            :rules="[rules.required, rules.isNumber, rules.noNegativo]"
           ></v-text-field>
 
           <!-- Selección de escenario -->
@@ -180,6 +180,8 @@ const rules = {
     (value !== null && value !== undefined && value !== "") ||
     "Este campo es obligatorio",
   isNumber: (value: number) => !isNaN(value) || "Debe ser un número",
+  // La base de datos no admite resultados negativos
+  noNegativo: (value: number) => Number(value) >= 0 || "No puede ser negativo",
   isBool: (value: boolean) =>
     value == true || value == false || "Este campo es obligatorio",
 };
