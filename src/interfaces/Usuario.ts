@@ -127,6 +127,8 @@ export interface ClasificacionTorneosDTO {
   idTorneo?: number;
   nombreTorneo: string;
   resultado: number;
+  // Cuántos hay en la clasificación final: el 45 de «3/45»
+  totalJugadores?: number;
 }
 
 export interface UsuarioCambioPassDTO {

@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Avatar por defecto: un Señor Oscuro chibi con ojos de anime y el Anillo -->
+  <defs>
+    <radialGradient id="cielo" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#ffb347"/>
+      <stop offset="0.45" stop-color="#d9461c"/>
+      <stop offset="1" stop-color="#3b0c08"/>
+    </radialGradient>
+    <linearGradient id="acero" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b7180"/>
+      <stop offset="0.55" stop-color="#2c2f38"/>
+      <stop offset="1" stop-color="#15161b"/>
+    </linearGradient>
+    <linearGradient id="pincho" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a909c"/>
+      <stop offset="1" stop-color="#2a2d35"/>
+    </linearGradient>
+    <radialGradient id="ojo" cx="50%" cy="42%" r="62%">
+      <stop offset="0" stop-color="#fff7b8"/>
+      <stop offset="0.4" stop-color="#ffb21e"/>
+      <stop offset="1" stop-color="#d63800"/>
+    </radialGradient>
+    <linearGradient id="oro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff2a6"/>
+      <stop offset="0.5" stop-color="#f2b705"/>
+      <stop offset="1" stop-color="#b37400"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cielo de Mordor y el Orodruin al fondo -->
+  <rect width="256" height="256" fill="url(#cielo)"/>
+  <path d="M0 214 L46 186 L70 194 L104 160 L120 168 L136 160 L170 194 L204 178 L256 204 V256 H0Z" fill="#2a0806" opacity="0.85"/>
+  <path d="M112 162 Q120 150 128 162 Q122 156 112 162Z" fill="#ff7a1a" opacity="0.9"/>
+
+  <!-- Cuerpo pequeño con hombreras de pinchos -->
+  <path d="M74 256 C76 214 98 196 128 196 C158 196 180 214 182 256Z" fill="url(#acero)"/>
+  <path d="M78 222 L56 204 L84 208Z" fill="url(#pincho)"/>
+  <path d="M178 222 L200 204 L172 208Z" fill="url(#pincho)"/>
+  <path d="M120 206 L128 226 L136 206Z" fill="#f2b705" opacity="0.8"/>
+
+  <!-- Corona de pinchos del yelmo -->
+  <path d="M120 74 L128 14 L136 74Z" fill="url(#pincho)"/>
+  <path d="M104 80 L90 26 L116 74Z" fill="url(#pincho)"/>
+  <path d="M152 80 L166 26 L140 74Z" fill="url(#pincho)"/>
+  <path d="M90 94 L60 50 L100 84Z" fill="url(#pincho)"/>
+  <path d="M166 94 L196 50 L156 84Z" fill="url(#pincho)"/>
+  <path d="M84 112 L50 88 L90 100Z" fill="url(#pincho)"/>
+  <path d="M172 112 L206 88 L166 100Z" fill="url(#pincho)"/>
+
+  <!-- Yelmo enorme, como debe ser en un chibi -->
+  <path d="M78 124 C78 84 102 68 128 68 C154 68 178 84 178 124 L174 178 C162 198 94 198 82 178Z" fill="url(#acero)"/>
+  <path d="M96 84 C108 74 124 72 136 74" stroke="#9aa1ad" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Hueco de la cara -->
+  <path d="M96 116 C96 106 160 106 160 116 L156 162 C146 176 110 176 100 162Z" fill="#140607"/>
+
+  <!-- Ojos de anime: grandes, brillantes y con pupila de gato -->
+  <ellipse cx="114" cy="135" rx="12" ry="15" fill="url(#ojo)"/>
+  <ellipse cx="142" cy="135" rx="12" ry="15" fill="url(#ojo)"/>
+  <ellipse cx="114" cy="137" rx="3" ry="11" fill="#1a0400"/>
+  <ellipse cx="142" cy="137" rx="3" ry="11" fill="#1a0400"/>
+  <circle cx="109" cy="128" r="4.5" fill="#fff"/>
+  <circle cx="137" cy="128" r="4.5" fill="#fff"/>
+  <circle cx="118" cy="143" r="2" fill="#fff"/>
+  <circle cx="146" cy="143" r="2" fill="#fff"/>
+
+  <!-- Coloretes y boquita: el terror de la Tierra Media, pero adorable -->
+  <ellipse cx="104" cy="155" rx="6" ry="3" fill="#ff6b8a" opacity="0.75"/>
+  <ellipse cx="152" cy="155" rx="6" ry="3" fill="#ff6b8a" opacity="0.75"/>
+  <path d="M121 157 q3.5 4 7 0 q3.5 4 7 0" stroke="#ffb21e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Gota de sudor: ha perdido algo -->
+  <path d="M184 120 C178 132 178 140 184 142 C190 140 190 132 184 120Z" fill="#8fd3ff" stroke="#3b8fd1" stroke-width="2"/>
+
+  <!-- El Anillo, bien alto en su puño -->
+  <path d="M164 222 C172 214 182 214 186 222" stroke="#2c2f38" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <circle cx="188" cy="222" r="15" fill="url(#acero)"/>
+  <path d="M177 214 q5 -5 10 0 M187 214 q5 -5 10 0" stroke="#15161b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <circle cx="188" cy="195" r="11" fill="none" stroke="url(#oro)" stroke-width="6"/>
+  <path d="M206 172 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3Z" fill="#fff7b8"/>
+  <path d="M168 178 l2 4 l4 2 l-4 2 l-2 4 l-2 -4 l-4 -2 l4 -2Z" fill="#fff7b8"/>
+</svg>

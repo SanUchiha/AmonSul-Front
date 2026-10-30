@@ -6,46 +6,56 @@
           <LoadingGandalf />
         </div>
         <div v-else>
-          <v-tabs v-model="tab" color="primary" grow>
-            <v-tab value="1">Perfil</v-tab>
-            <v-tab value="2">Amistosas </v-tab>
-            <v-tab value="3">Torneos </v-tab>
+          <!-- Lo esencial, siempre a la vista -->
+          <CabeceraJugador :usuario="usuarioData" :partidas="partidas" />
+
+          <v-tabs v-model="tab" color="primary" grow show-arrows>
+            <v-tab value="1">Resumen</v-tab>
+            <v-tab value="2">Amistosas</v-tab>
+            <v-tab value="3">Eventos</v-tab>
             <v-tab value="4">Resultados</v-tab>
           </v-tabs>
 
           <v-window v-model="tab">
             <v-window-item value="1">
-              <PerfilUsuarioView
-                :email="usuarioData.email"
-                :editable="false"
-              ></PerfilUsuarioView>
+              <div class="pa-2">
+                <ResumenJugador
+                  :usuario="usuarioData"
+                  :partidas="partidas"
+                  :idUsuarioQueMira="idUsuarioQueMira"
+                />
+              </div>
             </v-window-item>
 
             <v-window-item value="2">
-              <DetalleJugadorPartidasAmistosas
-                :isLoading="isLoading"
-                :amistosasMatches="validMatches"
-                :idUsuario="usuarioData.idUsuario"
-                :usuarioData="usuarioData"
-              />
+              <div class="pa-2">
+                <PartidasJugador
+                  :partidas="partidas"
+                  origen="amistosa"
+                  :idUsuario="usuarioData.idUsuario"
+                />
+              </div>
             </v-window-item>
 
             <v-window-item value="3">
-              <DetalleJugadorPartidasTorneo
-                :isLoading="isLoading"
-                :tournamentMatches="tournamentMatches"
-                :idUsuario="usuarioData.idUsuario"
-                :usuarioData="usuarioData"
-              />
+              <div class="pa-2">
+                <PartidasJugador
+                  :partidas="partidas"
+                  origen="torneo"
+                  :idUsuario="usuarioData.idUsuario"
+                />
+              </div>
             </v-window-item>
 
             <v-window-item value="4">
+              <div class="pa-2">
               <TablaTorneosDisputados
                 :clasificacionTorneos="usuarioData.clasificacionTorneos"
                 :tournamentMatches="tournamentMatches"
                 :idUsuario="usuarioData.idUsuario"
                 :isLoading="isLoadingTournamentMatches"
               />
+              </div>
             </v-window-item>
           </v-window>
         </div>
@@ -69,7 +79,10 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, ComputedRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
+import CabeceraJugador from "@/components/DetalleJugador/CabeceraJugador.vue";
+import ResumenJugador from "@/components/DetalleJugador/ResumenJugador.vue";
+import { partidasJugadas } from "@/utils/historialJugador";
+import { useAuth } from "@/composables/useAuth";
 import {
   ViewPartidaAmistosaDTO,
   ViewPartidaTorneoDTO,
@@ -77,12 +90,11 @@ import {
 import { UsuarioDataDTO } from "@/interfaces/Usuario";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { useUsuariosStore } from "@/store/usuarios";
-import DetalleJugadorPartidasAmistosas from "@/components/DetalleJugador/DetalleJugadorPartidasAmistosas.vue";
-import DetalleJugadorPartidasTorneo from "@/components/DetalleJugador/DetalleJugadorPartidasTorneo.vue";
+import PartidasJugador from "@/components/DetalleJugador/PartidasJugador.vue";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import TablaTorneosDisputados from "@/components/DetalleJugador/TablaTorneosDisputados.vue";
 
-const tab = ref<string>("one");
+const tab = ref<string>("1");
 const usuariosStore = useUsuariosStore();
 
 const isLoading = ref(true);
@@ -97,6 +109,17 @@ const usuarioData: ComputedRef<UsuarioDataDTO> = computed(
 const pendingMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const validMatches = ref<ViewPartidaAmistosaDTO[]>([]);
 const tournamentMatches = ref<ViewPartidaTorneoDTO[]>([]);
+
+// Torneo y amistosas juntas, solo las jugadas: para la cabecera y el resumen
+const partidas = computed(() =>
+  usuarioData.value?.idUsuario
+    ? partidasJugadas(usuarioData.value.idUsuario, tournamentMatches.value, validMatches.value)
+    : []
+);
+const { getidUsuario } = useAuth();
+const idUsuarioQueMira = computed(() =>
+  getidUsuario.value ? Number(getidUsuario.value) : null
+);
 
 const cargarPartidasTorneos = async () => {
   try {

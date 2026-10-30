@@ -17,10 +17,12 @@
             :smooth="radius || false"
             :stroke-linecap="lineCap"
             :type="type"
+            :label-size="11"
             auto-draw
           >
+            <!-- Con muchos cambios los números se pisan: solo los que importan -->
             <template v-slot:label="item">
-              {{ item.value }}
+              {{ indicesConEtiqueta.has(item.index) ? item.value : "" }}
             </template>
           </v-sparkline>
         </v-sheet>
@@ -38,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from "vue";
+import { computed, defineProps, onMounted, ref, watch } from "vue";
 import { getEloUsuario } from "@/services/EloService";
 import ProgressCircular from "../Commons/ProgressCircular.vue";
 
@@ -58,7 +60,8 @@ const gradients = ref<string[][]>([
 const value = ref<number[]>([]);
 const width = ref<number>(2);
 const radius = ref<number>(10);
-const padding = ref<number>(8);
+// Con margen: las etiquetas de los extremos no se cortan
+const padding = ref<number>(16);
 const lineCap = ref<string>("round");
 const gradient = ref<string[]>(gradients.value[5]);
 const gradientDirection = ref<string>("top");
@@ -70,7 +73,26 @@ const mejorResultado = ref<number>();
 const peorResultado = ref<number>();
 const resultadoActual = ref<number>();
 
-onMounted(async () => {
+// Las etiquetas que se enseñan: el actual, el mejor, el peor y el primero, por ese orden, y ninguna demasiado cerca
+// de otra ya puesta
+const indicesConEtiqueta = computed(() => {
+  const elos = value.value;
+  const elegidos = new Set<number>();
+  if (elos.length === 0) return elegidos;
+  const separacion = Math.max(1, Math.floor(elos.length / 8));
+  const candidatos = [
+    elos.length - 1,
+    elos.indexOf(Math.max(...elos)),
+    elos.indexOf(Math.min(...elos)),
+    0,
+  ];
+  for (const indice of candidatos)
+    if ([...elegidos].every(otro => Math.abs(otro - indice) >= separacion))
+      elegidos.add(indice);
+  return elegidos;
+});
+
+async function cargar() {
   if (props.idUsuario != undefined) {
     try {
       isLoading.value = true;
@@ -94,7 +116,16 @@ onMounted(async () => {
   } else {
     isLoading.value = false;
   }
-});
+}
+
+onMounted(cargar);
+// En la ficha de jugador la vista se reutiliza al pasar de uno a otro
+watch(
+  () => props.idUsuario,
+  (nuevo, anterior) => {
+    if (nuevo !== anterior) cargar();
+  }
+);
 </script>
 
 <style scoped></style>

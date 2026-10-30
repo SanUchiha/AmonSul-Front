@@ -124,6 +124,9 @@ export interface ViewPartidaTorneoDTO {
   puntosPartida: number;
   ganadorPartidaTorneo: number;
   ganadorPartidaNick?: string;
+  // Solo cuenta como jugada si la han validado los dos
+  partidaValidadaUsuario1?: boolean | null;
+  partidaValidadaUsuario2?: boolean | null;
   esTorneo: boolean;
   ejercitoUsuario1?: string;
   ejercitoUsuario2?: string;

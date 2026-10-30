@@ -1,84 +1,111 @@
 <template>
-  <v-card class="section-card stats-section pt-0 mt-0">
-    <v-col cols="12">
-      <p class="text-h5 ringbearer">Resultados en Torneos</p>
-    </v-col>
-    <v-divider></v-divider>
-    <v-data-table
-      :headers="headers"
-      :items="resumenTorneos"
-      :loading="isLoading"
-      class="elevation-1"
-      :items-per-page="10"
-      :search="search"
-      no-data-text="No ha jugado torneos"
+  <div class="text-left">
+    <div v-if="isLoading" class="d-flex justify-center pa-6">
+      <v-progress-circular indeterminate color="primary" />
+    </div>
+    <p
+      v-else-if="resumenTorneos.length === 0"
+      class="text-body-2 text-medium-emphasis my-4 text-center"
     >
-      <template #top>
-        <v-text-field
-          v-model="search"
-          label="Buscar torneo"
-          class="mx-4 my-2"
-          clearable
-        />
-      </template>
-      <template v-slot:item="{ item }">
-        <tr @click="toggleExpand(item.clave)" class="clickable-row">
-          <td class="nombre-torneo">{{ item.nombreTorneo }}</td>
-          <td class="text-center px-1">
-            <v-chip
-              v-if="item.posicion !== null"
-              :color="colorPosicion(item.posicion)"
-              prepend-icon="mdi-trophy"
-              variant="flat"
-              size="small"
-            >
-              {{ item.posicion }}º
-            </v-chip>
-            <span v-else class="text-medium-emphasis">-</span>
-          </td>
-          <td class="text-right px-1">
-            <v-icon>
-              {{
-                expanded.includes(item.clave)
-                  ? "mdi-chevron-up"
-                  : "mdi-chevron-down"
-              }}
-            </v-icon>
-          </td>
-        </tr>
+      Aún no ha jugado ningún evento.
+    </p>
+    <template v-else>
+      <!-- Filtros: los chips se envuelven en móvil -->
+      <v-chip-group
+        v-if="formatos.length > 1"
+        v-model="filtroFormato"
+        mandatory
+        column
+        selected-class="text-primary"
+      >
+        <v-chip value="todos" size="small" filter>Todos ({{ resumenTorneos.length }})</v-chip>
+        <v-chip v-for="f in formatos" :key="f" :value="f" size="small" filter>
+          {{ plural(f) }} ({{ resumenTorneos.filter(t => t.formato === f).length }})
+        </v-chip>
+      </v-chip-group>
+      <v-text-field
+        v-model="search"
+        label="Buscar evento"
+        prepend-inner-icon="mdi-magnify"
+        density="compact"
+        clearable
+        hide-details
+        class="mt-1 mb-3"
+      />
 
-        <!-- Expandido: resultados del jugador en el torneo -->
-        <tr v-if="expanded.includes(item.clave)">
-          <td colspan="3" class="py-3">
+      <p v-if="filtrados.length === 0" class="text-body-2 text-medium-emphasis text-center my-4">
+        No hay eventos con estos filtros.
+      </p>
+      <v-card
+        v-for="item in visibles"
+        :key="item.clave"
+        variant="outlined"
+        class="mb-2"
+      >
+        <!-- Pulsando se despliega su actuación -->
+        <div class="pa-3 d-flex align-center ga-2 clickable-row" @click="toggleExpand(item.clave)">
+          <div class="flex-grow-1 min-w-0">
+            <div class="text-body-2 font-weight-bold nombre-torneo">{{ item.nombreTorneo }}</div>
+            <div class="text-caption text-medium-emphasis">
+              {{ item.formato }}<template v-if="item.ultimaFecha"> · {{ fecha(item.ultimaFecha) }}</template>
+              <template v-if="item.jugadas">
+                · {{ item.victorias }}-{{ item.empates }}-{{ item.derrotas }}
+              </template>
+            </div>
+          </div>
+          <v-chip
+            v-if="item.posicion !== null"
+            :color="colorPosicion(item.posicion)"
+            variant="flat"
+            size="small"
+            class="flex-shrink-0"
+          >
+            {{ textoPosicion(item.posicion, item.totalJugadores) }}
+          </v-chip>
+          <span v-else class="text-caption text-medium-emphasis">Sin posición</span>
+          <v-icon size="small">
+            {{ expanded.includes(item.clave) ? "mdi-chevron-up" : "mdi-chevron-down" }}
+          </v-icon>
+        </div>
+        <v-expand-transition>
+          <div v-show="expanded.includes(item.clave)" class="px-3 pb-3">
             <div class="d-flex flex-wrap ga-2">
               <v-chip
+                v-if="item.jugadas"
                 color="primary"
                 variant="flat"
+                size="small"
                 prepend-icon="mdi-sword-cross"
                 append-icon="mdi-chevron-right"
                 @click.stop="abrirPartidas(item)"
               >
-                {{ item.jugadas }} partidas
+                {{ item.jugadas }} {{ item.jugadas === 1 ? "partida" : "partidas" }}
               </v-chip>
               <!-- Fondo sólido y texto blanco: en tonal el texto de color apenas contrasta en tema oscuro -->
-              <v-chip variant="flat" color="green-darken-2">
+              <v-chip variant="flat" color="green-darken-2" size="small">
                 {{ item.victorias }} V
               </v-chip>
-              <v-chip>{{ item.empates }} E</v-chip>
-              <v-chip variant="flat" color="red-darken-2">
+              <v-chip size="small">{{ item.empates }} E</v-chip>
+              <v-chip variant="flat" color="red-darken-2" size="small">
                 {{ item.derrotas }} D
               </v-chip>
-              <v-chip>{{ item.puntosFavor }} pts a favor</v-chip>
-              <v-chip>{{ item.puntosContra }} pts en contra</v-chip>
-              <v-chip v-if="item.ejercito !== '-'" prepend-icon="mdi-shield">
+              <v-chip size="small">{{ item.puntosFavor }} pts a favor</v-chip>
+              <v-chip size="small">{{ item.puntosContra }} pts en contra</v-chip>
+              <v-chip v-if="item.ejercito !== '-'" size="small" prepend-icon="mdi-shield">
                 {{ item.ejercito }}
               </v-chip>
             </div>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
-  </v-card>
+          </div>
+        </v-expand-transition>
+      </v-card>
+      <!-- Por tandas: con muchos eventos la lista no se hace eterna -->
+      <div v-if="filtrados.length > visibles.length" class="text-center mt-2">
+        <v-btn variant="tonal" size="small" @click="cuantosVer += TANDA">
+          Ver más ({{ filtrados.length - visibles.length }})
+        </v-btn>
+      </div>
+    </template>
+  </div>
 
   <!-- Modal partidas del torneo: pantalla completa en móvil -->
   <v-dialog
@@ -144,11 +171,17 @@ import {
 } from "@/utils/partidaParejas";
 import { ClasificacionTorneosDTO } from "@/interfaces/Usuario";
 import CardPartidaTorneo from "../PartidasTorneo/CardPartidaTorneo.vue";
+import { nombreEvento } from "@/Constant/FormatoTorneo";
+import { compararPartidasTorneo, textoPosicion } from "@/utils/historialJugador";
 
 interface ResumenTorneo {
   clave: string;
   nombreTorneo: string;
+  // Torneo, Liga o Copa
+  formato: string;
   posicion: number | null;
+  // Cuántos hay en la clasificación final
+  totalJugadores: number | null;
   partidas: ViewPartidaTorneoDTO[];
   jugadas: number;
   victorias: number;
@@ -168,18 +201,20 @@ const props = defineProps<{
   isLoading?: boolean;
 }>();
 
-const search = ref("");
+const search = ref<string | null>("");
 const expanded = ref<string[]>([]);
 const showPartidas = ref<boolean>(false);
 const torneoSeleccionado = ref<ResumenTorneo | null>(null);
 const { xs } = useDisplay();
 const route = useRoute();
 
-const headers = [
-  { title: "Torneo", key: "nombreTorneo" },
-  { title: "Pos", key: "posicion", align: "center" as const },
-  { title: "", key: "expandir", sortable: false },
-];
+const TANDA = 10;
+const cuantosVer = ref(TANDA);
+const filtroFormato = ref<string>("todos");
+const fecha = (ms: number) => new Date(ms).toLocaleDateString("es-ES");
+const plural = (nombre: string) => (nombre === "Torneo" ? "Torneos" : `${nombre}s`);
+const normalizar = (texto: string) =>
+  texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 const toggleExpand = (clave: string) => {
   expanded.value = expanded.value.includes(clave)
@@ -192,14 +227,20 @@ const abrirPartidas = (torneo: ResumenTorneo) => {
   showPartidas.value = true;
 };
 
-// Al pulsar un nick en una partida se navega a otro jugador: cerrar el modal
+// Al pulsar un nick en una partida se navega a otro jugador: cerrar el modal y empezar de cero
 watch(
   () => route.params.idUsuario,
   () => {
     showPartidas.value = false;
     expanded.value = [];
+    filtroFormato.value = "todos";
+    search.value = "";
+    cuantosVer.value = TANDA;
   }
 );
+watch([filtroFormato, search], () => {
+  cuantosVer.value = TANDA;
+});
 
 // Agrupa por idTorneo; si el back aún no lo envía, por nombre
 const claveTorneo = (idTorneo?: number, nombreTorneo?: string) =>
@@ -208,7 +249,9 @@ const claveTorneo = (idTorneo?: number, nombreTorneo?: string) =>
 const nuevoResumen = (clave: string, nombreTorneo: string): ResumenTorneo => ({
   clave,
   nombreTorneo,
+  formato: "Torneo",
   posicion: null,
+  totalJugadores: null,
   partidas: [],
   jugadas: 0,
   victorias: 0,
@@ -264,6 +307,7 @@ const resumenTorneos = computed<ResumenTorneo[]>(() => {
       : partida.resultadoUsuario1;
 
     fila.partidas.push(partida);
+    fila.formato = nombreEvento(partida.formatoTorneo);
     fila.jugadas++;
     fila.puntosFavor += propios;
     fila.puntosContra += rival;
@@ -288,24 +332,30 @@ const resumenTorneos = computed<ResumenTorneo[]>(() => {
   });
 
   // En el modal, las partidas en orden de juego
-  const fechaPartida = (p: ViewPartidaTorneoDTO) =>
-    p.fechaPartida ? new Date(p.fechaPartida).getTime() : 0;
-  resumen.forEach(fila =>
-    fila.partidas.sort(
-      (a, b) =>
-        fechaPartida(a) - fechaPartida(b) || a.idPartidaTorneo - b.idPartidaTorneo
-    )
-  );
+  resumen.forEach(fila => fila.partidas.sort(compararPartidasTorneo));
 
   // La posición viene de la clasificación guardada al cerrar el torneo
   (props.clasificacionTorneos ?? []).forEach(clasificacion => {
     const clave = claveTorneo(clasificacion.idTorneo, clasificacion.nombreTorneo);
-    obtenerFila(clave, clasificacion.nombreTorneo).posicion =
-      clasificacion.resultado;
+    const fila = obtenerFila(clave, clasificacion.nombreTorneo);
+    fila.posicion = clasificacion.resultado;
+    fila.totalJugadores = clasificacion.totalJugadores ?? null;
   });
 
   return [...resumen.values()].sort((a, b) => b.ultimaFecha - a.ultimaFecha);
 });
+
+// Torneo, Liga o Copa: el filtro solo sale si ha jugado más de uno
+const formatos = computed(() => [...new Set(resumenTorneos.value.map(t => t.formato))]);
+const filtrados = computed(() => {
+  const texto = normalizar(search.value ?? "").trim();
+  return resumenTorneos.value.filter(
+    t =>
+      (filtroFormato.value === "todos" || t.formato === filtroFormato.value) &&
+      (!texto || normalizar(t.nombreTorneo).includes(texto))
+  );
+});
+const visibles = computed(() => filtrados.value.slice(0, cuantosVer.value));
 
 const colorPosicion = (posicion: number) => {
   if (posicion === 1) return "amber-darken-2";
