@@ -1,260 +1,197 @@
 <template>
   <!-- Tabla inscritos -->
 
+  <!-- Inscritos en tarjetas, como en la gestión de un torneo con una lista -->
   <v-card flat>
-    <v-card-title class="d-flex align-center pe-2">
-      Inscritos
-      <v-spacer></v-spacer>
+    <div class="text-left px-3 pt-3">
+      <!-- Justo encima de los inscritos -->
+      <v-btn variant="tonal" color="secondary" block class="mb-3" @click="openAddJugadorModal">
+        Añadir jugador
+      </v-btn>
+      <h3 class="text-subtitle-1 font-weight-bold mb-2">Inscritos ({{ localInscripciones.length }})</h3>
       <v-text-field
         v-model="search"
         density="compact"
-        label="Buscar"
+        label="Buscar jugador"
         prepend-inner-icon="mdi-magnify"
-        variant="solo-filled"
-        flat
+        clearable
         hide-details
-        single-line
+        class="mb-2"
       />
-    </v-card-title>
+      <!-- A quién falta reclamarle algo, de un toque -->
+      <v-chip-group v-model="filtro" mandatory column selected-class="text-primary" class="mb-1">
+        <v-chip value="todos" size="small" filter>Todos ({{ localInscripciones.length }})</v-chip>
+        <v-chip value="faltanListas" size="small" filter>Faltan listas ({{ faltanListas.length }})</v-chip>
+        <v-chip value="sinPagar" size="small" filter>Sin pagar ({{ sinPagar.length }})</v-chip>
+      </v-chip-group>
+    </div>
 
-    <v-divider></v-divider>
-
-    <div v-if="isLoading" class="text-center pa-4">
+    <div v-if="isLoading && localInscripciones.length === 0" class="text-center pa-4">
       Cargando inscripciones...
     </div>
-
-    <div
-      v-else-if="!isLoading && localInscripciones.length === 0"
-      class="text-center pa-4"
-    >
+    <div v-else-if="localInscripciones.length === 0" class="text-center pa-4">
       No hay inscripciones para este torneo
     </div>
-
-    <v-data-table
-      v-else
-      v-model:search="search"
-      :items="localInscripciones"
-      :headers="headers"
-      class="custom-table"
-      item-key="nick"
-    >
-      <template v-slot:item="{ item }">
-        <tr :class="{ 'expanded-row': expandedRows[item.idInscripcion] }">
-          <!-- nick -->
-          <td>
-            {{ item.nick }}
-            <v-btn icon @click.stop="toggleExpand(item.idInscripcion)">
-              <v-icon>
-                {{
-                  expandedRows[item.idInscripcion]
-                    ? "mdi-chevron-up"
-                    : "mdi-chevron-down"
-                }}
-              </v-icon>
-            </v-btn>
-          </td>
-
-          <!-- fecha de la inscripcion -->
-          <td>
-            <v-chip
-              :color="
-                chipColor(
-                  item.fechaInscripcion,
-                  torneo?.torneo.fechaFinInscripcion
-                )
-              "
-              dark
-            >
-              {{ formattedDate(item.fechaInscripcion) }}
-            </v-chip>
-          </td>
-
-          <!-- numero de listas entregadas -->
-          <td>
-            <v-chip
-              :color="
-                chipNumeroListasColor(
-                  item.countListasEntregadas,
-                  torneo.torneo.listasPorJugador
-                )
-              "
-              dark
-            >
-              {{ item.countListasEntregadas }}/{{
-                torneo.torneo.listasPorJugador
-              }}
-            </v-chip>
-          </td>
-
-          <!-- fecha ultima entrega de la lista -->
-          <td>
-            <v-chip
-              :color="
-                chipColor(
-                  item.fechaUltimaEntrega,
-                  torneo?.torneo.fechaEntregaListas
-                )
-              "
-              dark
-            >
-              {{ formattedDate(item.fechaUltimaEntrega) }}
-            </v-chip>
-          </td>
-
-          <!-- estado del pago -->
-          <td>
-            <span :class="item.esPago === 'SI' ? 'text-success' : 'text-error'">
-              {{ item.esPago }}
+    <div v-else-if="visibles.length === 0" class="text-center text-medium-emphasis pa-4">
+      Nadie con estos filtros
+    </div>
+    <v-row v-else dense class="px-2">
+      <v-col v-for="item in visibles" :key="item.idInscripcion" cols="12" sm="6" lg="4">
+        <!-- Pulsando la tarjeta se despliegan sus listas -->
+        <v-card
+          v-ripple
+          variant="outlined"
+          class="pa-3 text-left tarjeta"
+          role="button"
+          tabindex="0"
+          @click="toggleExpand(item.idInscripcion)"
+          @keydown.enter="toggleExpand(item.idInscripcion)"
+        >
+          <div class="d-flex align-center ga-2">
+            <span class="text-body-1 font-weight-bold flex-grow-1 texto-largo">{{ item.nick }}</span>
+            <v-menu>
+              <template #activator="{ props: menuProps }">
+                <v-btn
+                  icon="mdi-dots-vertical"
+                  variant="text"
+                  size="small"
+                  density="comfortable"
+                  aria-label="Más acciones"
+                  v-bind="menuProps"
+                  @click.stop
+                />
+              </template>
+              <v-list density="compact">
+                <v-list-item
+                  prepend-icon="mdi-cash-sync"
+                  :title="item.esPago === 'SI' ? 'Marcar como sin pagar' : 'Marcar como pagado'"
+                  @click="updatePago(item.idInscripcion, item.esPago)"
+                />
+                <v-list-item
+                  prepend-icon="mdi-delete"
+                  base-color="error"
+                  title="Eliminar inscripción"
+                  @click="borrar = item"
+                />
+              </v-list>
+            </v-menu>
+          </div>
+          <!-- El correo, para escribirle: se abre la aplicación de correo sin desplegar -->
+          <a
+            v-if="item.email"
+            :href="`mailto:${item.email}`"
+            class="d-block text-caption text-medium-emphasis texto-largo email"
+            @click.stop
+          >
+            {{ item.email }}
+          </a>
+          <div class="text-body-2">
+            <span :class="item.countListasEntregadas >= torneo.torneo.listasPorJugador ? 'text-success' : 'text-warning'">
+              {{ item.countListasEntregadas }}/{{ torneo.torneo.listasPorJugador }} listas entregadas
             </span>
-            <v-icon
-              @click="updatePago(item.idInscripcion, item.esPago)"
-              class="ml-2 cursor-pointer"
-            >
-              mdi-swap-horizontal
-            </v-icon>
-          </td>
+            <span class="text-medium-emphasis"> · </span>
+            <span :class="item.esPago === 'SI' ? 'text-success' : 'text-warning'">
+              {{ item.esPago === "SI" ? "Pagado" : "Sin pagar" }}
+            </span>
+          </div>
+          <!-- Las fechas, en amarillo si llegaron fuera de plazo -->
+          <div class="text-caption text-medium-emphasis">
+            <span :class="{ 'text-warning': tarde(item.fechaInscripcion, torneo?.torneo.fechaFinInscripcion) }">
+              Inscrito {{ formattedDate(item.fechaInscripcion) }}
+            </span>
+            <template v-if="item.fechaUltimaEntrega">
+              ·
+              <span :class="{ 'text-warning': tarde(item.fechaUltimaEntrega, torneo?.torneo.fechaEntregaListas) }">
+                Última lista {{ formattedDate(item.fechaUltimaEntrega) }}
+              </span>
+            </template>
+          </div>
+          <div class="text-caption text-medium-emphasis mt-1">
+            {{ expandedRows[item.idInscripcion] ? "Ocultar listas" : "Ver listas" }}
+            <v-icon size="small" :icon="expandedRows[item.idInscripcion] ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+          </div>
 
-          <!-- eliminar inscripcion -->
-          <td>
-            <v-icon
-              @click="handleEliminarInscripcion(item.idInscripcion)"
-              class="ml-2 cursor-pointer"
-              color="red"
-            >
-              mdi-delete
-            </v-icon>
-          </td>
-        </tr>
-
-        <!-- Fila expandida con slots -->
-        <tr v-if="expandedRows[item.idInscripcion]">
-          <td colspan="5">
-            <div
-              v-for="n in torneo.torneo.listasPorJugador"
-              :key="'slot-' + n"
-              class="expanded-content"
-            >
-              <slot :name="'expanded-content-' + n" :item="item">
-                <!-- Contenido por defecto si no se pasa un slot -->
-                <v-table class="mt-2">
-                  <thead>
-                    <tr>
-                      <th class="text-center">ID</th>
-                      <th class="text-center">Fecha de entrega</th>
-                      <th class="text-center">Estado</th>
-                      <th class="text-center">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        {{ n }}
-                      </td>
-                      <td>
-                        <v-chip
-                          v-if="item.lista[n - 1]"
-                          :color="
-                            chipColor(
-                              item.lista[n - 1].fechaEntrega,
-                              torneo?.torneo.fechaEntregaListas
-                            )
-                          "
-                          dark
-                        >
-                          {{ formattedDate(item.lista[n - 1].fechaEntrega) }}
-                        </v-chip>
-
-                        <v-btn
-                          v-if="!item.lista[n - 1]"
-                          color="primary"
-                          variant="tonal"
-                          @click="
-                            handleAddLista(
-                              item.idInscripcion,
-                              item.idUsuario,
-                              item.idTorneo
-                            )
-                          "
-                          >subir lista</v-btn
-                        >
-                      </td>
-                      <td>
-                        <v-select
-                          v-if="item.lista[n - 1]"
-                          :items="ESTADOS_LISTA"
-                          v-model="item.lista[n - 1].estadoLista"
-                          item-title="corto"
-                          item-value="valor"
-                          @update:modelValue="
-                            (value: string) =>
-                              updateEstado(
-                                item.lista[n - 1].idLista,
-                                value,
-                                item.idTorneo, 
-                                item.idUsuario
-                              )
-                          "
-                          chips
-                        >
-                        </v-select>
-                      </td>
-
-                      <td>
-                        <v-btn
-                          v-if="item.lista[n - 1]"
-                          icon
-                          @click.stop="verLista(item.lista[n - 1], item.nick)"
-                        >
-                          <v-icon>mdi-eye</v-icon>
-                        </v-btn>
-
-                        <v-btn
-                          v-if="item.lista[n - 1]"
-                          icon
-                          @click.stop="
-                            handleEditLista(
-                              item.lista[n - 1],
-                              item.idTorneo,
-                              item.idUsuario
-                            )
-                          "
-                        >
-                          <v-icon>mdi-file-edit</v-icon>
-                        </v-btn>
-                      </td>
-                    </tr>
-                  </tbody>
-                </v-table>
-              </slot>
+          <!-- Sus listas: cada una con su estado, que el organizador puede cambiar, y sus acciones -->
+          <v-expand-transition>
+            <div v-if="expandedRows[item.idInscripcion]" @click.stop>
+              <v-card v-for="n in torneo.torneo.listasPorJugador" :key="n" variant="tonal" class="pa-2 mt-2">
+                <div class="text-body-2 font-weight-bold">Lista {{ n }}</div>
+                <template v-if="item.lista[n - 1]">
+                  <div class="text-body-2">
+                    <span v-if="item.lista[n - 1].ejercito" class="text-medium-emphasis">
+                      {{ item.lista[n - 1].ejercito }} ·
+                    </span>
+                    <span :class="`text-${estadoLista(item.lista[n - 1].estadoLista).color}`">
+                      {{ estadoLista(item.lista[n - 1].estadoLista).texto }}
+                    </span>
+                    <span v-if="bandoLista(item.lista[n - 1].bando)" class="text-medium-emphasis text-no-wrap">
+                      · {{ bandoLista(item.lista[n - 1].bando)!.texto }}
+                    </span>
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    <span :class="{ 'text-warning': tarde(item.lista[n - 1].fechaEntrega, torneo?.torneo.fechaEntregaListas) }">
+                      Entregada {{ formattedDate(item.lista[n - 1].fechaEntrega) }}
+                    </span>
+                  </div>
+                  <v-select
+                    :items="ESTADOS_LISTA"
+                    v-model="item.lista[n - 1].estadoLista"
+                    item-title="corto"
+                    item-value="valor"
+                    label="Estado"
+                    density="compact"
+                    hide-details
+                    class="mt-2"
+                    @update:modelValue="
+                      (value: string) => updateEstado(item.lista[n - 1].idLista, value, item.idTorneo, item.idUsuario)
+                    "
+                  />
+                  <div class="d-flex ga-1 mt-2">
+                    <v-btn size="small" variant="tonal" class="accion text-none" @click="verLista(item.lista[n - 1], item.nick)">
+                      Ver lista
+                    </v-btn>
+                    <v-btn
+                      size="small"
+                      variant="tonal"
+                      class="accion text-none"
+                      @click="handleEditLista(item.lista[n - 1], item.idTorneo, item.idUsuario)"
+                    >
+                      Cambiar lista
+                    </v-btn>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="text-body-2 text-warning">Lista sin entregar</div>
+                  <div class="d-flex mt-2">
+                    <v-btn
+                      size="small"
+                      variant="tonal"
+                      class="accion text-none"
+                      @click="handleAddLista(item.idInscripcion, item.idUsuario, item.idTorneo)"
+                    >
+                      Subir lista
+                    </v-btn>
+                  </div>
+                </template>
+              </v-card>
             </div>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
-
-    <!-- boton para generar los pairing pasandole el id del torneo -->
-    <v-row justify="center" class="my-4 ga-5">
-      <v-btn
-        variant="tonal"
-        @click="openAddJugadorModal"
-        color="secondary"
-        size="large"
-      >
-        Añadir Jugador
-      </v-btn>
-      <v-btn
-        variant="tonal"
-        @click="handlerModalGenerarRonda1"
-        color="primary"
-        size="large"
-      >
-        Generar Ronda 1
-      </v-btn>
-
-      <v-btn variant="tonal" @click="openSorteo" color="primary" size="large">
-        Sorteo
-      </v-btn>
+          </v-expand-transition>
+        </v-card>
+      </v-col>
     </v-row>
+
+    <!-- Borrar una inscripción no tiene vuelta atrás: mejor preguntarlo -->
+    <v-dialog :model-value="!!borrar" max-width="400" @update:model-value="borrar = null">
+      <v-card v-if="borrar">
+        <v-card-title class="text-wrap">¿Eliminar la inscripción de {{ borrar.nick }}?</v-card-title>
+        <v-card-text>Se borran su inscripción y sus listas en este torneo. Esta acción no se puede deshacer.</v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="borrar = null">Volver</v-btn>
+          <v-btn color="error" variant="flat" @click="confirmarBorrar">Eliminar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <ModalParametrosPrimeraRondaMas
       v-if="torneo.torneo.idTorneo"
@@ -391,7 +328,7 @@
 </template>
 
 <script setup lang="ts">
-import { ESTADOS_LISTA } from "@/utils/estadoLista";
+import { bandoLista, ESTADOS_LISTA, estadoLista } from "@/utils/estadoLista";
 import { ref, computed, watch, defineEmits } from "vue";
 import { defineProps } from "vue";
 import {
@@ -454,7 +391,7 @@ const showErrorUpdateEstadoLista = ref<boolean>(false);
 const showErrorEditLista = ref<boolean>(false);
 const showModalEditLista = ref<boolean>(false);
 const listaData = ref<string>("");
-const search = ref<string>("");
+const search = ref<string | null>("");
 const expandedRows = ref<{ [key: number]: boolean }>({});
 const showModalGenerarRonda1 = ref<boolean>(false);
 
@@ -677,35 +614,46 @@ watch(
 
 const emit = defineEmits(["inscripcionEliminada", "cambios"]);
 
-const headers = computed(() => [
-  { title: "Nick", key: "nick" },
-  { title: "Fecha Inscripción", key: "fechaInscripcion" },
-  { title: "Listas entregadas", key: "estadoLista" },
-  { title: "Fecha última entrega", key: "fechaEntrega" },
-  { title: "Pagado", key: "esPago" },
-  { title: "Eliminar", key: "eliminar" },
-]);
+// Generar la ronda 1 y el sorteo se piden desde la tarjeta de gestión, debajo de Descargar listas
+defineExpose({ abrirGenerarRonda1: () => handlerModalGenerarRonda1(), abrirSorteo: () => openSorteo() });
+
+// Filtros: a quien le faltan listas y quien no ha pagado, sin contar al bye
+const filtro = ref<"todos" | "faltanListas" | "sinPagar">("todos");
+const esBye = (item: InscripcionTorneoCreadoMasDTO) =>
+  item.idUsuario === 568 || /^bye\d*$/i.test((item.nick ?? "").trim());
+const reales = computed(() => localInscripciones.value.filter(i => !esBye(i)));
+const faltanListas = computed(() =>
+  reales.value.filter(i => i.countListasEntregadas < props.torneo.torneo.listasPorJugador)
+);
+const sinPagar = computed(() => reales.value.filter(i => i.esPago !== "SI"));
+const normalizar = (texto: string) =>
+  texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const visibles = computed(() => {
+  const base =
+    filtro.value === "faltanListas"
+      ? faltanListas.value
+      : filtro.value === "sinPagar"
+        ? sinPagar.value
+        : localInscripciones.value;
+  const texto = normalizar(search.value ?? "").trim();
+  return texto ? base.filter(i => normalizar(i.nick ?? "").includes(texto)) : base;
+});
+// Fuera de plazo: después de la fecha límite del torneo
+const tarde = (fecha?: string | null, limite?: string | null) =>
+  !!fecha && !!limite && new Date(fecha) > new Date(limite);
+
+// Borrar una inscripción, tras confirmarlo
+const borrar = ref<InscripcionTorneoCreadoMasDTO | null>(null);
+const confirmarBorrar = async () => {
+  const idInscripcion = borrar.value?.idInscripcion;
+  borrar.value = null;
+  if (idInscripcion) await handleEliminarInscripcion(idInscripcion);
+};
 
 const formattedDate = (date: string | null | undefined) => {
   return date ? new Date(date).toLocaleDateString() : "N/A";
 };
 
-const chipColor = (
-  inscriptionDate: string | null | undefined,
-  referenceDate: string | null | undefined
-) => {
-  if (!inscriptionDate || !referenceDate) return "red";
-  return new Date(inscriptionDate) < new Date(referenceDate)
-    ? "green"
-    : "yellow";
-};
-
-const chipNumeroListasColor = (
-  numeroListasEnviadas: number,
-  listasNecesarias: number
-) => {
-  return numeroListasEnviadas < listasNecesarias ? "yellow" : "green";
-};
 
 const toggleExpand = (id: number) => {
   expandedRows.value[id] = !expandedRows.value[id];
@@ -746,6 +694,20 @@ const verLista = (lista: ListaDTO, nick: string) => {
 </script>
 
 <style scoped>
+.tarjeta {
+  cursor: pointer;
+}
+.texto-largo {
+  overflow-wrap: anywhere;
+}
+.email {
+  text-decoration: none;
+}
+.accion {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 4px;
+}
 .expanded-row {
   background-color: rgb(87, 60, 12);
 }

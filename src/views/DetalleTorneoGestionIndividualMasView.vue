@@ -35,9 +35,21 @@
               <!-- tab Gestion -->
               <v-tabs-window-item :value="0" :key="0">
                 <div>
-                  <CardGestionTorneoMas :torneo="torneoGestion" />
+                  <CardGestionTorneoMas :torneo="torneoGestion">
+                    <template #acciones>
+                      <div class="d-flex ga-2">
+                        <v-btn variant="tonal" color="primary" class="flex-grow-1" @click="tablaInscritos?.abrirGenerarRonda1()">
+                          Generar ronda 1
+                        </v-btn>
+                        <v-btn variant="tonal" color="primary" class="flex-grow-1" @click="tablaInscritos?.abrirSorteo()">
+                          Sorteo
+                        </v-btn>
+                      </div>
+                    </template>
+                  </CardGestionTorneoMas>
 
                   <TablaInscritosMas
+                    ref="tablaInscritos"
                     :torneo="torneoGestion"
                     @inscripcionEliminada="handleInscripcionEliminada"
                     @cambios="refreshTorneo"
@@ -508,6 +520,8 @@ const numeroRondas = ref<number[]>([]);
 const activeTab = ref<number>(0);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
 const tabClasificacion = ref<number>();
+// Para pedirle la ronda 1 y el sorteo desde los botones de la tarjeta de gestión
+const tablaInscritos = ref<{ abrirGenerarRonda1: () => void; abrirSorteo: () => void }>();
 const route = useRoute();
 const idTorneo = ref<number>(parseInt(route.params.idTorneo.toString()));
 // Hasta tener el torneo no se pinta nada: así las pestañas se montan ya con sus valores

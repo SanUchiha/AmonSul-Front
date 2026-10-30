@@ -84,6 +84,8 @@
                 Descargar Listas</v-btn
               >
             </div>
+            <!-- Acciones propias de la gestión, justo debajo: generar la ronda 1 y el sorteo -->
+            <slot name="acciones" />
           </div>
         </v-list-item-title>
       </v-list-item-content>

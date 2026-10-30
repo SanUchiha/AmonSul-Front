@@ -132,7 +132,10 @@ export interface InscripcionTorneoCreadoDTO {
 export interface InscripcionTorneoCreadoMasDTO {
   idInscripcion: number;
   idUsuario: number;
+  idTorneo: number;
   nick: string;
+  // Solo en la gestión, para el organizador
+  email?: string | null;
   fechaInscripcion: string;
   bando?: "evil" | "good" | null;
   fechaUltimaEntrega?: string | null;
