@@ -3,11 +3,8 @@
     <LoadingGandalf />
   </div>
   <v-container v-else class="mis-eventos text-left">
-    <!-- Cabecera: qué hay aquí y dónde buscar más eventos -->
-    <div class="d-flex flex-wrap align-center ga-2 mb-1">
-      <h1 class="text-h5 font-weight-bold flex-grow-1">Mis eventos</h1>
-      <v-btn variant="tonal" color="primary" to="/torneos">Calendario de eventos</v-btn>
-    </div>
+    <!-- Cabecera: qué hay aquí -->
+    <h1 class="text-h5 font-weight-bold mb-1">Mis eventos</h1>
     <p class="text-body-2 text-medium-emphasis mb-3">
       Los eventos en los que estás inscrito. Tus partidas y resultados están en
       <router-link :to="`/detalle-jugador/${idUsuario}`">tu ficha de jugador</router-link>.
@@ -19,16 +16,13 @@
     </v-chip-group>
 
     <v-card v-if="lista.length === 0" variant="outlined" class="pa-4 text-center">
-      <p class="text-body-2 text-medium-emphasis mb-3">
+      <p class="text-body-2 text-medium-emphasis mb-0">
         {{
           vista === "proximos"
             ? "No estás inscrito en ningún evento próximo."
             : "Aún no has terminado ningún evento."
         }}
       </p>
-      <v-btn v-if="vista === 'proximos'" color="primary" variant="tonal" to="/torneos">
-        Buscar en el calendario
-      </v-btn>
     </v-card>
     <v-row v-else dense>
       <v-col v-for="inscripcion in visibles" :key="inscripcion.clave" cols="12" sm="6" lg="4">
