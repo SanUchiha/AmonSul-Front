@@ -50,22 +50,17 @@
     @actualizada="cargarInscripciones"
     @close="abierta = null"
   />
-  <v-dialog
+  <ModalInscripcionEquipo
     v-if="abierta?.porEquipos"
-    :model-value="true"
-    max-width="800"
-    @update:model-value="abierta = null"
-  >
-    <ModalInscripcionEquipo
-      :key="abierta.clave"
-      :idInscripcion="abierta.idInscripcion"
-      :idUsuario="idUsuario"
-      :idTorneo="abierta.idTorneo"
-      :idOrganizador="abierta.idOrganizador"
-      @eliminar-inscripcion-equipo="idEquipo => pedirBaja(abierta, idEquipo)"
-      @close="abierta = null"
-    />
-  </v-dialog>
+    :key="abierta.clave"
+    :idInscripcion="abierta.idInscripcion"
+    :idUsuario="idUsuario"
+    :idTorneo="abierta.idTorneo"
+    :idOrganizador="abierta.idOrganizador"
+    @eliminar-inscripcion-equipo="idEquipo => pedirBaja(abierta, idEquipo)"
+    @actualizada="cargarInscripciones"
+    @close="abierta = null"
+  />
 
   <!-- Darse de baja no tiene vuelta atrás: mejor preguntarlo -->
   <v-dialog :model-value="!!baja" max-width="420" @update:model-value="baja = null">
