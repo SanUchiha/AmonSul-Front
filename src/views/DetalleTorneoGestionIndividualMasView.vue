@@ -24,6 +24,8 @@
               v-model="activeTab"
               :rondas="numeroRondas"
               :partidasPorRonda="partidasPorRonda"
+              v-model:jugador="jugadorBuscado"
+              :jugadores="jugadores"
             />
 
             <!-- Contenido de las Tabs -->
@@ -179,11 +181,11 @@
                 class="pa-2 text-left"
               >
                 <CardPartidaGestion
-                  v-for="(partida, index) in partidasPorRonda[activeTab!]"
+                  v-for="partida in deLaBusqueda(partidasPorRonda[activeTab!])"
                   :key="partida.idPartidaTorneo"
                   :partida="partida"
                   :editable="true"
-                  :etiqueta="`Mesa ${index + 1}`"
+                  :etiqueta="`Mesa ${mesaDe(partidasPorRonda[activeTab!], partida)}`"
                   @partidaActualizada="actualizarPartida"
                 >
                   <div class="d-flex flex-wrap align-center justify-end ga-1 mt-1">
@@ -1341,7 +1343,15 @@ const handleInscripcionEliminada = (idInscripcion: number) => {
 
 
 // Las rondas en una sola pestaña: activeTab sigue siendo el número de ronda
-const { pestana, enRondas, TAB_RONDAS } = useRondasEnPestana(
+const {
+  pestana,
+  enRondas,
+  TAB_RONDAS,
+  jugadorBuscado,
+  jugadores,
+  deLaBusqueda,
+  mesaDe,
+} = useRondasEnPestana(
   activeTab,
   numeroRondas,
   partidasPorRonda

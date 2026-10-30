@@ -10,11 +10,11 @@
       >
         <v-card-text>
           <div
-            v-for="(mesa, index) in emparejamientosUnicos"
-            :key="index"
+            v-for="mesa in visibles"
+            :key="mesa.numero"
             class="mb-2"
           >
-            <strong>Mesa {{ index + 1 }}:</strong>
+            <strong>Mesa {{ mesa.numero }}:</strong>
             {{ mesa.equipo1 }} vs {{ mesa.equipo2 }}
             <v-btn
               icon
@@ -48,6 +48,8 @@ const props = defineProps<{
   partidas: PartidaTorneoDTO[];
   numeroRonda: number;
   idTorneo: number;
+  // Con un jugador buscado, solo los cruces de su equipo, con su número de mesa de siempre
+  soloEquipos?: number[] | null;
 }>();
 
 const equipos1Old = ref();
@@ -82,6 +84,17 @@ const emparejamientosUnicos = computed(() => {
 
   return resultado;
 });
+
+const visibles = computed(() =>
+  emparejamientosUnicos.value
+    .map((mesa, index) => ({ ...mesa, numero: index + 1 }))
+    .filter(
+      mesa =>
+        !props.soloEquipos ||
+        props.soloEquipos.includes(mesa.idEquipo1) ||
+        props.soloEquipos.includes(mesa.idEquipo2)
+    )
+);
 
 const equiposDisponibles = computed(() => {
   const equiposMap = new Map<number, string>();

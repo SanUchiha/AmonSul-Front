@@ -10,11 +10,11 @@
       >
         <v-card-text>
           <div
-            v-for="(mesa, index) in emparejamientosUnicos"
-            :key="index"
+            v-for="mesa in visibles"
+            :key="mesa.numero"
             class="mb-2"
           >
-            <strong>Mesa {{ index + 1 }}:</strong>
+            <strong>Mesa {{ mesa.numero }}:</strong>
             {{ mesa.equipo1 }} vs {{ mesa.equipo2 }}
           </div>
         </v-card-text>
@@ -31,11 +31,18 @@ import { defineProps } from "vue";
 const props = defineProps<{
   partidas: PartidaTorneoDTO[];
   numeroRonda: number;
+  // Con un jugador buscado, solo los cruces de su equipo, con su número de mesa de siempre
+  soloEquipos?: number[] | null;
 }>();
 
 const emparejamientosUnicos = computed(() => {
   const set = new Set<string>();
-  const resultado: { equipo1: string; equipo2: string }[] = [];
+  const resultado: {
+    equipo1: string;
+    equipo2: string;
+    idEquipo1: number | null;
+    idEquipo2: number | null;
+  }[] = [];
 
   props.partidas
     .filter((p) => p.numeroRonda === props.numeroRonda)
@@ -49,10 +56,23 @@ const emparejamientosUnicos = computed(() => {
         resultado.push({
           equipo1: equipoA as string,
           equipo2: equipoB as string,
+          idEquipo1: partida.idEquipo1,
+          idEquipo2: partida.idEquipo2,
         });
       }
     });
 
   return resultado;
 });
+
+const visibles = computed(() =>
+  emparejamientosUnicos.value
+    .map((mesa, index) => ({ ...mesa, numero: index + 1 }))
+    .filter(
+      mesa =>
+        !props.soloEquipos ||
+        (mesa.idEquipo1 != null && props.soloEquipos.includes(mesa.idEquipo1)) ||
+        (mesa.idEquipo2 != null && props.soloEquipos.includes(mesa.idEquipo2))
+    )
+);
 </script>

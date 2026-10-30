@@ -38,6 +38,8 @@
         v-model="activeTab"
         :rondas="numeroRondas"
         :partidasPorRonda="partidasPorRonda"
+        v-model:jugador="jugadorBuscado"
+        :jugadores="jugadores"
       />
       <v-window v-model="activeTab">
         <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion">
@@ -78,7 +80,7 @@
               lg="6"
               xl="4"
               class="pb-0"
-              v-for="(partida, index) in partidasPorRonda[n]"
+              v-for="partida in deLaBusqueda(partidasPorRonda[n])"
               :key="partida.idPartidaTorneo"
             >
               <!-- Partida completada -->
@@ -91,7 +93,7 @@
                 <CardPartidaTorneoMasLive
                   :idUsuario="parseInt(idUsuarioLogger!)"
                   :match="partida"
-                  :mesa="`Mesa ${index + 1}`"
+                  :mesa="`Mesa ${mesaDe(partidasPorRonda[n], partida)}`"
                   :completa="true"
                   :editarPartidaPJ="false"
                   :soloValidarPJ="false"
@@ -102,7 +104,7 @@
                 <CardPartidaTorneoMasLive
                   :idUsuario="parseInt(idUsuarioLogger!)"
                   :match="partida"
-                  :mesa="`Mesa ${index + 1}`"
+                  :mesa="`Mesa ${mesaDe(partidasPorRonda[n], partida)}`"
                   :completa="false"
                   :editarPartidaPJ="editarPartidaPJ(partida)"
                   :soloValidarPJ="soloValidarPJ(partida)"
@@ -867,7 +869,15 @@ const soloValidarPJ = (partida: PartidaTorneoMasDTO) => {
 // };
 
 // Las rondas en una sola pestaña: activeTab sigue siendo el número de ronda
-const { pestana, enRondas, TAB_RONDAS } = useRondasEnPestana(
+const {
+  pestana,
+  enRondas,
+  TAB_RONDAS,
+  jugadorBuscado,
+  jugadores,
+  deLaBusqueda,
+  mesaDe,
+} = useRondasEnPestana(
   activeTab,
   numeroRondas,
   partidasPorRonda
