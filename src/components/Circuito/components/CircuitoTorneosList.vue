@@ -4,7 +4,7 @@
     
     <div class="torneos-header">
       <v-icon size="small" color="primary" class="mr-1">mdi-trophy</v-icon>
-      <span class="torneos-count">{{ numeroTorneos }} torneos disputados</span>
+      <span class="torneos-count">{{ numeroTorneos }} {{ numeroTorneos === 1 ? "torneo disputado" : "torneos disputados" }}</span>
     </div>
     
     <div v-if="torneos.length > 0" class="torneos-container">

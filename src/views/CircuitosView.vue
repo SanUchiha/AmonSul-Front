@@ -67,7 +67,8 @@ const loadCircuitos = async () => {
   loading.value = true;
   try {
     const response = await getCircuitos();
-    circuitos.value = response.data;
+    // Los más nuevos primero, como al añadir un torneo a un circuito: en el móvil los de este año quedaban al final
+    circuitos.value = [...response.data].sort((a: CircuitoDTO, b: CircuitoDTO) => b.idCircuito - a.idCircuito);
   } catch (error) {
     console.error("Error al cargar circuitos:", error);
   } finally {

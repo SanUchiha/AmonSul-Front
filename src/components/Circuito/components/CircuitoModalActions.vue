@@ -1,5 +1,6 @@
 <template>
-  <v-card-actions class="d-flex justify-space-between">
+  <!-- En el móvil los dos botones no caben en una fila -->
+  <v-card-actions class="d-flex flex-wrap ga-2 justify-space-between">
     <!-- Botón para ver clasificación -->
     <v-btn
       color="primary"

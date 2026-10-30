@@ -1,8 +1,9 @@
 <template>
   <v-dialog v-model="show" max-width="900px">
     <v-card class="elevation-2 rounded">
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span class="headline">
+      <!-- En el móvil el nombre del circuito baja de línea: si no, empujaba la x fuera -->
+      <v-card-title class="d-flex justify-space-between align-center ga-2 text-wrap">
+        <span class="headline flex-grow-1">
           <v-icon color="primary" class="mr-2">mdi-podium</v-icon>
           Clasificación - {{ circuitoNombre }}
         </span>
@@ -10,7 +11,7 @@
           icon 
           variant="text"
           @click="close"
-          class="close-button"
+          class="close-button flex-shrink-0"
         >
           <v-icon>mdi-close</v-icon>
         </v-btn>
@@ -126,18 +127,17 @@ const props = defineProps<{
   loading?: boolean;
 }>();
 
-// Estado del buscador
-const searchTerm = ref("");
+// Estado del buscador: la x del campo lo deja a null
+const searchTerm = ref<string | null>("");
 
 // Clasificación filtrada
 const clasificacionFiltrada = computed(() => {
-  if (!searchTerm.value.trim()) {
+  const texto = (searchTerm.value ?? "").trim().toLowerCase();
+  if (!texto) {
     return props.clasificacion;
   }
-  
-  return props.clasificacion.filter(jugador => 
-    jugador.nick.toLowerCase().includes(searchTerm.value.toLowerCase())
-  );
+
+  return props.clasificacion.filter(jugador => jugador.nick.toLowerCase().includes(texto));
 });
 
 // Función para obtener la posición real del jugador
@@ -194,10 +194,12 @@ watch(show, (newValue) => {
   overflow-y: auto;
 }
 
+// En el móvil cuatro columnas y los puntos de cada torneo bajo el nick: con cinco había scroll horizontal
 .tabla-header {
   display: grid;
-  grid-template-columns: 30px minmax(100px, 1fr) 50px 40px 70px;
-  gap: 6px;
+  grid-template-columns: 28px minmax(0, 1fr) 44px 72px;
+  grid-template-areas: "pos nick total ganados";
+  column-gap: 8px;
   padding: 8px 0 12px 0;
   border-bottom: 2px solid #e5e7eb;
   font-size: 0.75rem;
@@ -207,11 +209,35 @@ watch(show, (newValue) => {
 
   @media (min-width: 768px) {
     grid-template-columns: 40px 180px 80px 70px 120px;
+    grid-template-areas: "pos nick total ganados puntos";
     gap: 16px;
   }
 
   .header-pos {
+    grid-area: pos;
     text-align: center;
+  }
+
+  .header-nick {
+    grid-area: nick;
+  }
+
+  .header-totales {
+    grid-area: total;
+  }
+
+  .header-ganados {
+    grid-area: ganados;
+    white-space: nowrap;
+  }
+
+  .header-puntos {
+    grid-area: puntos;
+    display: none;
+
+    @media (min-width: 768px) {
+      display: block;
+    }
   }
 
   .header-totales, .header-ganados {
@@ -225,8 +251,12 @@ watch(show, (newValue) => {
 
 .jugador-row {
   display: grid;
-  grid-template-columns: 30px minmax(100px, 1fr) 50px 40px 70px;
-  gap: 6px;
+  grid-template-columns: 28px minmax(0, 1fr) 44px 72px;
+  grid-template-areas:
+    "pos nick total ganados"
+    ". puntos puntos puntos";
+  column-gap: 8px;
+  row-gap: 4px;
   padding: 12px 0;
   border-bottom: 1px solid #f3f4f6;
   font-size: 0.875rem;
@@ -235,6 +265,7 @@ watch(show, (newValue) => {
 
   @media (min-width: 768px) {
     grid-template-columns: 40px 180px 80px 70px 120px;
+    grid-template-areas: "pos nick total ganados puntos";
     gap: 16px;
     height: 64px;
   }
@@ -248,6 +279,7 @@ watch(show, (newValue) => {
   }
 
   .posicion {
+    grid-area: pos;
     font-weight: 500;
     text-align: center;
     display: flex;
@@ -256,6 +288,7 @@ watch(show, (newValue) => {
   }
 
   .nombre {
+    grid-area: nick;
     font-weight: 400;
     line-height: 1.2;
     word-wrap: break-word;
@@ -265,20 +298,23 @@ watch(show, (newValue) => {
   }
 
   .puntos {
+    grid-area: total;
     font-weight: 500;
     text-align: right;
   }
 
   .torneos {
+    grid-area: ganados;
     font-size: 0.8rem;
     text-align: center;
   }
 
   .puntos-detalle {
+    grid-area: puntos;
     display: flex;
     flex-wrap: wrap;
-    gap: 1px;
-    font-size: 0.5rem;
+    gap: 2px;
+    font-size: 0.625rem;
 
     @media (min-width: 768px) {
       gap: 2px;
@@ -288,11 +324,11 @@ watch(show, (newValue) => {
     .punto-individual {
       background-color: #414a5c;
       color: #ffffff;
-      padding: 1px 2px;
+      padding: 1px 3px;
       border-radius: 2px;
-      font-size: 0.5rem;
+      font-size: 0.625rem;
       line-height: 1.2;
-      min-width: 12px;
+      min-width: 16px;
       text-align: center;
 
       @media (min-width: 768px) {
