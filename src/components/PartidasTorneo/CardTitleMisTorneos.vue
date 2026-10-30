@@ -1,7 +1,7 @@
 <template>
   <v-card class="jugador-card ringbearer">
     <v-card-title class="title">
-      <h2>Mis torneos</h2>
+      <h2>Mis eventos</h2>
     </v-card-title>
   </v-card>
 </template>

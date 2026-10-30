@@ -49,7 +49,7 @@
             <p class="text-caption text-medium-emphasis">
               El calendario es abierto: queda con tu rival y, al jugar, meted
               el resultado aquí. Puedes cambiar de lista antes de cada partida
-              desde Mis torneos.
+              desde Mis eventos.
             </p>
 
             <h3 class="text-subtitle-1 font-weight-bold mt-3">

@@ -265,6 +265,17 @@
               <v-list-item v-bind="props" :subtitle="item.raw.subtitle" />
             </template>
           </v-select>
+          <!-- Cómo puntúa el tipo elegido -->
+          <v-alert
+            v-if="classificationType"
+            type="info"
+            variant="tonal"
+            density="compact"
+            class="mb-4 text-left text-body-2"
+          >
+            {{ ClassificationTypeDescriptions[classificationType].detalle }}
+            {{ DESEMPATE_CLASIFICACION }}
+          </v-alert>
 
           <!-- fecha de inicio -->
           <v-text-field
@@ -496,7 +507,9 @@ import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import {
   ClassificationType,
+  ClassificationTypeDescriptions,
   ClassificationTypeLabels,
+  DESEMPATE_CLASIFICACION,
 } from "@/Constant/TipoClasificacion";
 import {
   DESEMPATE_GRUPOS,
@@ -731,22 +744,14 @@ watch(
 );
 
 const classificationTypeOptions = [
-  {
-    label: ClassificationTypeLabels[ClassificationType.NORMAL],
-    subtitle: "Victoria: 3pts · Empate: 1pt · Derrota: 0pts",
-    value: ClassificationType.NORMAL,
-  },
-  {
-    label: ClassificationTypeLabels[ClassificationType.EXTENDED],
-    subtitle: "Individual (6/5/2/1/0) · Equipos (4/3/2/1/0)",
-    value: ClassificationType.EXTENDED,
-  },
-  {
-    label: ClassificationTypeLabels[ClassificationType.ALEMAN],
-    subtitle: "Quien lo quiera utilizar, sabe como funciona",
-    value: ClassificationType.ALEMAN,
-  },
-];
+  ClassificationType.NORMAL,
+  ClassificationType.EXTENDED,
+  ClassificationType.ALEMAN,
+].map(value => ({
+  label: ClassificationTypeLabels[value],
+  subtitle: ClassificationTypeDescriptions[value].resumen,
+  value,
+}));
 
 const convertirFecha = (dateString: string) => {
   const dateParts = dateString.split("/");

@@ -136,6 +136,8 @@ export interface ViewPartidaTorneoDTO {
   // Solo en Copa: por su grupo y jornada o por la eliminatoria
   fase?: string | null;
   grupo?: number | null;
+  // En la eliminatoria, las rondas del cuadro: para saber si es la final, las semifinales...
+  rondasEliminatoria?: number | null;
   eloVariacionUsuario1?: number | null;
   eloVariacionUsuario2?: number | null;
   // Solo en Parejas: compañeros de los capitanes idUsuario1 e idUsuario2
@@ -165,4 +167,6 @@ export interface EstaJugandoDTO {
   // Solo en Parejas: una lista por pareja en vez de una por jugador
   listaPorPareja?: boolean;
   formatoTorneo?: string | null;
+  // En una copa, las rondas del cuadro: la partida de eliminatoria se nombra por su ronda
+  rondasEliminatoria?: number | null;
 }

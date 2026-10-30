@@ -12,7 +12,7 @@
               :match="partida"
               :mesa="
                 esCopa
-                  ? etiquetaPartidaCopa(partida)
+                  ? etiquetaPartidaCopa(partida, null, estaJugando.rondasEliminatoria)
                   : esLiga
                     ? `Jornada ${partida.numeroRonda}`
                     : `Mesa ${partida.numeroMesa}`

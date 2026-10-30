@@ -231,7 +231,22 @@
             item-title="label"
             item-value="value"
             :rules="[(v: number) => !!v || 'Campo obligatorio']"
-          />
+          >
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props" :subtitle="item.raw.subtitle" />
+            </template>
+          </v-select>
+          <!-- Cómo puntúa el tipo elegido -->
+          <v-alert
+            v-if="classificationType"
+            type="info"
+            variant="tonal"
+            density="compact"
+            class="mb-4 text-left text-body-2"
+          >
+            {{ ClassificationTypeDescriptions[classificationType].detalle }}
+            {{ DESEMPATE_CLASIFICACION }}
+          </v-alert>
 
           <!-- fecha de inicio -->
           <v-text-field
@@ -459,7 +474,9 @@ import {
 } from "@/Constant/TiposTorneo";
 import {
   ClassificationType,
+  ClassificationTypeDescriptions,
   ClassificationTypeLabels,
+  DESEMPATE_CLASIFICACION,
 } from "@/Constant/TipoClasificacion";
 import {
   FORMATO_COPA,
@@ -487,19 +504,14 @@ const internalIsVisible = ref(props.isVisible);
 const isValid = ref(true);
 
 const classificationTypeOptions = [
-  {
-    label: ClassificationTypeLabels[ClassificationType.NORMAL],
-    value: ClassificationType.NORMAL,
-  },
-  {
-    label: ClassificationTypeLabels[ClassificationType.EXTENDED],
-    value: ClassificationType.EXTENDED,
-  },
-  {
-    label: ClassificationTypeLabels[ClassificationType.ALEMAN],
-    value: ClassificationType.ALEMAN,
-  },
-];
+  ClassificationType.NORMAL,
+  ClassificationType.EXTENDED,
+  ClassificationType.ALEMAN,
+].map(value => ({
+  label: ClassificationTypeLabels[value],
+  subtitle: ClassificationTypeDescriptions[value].resumen,
+  value,
+}));
 
 watch(
   () => props.isVisible,

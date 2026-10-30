@@ -13,7 +13,7 @@
           <v-list-item-title>Mis partidas</v-list-item-title>
         </v-list-item>
         <v-list-item link to="/mis-torneos" v-if="isAuthenticated">
-          <v-list-item-title>Mis torneos</v-list-item-title>
+          <v-list-item-title>Mis eventos</v-list-item-title>
         </v-list-item>
         <v-list-item link to="/torneos" v-if="isAuthenticated">
           <v-list-item-title>Calendario</v-list-item-title>

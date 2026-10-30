@@ -30,7 +30,7 @@
           <v-list-item>
             <v-list-item-title
               class="text-center grey--text text-wrap aviso-torneos"
-              >No tienes torneos individuales en el
+              >No tienes eventos individuales en el
               horizonte.</v-list-item-title
             >
           </v-list-item>
@@ -40,7 +40,7 @@
   </div>
   <div v-if="hasAcciones">
     <v-container :loading="isLoading" class="mb-0 pb-0">
-      <h3 class="ringbearer text-center mb-4">Torneos individuales</h3>
+      <h3 class="ringbearer text-center mb-4">Eventos individuales</h3>
       <v-list>
         <template v-if="listaTorneos && listaTorneos.length > 0">
           <v-list-item
@@ -102,7 +102,7 @@
           <v-list-item>
             <v-list-item-title
               class="text-center grey--text text-wrap aviso-torneos"
-              >No tienes torneos individuales en el
+              >No tienes eventos individuales en el
               horizonte.</v-list-item-title
             >
           </v-list-item>

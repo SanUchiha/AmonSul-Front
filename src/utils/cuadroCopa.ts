@@ -154,18 +154,22 @@ export function montarCuadro(
   return { rondas, tercerPuesto, campeon: nivel[0] };
 }
 
-// Cómo se nombra una partida: su grupo y jornada, o su ronda del cuadro si se conoce el cuadro entero; si no,
-// "Eliminatoria" sin más
+// Cómo se nombra una partida: su grupo y jornada, o su ronda del cuadro si se conoce el cuadro entero o al menos
+// cuántas rondas tiene; si no, "Eliminatoria" sin más
 export function etiquetaPartidaCopa(
   partida: Pick<PartidaTorneoDTO, "fase" | "grupo" | "numeroRonda">,
-  cuadro?: CuadroCopa | null
+  cuadro?: CuadroCopa | null,
+  rondasCuadro?: number | null
 ) {
   if (partida.fase === FASE_TERCER_PUESTO) return "Tercer puesto";
-  if (partida.fase === FASE_ELIMINATORIA)
-    return (
-      cuadro?.rondas.find(r => r.numero === partida.numeroRonda)?.nombre ??
-      "Eliminatoria"
-    );
+  if (partida.fase === FASE_ELIMINATORIA) {
+    const enCuadro = cuadro?.rondas.find(r => r.numero === partida.numeroRonda)?.nombre;
+    if (enCuadro) return enCuadro;
+    // La ronda r de un cuadro de n rondas tiene 2^(n - r) cruces
+    if (rondasCuadro && partida.numeroRonda <= rondasCuadro)
+      return nombreRonda(2 ** (rondasCuadro - partida.numeroRonda));
+    return "Eliminatoria";
+  }
   return `Grupo ${partida.grupo} · Jornada ${partida.numeroRonda}`;
 }
 

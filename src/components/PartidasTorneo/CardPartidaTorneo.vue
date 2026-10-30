@@ -98,11 +98,15 @@ const contexto = computed(() =>
   [
     props.mostrarTorneo ? props.match.nombreTorneo : "",
     props.match.formatoTorneo === FORMATO_COPA && props.match.fase && props.match.numeroRonda
-      ? etiquetaPartidaCopa({
-          fase: props.match.fase,
-          grupo: props.match.grupo,
-          numeroRonda: props.match.numeroRonda,
-        })
+      ? etiquetaPartidaCopa(
+          {
+            fase: props.match.fase,
+            grupo: props.match.grupo,
+            numeroRonda: props.match.numeroRonda,
+          },
+          null,
+          props.match.rondasEliminatoria
+        )
       : props.match.numeroRonda
         ? `${esPorJornadas(props.match.formatoTorneo) ? "Jornada" : "Ronda"} ${props.match.numeroRonda}`
         : "",

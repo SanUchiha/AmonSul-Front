@@ -29,7 +29,8 @@
             <v-card class="pa-3" elevation="2">
               <span class="text-caption font-weight-bold text-primary">{{ novedad.fecha }}</span>
               <h3 class="text-h6 novedad-titulo">{{ novedad.titulo }}</h3>
-              <p class="text-body-2">{{ novedad.descripcion }}</p>
+              <!-- Justificado; con el idioma, el navegador parte palabras y no quedan huecos grandes en móvil -->
+              <p class="text-body-2 novedad-texto" lang="es">{{ novedad.descripcion }}</p>
             </v-card>
           </v-timeline-item>
         </v-timeline>
@@ -190,5 +191,9 @@ export default {
 /* El mismo dorado que los títulos de las mesas en el directo */
 .novedad-titulo {
   color: #ffcc00;
+}
+.novedad-texto {
+  text-align: justify;
+  hyphens: auto;
 }
 </style>
