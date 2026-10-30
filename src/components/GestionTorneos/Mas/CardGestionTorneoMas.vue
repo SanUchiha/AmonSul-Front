@@ -26,70 +26,32 @@
       <p><strong>Listas de luz:</strong> {{ listasLuz }}</p>
       <p><strong>Listas de oscuridad:</strong> {{ listasOscuridad }}</p>
     </v-card-text>
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title>
-          <div class="flex-column align-items-center">
-            <div class="text-wrap text-sm">
-              <v-btn
-                class="mt-2"
-                variant="tonal"
-                color="secondary"
-                @click="modificarTorneo()"
-              >
-                Modificar torneo
-              </v-btn>
-            </div>
-
-            <div class="text-wrap text-sm">
-              <v-btn
-                class="mt-2"
-                variant="tonal"
-                color="secondary"
-                @click="modificarBasesTorneo()"
-              >
-                Modificar bases
-              </v-btn>
-            </div>
-
-            <div class="text-wrap text-sm">
-              <v-btn
-                variant="tonal"
-                color="secondary"
-                @click="handlerMostrarListas"
-                block
-                >{{ mostrarListas ? "Ocultar" : "Mostrar" }} Listas</v-btn
-              >
-            </div>
-
-            <div class="text-wrap text-sm">
-              <v-btn
-                variant="tonal"
-                color="secondary"
-                @click="handlerMostrarClasificacion"
-                block
-                >{{
-                  mostrarClasificacion ? "Ocultar" : "Mostrar"
-                }}
-                Clasificación</v-btn
-              >
-            </div>
-            <div class="text-wrap text-sm">
-              <v-btn
-                variant="tonal"
-                color="secondary"
-                @click="descargarListasTorneo"
-                block
-              >
-                Descargar Listas</v-btn
-              >
-            </div>
-            <!-- Acciones propias de la gestión, justo debajo: generar la ronda 1 y el sorteo -->
-            <slot name="acciones" />
-          </div>
-        </v-list-item-title>
-      </v-list-item-content>
-    </v-list-item>
+    <!-- Los mismos botones en todas las gestiones: uno por fila y a lo ancho -->
+    <v-card-actions>
+      <v-row>
+        <v-col cols="12">
+          <v-btn variant="tonal" color="secondary" block @click="modificarTorneo()">Modificar torneo</v-btn>
+        </v-col>
+        <v-col cols="12">
+          <v-btn variant="tonal" color="secondary" block @click="modificarBasesTorneo()">Modificar bases</v-btn>
+        </v-col>
+        <v-col cols="12">
+          <v-btn variant="tonal" color="secondary" block @click="handlerMostrarListas">
+            {{ mostrarListas ? "Ocultar" : "Mostrar" }} Listas
+          </v-btn>
+        </v-col>
+        <v-col cols="12">
+          <v-btn variant="tonal" color="secondary" block @click="handlerMostrarClasificacion">
+            {{ mostrarClasificacion ? "Ocultar" : "Mostrar" }} Clasificación
+          </v-btn>
+        </v-col>
+        <v-col cols="12">
+          <v-btn variant="tonal" color="secondary" block @click="descargarListasTorneo">Descargar Listas</v-btn>
+        </v-col>
+        <!-- Acciones propias de la gestión, justo debajo: generar la ronda 1 y el sorteo -->
+        <slot name="acciones" />
+      </v-row>
+    </v-card-actions>
     <v-card-text>
       <CardAddTorneoCircuito :idTorneo="props.torneo?.torneo.idTorneo!" />
     </v-card-text>

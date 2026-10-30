@@ -26,9 +26,10 @@
       <p><strong>Listas de luz:</strong> {{ listasLuz }}</p>
       <p><strong>Listas de oscuridad:</strong> {{ listasOscuridad }}</p>
     </v-card-text>
+    <!-- Los mismos botones en todas las gestiones: uno por fila y a lo ancho -->
     <v-card-actions>
       <v-row>
-        <v-col>
+        <v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"
@@ -37,7 +38,7 @@
             >Modificar {{ nombreEvento(props.torneo?.torneo.formatoTorneo).toLowerCase() }}</v-btn
           >
         </v-col>
-        <v-col>
+        <v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"
@@ -47,7 +48,7 @@
           >
         </v-col>
 
-        <v-col>
+        <v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"
@@ -57,7 +58,7 @@
           >
         </v-col>
 
-        <v-col>
+        <v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"
@@ -68,7 +69,7 @@
             }}
             Clasificación</v-btn
           > </v-col
-        ><v-col>
+        ><v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"

@@ -85,9 +85,10 @@
     </v-card-text>
     <v-divider class="my-2" />
 
+    <!-- Los mismos botones en todas las gestiones: uno por fila y a lo ancho -->
     <v-card-actions>
       <v-row>
-        <v-col>
+        <v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"
@@ -96,7 +97,7 @@
             >Modificar torneo</v-btn
           >
         </v-col>
-        <v-col>
+        <v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"
@@ -106,7 +107,7 @@
           >
         </v-col>
 
-        <v-col>
+        <v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"
@@ -116,7 +117,7 @@
           >
         </v-col>
 
-        <v-col>
+        <v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"
@@ -127,7 +128,7 @@
             }}
             Clasificación</v-btn
           > </v-col
-        ><v-col>
+        ><v-col cols="12">
           <v-btn
             variant="tonal"
             color="secondary"

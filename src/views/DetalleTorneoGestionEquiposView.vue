@@ -41,9 +41,9 @@
               <v-window-item :value="0" :key="0">
                 <div>
                   <CardGestionInfoTorneoEquipo :torneo="torneoGestion">
-                    <!-- Como los demás botones: cada uno a lo ancho en móvil -->
+                    <!-- Como los demás botones: cada uno en su fila y a lo ancho -->
                     <template #acciones>
-                      <v-col cols="12" sm>
+                      <v-col cols="12">
                         <v-btn
                           variant="tonal"
                           color="primary"
@@ -54,7 +54,7 @@
                           Generar ronda 1
                         </v-btn>
                       </v-col>
-                      <v-col cols="12" sm>
+                      <v-col cols="12">
                         <v-btn variant="tonal" color="primary" block @click="accionesEquipo?.abrirSorteo()">
                           Sorteo
                         </v-btn>
