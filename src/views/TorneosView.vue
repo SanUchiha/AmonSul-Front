@@ -2,6 +2,10 @@
   <v-container>
     <v-row dense>
       <v-col cols="12" md="12" class="text-center">
+        <h1 class="text-h5 font-weight-bold text-left mb-1">Calendario de eventos</h1>
+        <p class="text-body-2 text-medium-emphasis text-left mb-3">
+          Torneos, ligas y copas. Los que están en curso salen en Próximos hasta que terminan.
+        </p>
         <v-tabs v-model="tab" color="primary" grow>
           <v-tab value="proximos"> Próximos </v-tab>
           <v-tab value="pasados"> Pasados </v-tab>
@@ -11,7 +15,7 @@
             <v-col cols="12" sm="8" offset-sm="2">
               <v-text-field
                 v-model="searchQuery"
-                label="Buscar torneo"
+                label="Buscar evento"
                 clearable
                 tonal
                 dense
@@ -48,7 +52,7 @@
           <template v-else>
             <template v-if="tab === 'proximos'">
               <div v-if="paginatedTorneosProximos.length < 1">
-                No hay torneos próximos...
+                No hay eventos próximos.
               </div>
               <v-row v-else dense>
                 <v-col
@@ -64,7 +68,7 @@
             </template>
             <template v-else>
               <div v-if="paginatedTorneosPasados.length < 1">
-                No se encontraron torneos que coincidan con la búsqueda.
+                No hay eventos pasados con esa búsqueda.
               </div>
               <v-row v-else dense>
                 <v-col
@@ -97,6 +101,11 @@ import {
   buscarTorneosPorNombreAsync,
 } from "@/services/TorneosService";
 import { Torneo } from "@/interfaces/Torneo";
+import { diaDeHoy, ultimoDiaEvento } from "@/utils/Fecha";
+
+// Como en el back: un evento ha terminado si su último día ya pasó. Se comparan días, no horas: el de hoy aún no
+const haTerminado = (torneo: Torneo) =>
+  ultimoDiaEvento(torneo.fechaInicioTorneo, torneo.fechaFinTorneo) < diaDeHoy();
 
 const isLoading = ref(true);
 const tab = ref("proximos");
@@ -119,10 +128,7 @@ const fetchTorneosProximos = async () => {
   try {
     if (searchQuery.value) {
       const res = await buscarTorneosPorNombreAsync(searchQuery.value);
-      torneosProximos.value = res.data.filter(
-        (t: { fechaInicioTorneo: string | number | Date }) =>
-          new Date(t.fechaInicioTorneo) >= new Date()
-      );
+      torneosProximos.value = res.data.filter((t: Torneo) => !haTerminado(t));
       totalPagesProximos.value = Math.max(
         1,
         Math.ceil(torneosProximos.value.length / pageSize.value)
@@ -147,10 +153,7 @@ const fetchTorneosPasados = async () => {
   try {
     if (searchQuery.value) {
       const res = await buscarTorneosPorNombreAsync(searchQuery.value);
-      torneosPasados.value = res.data.filter(
-        (t: { fechaInicioTorneo: string | number | Date }) =>
-          new Date(t.fechaInicioTorneo) < new Date()
-      );
+      torneosPasados.value = res.data.filter((t: Torneo) => haTerminado(t));
       totalPagesPasados.value = Math.max(
         1,
         Math.ceil(torneosPasados.value.length / pageSize.value)

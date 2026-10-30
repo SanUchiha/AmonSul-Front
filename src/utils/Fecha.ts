@@ -20,6 +20,16 @@ export const formatFechaDB = async (fecha: string): Promise<string> => {
   return formattedDate;
 };
 
+// Hoy como "AAAA-MM-DD", para comparar días sin horas
+export const diaDeHoy = () => new Date().toLocaleDateString("sv-SE");
+
+// El último día de un evento: su fecha de fin o, si no la tiene válida (anterior al inicio), la de inicio
+export const ultimoDiaEvento = (inicio: string, fin?: string | null) => {
+  const diaInicio = inicio.slice(0, 10);
+  const diaFin = (fin ?? "").slice(0, 10);
+  return diaFin >= diaInicio ? diaFin : diaInicio;
+};
+
 // "AAAA-MM-DD" de una fecha del back; "" si no la hay o es la vacía (0001-01-01) de un DateOnly
 export const fechaConocida = (fecha: string | null | undefined) =>
   fecha && Number(fecha.slice(0, 4)) > 1900 ? fecha.slice(0, 10) : "";

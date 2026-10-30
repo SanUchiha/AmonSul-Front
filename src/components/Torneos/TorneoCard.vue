@@ -13,8 +13,9 @@
     >
       {{ torneo.nombreTorneo }}
     </v-card-title>
-    <div v-if="esLiga" class="d-flex justify-center mb-2">
-      <v-chip size="small" color="primary">{{ nombreEvento(torneo.formatoTorneo) }}</v-chip>
+    <div v-if="esLiga || enCurso" class="d-flex justify-center ga-1 mb-2">
+      <v-chip v-if="esLiga" size="small" color="primary">{{ nombreEvento(torneo.formatoTorneo) }}</v-chip>
+      <v-chip v-if="enCurso" size="small" color="success" prepend-icon="mdi-sword-cross">En curso</v-chip>
     </div>
     <v-card-subtitle class="text-center mb-3">
       <p class="text-wrap" v-if="formattedAddress.trim()">
@@ -36,9 +37,15 @@
         <v-col cols="10" offset="1" class="text-left">
           <p>
             <v-icon left color="green">mdi-calendar</v-icon>
-            <strong>Fecha:</strong> {{ fechaTorneo }}
-            <template v-if="!esLiga">
-              a las {{ torneo.horaInicioTorneo }}
+            <!-- Una liga o un evento de varios días: del primero al último -->
+            <template v-if="variosDias">
+              <strong>Fechas:</strong> del {{ fechaTorneo }} al {{ formatFechaSpaWhitoutAsync(ultimoDia) }}
+            </template>
+            <template v-else>
+              <strong>Fecha:</strong> {{ fechaTorneo }}
+              <template v-if="!esLiga">
+                a las {{ torneo.horaInicioTorneo }}
+              </template>
             </template>
           </p>
           <p>
@@ -86,13 +93,21 @@
 <script setup lang="ts">
 import { Torneo } from "@/interfaces/Torneo";
 import { FORMATO_COPA, esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
-import { formatFechaSpa } from "@/utils/Fecha";
+import { diaDeHoy, formatFechaSpa, formatFechaSpaWhitoutAsync, ultimoDiaEvento } from "@/utils/Fecha";
 import { defineProps, ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps<{ torneo: Torneo; verClasificacion: boolean }>();
 // Liga o Copa
 const esLiga = computed(() => esPorJornadas(props.torneo.formatoTorneo));
+const ultimoDia = computed(() =>
+  ultimoDiaEvento(props.torneo.fechaInicioTorneo, props.torneo.fechaFinTorneo)
+);
+const variosDias = computed(() => ultimoDia.value > props.torneo.fechaInicioTorneo.slice(0, 10));
+// Ya empezado y sin terminar: una liga a mitad o un torneo que se juega hoy
+const enCurso = computed(
+  () => props.torneo.fechaInicioTorneo.slice(0, 10) <= diaDeHoy() && ultimoDia.value >= diaDeHoy()
+);
 const router = useRouter();
 const fechaTorneo = ref<string>("");
 
