@@ -1,116 +1,94 @@
 <template>
   <v-card flat>
-    <v-card-title class="d-flex align-center pe-2">
-      Inscritos
-      <v-spacer></v-spacer>
+    <!-- Inscritos en tarjetas: en móvil la tabla necesitaba scroll horizontal -->
+    <div class="text-left px-3 pt-3">
+      <h3 class="text-subtitle-1 font-weight-bold mb-2">Inscritos ({{ localInscripciones.length }})</h3>
       <v-text-field
         v-model="search"
         density="compact"
-        label="Buscar"
+        label="Buscar jugador"
         prepend-inner-icon="mdi-magnify"
-        variant="solo-filled"
-        flat
+        clearable
         hide-details
-        single-line
+        class="mb-2"
       />
-    </v-card-title>
-
-    <v-divider></v-divider>
-
-    <div v-if="isLoading" class="text-center pa-4">
-      Cargando inscripciones...
+      <!-- A quién falta reclamarle algo, de un toque -->
+      <v-chip-group v-model="filtro" mandatory column selected-class="text-primary" class="mb-1">
+        <v-chip value="todos" size="small" filter>Todos ({{ localInscripciones.length }})</v-chip>
+        <v-chip value="sinLista" size="small" filter>Sin lista ({{ sinLista.length }})</v-chip>
+        <v-chip v-if="ilegales.length > 0" value="ilegal" size="small" filter>
+          Lista ilegal ({{ ilegales.length }})
+        </v-chip>
+        <v-chip value="sinPagar" size="small" filter>Sin pagar ({{ sinPagar.length }})</v-chip>
+      </v-chip-group>
     </div>
 
-    <div
-      v-else-if="!isLoading && localInscripciones.length === 0"
-      class="text-center pa-4"
-    >
+    <div v-if="isLoading" class="text-center pa-4">Cargando inscripciones...</div>
+    <div v-else-if="localInscripciones.length === 0" class="text-center pa-4">
       No hay inscripciones para este torneo
     </div>
-
-    <v-data-table
-      v-else
-      v-model:search="search"
-      :items="localInscripciones"
-      :headers="headers"
-      class="custom-table"
-      item-key="nick"
-    >
-      <template v-slot:item="{ item }">
-        <tr @click="handleRowClick(item)">
-          <!-- nick -->
-          <td>{{ item.nick }}</td>
-
-          <!-- fecha de la inscripcion -->
-          <td>
-            <v-chip
-              :color="
-                chipColor(
-                  item.fechaInscripcion,
-                  torneo?.torneo.fechaFinInscripcion
-                )
-              "
-              dark
-            >
-              {{ formattedDate(item.fechaInscripcion) }}
-            </v-chip>
-          </td>
-
-          <!-- estado de la lista -->
-          <td>
-            <v-chip :color="formattedEstadoLista(item.estadoLista).color" dark>
-              {{ formattedEstadoLista(item.estadoLista).text }}
-            </v-chip>
-          </td>
-
-          <!-- fecha entrega de la lista -->
-          <td>
-            <v-chip
-              :color="
-                chipColor(item.fechaEntrega, torneo?.torneo.fechaEntregaListas)
-              "
-              dark
-            >
-              {{ formattedDate(item.fechaEntrega) }}
-            </v-chip>
-          </td>
-
-          <!-- estado del pago -->
-          <td>
-            <v-chip :color="formattedEstadoPago(item.esPago).color" dark>
-              {{ formattedEstadoPago(item.esPago).text }}
-            </v-chip>
-          </td>
-
-          <!-- Puntos extra -->
-          <td class="d-flex align-center">
-            <v-btn
-              icon
-              small
-              color="primary"
-              variant="tonal"
-              :loading="loadingPuntosExtra"
-              @click.stop="actualizarPuntos(item, -1)"
-            >
-              <v-icon>mdi-minus</v-icon>
-            </v-btn>
-
-            <span class="mx-2">{{ item.puntosExtra }}</span>
-
-            <v-btn
-              icon
-              small
-              color="primary"
-              variant="tonal"
-              :loading="loadingPuntosExtra"
-              @click.stop="actualizarPuntos(item, 1)"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
+    <div v-else-if="visibles.length === 0" class="text-center text-medium-emphasis pa-4">
+      Nadie con estos filtros
+    </div>
+    <v-row v-else dense class="px-2">
+      <v-col v-for="item in visibles" :key="item.idInscripcion" cols="12" sm="6" lg="4">
+        <!-- Pulsando la tarjeta, el detalle para cambiar la lista o el pago -->
+        <v-card
+          v-ripple
+          variant="outlined"
+          class="pa-3 text-left tarjeta"
+          role="button"
+          tabindex="0"
+          @click="handleRowClick(item)"
+          @keydown.enter="handleRowClick(item)"
+        >
+          <div class="d-flex align-center ga-2">
+            <span class="text-body-1 font-weight-bold flex-grow-1 nick">{{ item.nick }}</span>
+            <!-- Puntos extra: se tocan sin abrir el detalle -->
+            <div class="d-flex align-center flex-shrink-0" @click.stop>
+              <v-btn
+                icon="mdi-minus"
+                size="x-small"
+                variant="tonal"
+                :disabled="loadingPuntosExtra"
+                aria-label="Quitar un punto extra"
+                @click.stop="actualizarPuntos(item, -1)"
+              />
+              <span class="mx-2 text-body-2 font-weight-bold puntos">{{ item.puntosExtra }}</span>
+              <v-btn
+                icon="mdi-plus"
+                size="x-small"
+                variant="tonal"
+                :disabled="loadingPuntosExtra"
+                aria-label="Sumar un punto extra"
+                @click.stop="actualizarPuntos(item, 1)"
+              />
+            </div>
+          </div>
+          <div class="text-body-2">
+            <span :class="`text-${estadoLista(item.estadoLista).color}`">
+              {{ estadoLista(item.estadoLista).texto }}
+            </span>
+            <span class="text-medium-emphasis"> · </span>
+            <span :class="estaPagado(item) ? 'text-success' : 'text-warning'">
+              {{ estaPagado(item) ? "Pagado" : "Sin pagar" }}
+            </span>
+          </div>
+          <!-- Las fechas, en amarillo si llegaron fuera de plazo -->
+          <div class="text-caption text-medium-emphasis">
+            <span :class="{ 'text-warning': tarde(item.fechaInscripcion, torneo?.torneo.fechaFinInscripcion) }">
+              Inscrito {{ formattedDate(item.fechaInscripcion) }}
+            </span>
+            <template v-if="item.fechaEntrega">
+              ·
+              <span :class="{ 'text-warning': tarde(item.fechaEntrega, torneo?.torneo.fechaEntregaListas) }">
+                Lista {{ formattedDate(item.fechaEntrega) }}
+              </span>
+            </template>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <!-- boton para generar los pairing pasandole el id del torneo -->
     <v-row justify="center" class="my-4 ga-5">
@@ -308,7 +286,7 @@ watch(
 
 const emit = defineEmits(["inscripcionEliminada"]);
 
-const search = ref<string>("");
+const search = ref<string | null>("");
 const showModal = ref(false);
 const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
   idInscripcion: 0,
@@ -347,43 +325,42 @@ const selectedInscripcion = ref<InscripcionTorneoCreadoDTO>({
   puntosExtra: 0,
 });
 
-const headers = computed(() => [
-  { title: "Nick", key: "nick" },
-  { title: "Fecha Inscripción", key: "fechaInscripcion" },
-  { title: "Estado Lista", key: "estadoLista" },
-  { title: "Fecha Entrega", key: "fechaEntrega" },
-  { title: "Pagado", key: "esPago" },
-  { title: "Pts Extra", key: "puntosExtra" },
-]);
+// Filtros: los que no han entregado la lista, los que la tienen ilegal y los que no han pagado
+const filtro = ref<"todos" | "sinLista" | "ilegal" | "sinPagar">("todos");
+const estaPagado = (item: InscripcionTorneoCreadoDTO) => (item.esPago ?? "").toUpperCase() === "SI";
+const sinEntregar = (item: InscripcionTorneoCreadoDTO) =>
+  !["ENTREGADA", "OK", "ILEGAL"].includes((item.estadoLista ?? "").toUpperCase());
+// El bye lo inscribe el sistema con números impares: no es nadie a quien reclamar nada
+const esBye = (item: InscripcionTorneoCreadoDTO) =>
+  item.idUsuario === 568 || /^bye\d*$/i.test((item.nick ?? "").trim());
+const reales = computed(() => localInscripciones.value.filter(i => !esBye(i)));
+const sinLista = computed(() => reales.value.filter(sinEntregar));
+const ilegales = computed(() =>
+  reales.value.filter(i => (i.estadoLista ?? "").toUpperCase() === "ILEGAL")
+);
+const sinPagar = computed(() => reales.value.filter(i => !estaPagado(i)));
+const normalizar = (texto: string) =>
+  texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const visibles = computed(() => {
+  const base =
+    filtro.value === "sinLista"
+      ? sinLista.value
+      : filtro.value === "ilegal"
+        ? ilegales.value
+        : filtro.value === "sinPagar"
+          ? sinPagar.value
+          : localInscripciones.value;
+  const texto = normalizar(search.value ?? "").trim();
+  return texto ? base.filter(i => normalizar(i.nick ?? "").includes(texto)) : base;
+});
+// Fuera de plazo: después de la fecha límite del torneo
+const tarde = (fecha?: string | null, limite?: string | null) =>
+  !!fecha && !!limite && new Date(fecha) > new Date(limite);
 
 const formattedDate = (date: string | null | undefined) => {
   return date ? new Date(date).toLocaleDateString() : "N/A";
 };
 
-const chipColor = (
-  inscriptionDate: string | null | undefined,
-  referenceDate: string | null | undefined
-) => {
-  if (!inscriptionDate || !referenceDate) return "red";
-  return new Date(inscriptionDate) < new Date(referenceDate)
-    ? "blue"
-    : "yellow";
-};
-
-const formattedEstadoPago = (estado: string) => {
-  if (estado === "NO") {
-    return { text: "NO", color: "red" };
-  } else if (estado === "SI") {
-    return { text: "SI", color: "blue" };
-  }
-  return { text: "Desconocido", color: "gray" };
-};
-
-// Los textos y colores de Mis eventos: sin entregar en amarillo, entregada y validada en verde, ilegal en rojo
-const formattedEstadoLista = (estado: string) => {
-  const { corto, color } = estadoLista(estado);
-  return { text: corto, color };
-};
 
 const handleRowClick = (item: InscripcionTorneoCreadoDTO) => {
   selectedInscripcion.value = item;
@@ -413,3 +390,16 @@ const closeModal = () => {
   showModal.value = false;
 };
 </script>
+
+<style scoped>
+.tarjeta {
+  cursor: pointer;
+}
+.nick {
+  overflow-wrap: anywhere;
+}
+.puntos {
+  min-width: 1.5em;
+  text-align: center;
+}
+</style>
