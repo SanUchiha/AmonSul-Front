@@ -65,6 +65,24 @@ export default {
       novedades: [
         {
           fecha: "Octubre 2026",
+          titulo: "Llegan las Copas",
+          descripcion:
+            "Nuevo formato de evento: fase de grupos y eliminatoria, como un mundial. Al crear un evento, elige Copa y decide cuántos grupos hay, cuántos pasan de cada uno, cómo se reparten los jugadores (por ELO con bombos, al azar o a mano), quién pasa si un cruce de la eliminatoria acaba en empate y si hay partido por el tercer puesto. En cada grupo se juega todos contra todos con calendario abierto, como en la liga, y cada jugador lleva su ejército toda la copa. Al cerrar los grupos se monta el cuadro con los mejores, que avanza solo según se validan los cruces. Si la copa cuenta para el ELO, cada partida suma en cuanto la validan los dos jugadores.",
+        },
+        {
+          fecha: "Octubre 2026",
+          titulo: "Rondas más fáciles de seguir",
+          descripcion:
+            "En los torneos, cada ronda ya no es una pestaña: hay una sola pestaña Rondas con pastillas para pasar de una a otra, como las jornadas de la liga, tanto en la vista de los jugadores como en la gestión. Además, un buscador enseña solo las partidas de un jugador en cada ronda, con su mesa; en los torneos por equipos, también el cruce de su equipo.",
+        },
+        {
+          fecha: "Octubre 2026",
+          titulo: "Gestión de eventos renovada",
+          descripcion:
+            "La gestión pasa a llamarse Gestión Eventos. Las partidas de la gestión de torneos usan la misma tarjeta que las ligas y las copas: resultado, si cada jugador mató al general, quién la ha validado, escenario y fecha, y un botón para validarla de un toque. En los torneos por equipos, la gestión muestra también la clasificación individual, y en todos los torneos la clasificación individual ya detecta siempre el ejército y el bando de cada jugador.",
+        },
+        {
+          fecha: "Octubre 2026",
           titulo: "Llegan las Ligas",
           descripcion:
             "Nuevo formato de evento: todos contra todos por jornadas. Al crear un evento, elige Liga como tipo y decide si es solo ida o ida y vuelta y si cuenta para el ELO. Cada jugador elige su ejército al inscribirse y lo lleva toda la liga, pero puede cambiar de lista antes de cada partida: cada partida guarda la lista con la que se jugó. Las jornadas se generan todas a la vez y el calendario es abierto: quedáis con vuestro rival y metéis el resultado en Mis partidas, dentro de la liga. Si la liga cuenta para el ELO, cada partida suma en cuanto la validan los dos jugadores.",
