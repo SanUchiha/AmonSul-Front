@@ -53,6 +53,7 @@
                     :torneo="torneoGestion"
                     @inscripcionEliminada="handleInscripcionEliminada"
                     @cambios="refreshTorneo"
+                    @puntosExtra="actualizarPuntosExtra"
                   />
                 </div>
               </v-tabs-window-item>
@@ -1316,6 +1317,13 @@ const isRondaValidada = (numeroRonda: number) => {
       partida.partidaValidadaUsuario1 === true &&
       partida.partidaValidadaUsuario2 === true
   );
+};
+
+// Los puntos extra que cambia el organizador mueven la clasificación al momento, sin recargar
+const actualizarPuntosExtra = (idUsuario: number, puntosExtra: number) => {
+  const inscripcion = inscripciones.value.find(i => i.idUsuario === idUsuario);
+  if (inscripcion) inscripcion.puntosExtra = puntosExtra;
+  calcularClasificacion();
 };
 
 const handleInscripcionEliminada = (idInscripcion: number) => {

@@ -140,6 +140,8 @@ export interface InscripcionTorneoCreadoMasDTO {
   bando?: "evil" | "good" | null;
   fechaUltimaEntrega?: string | null;
   esPago: string;
+  // Los que da el organizador y suman en la clasificación
+  puntosExtra?: number;
   lista: ListaDTO[];
   countListasEntregadas: number;
 }

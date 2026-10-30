@@ -62,6 +62,7 @@
                       :equipo="equipo"
                       :torneo="torneo!"
                       @delete-team="handleEquipoEliminado(equipo.idEquipo)"
+                      @puntos-extra="actualizarPuntosExtra"
                     />
                   </div>
                 </div>
@@ -654,6 +655,13 @@ const handleConfigConfirm = () => {
   closeConfigModal();
 };
 
+
+// Los puntos extra que cambia el organizador mueven la clasificación al momento, sin recargar
+const actualizarPuntosExtra = (idUsuario: number, puntosExtra: number) => {
+  const inscripcion = inscripciones.value.find(i => i.idUsuario === idUsuario);
+  if (inscripcion) inscripcion.puntosExtra = puntosExtra;
+  calcularClasificacion();
+};
 
 const handleEquipoEliminado = (idEquipo: number) => {
   if (torneoGestion.value) {

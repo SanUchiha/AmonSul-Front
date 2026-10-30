@@ -60,6 +60,8 @@
             <v-chip v-if="esRetirado(inscripcion)" size="x-small" color="error" variant="tonal">
               Retirado
             </v-chip>
+            <!-- Puntos extra: suman en la clasificación -->
+            <PuntosExtra v-else :inscripcion="inscripcion" />
             <v-menu>
               <template #activator="{ props: menuProps }">
                 <v-btn
@@ -219,6 +221,7 @@ import {
 import { FORMATO_COPA, textosEvento } from "@/Constant/FormatoTorneo";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import ModalAddJugadorTorneo from "@/components/GestionTorneos/ModalAddJugadorTorneo.vue";
+import PuntosExtra from "@/components/GestionTorneos/PuntosExtra.vue";
 import ModalDetalleInscripcion from "@/components/GestionTorneos/ModalDetalleInscripcion.vue";
 import ModalElegirEjercito from "@/components/Inscripcion/ModalElegirEjercito.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";

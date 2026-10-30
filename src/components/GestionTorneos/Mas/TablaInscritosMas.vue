@@ -49,6 +49,12 @@
         >
           <div class="d-flex align-center ga-2">
             <span class="text-body-1 font-weight-bold flex-grow-1 texto-largo">{{ item.nick }}</span>
+            <!-- Puntos extra: suman en la clasificación -->
+            <PuntosExtra
+              v-if="!esBye(item)"
+              :inscripcion="item"
+              @cambiado="(idUsuario, puntos) => emit('puntosExtra', idUsuario, puntos)"
+            />
             <v-menu>
               <template #activator="{ props: menuProps }">
                 <v-btn
@@ -360,6 +366,7 @@ import ModalSubirListaGestionMas from "./ModalSubirListaGestionMas.vue";
 import ModalModificarLista from "@/components/Inscripcion/ModalModificarLista.vue";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalParametrosPrimeraRondaMas from "./ModalParametrosPrimeraRondaMas.vue";
+import PuntosExtra from "../PuntosExtra.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoMasDTO }>();
 const localInscripciones = ref<InscripcionTorneoCreadoMasDTO[]>([]);
@@ -612,7 +619,7 @@ watch(
   }
 );
 
-const emit = defineEmits(["inscripcionEliminada", "cambios"]);
+const emit = defineEmits(["inscripcionEliminada", "cambios", "puntosExtra"]);
 
 // Generar la ronda 1 y el sorteo se piden desde la tarjeta de gestión, debajo de Descargar listas
 defineExpose({ abrirGenerarRonda1: () => handlerModalGenerarRonda1(), abrirSorteo: () => openSorteo() });

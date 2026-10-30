@@ -76,6 +76,12 @@
       <span :class="equipo.esPago === 'SI' ? 'text-success' : 'text-warning'">
         {{ equipo.esPago === "SI" ? "Pagado" : "Sin pagar" }}
       </span>
+      <template v-if="puntosExtraEquipo !== 0">
+        <span class="text-medium-emphasis"> · </span>
+        <span class="text-medium-emphasis">
+          {{ puntosExtraEquipo > 0 ? "+" : "" }}{{ puntosExtraEquipo }} {{ Math.abs(puntosExtraEquipo) === 1 ? "punto extra" : "puntos extra" }}
+        </span>
+      </template>
     </div>
     <div class="text-caption text-medium-emphasis mt-1">
       {{ isExpanded ? "Ocultar miembros" : "Ver miembros" }}
@@ -94,6 +100,11 @@
                   (capitán)
                 </span>
               </span>
+              <!-- Puntos extra: suman en su clasificación y en la del equipo -->
+              <PuntosExtra
+                :inscripcion="item"
+                @cambiado="(idUsuario, puntos) => emit('puntos-extra', idUsuario, puntos)"
+              />
               <v-menu v-model="isOpenMenuAcciones[item.idInscripcion]">
                 <template #activator="{ props: menuProps }">
                   <v-btn
@@ -334,6 +345,7 @@ import ModalCambiarEstadoListaEquipos from "./ModalCambiarEstadoListaEquipos.vue
 import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { UsuarioSinEquipoDTO } from "@/interfaces/Usuario";
 import ModalAddMiembroEquipo from "@/components/GestionTorneos/Equipos/ModalAddMiembroEquipo.vue";
+import PuntosExtra from "@/components/GestionTorneos/PuntosExtra.vue";
 
 const props = defineProps<{ equipo: EquipoDTO; torneo: Torneo }>();
 
@@ -371,7 +383,13 @@ const esPago = toRef(props.equipo, "esPago");
 
 const emit = defineEmits<{
   (e: "delete-team"): void;
+  (e: "puntos-extra", idUsuario: number, puntosExtra: number): void;
 }>();
+
+// Los de todos sus miembros: es lo que suma el equipo en la clasificación
+const puntosExtraEquipo = computed(() =>
+  inscripcionesEquipo.value.reduce((total, i) => total + (i.puntosExtra ?? 0), 0)
+);
 
 //Spiner
 const isCargandoAccion = ref(false);

@@ -49,25 +49,10 @@
           <div class="d-flex align-center ga-2">
             <span class="text-body-1 font-weight-bold flex-grow-1 nick">{{ item.nick }}</span>
             <!-- Puntos extra: se tocan sin abrir el detalle -->
-            <div class="d-flex align-center flex-shrink-0" @click.stop>
-              <v-btn
-                icon="mdi-minus"
-                size="x-small"
-                variant="tonal"
-                :disabled="loadingPuntosExtra"
-                aria-label="Quitar un punto extra"
-                @click.stop="actualizarPuntos(item, -1)"
-              />
-              <span class="mx-2 text-body-2 font-weight-bold puntos">{{ item.puntosExtra }}</span>
-              <v-btn
-                icon="mdi-plus"
-                size="x-small"
-                variant="tonal"
-                :disabled="loadingPuntosExtra"
-                aria-label="Sumar un punto extra"
-                @click.stop="actualizarPuntos(item, 1)"
-              />
-            </div>
+            <PuntosExtra
+              :inscripcion="item"
+              @cambiado="(idUsuario, puntos) => emit('puntosExtra', idUsuario, puntos)"
+            />
           </div>
           <!-- El correo, para escribirle: se abre la aplicación de correo sin abrir el detalle -->
           <a
@@ -157,17 +142,12 @@ import ModalAddJugadorTorneo from "./ModalAddJugadorTorneo.vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import { getInfoTorneoCreado } from "@/services/TorneosService";
 import ModalSorteo from "./ModalSorteo.vue";
-import { useToast } from "@/composables/useToast";
-import { updatePuntosExtraAsync } from "@/services/InscripcionesService";
-import { UpdatePuntosExtraDTO } from "@/interfaces/Inscripcion";
+import PuntosExtra from "./PuntosExtra.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
-
-const { triggerToast } = useToast();
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO }>();
 const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 const isLoading = ref<boolean>(true);
-const loadingPuntosExtra = ref<boolean>(false);
 const showConfigModal = ref<boolean>(false);
 const showSorteoModal = ref<boolean>(false);
 const showAddJugadorModal = ref<boolean>(false);
@@ -204,31 +184,6 @@ const openSorteo = async () => {
     isLoading.value = false;
   }
   showSorteoModal.value = true;
-};
-
-const actualizarPuntos = async (
-  inscripcion: InscripcionTorneoCreadoDTO,
-  puntos: number
-) => {
-  loadingPuntosExtra.value = true;
-  try {
-    inscripcion.puntosExtra += puntos;
-
-    const request: UpdatePuntosExtraDTO = {
-      idInscripcion: inscripcion.idInscripcion,
-      puntosExtra: inscripcion.puntosExtra,
-    };
-    await updatePuntosExtraAsync(request);
-
-    triggerToast("success", "Puntos extra modificados correctamente.");
-  } catch (error) {
-    console.error("Error al actualizar puntos:", error);
-    inscripcion.puntosExtra -= puntos;
-
-    triggerToast("error", "Puntos extra no han podido ser modificados.");
-  } finally {
-    loadingPuntosExtra.value = false;
-  }
 };
 
 const closeSorteoModal = () => {
@@ -279,7 +234,7 @@ watch(
   }
 );
 
-const emit = defineEmits(["inscripcionEliminada"]);
+const emit = defineEmits(["inscripcionEliminada", "puntosExtra"]);
 
 // Generar la ronda 1 y el sorteo se piden desde la tarjeta de gestión, debajo de Descargar listas
 defineExpose({ abrirGenerarRonda1: openConfigModal, abrirSorteo: openSorteo });
@@ -395,10 +350,6 @@ const closeModal = () => {
 }
 .nick {
   overflow-wrap: anywhere;
-}
-.puntos {
-  min-width: 1.5em;
-  text-align: center;
 }
 .email {
   overflow-wrap: anywhere;

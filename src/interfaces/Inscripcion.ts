@@ -151,6 +151,8 @@ export interface InscripcionTorneoDTO {
   email?: string | null;
   // good o evil: el bando de su lista, si la ha entregado
   bando?: string | null;
+  // Los que da el organizador: suman en la clasificación individual y en la de su equipo
+  puntosExtra?: number;
 }
 
 export interface JugadoresEquipoParaCambioDTO {

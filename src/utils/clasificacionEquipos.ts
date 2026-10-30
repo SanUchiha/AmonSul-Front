@@ -18,7 +18,8 @@ function crearClasificacionBase(
     clasificacionMap.set(equipo.idEquipo, {
       nombreEquipo: equipo.nombreEquipo ?? `Equipo ${equipo.idEquipo}`,
       idEquipo: equipo.idEquipo,
-      puntos: 0,
+      // Los puntos extra que da el organizador a cada miembro cuentan para el equipo
+      puntos: (equipo.inscripciones ?? []).reduce((total, i) => total + (i.puntosExtra ?? 0), 0),
       puntosFavor: 0,
       puntosContra: 0,
       diferencia: 0,
