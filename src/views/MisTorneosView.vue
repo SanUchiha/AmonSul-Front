@@ -1,238 +1,221 @@
 <template>
-  <v-container class="text-center">
-    <div v-if="isLoading">
-      <LoadingGandalf />
+  <div v-if="isLoading" class="d-flex justify-center align-center" style="height: 150px">
+    <LoadingGandalf />
+  </div>
+  <v-container v-else class="mis-eventos text-left">
+    <!-- Cabecera: qué hay aquí y dónde buscar más eventos -->
+    <div class="d-flex flex-wrap align-center ga-2 mb-1">
+      <h1 class="text-h5 font-weight-bold flex-grow-1">Mis eventos</h1>
+      <v-btn variant="tonal" color="primary" to="/torneos">Calendario de eventos</v-btn>
     </div>
-    <div v-else>
-      <!-- Titulo -->
-      <CardTitleMisTorneos />
-      <v-spacer class="my-4"></v-spacer>
+    <p class="text-body-2 text-medium-emphasis mb-3">
+      Los eventos en los que estás inscrito. Tus partidas y resultados están en
+      <router-link :to="`/detalle-jugador/${idUsuario}`">tu ficha de jugador</router-link>.
+    </p>
 
-      <!-- Resumen partidas -->
-      <v-row justify="center">
-        <v-col cols="12" md="12">
-          <v-row dense>
-            <v-col cols="12" md="12" class="text-center">
-              <CardInscripcionesUsuarioTorneo :usuario="usuarioData" />
-            </v-col>
-          </v-row>
-          <v-row dense> </v-row>
-          <v-row dense>
-            <v-col cols="12" sm="6" class="text-center">
-              <SparklineElo :idUsuario="idUsuarioLogger" />
-            </v-col>
-            <v-col cols="12" sm="6" class="text-center">
-              <!-- Resumen partidas -->
-              <v-card class="section-card stats-section pt-0 mt-0 mb-2">
-                <v-col cols="12"
-                  ><p class="text-h5 ringbearer">Estadísticas</p></v-col
-                >
-                <v-divider></v-divider>
-                <v-col cols="12" md="12" class="text-center">
-                  <!--<CardResumenPartidas :usuario="usuarioData" />-->
-                  <CardEstadisticas
-                    :usuario="usuarioData"
-                    @filtroCambiar="filtrarPartidas"
-                  />
-                </v-col>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
+    <v-chip-group v-model="vista" mandatory column selected-class="text-primary" class="mb-2">
+      <v-chip value="proximos" filter>Próximos y en curso ({{ proximos.length }})</v-chip>
+      <v-chip value="terminados" filter>Terminados ({{ terminados.length }})</v-chip>
+    </v-chip-group>
 
-      <!-- partidas validades -->
-      <div v-if="!isLoadingMatches && matches.length > 0">
-        <v-card class="section-card stats-section pt-0 mt-0">
-          <v-col cols="12"
-            ><p class="text-h5 ringbearer">Partidas de torneo</p></v-col
-          >
-          <v-divider></v-divider>
-          <v-row>
-            <v-col
-              cols="12"
-              sm="6"
-              md="6"
-              lg="4"
-              xl="4"
-              class="pb-0"
-              v-for="match in partidasFiltradas"
-              :key="match.idPartidaTorneo"
-            >
-              <CardPartidaTorneo
-                :idUsuario="idUsuarioLogger"
-                :match="match"
-                class="mb-4"
-              />
-            </v-col>
-          </v-row>
-        </v-card>
-      </div>
-      <div v-else>
-        <h3>No tienes partidas en torneos</h3>
-      </div>
-      <v-divider class="my-3"></v-divider>
+    <v-card v-if="lista.length === 0" variant="outlined" class="pa-4 text-center">
+      <p class="text-body-2 text-medium-emphasis mb-3">
+        {{
+          vista === "proximos"
+            ? "No estás inscrito en ningún evento próximo."
+            : "Aún no has terminado ningún evento."
+        }}
+      </p>
+      <v-btn v-if="vista === 'proximos'" color="primary" variant="tonal" to="/torneos">
+        Buscar en el calendario
+      </v-btn>
+    </v-card>
+    <v-row v-else dense>
+      <v-col v-for="inscripcion in visibles" :key="inscripcion.clave" cols="12" sm="6" lg="4">
+        <TarjetaInscripcion :inscripcion="inscripcion" @verInscripcion="abrirInscripcion" />
+      </v-col>
+    </v-row>
+    <!-- Por tandas: los terminados pueden ser muchos -->
+    <div v-if="lista.length > visibles.length" class="text-center mt-2">
+      <v-btn variant="tonal" size="small" @click="cuantosVer += TANDA">
+        Ver más ({{ lista.length - visibles.length }})
+      </v-btn>
     </div>
   </v-container>
+
+  <!-- Detalle de la inscripción: subir la lista, ver la del equipo o darse de baja -->
+  <ModalInscripcion
+    v-if="abierta && !abierta.porEquipos"
+    :key="abierta.clave"
+    :idInscripcion="abierta.idInscripcion"
+    :idUsuario="idUsuario"
+    :idTorneo="abierta.idTorneo"
+    :idOrganizador="abierta.idOrganizador ?? 0"
+    :ejercitoElegido="abierta.ejercitoElegido ?? null"
+    @eliminar-inscripcion="pedirBaja(abierta)"
+    @close="abierta = null"
+  />
+  <v-dialog
+    v-if="abierta?.porEquipos"
+    :model-value="true"
+    max-width="800"
+    @update:model-value="abierta = null"
+  >
+    <ModalInscripcionEquipo
+      :key="abierta.clave"
+      :idInscripcion="abierta.idInscripcion"
+      :idUsuario="idUsuario"
+      :idTorneo="abierta.idTorneo"
+      :idOrganizador="abierta.idOrganizador"
+      @eliminar-inscripcion-equipo="idEquipo => pedirBaja(abierta, idEquipo)"
+      @close="abierta = null"
+    />
+  </v-dialog>
+
+  <!-- Darse de baja no tiene vuelta atrás: mejor preguntarlo -->
+  <v-dialog :model-value="!!baja" max-width="420" @update:model-value="baja = null">
+    <v-card v-if="baja">
+      <v-card-title class="text-wrap">¿Darte de baja?</v-card-title>
+      <v-card-text>
+        {{
+          baja.idEquipo
+            ? `Se dará de baja a tu equipo de ${baja.inscripcion.torneo.nombreTorneo}.`
+            : `Dejarás de estar inscrito en ${baja.inscripcion.torneo.nombreTorneo}.`
+        }}
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn variant="text" @click="baja = null">Volver</v-btn>
+        <v-btn color="error" variant="flat" :loading="dandoDeBaja" @click="confirmarBaja">
+          Darme de baja
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import SparklineElo from "@/components/Elo/SparklineElo.vue";
-import CardPartidaTorneo from "@/components/PartidasTorneo/CardPartidaTorneo.vue";
-import CardInscripcionesUsuarioTorneo from "@/components/PartidasTorneo/CardInscripcionesUsuarioTorneo.vue";
-import CardTitleMisTorneos from "@/components/PartidasTorneo/CardTitleMisTorneos.vue";
-import { useAuth } from "@/composables/useAuth";
-import { FaccionDTO } from "@/interfaces/Faccion";
-import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
-import { idJugadorDelLado } from "@/utils/partidaParejas";
-import { UsuarioDataDTO } from "@/interfaces/Usuario";
-import { getFaccionByIdUser } from "@/services/FaccionesService";
-import { getTournamentMatches } from "@/services/PartidaTorneoService";
-import { ref, onMounted, computed } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import CardEstadisticas from "@/components/Perfil/CardEstadisticas.vue";
+import { useAuth } from "@/composables/useAuth";
+import { useToast } from "@/composables/useToast";
+import {
+  InscripcionUsuarioEquipoDTO,
+  InscripcionUsuarioIndividualDTO,
+} from "@/interfaces/Inscripcion";
+import {
+  cancelarInscripcion,
+  eliminarEquipoAsync,
+  getInscripcionesEquipoByUser,
+  getInscripcionesIndividualByUser,
+} from "@/services/InscripcionesService";
+import {
+  haTerminado,
+  MiInscripcion,
+  ordenProximos,
+  ordenTerminados,
+} from "@/utils/misEventos";
+import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import TarjetaInscripcion from "@/components/Inscripcion/TarjetaInscripcion.vue";
+import ModalInscripcion from "@/components/Inscripcion/ModalInscripcion.vue";
+import ModalInscripcionEquipo from "@/components/Inscripcion/ModalInscripcionEquipo.vue";
 
-const isLoading = ref(true);
-const { getidUsuario, getUser } = useAuth();
 const router = useRouter();
-const idUsuarioLogger = ref<number>(parseInt(getidUsuario.value));
-const emailOwner = ref<string | null>(getUser.value);
-const matches = ref<ViewPartidaTorneoDTO[]>([]);
-const isLoadingMatches = ref<boolean>(false);
-const faccionDTO = ref<FaccionDTO>({
-  idFaccion: 0,
-  nombreFaccion: "",
-});
-const usuarioData = ref<UsuarioDataDTO>({
-  idUsuario: 0,
-  nick: "",
-  email: "",
-  faccion: faccionDTO.value,
-  partidasValidadas: [],
-  partidasPendientes: [],
-  elos: [],
-  InscripcionesIndividualTorneo: [],
-  InscripcionesEquipoTorneo: [],
-  clasificacionElo: 0,
-  puntuacionElo: 0,
-  numeroPartidasJugadas: 0,
-  partidasGanadas: 0,
-  partidasEmpatadas: 0,
-  partidasPerdidas: 0,
-  proteccionDatos: null,
-  PartidasTorneo: [],
-  ClasificacionTorneos: [],
-  rankingElo: 0,
+const { getidUsuario } = useAuth();
+const { triggerToast } = useToast();
+const idUsuario = Number(getidUsuario.value);
+
+const TANDA = 10;
+const isLoading = ref(true);
+const inscripciones = ref<MiInscripcion[]>([]);
+const vista = ref<"proximos" | "terminados">("proximos");
+const cuantosVer = ref(TANDA);
+
+const proximos = computed(() =>
+  inscripciones.value.filter(i => !haTerminado(i)).sort(ordenProximos)
+);
+const terminados = computed(() =>
+  inscripciones.value.filter(i => haTerminado(i)).sort(ordenTerminados)
+);
+const lista = computed(() => (vista.value === "proximos" ? proximos.value : terminados.value));
+const visibles = computed(() => lista.value.slice(0, cuantosVer.value));
+watch(vista, () => {
+  cuantosVer.value = TANDA;
 });
 
-//Variables para filtrar partidas segun el click en la barra de estadisticas
-const filtroActivo = ref<"win" | "loss" | "draw" | null>(null);
-
-const partidasFiltradas = computed(() => {
-  if (!filtroActivo.value) return matches.value;
-
-  return matches.value.filter((partida) => {
-    const idLado = idJugadorDelLado(partida, idUsuarioLogger.value);
-    const esVictoria = partida.ganadorPartidaTorneo === idLado;
-    const esEmpate = partida.ganadorPartidaTorneo === null;
-    const esDerrota =
-      partida.ganadorPartidaTorneo &&
-      partida.ganadorPartidaTorneo !== idLado;
-
-    return (
-      (filtroActivo.value === "win" && esVictoria) ||
-      (filtroActivo.value === "draw" && esEmpate) ||
-      (filtroActivo.value === "loss" && esDerrota)
-    );
-  });
+// Las individuales y las de equipo, con la misma forma para pintarlas igual
+const desdeIndividual = (i: InscripcionUsuarioIndividualDTO): MiInscripcion => ({
+  clave: `i${i.idInscripcion}`,
+  idInscripcion: i.idInscripcion,
+  idTorneo: i.idTorneo,
+  idOrganizador: i.idOrganizador,
+  porEquipos: false,
+  torneo: i.torneo,
+  estadoLista: i.estadoLista,
+  esPago: i.esPago,
+  ejercitoElegido: i.ejercitoElegido,
+});
+const desdeEquipo = (i: InscripcionUsuarioEquipoDTO): MiInscripcion => ({
+  clave: `e${i.idInscripcion}`,
+  idInscripcion: i.idInscripcion,
+  idTorneo: i.idTorneo,
+  idOrganizador: null,
+  porEquipos: true,
+  torneo: i.torneo,
 });
 
-const initializeComponent = async () => {
-  if (idUsuarioLogger.value && emailOwner.value) {
-    isLoading.value = true;
-    isLoadingMatches.value = true;
-    try {
-      const response = await getTournamentMatches(idUsuarioLogger.value);
-      matches.value = response.data;
-
-      loadComunidad(idUsuarioLogger.value);
-      usuarioData.value.email = emailOwner.value;
-
-      loadResume(matches.value);
-
-      loadRankingElo(idUsuarioLogger.value);
-    } catch (error) {
-      console.error(error);
-      router.push({ name: "error" });
-    } finally {
-      isLoading.value = false;
-      isLoadingMatches.value = false;
-    }
-  }
-};
-
-const loadResume = async (matches: ViewPartidaTorneoDTO[]) => {
-  usuarioData.value.numeroPartidasJugadas = matches.length;
-
-  let contadorGanadas = 0;
-  let contadorEmpatadas = 0;
-  let contadorPerdidas = 0;
-
-  matches.forEach((element) => {
-    const idLado = idJugadorDelLado(element, idUsuarioLogger.value);
-    if (element.ganadorPartidaTorneo == idLado)
-      contadorGanadas++;
-    else if (
-      element.ganadorPartidaTorneo != idLado &&
-      element.ganadorPartidaTorneo != null
-    )
-      contadorPerdidas++;
-    else contadorEmpatadas++;
-  });
-
-  usuarioData.value.partidasGanadas = contadorGanadas;
-  usuarioData.value.partidasEmpatadas = contadorEmpatadas;
-  usuarioData.value.partidasPerdidas = contadorPerdidas;
-};
-
-onMounted(initializeComponent);
-
-const loadComunidad = async (idUser: number) => {
+const cargarInscripciones = async () => {
   try {
-    const response = await getFaccionByIdUser(idUser);
-    usuarioData.value.faccion.nombreFaccion = response.data;
+    const [individuales, equipos] = await Promise.all([
+      getInscripcionesIndividualByUser(String(idUsuario)),
+      getInscripcionesEquipoByUser(idUsuario),
+    ]);
+    inscripciones.value = [
+      ...(individuales.data as InscripcionUsuarioIndividualDTO[]).map(desdeIndividual),
+      ...(equipos.data as InscripcionUsuarioEquipoDTO[]).map(desdeEquipo),
+    ].filter(i => i.torneo);
   } catch (error) {
-    console.error("Error al obtener las comunidades: ", error);
+    console.error(error);
+    router.push({ name: "error" });
   }
 };
 
-const loadRankingElo = async (idUser: number) => {
-  // TODO MOSTRAR RANKING INDIVIDUAL ELO
-  idUser;
-  // try {
-  //   console.log(idUser);
-  //   const response = await getUsuarioData(idUser);
-  //   //TODO Arreglo getRankingEloByIdUser
-  //   //const response = await getRankingEloByIdUser(idUser);
-  //   console.log(response.data);
-  //   usuarioData.value.rankingElo = response.data.clasificacionElo;
-  // } catch (error) {
-  //   console.error("Error al obtener el ranking del jugador: ", error);
-  // }
+const abierta = ref<MiInscripcion | null>(null);
+const abrirInscripcion = (inscripcion: MiInscripcion) => {
+  abierta.value = inscripcion;
 };
 
-function filtrarPartidas(tipo: "win" | "loss" | "draw" | null) {
-  filtroActivo.value = tipo;
-}
+const baja = ref<{ inscripcion: MiInscripcion; idEquipo?: number } | null>(null);
+const dandoDeBaja = ref(false);
+const pedirBaja = (inscripcion: MiInscripcion | null, idEquipo?: number) => {
+  abierta.value = null;
+  if (inscripcion) baja.value = { inscripcion, idEquipo };
+};
+const confirmarBaja = async () => {
+  if (!baja.value) return;
+  dandoDeBaja.value = true;
+  try {
+    if (baja.value.idEquipo) await eliminarEquipoAsync(baja.value.idEquipo);
+    else await cancelarInscripcion(baja.value.inscripcion.idInscripcion);
+    triggerToast("success", "Te has dado de baja");
+    baja.value = null;
+    await cargarInscripciones();
+  } catch (error) {
+    console.error(error);
+    triggerToast("error", "No se ha podido dar de baja");
+  } finally {
+    dandoDeBaja.value = false;
+  }
+};
+
+onMounted(async () => {
+  if (idUsuario) await cargarInscripciones();
+  isLoading.value = false;
+});
 </script>
 
 <style scoped>
-.section-card {
-  margin-bottom: 20px;
-  padding: 20px;
-  background: #212121;
-  color: white;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+.mis-eventos {
+  max-width: 1100px;
 }
 </style>

@@ -52,6 +52,7 @@ export interface TorneoReducidoDTO {
   idTorneo: number; // Identificador único del torneo (PK)
   nombreTorneo: string; // Nombre del torneo
   limiteParticipantes?: number; // Límite de plazas del torneo (opcional)
+  fechaInicioTorneo?: string; // Primer día del evento
   fechaFinTorneo: string; // Fecha de fin del torneo
   numeroPartidas: number; // Número de partidas del torneo
   puntosTorneo: number; // Puntos asignados al torneo
