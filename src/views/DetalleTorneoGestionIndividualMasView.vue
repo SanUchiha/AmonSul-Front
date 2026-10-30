@@ -39,7 +39,14 @@
                     <!-- Como los demás botones: cada uno en su fila y a lo ancho -->
                     <template #acciones>
                       <v-col cols="12">
-                        <v-btn variant="tonal" color="primary" block @click="tablaInscritos?.abrirGenerarRonda1()">
+                        <!-- Con la ronda 1 ya generada, desactivado: el back tampoco la genera dos veces -->
+                        <v-btn
+                          variant="tonal"
+                          color="primary"
+                          block
+                          :disabled="partidasPorRonda[1] !== undefined"
+                          @click="tablaInscritos?.abrirGenerarRonda1()"
+                        >
                           Generar ronda 1
                         </v-btn>
                       </v-col>

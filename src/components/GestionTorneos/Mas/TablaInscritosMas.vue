@@ -528,7 +528,9 @@ const refreshTorneo = async () => {
 const openSorteo = async () => {
   isLoading.value = true;
   try {
+    // El bye no entra en el sorteo
     nicks.value = localInscripciones.value
+      .filter((x) => !esBye(x))
       .map((x) => x.nick)
       .filter((nick): nick is string => nick !== null && nick !== undefined);
   } catch (error) {
