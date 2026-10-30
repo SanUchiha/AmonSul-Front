@@ -116,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+import { esUsuarioBye } from "@/utils/bye";
 import { computed, ref } from "vue";
 import { TorneoGestionInfoMasDTO, Torneo } from "@/interfaces/Torneo";
 import { getListasTorneoAsync, getTorneo } from "@/services/TorneosService";
@@ -149,26 +150,31 @@ const mostrarClasificacion = ref(props.torneo?.torneo.mostrarClasificacion);
 const isLoading = ref<boolean>(false);
 const isDownloading = ref<boolean>(false);
 
+// Las cifras, sin el bye: no es nadie a quien contar ni reclamar
+const inscritos = computed(() =>
+  (props.torneo?.inscripciones ?? []).filter(i => !esUsuarioBye(i.idUsuario, i.nick))
+);
+
 const plazasRestantes = computed(() => {
-  if (!props.torneo || props.torneo.inscripciones.length === null) {
+  if (!props.torneo || inscritos.value.length === null) {
     return "Sin límite";
   }
   if (props.torneo.torneo.limiteParticipantes == null) return "Sin límite";
   return (
-    props.torneo.torneo.limiteParticipantes - props.torneo.inscripciones.length
+    props.torneo.torneo.limiteParticipantes - inscritos.value.length
   );
 });
 
 const todasLasListas = computed(() => {
-  if (!props.torneo || !props.torneo.inscripciones) return [];
+  if (!props.torneo || !inscritos.value) return [];
 
-  return props.torneo.inscripciones.flatMap(inscripcion => inscripcion.lista);
+  return inscritos.value.flatMap(inscripcion => inscripcion.lista);
 });
 
 const listasTotales = computed(() => {
   if (!props.torneo) return 0;
   return (
-    props.torneo.torneo.listasPorJugador * props.torneo.inscripciones.length
+    props.torneo.torneo.listasPorJugador * inscritos.value.length
   );
 });
 
@@ -183,12 +189,12 @@ const listasOscuridad = computed(() => {
 });
 
 const totalInscripciones = computed(() => {
-  return props.torneo ? props.torneo.inscripciones.length : 0;
+  return props.torneo ? inscritos.value.length : 0;
 });
 
 const pagosRealizados = computed(() => {
   if (!props.torneo) return 0;
-  return props.torneo.inscripciones.filter(
+  return inscritos.value.filter(
     inscripcion => inscripcion.esPago === "SI"
   ).length;
 });

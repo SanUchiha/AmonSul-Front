@@ -11,10 +11,6 @@ import {
 } from "@/interfaces/Torneo";
 import { http } from "./index";
 
-export const getTorneos = async () => {
-  return http.get(`Torneo`);
-};
-
 export const getTorneosProximosPaginadosAsync = async (
   pageNumber = 1,
   pageSize = 10

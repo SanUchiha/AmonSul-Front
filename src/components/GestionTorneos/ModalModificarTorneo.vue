@@ -532,8 +532,8 @@ const tileLayerUrl = ref<string>(
 const isSearching = ref<boolean>(false);
 // Función para buscar la dirección ingresada por el usuario
 const searchLocation = async () => {
-  isSearching.value = true;
   if (!searchQuery.value.trim()) return;
+  isSearching.value = true;
 
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
     searchQuery.value
@@ -583,6 +583,31 @@ const formatAddress = (data: any): string => {
   return [`${road}${houseNumber}`, city, state, postcode, country]
     .filter(Boolean) // Elimina valores vacíos
     .join(", ");
+};
+
+// Al abrir, el lugar guardado en el buscador y en el mapa: son coordenadas "lat, lon" o, si no se encontró
+// la dirección al crearlo, el texto tal cual
+const mostrarLugarGuardado = async (lugar: string) => {
+  const coordenadas = lugar.match(/^(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)$/);
+  if (!coordenadas) {
+    searchQuery.value = lugar;
+    formattedAddress.value = "";
+    selectedLocation.value = null;
+    return;
+  }
+  const lat = parseFloat(coordenadas[1]);
+  const lng = parseFloat(coordenadas[2]);
+  selectedLocation.value = { lat, lng };
+  try {
+    const { data } = await axios.get(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
+    );
+    formattedAddress.value = data?.display_name ? formatAddress(data) : lugar;
+  } catch (error) {
+    console.error("Error obteniendo la dirección:", error);
+    formattedAddress.value = lugar;
+  }
+  searchQuery.value = formattedAddress.value;
 };
 
 const handleDateChangeInicio = (newDate: string | null) => {
@@ -659,6 +684,7 @@ watch(
       limiteParticipantes.value = newTorneo.limiteParticipantes;
       descripcionTorneo.value = newTorneo.descripcionTorneo || "";
       lugarTorneo.value = newTorneo.lugarTorneo || "";
+      mostrarLugarGuardado(lugarTorneo.value);
       precioTorneo.value = newTorneo.precioTorneo;
       numeroPartidas.value = newTorneo.numeroPartidas;
       puntosTorneo.value = newTorneo.puntosTorneo;

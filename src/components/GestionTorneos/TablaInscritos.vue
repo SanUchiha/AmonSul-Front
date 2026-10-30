@@ -6,7 +6,7 @@
       <v-btn variant="tonal" color="secondary" block class="mb-3" @click="openAddJugadorModal">
         Añadir jugador
       </v-btn>
-      <h3 class="text-subtitle-1 font-weight-bold mb-2">Inscritos ({{ localInscripciones.length }})</h3>
+      <h3 class="text-subtitle-1 font-weight-bold mb-2">Inscritos ({{ reales.length }})</h3>
       <v-text-field
         v-model="search"
         density="compact"
@@ -18,7 +18,7 @@
       />
       <!-- A quién falta reclamarle algo, de un toque -->
       <v-chip-group v-model="filtro" mandatory column selected-class="text-primary" class="mb-1">
-        <v-chip value="todos" size="small" filter>Todos ({{ localInscripciones.length }})</v-chip>
+        <v-chip value="todos" size="small" filter>Todos ({{ reales.length }})</v-chip>
         <v-chip value="faltanListas" size="small" filter>Faltan listas ({{ faltanListas.length }})</v-chip>
         <v-chip v-if="ilegales.length > 0" value="ilegal" size="small" filter>
           Lista ilegal ({{ ilegales.length }})
@@ -125,6 +125,7 @@
 </template>
 
 <script setup lang="ts">
+import { esUsuarioBye } from "@/utils/bye";
 import { bandoLista, estadoLista } from "@/utils/estadoLista";
 import { ref, computed, watch, defineEmits } from "vue";
 import { defineProps } from "vue";
@@ -284,8 +285,7 @@ const estaPagado = (item: InscripcionTorneoCreadoDTO) => (item.esPago ?? "").toU
 const faltaLista = (item: InscripcionTorneoCreadoDTO) =>
   !["ENTREGADA", "OK"].includes((item.estadoLista ?? "").toUpperCase());
 // El bye lo inscribe el sistema con números impares: no es nadie a quien reclamar nada
-const esBye = (item: InscripcionTorneoCreadoDTO) =>
-  item.idUsuario === 568 || /^bye\d*$/i.test((item.nick ?? "").trim());
+const esBye = (item: InscripcionTorneoCreadoDTO) => esUsuarioBye(item.idUsuario, item.nick);
 const reales = computed(() => localInscripciones.value.filter(i => !esBye(i)));
 const faltanListas = computed(() => reales.value.filter(faltaLista));
 const ilegales = computed(() =>

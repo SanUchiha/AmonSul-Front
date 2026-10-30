@@ -18,7 +18,6 @@ import DetalleTorneoGestionCopaView from "@/views/DetalleTorneoGestionCopaView.v
 import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
 import DetalleTorneoLiveEquiposView from "@/views/DetalleTorneoLiveEquiposView.vue";
 import DetalleTorneoLiveMasView from "@/views/DetalleTorneoLiveMasView.vue";
-import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
 import CircuitosView from "@/views/CircuitosView.vue";
 import DetalleTorneoGestionIndividualMasView from "@/views/DetalleTorneoGestionIndividualMasView.vue";
@@ -99,12 +98,9 @@ const routes: Array<RouteRecordRaw> = [
     component: EloView,
     meta: { requiresAuth: true },
   },
-  {
-    path: "/resultados-torneos",
-    name: "resultados-torneos",
-    component: ResultadosTorneosView,
-    meta: { requiresAuth: true },
-  },
+  // La antigua lista de todos los torneos con sus carteles, que cargaba de golpe: los resultados de cada evento
+  // están en el calendario
+  { path: "/resultados-torneos", redirect: "/torneos" },
 
   {
     path: "/detalle-torneo/:idTorneo",

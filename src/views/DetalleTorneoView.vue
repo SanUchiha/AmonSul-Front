@@ -93,7 +93,7 @@
                           <template v-else>
                             <strong>Fecha:</strong>
                             {{ formatDate(torneo.fechaInicioTorneo) }} a las
-                            {{ torneo.horaInicioTorneo }}
+                            {{ formatHora(torneo.horaInicioTorneo) }}
                           </template>
                         </p>
                         <p>
@@ -509,7 +509,7 @@ import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalElegirEjercito from "@/components/Inscripcion/ModalElegirEjercito.vue";
 import { esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import { diaDeHoy, ultimoDiaEvento } from "@/utils/Fecha";
+import { diaDeHoy, formatHora, ultimoDiaEvento } from "@/utils/Fecha";
 import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
 
 const { getidUsuario } = useAuth();

@@ -20,6 +20,9 @@ export const formatFechaDB = async (fecha: string): Promise<string> => {
   return formattedDate;
 };
 
+// "09:00:00" del back como "09:00"
+export const formatHora = (hora: string | null | undefined) => (hora ?? "").slice(0, 5);
+
 // Hoy como "AAAA-MM-DD", para comparar días sin horas
 export const diaDeHoy = () => new Date().toLocaleDateString("sv-SE");
 

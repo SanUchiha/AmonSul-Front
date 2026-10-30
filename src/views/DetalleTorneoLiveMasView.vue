@@ -289,6 +289,7 @@ import { getInscripcionesTorneo } from "@/services/InscripcionesService";
 import { getPartidasTorneoMas, getResumenTorneoAsync, getTorneo } from "@/services/TorneosService";
 import { appsettings } from "@/settings/appsettings";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
+import { esUsuarioBye } from "@/utils/bye";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -748,7 +749,8 @@ const calcularClasificacion = async () => {
   });
 
   //Ordenar segun parametros
-  clasificacion.value = Object.values(ranking).sort((a, b) => {
+  // El bye no es un jugador: ni sale en la clasificación ni se guarda como posición
+  clasificacion.value = Object.values(ranking).filter(j => !esUsuarioBye(j.idUsuario, j.nick)).sort((a, b) => {
     // 1. Ordenar por puntosTorneo
     if (b.puntosTorneo !== a.puntosTorneo) {
       return b.puntosTorneo - a.puntosTorneo;

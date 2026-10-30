@@ -44,7 +44,7 @@
             <template v-else>
               <strong>Fecha:</strong> {{ fechaTorneo }}
               <template v-if="!esLiga">
-                a las {{ torneo.horaInicioTorneo }}
+                a las {{ formatHora(torneo.horaInicioTorneo) }}
               </template>
             </template>
           </p>
@@ -93,7 +93,7 @@
 <script setup lang="ts">
 import { Torneo } from "@/interfaces/Torneo";
 import { FORMATO_COPA, esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
-import { diaDeHoy, formatFechaSpa, formatFechaSpaWhitoutAsync, ultimoDiaEvento } from "@/utils/Fecha";
+import { diaDeHoy, formatFechaSpa, formatFechaSpaWhitoutAsync, formatHora, ultimoDiaEvento } from "@/utils/Fecha";
 import { defineProps, ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 

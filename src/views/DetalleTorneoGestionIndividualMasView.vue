@@ -73,7 +73,8 @@
                 class="ma-3 text-green-500"
               >
                 Todas las partidas están validadas
-                <div>
+                <!-- Con los resultados guardados el torneo está cerrado: ni partidas nuevas ni rondas que quitar -->
+                <div v-if="!wasSave">
                   <v-list-item>
                     <v-list-item-content>
                       <v-list-item-title>
@@ -113,7 +114,7 @@
                             </v-btn>
                             <!-- La última generada también se puede eliminar aunque no sea la última del torneo -->
                             <v-btn
-                              v-if="activeTab === ultimaRondaGenerada"
+                              v-if="activeTab === ultimaRondaGenerada && !wasSave"
                               class="mt-2"
                               variant="tonal"
                               color="error"
@@ -128,6 +129,7 @@
                   </div>
                 </div>
                 <div v-else class="mt-3">
+                  <p v-if="wasSave" class="mt-2">Resultados guardados: el torneo está cerrado.</p>
                   <!-- boton para cerrar el torneo -->
                   <v-btn
                     v-if="!wasSave"
@@ -139,6 +141,7 @@
                     Guardar resultados
                   </v-btn>
                   <v-btn
+                    v-if="!wasSave"
                     class="mt-2 ml-2"
                     variant="tonal"
                     color="error"
@@ -155,7 +158,7 @@
                   "
                 >
                   Esperando ronda...
-                  <div>
+                  <div v-if="!wasSave">
                     <v-list-item>
                       <v-list-item-content>
                         <v-list-item-title>
@@ -183,6 +186,7 @@
                           <v-list-item-title>
                             <div class="d-flex flex-wrap justify-center ga-2">
                               <v-btn
+                                v-if="!wasSave"
                                 class="mt-2"
                                 variant="tonal"
                                 color="secondary"
@@ -191,7 +195,7 @@
                                 Añadir partida
                               </v-btn>
                               <v-btn
-                                v-if="activeTab === ultimaRondaGenerada"
+                                v-if="activeTab === ultimaRondaGenerada && !wasSave"
                                 class="mt-2"
                                 variant="tonal"
                                 color="error"
@@ -221,7 +225,7 @@
                   :etiqueta="`Mesa ${mesaDe(partidasPorRonda[activeTab!], partida)}`"
                   @partidaActualizada="actualizarPartida"
                 >
-                  <div class="d-flex flex-wrap align-center justify-end ga-1 mt-1">
+                  <div v-if="!wasSave" class="d-flex flex-wrap align-center justify-end ga-1 mt-1">
                     <v-btn
                       size="small"
                       variant="text"
@@ -532,6 +536,7 @@ import {
   ResultMatchMatchedPlayType,
 } from "@/Constant/TipoClasificacion";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
+import { esUsuarioBye } from "@/utils/bye";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -1259,7 +1264,8 @@ const calcularClasificacion = () => {
     }
   });
 
-  clasificacion.value = Object.values(ranking).sort((a, b) => {
+  // El bye no es un jugador: ni sale en la clasificación ni se guarda como posición
+  clasificacion.value = Object.values(ranking).filter(j => !esUsuarioBye(j.idUsuario, j.nick)).sort((a, b) => {
     // 1. Ordenar por puntosTorneo
     if (b.puntosTorneo !== a.puntosTorneo) {
       return b.puntosTorneo - a.puntosTorneo;

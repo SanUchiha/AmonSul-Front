@@ -17,6 +17,7 @@
             <strong>Mesa {{ mesa.numero }}:</strong>
             {{ mesa.equipo1 }} vs {{ mesa.equipo2 }}
             <v-btn
+              v-if="!props.cerrado"
               icon
               @click="editarEmparejamiento(mesa.idEquipo1, mesa.idEquipo2)"
             >
@@ -50,6 +51,8 @@ const props = defineProps<{
   idTorneo: number;
   // Con un jugador buscado, solo los cruces de su equipo, con su número de mesa de siempre
   soloEquipos?: number[] | null;
+  // Con los resultados guardados los cruces ya no se cambian
+  cerrado?: boolean;
 }>();
 
 const equipos1Old = ref();

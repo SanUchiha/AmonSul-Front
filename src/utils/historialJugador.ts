@@ -4,6 +4,7 @@ import {
 } from "@/interfaces/Partidas";
 import { ejercitoDelJugador, idJugadorDelLado, juegaEnLado1 } from "@/utils/partidaParejas";
 import { FASE_ELIMINATORIA } from "@/Constant/FormatoTorneo";
+import { esUsuarioBye } from "@/utils/bye";
 
 export type ResultadoPartida = "V" | "E" | "D";
 
@@ -29,10 +30,6 @@ export interface PartidaJugada {
   // La partida tal cual, para pintarla con su tarjeta
   original: ViewPartidaTorneoDTO | ViewPartidaAmistosaDTO;
 }
-
-// El bye no es un rival de verdad: no cuenta en el resumen
-const esBye = (idUsuario: number, nick?: string | null) =>
-  idUsuario === 568 || /^bye\d*$/i.test((nick ?? "").trim());
 
 // De torneo, solo las que han validado los dos; si el historial no lo trae, las que tienen ganador o resultado
 function torneoJugada(partida: ViewPartidaTorneoDTO) {
@@ -61,7 +58,7 @@ function desdeTorneo(partida: ViewPartidaTorneoDTO, idUsuario: number): PartidaJ
   const idsRivales = rivales.map(r => r.id as number);
   const nicksRivales = rivales.map(r => r.nick ?? "");
   const nickRival = nicksRivales.filter(Boolean).join(" y ");
-  if (esBye(idsRivales[0], nickRival)) return null;
+  if (esUsuarioBye(idsRivales[0], nickRival)) return null;
   const propios = (lado1 ? partida.resultadoUsuario1 : partida.resultadoUsuario2) ?? 0;
   const rival = (lado1 ? partida.resultadoUsuario2 : partida.resultadoUsuario1) ?? 0;
   const ganador = partida.ganadorPartidaTorneo;
@@ -97,7 +94,7 @@ function desdeAmistosa(partida: ViewPartidaAmistosaDTO, idUsuario: number): Part
   const lado1 = partida.idUsuario1 === idUsuario;
   const idRival = lado1 ? partida.idUsuario2 : partida.idUsuario1;
   const nickRival = lado1 ? partida.nickUsuario2 : partida.nickUsuario1;
-  if (esBye(idRival, nickRival)) return null;
+  if (esUsuarioBye(idRival, nickRival)) return null;
   const resultado: ResultadoPartida =
     partida.ganadorPartida === idUsuario ? "V" : partida.ganadorPartida === 0 ? "E" : "D";
   return {
