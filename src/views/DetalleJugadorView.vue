@@ -11,15 +11,15 @@
 
           <div ref="pestanas">
             <v-tabs v-model="tab" color="primary" grow show-arrows>
-              <v-tab value="1">Resumen</v-tab>
-              <v-tab value="2">Amistosas</v-tab>
-              <v-tab value="3">Eventos</v-tab>
-              <v-tab value="4">Resultados</v-tab>
+              <v-tab value="resumen">Resumen</v-tab>
+              <v-tab value="amistosas">Amistosas</v-tab>
+              <v-tab value="eventos">Eventos</v-tab>
+              <v-tab value="resultados">Resultados</v-tab>
             </v-tabs>
           </div>
 
           <v-window v-model="tab">
-            <v-window-item value="1">
+            <v-window-item value="resumen">
               <div class="pa-2">
                 <ResumenJugador
                   :usuario="usuarioData"
@@ -30,29 +30,31 @@
               </div>
             </v-window-item>
 
-            <v-window-item value="2">
+            <v-window-item value="amistosas">
               <div class="pa-2">
                 <PartidasJugador
                   :partidas="partidas"
                   origen="amistosa"
                   :idUsuario="usuarioData.idUsuario"
-                  v-model:filtro="filtroPartidas"
+                  :filtro="filtroConNick"
+                  @update:filtro="filtroPartidas = $event"
                 />
               </div>
             </v-window-item>
 
-            <v-window-item value="3">
+            <v-window-item value="eventos">
               <div class="pa-2">
                 <PartidasJugador
                   :partidas="partidas"
                   origen="torneo"
                   :idUsuario="usuarioData.idUsuario"
-                  v-model:filtro="filtroPartidas"
+                  :filtro="filtroConNick"
+                  @update:filtro="filtroPartidas = $event"
                 />
               </div>
             </v-window-item>
 
-            <v-window-item value="4">
+            <v-window-item value="resultados">
               <div class="pa-2">
               <TablaTorneosDisputados
                 :clasificacionTorneos="usuarioData.clasificacionTorneos"
@@ -99,14 +101,32 @@ import PartidasJugador from "@/components/DetalleJugador/PartidasJugador.vue";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import TablaTorneosDisputados from "@/components/DetalleJugador/TablaTorneosDisputados.vue";
 
-const tab = ref<string>("1");
+const router = useRouter();
+const route = useRoute();
+
+// La pestaña y el filtro van en la URL (?pestana=eventos&rival=12): volver atrás los conserva y se pueden compartir
+const PESTANAS = ["resumen", "amistosas", "eventos", "resultados"] as const;
+type Pestana = (typeof PESTANAS)[number];
+const textoDeQuery = (valor: unknown) => (typeof valor === "string" && valor ? valor : undefined);
+const pestanaDeRuta = (): Pestana => {
+  const pestana = textoDeQuery(route.query.pestana) as Pestana | undefined;
+  return pestana && PESTANAS.includes(pestana) ? pestana : "resumen";
+};
+const filtroDeRuta = (): FiltroPartidas | null => {
+  const idRival = Number(route.query.rival);
+  if (Number.isInteger(idRival) && idRival > 0) return { idRival };
+  const ejercito = textoDeQuery(route.query.ejercito);
+  return ejercito ? { ejercito } : null;
+};
+
+const tab = ref<Pestana>(pestanaDeRuta());
 const pestanas = ref<HTMLElement>();
 
 // Un ejército o un rival pulsado en el resumen: sus partidas, en eventos o en amistosas, con las pestañas a la vista
-const filtroPartidas = ref<FiltroPartidas | null>(null);
+const filtroPartidas = ref<FiltroPartidas | null>(filtroDeRuta());
 const verPartidasFiltradas = async (filtro: FiltroPartidas, origen: "torneo" | "amistosa") => {
   filtroPartidas.value = filtro;
-  tab.value = origen === "amistosa" ? "2" : "3";
+  tab.value = origen === "amistosa" ? "amistosas" : "eventos";
   await nextTick();
   // Por debajo de la barra de arriba, que es fija
   const arriba = pestanas.value?.getBoundingClientRect().top;
@@ -118,8 +138,17 @@ const usuariosStore = useUsuariosStore();
 const isLoading = ref(true);
 const isLoadingTournamentMatches = ref<boolean>(false);
 
-const router = useRouter();
-const route = useRoute();
+watch([tab, filtroPartidas], () => {
+  const query: Record<string, string> = {};
+  if (tab.value !== "resumen") query.pestana = tab.value;
+  if (filtroPartidas.value?.idRival != null) query.rival = String(filtroPartidas.value.idRival);
+  else if (filtroPartidas.value?.ejercito) query.ejercito = filtroPartidas.value.ejercito;
+  const actual = route.query;
+  const igual =
+    Object.keys(query).length === Object.keys(actual).length &&
+    Object.entries(query).every(([clave, valor]) => actual[clave] === valor);
+  if (!igual) router.replace({ query });
+});
 const usuarioData: ComputedRef<UsuarioDataDTO> = computed(
   () => usuariosStore.usuarioData
 );
@@ -134,6 +163,14 @@ const partidas = computed(() =>
     ? partidasJugadas(usuarioData.value.idUsuario, tournamentMatches.value, validMatches.value)
     : []
 );
+// Con el rival en la URL solo viene su id: el nick sale de sus partidas
+const filtroConNick = computed<FiltroPartidas | null>(() => {
+  const filtro = filtroPartidas.value;
+  if (filtro?.idRival == null || filtro.nickRival) return filtro;
+  const idRival = filtro.idRival;
+  const partida = partidas.value.find(p => p.idsRivales.includes(idRival));
+  return { ...filtro, nickRival: partida?.nicksRivales[partida.idsRivales.indexOf(idRival)] || "su rival" };
+});
 const { getidUsuario } = useAuth();
 const idUsuarioQueMira = computed(() =>
   getidUsuario.value ? Number(getidUsuario.value) : null
@@ -196,7 +233,9 @@ watch(
   () => route.params.idUsuario,
   (nuevoId, anteriorId) => {
     if (nuevoId && nuevoId !== anteriorId) {
-      filtroPartidas.value = null;
+      // Lo que diga la URL del otro jugador: sin nada, su resumen; al volver atrás, lo que se estaba viendo
+      tab.value = pestanaDeRuta();
+      filtroPartidas.value = filtroDeRuta();
       initializeComponent();
     }
   }
