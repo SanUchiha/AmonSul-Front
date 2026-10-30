@@ -78,6 +78,8 @@
             Descargar Listas</v-btn
           >
         </v-col>
+        <!-- Acciones propias de cada gestión, justo debajo: en un torneo, generar la ronda 1 y el sorteo -->
+        <slot name="acciones" />
         <!-- Ancho completo: en una columna estrecha el selector no se lee -->
         <v-col cols="12">
           <CardAddTorneoCircuito

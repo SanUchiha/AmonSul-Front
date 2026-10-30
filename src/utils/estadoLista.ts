@@ -17,3 +17,11 @@ export const estadoLista = (estado?: string | null) => {
     color: encontrado.color,
   };
 };
+
+// El bando de una lista entregada: good es Luz y evil, Oscuridad. Sin bando, nada
+export const bandoLista = (bando?: string | null) => {
+  const valor = (bando ?? "").toLowerCase();
+  if (valor === "good") return { texto: "Luz" };
+  if (valor === "evil") return { texto: "Oscuridad" };
+  return null;
+};

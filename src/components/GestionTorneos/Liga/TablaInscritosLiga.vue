@@ -1,100 +1,139 @@
 <template>
+  <!-- Jugadores en tarjetas, como en la gestión de torneos -->
   <v-card class="mb-4">
-    <v-card-title class="d-flex align-center flex-wrap ga-2">
-      <span>Jugadores ({{ activos }})</span>
-      <v-spacer />
-      <v-btn
-        v-if="!ligaGenerada"
-        color="primary"
-        variant="tonal"
-        size="small"
-        prepend-icon="mdi-account-plus"
-        @click="showAddJugador = true"
-      >
-        Añadir jugador
-      </v-btn>
-    </v-card-title>
-
-    <v-list v-if="inscripciones.length > 0" lines="three">
-      <v-list-item
-        v-for="inscripcion in inscripciones"
-        :key="inscripcion.idInscripcion"
-        class="text-left"
-        @click="verDetalle(inscripcion)"
-      >
-        <v-list-item-title
-          class="text-wrap"
-          :class="{ 'text-disabled': esRetirado(inscripcion) }"
+    <div class="text-left px-3 pt-3">
+      <div class="d-flex align-center flex-wrap ga-2 mb-2">
+        <h3 class="text-subtitle-1 font-weight-bold flex-grow-1">Jugadores ({{ activos }})</h3>
+        <v-btn
+          v-if="!ligaGenerada"
+          color="primary"
+          variant="tonal"
+          size="small"
+          prepend-icon="mdi-account-plus"
+          @click="showAddJugador = true"
         >
-          {{ inscripcion.nick }}
-        </v-list-item-title>
-        <v-list-item-subtitle class="text-wrap">
-          {{ inscripcion.ejercitoElegido ?? "Sin ejército elegido" }}
-        </v-list-item-subtitle>
-        <div class="d-flex flex-wrap ga-1 mt-1">
-          <v-chip v-if="numeroGrupos" size="x-small" color="primary" variant="tonal">
-            {{ inscripcion.grupo ? `Grupo ${inscripcion.grupo}` : "Sin grupo" }}
-          </v-chip>
-          <v-chip v-if="esRetirado(inscripcion)" size="x-small" color="error">
-            Retirado
-          </v-chip>
-          <v-chip size="x-small" :color="estadoLista(inscripcion.estadoLista).color">
-            {{ estadoLista(inscripcion.estadoLista).texto }}
-          </v-chip>
-          <v-chip
-            size="x-small"
-            :color="inscripcion.esPago === 'SI' ? 'success' : 'warning'"
-          >
-            Pago: {{ inscripcion.esPago ?? "NO" }}
-          </v-chip>
-        </div>
+          Añadir jugador
+        </v-btn>
+      </div>
+      <template v-if="inscripciones.length > 0">
+        <v-text-field
+          v-model="search"
+          density="compact"
+          label="Buscar jugador"
+          prepend-inner-icon="mdi-magnify"
+          clearable
+          hide-details
+          class="mb-2"
+        />
+        <!-- A quién falta reclamarle algo, de un toque -->
+        <v-chip-group v-model="filtro" mandatory column selected-class="text-primary" class="mb-1">
+          <v-chip value="todos" size="small" filter>Todos ({{ inscripciones.length }})</v-chip>
+          <v-chip value="sinLista" size="small" filter>Sin lista ({{ sinLista.length }})</v-chip>
+          <v-chip value="sinPagar" size="small" filter>Sin pagar ({{ sinPagar.length }})</v-chip>
+        </v-chip-group>
+      </template>
+    </div>
 
-        <template #append>
-          <v-menu>
-            <template #activator="{ props: menuProps }">
-              <v-btn
-                icon="mdi-dots-vertical"
-                variant="text"
-                size="small"
-                v-bind="menuProps"
-                @click.stop
-              />
-            </template>
-            <v-list density="compact">
-              <v-list-item
-                prepend-icon="mdi-eye"
-                title="Ver inscripción"
-                @click="verDetalle(inscripcion)"
-              />
-              <v-list-item
-                v-if="!ligaGenerada"
-                prepend-icon="mdi-shield-edit"
-                title="Cambiar ejército"
-                @click="pedirEjercito(inscripcion)"
-              />
-              <!-- Copa: mover de grupo mientras no haya jornadas -->
-              <template v-if="numeroGrupos && !ligaGenerada && !esRetirado(inscripcion)">
-                <v-list-item
-                  v-for="g in gruposPara(inscripcion)"
-                  :key="g"
-                  prepend-icon="mdi-account-switch"
-                  :title="`Al grupo ${g}`"
-                  @click="moverAGrupo(inscripcion, g)"
+    <v-card-text v-if="inscripciones.length === 0">Aún no hay jugadores inscritos.</v-card-text>
+    <div v-else-if="visibles.length === 0" class="text-center text-medium-emphasis pa-4">
+      Nadie con estos filtros
+    </div>
+    <v-row v-else dense class="px-2 pb-2">
+      <v-col v-for="inscripcion in visibles" :key="inscripcion.idInscripcion" cols="12" sm="6" lg="4">
+        <!-- Pulsando la tarjeta, el detalle para cambiar la lista o el pago -->
+        <v-card
+          v-ripple
+          variant="outlined"
+          class="pa-3 text-left tarjeta"
+          role="button"
+          tabindex="0"
+          @click="verDetalle(inscripcion)"
+          @keydown.enter="verDetalle(inscripcion)"
+        >
+          <div class="d-flex align-center ga-2">
+            <span
+              class="text-body-1 font-weight-bold flex-grow-1 nick"
+              :class="{ 'text-disabled': esRetirado(inscripcion) }"
+            >
+              {{ inscripcion.nick }}
+            </span>
+            <v-chip v-if="esRetirado(inscripcion)" size="x-small" color="error" variant="tonal">
+              Retirado
+            </v-chip>
+            <v-menu>
+              <template #activator="{ props: menuProps }">
+                <v-btn
+                  icon="mdi-dots-vertical"
+                  variant="text"
+                  size="small"
+                  density="comfortable"
+                  aria-label="Más acciones"
+                  v-bind="menuProps"
+                  @click.stop
                 />
               </template>
-              <v-list-item
-                v-if="ligaGenerada && !ligaCerrada && !esRetirado(inscripcion)"
-                prepend-icon="mdi-account-remove"
-                base-color="error"
-                :title="`Retirar ${textos.del}`"
-                @click="pedirRetirar(inscripcion)"
-              />
-            </v-list>
-          </v-menu>
-        </template>
-      </v-list-item>
-    </v-list>
-    <v-card-text v-else>Aún no hay jugadores inscritos.</v-card-text>
+              <v-list density="compact">
+                <v-list-item
+                  prepend-icon="mdi-eye"
+                  title="Ver inscripción"
+                  @click="verDetalle(inscripcion)"
+                />
+                <v-list-item
+                  v-if="!ligaGenerada"
+                  prepend-icon="mdi-shield-edit"
+                  title="Cambiar ejército"
+                  @click="pedirEjercito(inscripcion)"
+                />
+                <!-- Copa: mover de grupo mientras no haya jornadas -->
+                <template v-if="numeroGrupos && !ligaGenerada && !esRetirado(inscripcion)">
+                  <v-list-item
+                    v-for="g in gruposPara(inscripcion)"
+                    :key="g"
+                    prepend-icon="mdi-account-switch"
+                    :title="`Al grupo ${g}`"
+                    @click="moverAGrupo(inscripcion, g)"
+                  />
+                </template>
+                <v-list-item
+                  v-if="ligaGenerada && !ligaCerrada && !esRetirado(inscripcion)"
+                  prepend-icon="mdi-account-remove"
+                  base-color="error"
+                  :title="`Retirar ${textos.del}`"
+                  @click="pedirRetirar(inscripcion)"
+                />
+              </v-list>
+            </v-menu>
+          </div>
+          <!-- El correo, para escribirle: se abre la aplicación de correo sin abrir el detalle -->
+          <a
+            v-if="inscripcion.email"
+            :href="`mailto:${inscripcion.email}`"
+            class="d-block text-caption text-medium-emphasis email"
+            @click.stop
+          >
+            {{ inscripcion.email }}
+          </a>
+          <div class="text-body-2 text-medium-emphasis">
+            {{ inscripcion.ejercitoElegido ?? "Sin ejército elegido" }}
+            <template v-if="numeroGrupos">
+              · {{ inscripcion.grupo ? `Grupo ${inscripcion.grupo}` : "Sin grupo" }}
+            </template>
+          </div>
+          <div class="text-body-2">
+            <span :class="`text-${estadoLista(inscripcion.estadoLista).color}`">
+              {{ estadoLista(inscripcion.estadoLista).texto }}
+            </span>
+            <span v-if="bandoLista(inscripcion.bando)" class="text-medium-emphasis text-no-wrap">
+              · {{ bandoLista(inscripcion.bando)!.texto }}
+            </span>
+            <span class="text-medium-emphasis"> · </span>
+            <span :class="inscripcion.esPago === 'SI' ? 'text-success' : 'text-warning'">
+              {{ inscripcion.esPago === "SI" ? "Pagado" : "Sin pagar" }}
+            </span>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-card>
 
   <ModalAddJugadorTorneo
@@ -165,7 +204,7 @@
 </template>
 
 <script setup lang="ts">
-import { estadoLista } from "@/utils/estadoLista";
+import { bandoLista, estadoLista } from "@/utils/estadoLista";
 import { computed, defineEmits, defineProps, ref } from "vue";
 import {
   InscripcionTorneoCreadoDTO,
@@ -229,6 +268,29 @@ async function moverAGrupo(inscripcion: InscripcionTorneoCreadoDTO, grupo: numbe
     isGuardando.value = false;
   }
 }
+// Buscador y filtros: los que no han entregado la lista y los que no han pagado, sin contar a los retirados
+const search = ref<string | null>("");
+const filtro = ref<"todos" | "sinLista" | "sinPagar">("todos");
+const enJuego = computed(() => inscripciones.value.filter(i => !esRetirado(i)));
+const sinLista = computed(() =>
+  enJuego.value.filter(
+    i => !["ENTREGADA", "OK", "ILEGAL"].includes((i.estadoLista ?? "").toUpperCase())
+  )
+);
+const sinPagar = computed(() => enJuego.value.filter(i => i.esPago !== "SI"));
+const normalizar = (texto: string) =>
+  texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const visibles = computed(() => {
+  const base =
+    filtro.value === "sinLista"
+      ? sinLista.value
+      : filtro.value === "sinPagar"
+        ? sinPagar.value
+        : inscripciones.value;
+  const texto = normalizar(search.value ?? "").trim();
+  return texto ? base.filter(i => normalizar(i.nick ?? "").includes(texto)) : base;
+});
+
 const activos = computed(
   () => props.torneo.inscripciones.filter(i => !esRetirado(i)).length
 );
@@ -307,3 +369,16 @@ async function retirar() {
   }
 }
 </script>
+
+<style scoped>
+.tarjeta {
+  cursor: pointer;
+}
+.nick,
+.email {
+  overflow-wrap: anywhere;
+}
+.email {
+  text-decoration: none;
+}
+</style>

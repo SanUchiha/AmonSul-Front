@@ -78,6 +78,10 @@
             <span :class="`text-${estadoLista(item.estadoLista).color}`">
               {{ estadoLista(item.estadoLista).texto }}
             </span>
+            <!-- Con la lista entregada, su bando -->
+            <span v-if="bandoLista(item.bando)" class="text-medium-emphasis text-no-wrap">
+              · {{ bandoLista(item.bando)!.texto }}
+            </span>
             <span class="text-medium-emphasis"> · </span>
             <span :class="estaPagado(item) ? 'text-success' : 'text-warning'">
               {{ estaPagado(item) ? "Pagado" : "Sin pagar" }}
@@ -108,18 +112,6 @@
         size="large"
       >
         Añadir Jugador
-      </v-btn>
-      <v-btn
-        variant="tonal"
-        @click="openConfigModal"
-        color="primary"
-        size="large"
-      >
-        Generar Ronda 1
-      </v-btn>
-
-      <v-btn variant="tonal" @click="openSorteo" color="primary" size="large">
-        Sorteo
       </v-btn>
     </v-row>
 
@@ -158,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import { estadoLista } from "@/utils/estadoLista";
+import { bandoLista, estadoLista } from "@/utils/estadoLista";
 import { ref, computed, watch, defineEmits } from "vue";
 import { defineProps } from "vue";
 import ModalDetalleInscripcion from "./ModalDetalleInscripcion.vue";
@@ -294,6 +286,9 @@ watch(
 );
 
 const emit = defineEmits(["inscripcionEliminada"]);
+
+// Generar la ronda 1 y el sorteo se piden desde la tarjeta de gestión, debajo de Descargar listas
+defineExpose({ abrirGenerarRonda1: openConfigModal, abrirSorteo: openSorteo });
 
 const search = ref<string | null>("");
 const showModal = ref(false);
