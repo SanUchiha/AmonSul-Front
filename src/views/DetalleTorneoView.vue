@@ -187,9 +187,7 @@
                           Plazo de inscripción cerrado
                         </span>
                         <span
-                          v-else-if="
-                            new Date(torneo.fechaInicioTorneo) < new Date()
-                          "
+                          v-else-if="yaDisputado"
                           class="text-red text-subtitle-1"
                         >
                           Torneo ya disputado
@@ -511,6 +509,7 @@ import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalElegirEjercito from "@/components/Inscripcion/ModalElegirEjercito.vue";
 import { esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import { diaDeHoy, ultimoDiaEvento } from "@/utils/Fecha";
 import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
 
 const { getidUsuario } = useAuth();
@@ -662,14 +661,20 @@ const isInscripcionCerrada = computed(() => {
     !torneo.value.inicioInscripciones
   )
     return false;
-  const fechaActual = new Date();
-  const fechaFinInscripcion = new Date(torneo.value.fechaFinInscripcion);
-  const fechaInicioInscripcion = new Date(torneo.value.inicioInscripciones);
-
+  // Por días: el último día del plazo aún se puede inscribir (comparar con la hora lo cerraba a medianoche)
+  const hoy = diaDeHoy();
   return (
-    fechaActual > fechaFinInscripcion || fechaActual < fechaInicioInscripcion
+    hoy > torneo.value.fechaFinInscripcion.slice(0, 10) ||
+    hoy < torneo.value.inicioInscripciones.slice(0, 10)
   );
 });
+
+// Disputado cuando ya pasó su último día: el mismo día del evento todavía no
+const yaDisputado = computed(
+  () =>
+    !!torneo.value &&
+    ultimoDiaEvento(torneo.value.fechaInicioTorneo, torneo.value.fechaFinTorneo) < diaDeHoy()
+);
 
 const goToUserDetail = (idUsuario: number) => {
   router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });

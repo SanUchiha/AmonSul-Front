@@ -51,7 +51,7 @@
   <!-- Modal éxito -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Emparejamiento cambiado con exito."
+    message="Emparejamiento cambiado con éxito."
     @update:isVisible="showSuccessModal = $event"
   />
 

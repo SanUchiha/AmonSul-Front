@@ -70,7 +70,7 @@
                   <v-list-item>
                     <v-list-item-content>
                       <v-list-item-title>
-                        <div class="flex-column align-items-center">
+                        <div class="d-flex flex-wrap justify-center ga-2">
                           <v-btn
                             class="mt-2"
                             variant="tonal"
@@ -95,7 +95,7 @@
                     <v-list-item>
                       <v-list-item-content>
                         <v-list-item-title>
-                          <div class="flex-column align-items-center">
+                          <div class="d-flex flex-wrap justify-center ga-2">
                             <v-btn
                               class="mt-2"
                               variant="tonal"
@@ -103,6 +103,16 @@
                               @click="generarSiguienteRonda(activeTab + 1)"
                             >
                               Generar siguiente ronda
+                            </v-btn>
+                            <!-- La última generada también se puede eliminar aunque no sea la última del torneo -->
+                            <v-btn
+                              v-if="activeTab === ultimaRondaGenerada"
+                              class="mt-2"
+                              variant="tonal"
+                              color="error"
+                              @click="abrirEliminarRonda(activeTab)"
+                            >
+                              Eliminar ronda
                             </v-btn>
                           </div>
                         </v-list-item-title>
@@ -142,7 +152,7 @@
                     <v-list-item>
                       <v-list-item-content>
                         <v-list-item-title>
-                          <div class="flex-column align-items-center">
+                          <div class="d-flex flex-wrap justify-center ga-2">
                             <v-btn
                               class="mt-2"
                               variant="tonal"
@@ -164,7 +174,7 @@
                       <v-list-item>
                         <v-list-item-content>
                           <v-list-item-title>
-                            <div class="flex-column align-items-center">
+                            <div class="d-flex flex-wrap justify-center ga-2">
                               <v-btn
                                 class="mt-2"
                                 variant="tonal"
@@ -174,7 +184,7 @@
                                 Añadir partida
                               </v-btn>
                               <v-btn
-                                v-if="activeTab === ultimaRonda"
+                                v-if="activeTab === ultimaRondaGenerada"
                                 class="mt-2"
                                 variant="tonal"
                                 color="error"
@@ -523,6 +533,10 @@ const numeroRondas = ref<number[]>([]);
 // Al entrar, la pestaña Gestión: como en la gestión por equipos
 const activeTab = ref<number>(0);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
+// La última ronda con partidas: la que se puede eliminar (ultimaRonda es la última del torneo, aunque no esté generada)
+const ultimaRondaGenerada = computed(() =>
+  Math.max(0, ...Object.keys(partidasPorRonda.value).map(Number))
+);
 const tabClasificacion = ref<number>();
 // Para pedirle la ronda 1 y el sorteo desde los botones de la tarjeta de gestión
 const tablaInscritos = ref<{ abrirGenerarRonda1: () => void; abrirSorteo: () => void }>();
@@ -734,13 +748,15 @@ const handleModificarPairingTorneoConfirm = async (
 ) => {
   isGenerating.value = true;
   try {
-    const response = pairingEditado;
     const index = partidas.value.findIndex(
-      partida => partida.idPartidaTorneo === response.idPartidaTorneo
+      partida => partida.idPartidaTorneo === pairingEditado.idPartidaTorneo
     );
     if (index !== -1) {
-      partidas.value[index] = response;
+      partidas.value[index] = pairingEditado;
     }
+    // El cambio puede haber pasado al jugador que sale a otra mesa: se recargan todas
+    const responsePartidas = await getPartidasTorneo(idTorneo.value);
+    partidas.value = responsePartidas.data;
     partidasPorRonda.value = partidas.value.reduce(
       (acc, partida) => {
         const { numeroRonda } = partida;

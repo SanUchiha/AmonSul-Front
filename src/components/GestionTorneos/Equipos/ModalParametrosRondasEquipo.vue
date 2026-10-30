@@ -104,7 +104,8 @@ const emit = defineEmits(["close", "confirm"]);
 
 const internalIsVisible = ref(props.isVisible);
 
-const esRepetirRivalCheck = ref<string>("SI");
+// Por defecto sin repetir rival, lo normal en un suizo; si no hay forma de emparejar sin repetir, la ventana lo avisa
+const esRepetirRivalCheck = ref<string>("NO");
 const opcionImpares = ref<string>("NO");
 const isImpares = ref<boolean>(false);
 const numeroRonda = ref<number>();

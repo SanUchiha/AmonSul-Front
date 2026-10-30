@@ -54,7 +54,7 @@
 
     <ModalSuccess
       :isVisible="showSuccessModal"
-      message="Consulta enviada con exito."
+      message="Consulta enviada con éxito."
       @update:isVisible="showSuccessModal = $event"
     />
 

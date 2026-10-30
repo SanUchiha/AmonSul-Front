@@ -6,7 +6,7 @@
         <div v-if="estaJugando.partidas && estaJugando.partidas.length > 0">
           <div v-if="estaJugando.torneoType == 'Individual'">
             <CardPartidaTorneoLive
-              v-for="(partida, idx) in estaJugando.partidas"
+              v-for="(partida, idx) in partidasOrdenadas"
               :key="partida.idPartidaTorneo || idx"
               :idUsuario="idUsuario"
               :match="partida"
@@ -15,7 +15,7 @@
                   ? etiquetaPartidaCopa(partida, null, estaJugando.rondasEliminatoria)
                   : esLiga
                     ? `Jornada ${partida.numeroRonda}`
-                    : `Mesa ${partida.numeroMesa}`
+                    : etiquetaRonda(partida)
               "
               :completa="
                 partida.partidaValidadaUsuario1 === true &&
@@ -28,11 +28,11 @@
           </div>
           <div v-else>
             <CardPartidaTorneoEquipoLive
-              v-for="(partida, idx) in estaJugando.partidas"
+              v-for="(partida, idx) in partidasOrdenadas"
               :key="partida.idPartidaTorneo || idx"
               :idUsuario="idUsuario"
               :match="partida"
-              :mesa="`Mesa ${partida.numeroMesa}`"
+              :mesa="etiquetaRonda(partida)"
               :completa="
                 partida.partidaValidadaUsuario1 === true &&
                 partida.partidaValidadaUsuario2 === true
@@ -97,6 +97,17 @@ const esLiga = computed(
 // En la copa, por su grupo y jornada o su ronda del cuadro
 const esCopa = computed(
   () => props.estaJugando?.formatoTorneo === FORMATO_COPA
+);
+
+// «Ronda 2 · Mesa 3»; sin número de mesa (con partidas de dos eventos el mismo día) solo la ronda
+const etiquetaRonda = (partida: PartidaTorneoDTO) =>
+  partida.numeroMesa
+    ? `Ronda ${partida.numeroRonda} · Mesa ${partida.numeroMesa}`
+    : `Ronda ${partida.numeroRonda}`;
+
+// La ronda en juego arriba: las ya jugadas del día quedan debajo
+const partidasOrdenadas = computed(() =>
+  [...(props.estaJugando?.partidas ?? [])].sort((a, b) => (b.numeroRonda ?? 0) - (a.numeroRonda ?? 0))
 );
 
 function close() {

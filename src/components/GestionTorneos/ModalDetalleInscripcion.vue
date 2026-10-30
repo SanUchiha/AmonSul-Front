@@ -149,7 +149,7 @@
   <!-- Modal response eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessModalSubirLista"
-    message="Lista subida con exito."
+    message="Lista subida con éxito."
     @update:isVisible="showSuccessModalSubirLista = $event"
   />
 
@@ -279,23 +279,30 @@ const logChange = async (
   }
 };
 
+// Solo cuando el organizador lo cambia en esta inscripción: al abrir la de otro jugador también cambian los valores,
+// y se volvían a guardar y le llegaba al jugador un correo sin haber cambiado nada
 watch(
-  () => localInscripcion.value.estadoLista,
-  (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-      logChange("estadoLista", newValue!);
+  () => [localInscripcion.value.idInscripcion, localInscripcion.value.estadoLista] as const,
+  ([id, nuevo], [idAnterior, anterior]) => {
+    if (id === idAnterior && nuevo !== anterior) {
+      logChange("estadoLista", nuevo!);
     }
   }
 );
 
 watch(
-  () => localInscripcion.value.esPago,
-  (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-      logChange("esPago", newValue!);
+  () => [localInscripcion.value.idInscripcion, localInscripcion.value.esPago] as const,
+  ([id, nuevo], [idAnterior, anterior]) => {
+    if (id === idAnterior && nuevo !== anterior) {
+      logChange("esPago", nuevo!);
     }
   }
 );
+
+// Cerrado tocando fuera o con Escape, como con la X: así no se queda abierto por debajo con el jugador anterior
+watch(show, abierto => {
+  if (!abierto) emit("close");
+});
 
 const toggleLista = async () => {
   showLista.value = !showLista.value;

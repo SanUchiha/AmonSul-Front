@@ -368,6 +368,7 @@
     v-if="isModalValidarVisible"
     :isVisible="isModalValidarVisible"
     :idPartidaTorneo="idPartidaSeleccionada"
+    :resumen="`${localMatch.nombreEquipo1} ${localMatch.resultadoUsuario1} - ${localMatch.resultadoUsuario2} ${localMatch.nombreEquipo2}`"
     @confirmar="confirmarValidar"
     @cerrar="cerrarModalValidar"
   />

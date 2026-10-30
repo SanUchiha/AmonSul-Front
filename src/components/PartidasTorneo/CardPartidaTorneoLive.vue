@@ -259,6 +259,7 @@
     v-if="isModalValidarVisible"
     :isVisible="isModalValidarVisible"
     :idPartidaTorneo="idPartidaSeleccionada"
+    :resumen="`${match.nick1} ${match.resultadoUsuario1} - ${match.resultadoUsuario2} ${match.nick2}`"
     @confirmar="confirmarValidar"
     @cerrar="cerrarModalValidar"
   />

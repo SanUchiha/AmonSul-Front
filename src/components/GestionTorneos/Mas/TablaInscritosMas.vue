@@ -231,28 +231,28 @@
   <!-- Modal response success subir la lista pago -->
   <ModalSuccess
     :isVisible="showSuccessAddLista"
-    message="Lista subida con exito."
+    message="Lista subida con éxito."
     @update:isVisible="showSuccessAddLista = $event"
   />
 
   <!-- Modal response success editar lista -->
   <ModalSuccess
     :isVisible="showSuccessEditLista"
-    message="Lista modificada con exito."
+    message="Lista modificada con éxito."
     @update:isVisible="showSuccessEditLista = $event"
   />
 
   <!-- Modal response success eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessEliminarInscripcion"
-    message="Inscripción eliminada con exito."
+    message="Inscripción eliminada con éxito."
     @update:isVisible="showSuccessEliminarInscripcion = $event"
   />
 
   <!-- Modal response success actualizar estado de una lista -->
   <ModalSuccess
     :isVisible="showSuccessUpdateEstadoLista"
-    message="Estado de la lista actualizado con exito."
+    message="Estado de la lista actualizado con éxito."
     @update:isVisible="showSuccessUpdateEstadoLista = $event"
   />
 

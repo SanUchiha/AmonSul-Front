@@ -95,3 +95,11 @@ v-tabs-item{
   }
 }
 
+
+// Las preguntas de los grupos de opciones («¿… ha matado al general?», «¿Se permiten emparejamientos…?») enteras en el
+// móvil, en varias líneas: Vuetify las corta con puntos suspensivos
+.v-radio-group > .v-input__control > .v-label {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}

@@ -194,7 +194,8 @@ const goodVsEvilCheck = ref<boolean>(false);
 const goodVsEvilCheckString = ref<string>("NO");
 const retosCheck = ref<boolean>(false);
 const esEloCheck = ref<boolean>(false);
-const esRepetirRivalCheck = ref<string>("SI");
+// Por defecto sin repetir rival, lo normal en un suizo; si no hay forma de emparejar sin repetir, la ventana lo avisa
+const esRepetirRivalCheck = ref<string>("NO");
 const opcionImpares = ref<string | null>(null);
 const isImpares = ref<boolean>(false);
 const numeroRonda = ref<number>();
@@ -568,8 +569,10 @@ const confirmarConfiguracion = async () => {
         isGenerating.value = false;
       }
 
-      //emit("confirm", configuracion);
-      //closeModal();
+      // Como en el resto de casos: se cierra y la gestión recarga las rondas. Sin esto la ventana seguía abierta con la
+      // ronda ya creada y, al volver a pulsar, se generaba otra vez
+      emit("confirm", configuracion);
+      closeModal();
     }
     //Si se puede repetir rival
     else {

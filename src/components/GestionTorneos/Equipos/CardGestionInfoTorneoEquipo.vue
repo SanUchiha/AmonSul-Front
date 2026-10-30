@@ -179,7 +179,7 @@
   <!-- modal torneo modificado con exito -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Torneo modificado con exito."
+    message="Torneo modificado con éxito."
     @update:isVisible="showSuccessModal = $event"
   />
   <!-- modal Error al modificar el torneo -->

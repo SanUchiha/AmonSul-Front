@@ -98,7 +98,7 @@
                   <v-list-item>
                     <v-list-item-content>
                       <v-list-item-title>
-                        <div class="flex-column align-items-center">
+                        <div class="d-flex flex-wrap justify-center ga-2">
                           <v-btn
                             v-if="!esParejas"
                             class="mt-2"
@@ -124,7 +124,7 @@
                     <v-list-item>
                       <v-list-item-content>
                         <v-list-item-title>
-                          <div class="flex-column align-items-center">
+                          <div class="d-flex flex-wrap justify-center ga-2">
                             <v-btn
                               class="mt-2"
                               variant="tonal"
@@ -132,6 +132,16 @@
                               @click="generarSiguienteRonda(activeTab + 1)"
                             >
                               Generar siguiente ronda
+                            </v-btn>
+                            <!-- La última generada también se puede eliminar aunque no sea la última del torneo -->
+                            <v-btn
+                              v-if="activeTab === ultimaRondaGenerada"
+                              class="mt-2"
+                              variant="tonal"
+                              color="error"
+                              @click="abrirEliminarRonda(activeTab)"
+                            >
+                              Eliminar ronda
                             </v-btn>
                           </div>
                         </v-list-item-title>
@@ -171,7 +181,7 @@
                     <v-list-item>
                       <v-list-item-content>
                         <v-list-item-title>
-                          <div class="flex-column align-items-center">
+                          <div class="d-flex flex-wrap justify-center ga-2">
                             <v-btn
                               v-if="!esParejas"
                               class="mt-2"
@@ -194,7 +204,7 @@
                       <v-list-item>
                         <v-list-item-content>
                           <v-list-item-title>
-                            <div class="flex-column align-items-center">
+                            <div class="d-flex flex-wrap justify-center ga-2">
                               <v-btn
                                 v-if="!esParejas"
                                 class="mt-2"
@@ -205,7 +215,7 @@
                                 Añadir partida
                               </v-btn>
                               <v-btn
-                                v-if="activeTab === ultimaRonda"
+                                v-if="activeTab === ultimaRondaGenerada"
                                 class="mt-2"
                                 variant="tonal"
                                 color="error"
@@ -458,6 +468,10 @@ const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
 const activeTab = ref<number>(0);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
+// La última ronda con partidas: la que se puede eliminar (ultimaRonda es la última del torneo, aunque no esté generada)
+const ultimaRondaGenerada = computed(() =>
+  Math.max(0, ...Object.keys(partidasPorRonda.value).map(Number))
+);
 const showErrorCambiarPairingModal = ref<boolean>(false);
 const tabClasificacion = ref<number>();
 const tabClasificacionIndividual = ref<number>();

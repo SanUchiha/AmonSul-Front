@@ -2,7 +2,11 @@
   <v-dialog v-model="isModalValidarVisible" max-width="400">
     <v-card>
       <v-card-title> Validar partida </v-card-title>
-      <v-card-text> </v-card-text>
+      <!-- Qué se da por bueno: en el móvil la ventana tapa la tarjeta de la partida -->
+      <v-card-text v-if="resumen">
+        ¿Das por bueno este resultado?
+        <div class="text-body-1 font-weight-bold mt-2">{{ resumen }}</div>
+      </v-card-text>
       <v-card-actions>
         <v-btn small variant="tonal" color="primary" @click="confirmarValidar">
           Confirmar
@@ -23,6 +27,8 @@ const props = defineProps({
   isVisible: Boolean,
   idPartidaTorneo: Number,
   usuario: Number,
+  // El resultado que se valida, por ejemplo «Aragorn 11 - 7 Legolas»
+  resumen: String,
 });
 
 //eslint-disable-next-line no-undef
