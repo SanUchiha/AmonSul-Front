@@ -2,6 +2,10 @@
   <v-card flat>
     <!-- Inscritos en tarjetas: en móvil la tabla necesitaba scroll horizontal -->
     <div class="text-left px-3 pt-3">
+      <!-- Justo encima de los inscritos -->
+      <v-btn variant="tonal" color="secondary" block class="mb-3" @click="openAddJugadorModal">
+        Añadir jugador
+      </v-btn>
       <h3 class="text-subtitle-1 font-weight-bold mb-2">Inscritos ({{ localInscripciones.length }})</h3>
       <v-text-field
         v-model="search"
@@ -104,16 +108,6 @@
     </v-row>
 
     <!-- boton para generar los pairing pasandole el id del torneo -->
-    <v-row justify="center" class="my-4 ga-5">
-      <v-btn
-        variant="tonal"
-        @click="openAddJugadorModal"
-        color="secondary"
-        size="large"
-      >
-        Añadir Jugador
-      </v-btn>
-    </v-row>
 
     <ModalParametrosPrimeraRonda
       :isVisible="showConfigModal"
