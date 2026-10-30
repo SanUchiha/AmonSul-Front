@@ -59,15 +59,10 @@
       Capitán: {{ equipo.nickCapitan }}
       <template v-if="equipo.fechaInscripcion"> · Inscrito {{ convertirFecha(equipo.fechaInscripcion) }}</template>
     </div>
-    <!-- El correo del capitán, para escribirle: se abre la aplicación de correo sin desplegar -->
-    <a
-      v-if="equipo.emailCapitan"
-      :href="`mailto:${equipo.emailCapitan}`"
-      class="d-block text-caption text-medium-emphasis texto-largo email"
-      @click.stop
-    >
+    <!-- El correo del capitán como texto: pulsarlo despliega los miembros; en su tarjeta de miembro se le escribe -->
+    <div v-if="equipo.emailCapitan" class="text-caption text-medium-emphasis texto-largo email">
       {{ equipo.emailCapitan }}
-    </a>
+    </div>
     <div class="text-body-2">
       <span :class="inscripcionesEquipo.length < numeroMiembrosEquipo ? 'text-warning' : 'text-medium-emphasis'">
         {{ inscripcionesEquipo.length }}/{{ numeroMiembrosEquipo }} jugadores

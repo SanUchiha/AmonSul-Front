@@ -106,15 +106,8 @@
               </v-list>
             </v-menu>
           </div>
-          <!-- El correo, para escribirle: se abre la aplicación de correo sin abrir el detalle -->
-          <a
-            v-if="inscripcion.email"
-            :href="`mailto:${inscripcion.email}`"
-            class="d-block text-caption text-medium-emphasis email"
-            @click.stop
-          >
-            {{ inscripcion.email }}
-          </a>
+          <!-- El correo como texto: pulsarlo abre el detalle como el resto de la tarjeta; en el detalle se le escribe -->
+          <div v-if="inscripcion.email" class="text-caption text-medium-emphasis email">{{ inscripcion.email }}</div>
           <div class="text-body-2 text-medium-emphasis">
             {{ inscripcion.ejercitoElegido ?? "Sin ejército elegido" }}
             <template v-if="numeroGrupos">

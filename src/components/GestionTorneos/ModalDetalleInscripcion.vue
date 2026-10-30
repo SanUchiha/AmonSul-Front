@@ -8,6 +8,14 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
+      <!-- El correo, para escribirle: abre la aplicación de correo -->
+      <a
+        v-if="inscripcion?.email"
+        :href="`mailto:${inscripcion.email}`"
+        class="d-block px-4 pb-2 text-body-2 text-medium-emphasis email"
+      >
+        {{ inscripcion.email }}
+      </a>
       <v-divider></v-divider>
 
       <v-card-text>
@@ -398,6 +406,10 @@ const recargarPagina = () => {
 </script>
 
 <style scoped>
+.email {
+  overflow-wrap: anywhere;
+  color: inherit;
+}
 .modal-title {
   display: flex;
   align-items: center;

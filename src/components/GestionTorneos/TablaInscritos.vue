@@ -54,15 +54,8 @@
               @cambiado="(idUsuario, puntos) => emit('puntosExtra', idUsuario, puntos)"
             />
           </div>
-          <!-- El correo, para escribirle: se abre la aplicación de correo sin abrir el detalle -->
-          <a
-            v-if="item.email"
-            :href="`mailto:${item.email}`"
-            class="d-block text-caption text-medium-emphasis email"
-            @click.stop
-          >
-            {{ item.email }}
-          </a>
+          <!-- El correo como texto: pulsarlo abre el detalle como el resto de la tarjeta; en el detalle se le escribe -->
+          <div v-if="item.email" class="text-caption text-medium-emphasis email">{{ item.email }}</div>
           <div class="text-body-2">
             <span :class="`text-${estadoLista(item.estadoLista).color}`">
               {{ estadoLista(item.estadoLista).texto }}

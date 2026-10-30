@@ -82,15 +82,8 @@
               </v-list>
             </v-menu>
           </div>
-          <!-- El correo, para escribirle: se abre la aplicación de correo sin desplegar -->
-          <a
-            v-if="item.email"
-            :href="`mailto:${item.email}`"
-            class="d-block text-caption text-medium-emphasis texto-largo email"
-            @click.stop
-          >
-            {{ item.email }}
-          </a>
+          <!-- El correo como texto: pulsarlo despliega las listas como el resto de la tarjeta -->
+          <div v-if="item.email" class="text-caption text-medium-emphasis texto-largo email">{{ item.email }}</div>
           <div class="text-body-2">
             <span :class="item.countListasEntregadas >= torneo.torneo.listasPorJugador ? 'text-success' : 'text-warning'">
               {{ item.countListasEntregadas }}/{{ torneo.torneo.listasPorJugador }} listas entregadas
