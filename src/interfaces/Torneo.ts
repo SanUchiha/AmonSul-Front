@@ -109,6 +109,8 @@ export interface InscripcionTorneoCreadoDTO {
   idUsuario: number;
   torneo: Torneo;
   nick?: string | null;
+  // Solo en la gestión, para el organizador
+  email?: string | null;
   fechaInscripcion?: string | null;
   bando?: "evil" | "good" | null;
   estadoLista?: string | null;
