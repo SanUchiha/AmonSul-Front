@@ -76,7 +76,7 @@
                 />
                 <v-list-item
                   prepend-icon="mdi-cash-sync"
-                  :title="item.esPago === 'SI' ? 'Marcar como sin pagar' : 'Marcar como pagado'"
+                  :title="item.esPago === 'SI' ? 'Marcar como no pagado' : 'Marcar como pagado'"
                   @click="updatePago(item.idInscripcion, item.esPago)"
                 />
                 <v-list-item
