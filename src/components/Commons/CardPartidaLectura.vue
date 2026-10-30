@@ -150,6 +150,12 @@
         {{ puntosPartida }} pts
       </span>
     </div>
+
+    <!-- Acciones de quien la usa, como validar una amistosa pendiente -->
+    <template v-if="$slots.default">
+      <v-divider />
+      <div class="px-4 py-2"><slot /></div>
+    </template>
   </v-card>
 </template>
 

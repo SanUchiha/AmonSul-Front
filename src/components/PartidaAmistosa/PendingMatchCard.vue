@@ -1,272 +1,131 @@
 <template>
-  <div class="center">
-    <v-card v-if="!isLoading" :class="['match-card']">
-      <v-divider></v-divider>
+  <!-- Amistosa pendiente: la misma tarjeta que las jugadas, con validar o cancelar debajo -->
+  <CardPartidaLectura
+    :contexto="['Pendiente', match.esElo ? 'ELO' : ''].filter(Boolean).join(' · ')"
+    :fecha="formatFechaSpaWhitoutAsync(match.fechaPartida)"
+    :jugador1="{
+      idUsuario: match.idUsuario1,
+      nick: match.nickUsuario1,
+      ejercito: match.ejercitoUsuario1,
+      puntos: match.resultadoUsuario1,
+    }"
+    :jugador2="{
+      idUsuario: match.idUsuario2,
+      nick: match.nickUsuario2,
+      ejercito: match.ejercitoUsuario2,
+      puntos: match.resultadoUsuario2,
+    }"
+    :escenario="match.escenarioPartida"
+    :puntosPartida="match.puntosPartida"
+    :idGanador="match.ganadorPartida"
+    :idUsuarioDestacado="idUsuario"
+  >
+    <div class="d-flex flex-wrap align-center ga-2">
+      <v-btn
+        v-if="!validadaPorMi"
+        color="success"
+        variant="flat"
+        size="small"
+        prepend-icon="mdi-check"
+        :loading="validando"
+        :disabled="cancelando"
+        @click="validar"
+      >
+        Validar
+      </v-btn>
+      <span v-else class="text-caption text-medium-emphasis">
+        Esperando a que {{ nickRival }} la valide
+      </span>
+      <v-btn
+        variant="text"
+        color="error"
+        size="small"
+        class="ml-auto"
+        :loading="cancelando"
+        :disabled="validando"
+        @click="confirmarCancelar = true"
+      >
+        Cancelar
+      </v-btn>
+    </div>
+  </CardPartidaLectura>
 
-      <v-card-title class="text-center">
-        <v-row align="center" justify="center" class="match-score" no-gutters>
-          <v-col
-            @click="verProfileUser(match.idUsuario1)"
-            cols="5"
-            class="player-name text-center"
-          >
-            <span class="player-nick">
-              {{ match.nickUsuario1 }}
-            </span>
-            <v-card-subtitle class="text-wrap">{{
-              match.ejercitoUsuario1
-            }}</v-card-subtitle>
-          </v-col>
-
-          <v-col cols="2" class="score text-center marcador">
-            <p>vs</p>
-            <p>{{ match.resultadoUsuario1 }}-{{ match.resultadoUsuario2 }}</p>
-          </v-col>
-
-          <v-col
-            @click="verProfileUser(match.idUsuario2)"
-            cols="5"
-            class="player-name text-right"
-          >
-            <span class="player-nick"> {{ match.nickUsuario2 }} </span><br />
-            <v-card-subtitle class="text-wrap">{{
-              match.ejercitoUsuario2
-            }}</v-card-subtitle>
-          </v-col>
-        </v-row>
-      </v-card-title>
-
-      <!-- Información de la partida -->
+  <!-- Cancelar la borra: mejor preguntarlo antes -->
+  <v-dialog v-model="confirmarCancelar" max-width="400">
+    <v-card>
+      <v-card-title class="text-wrap">¿Cancelar la partida?</v-card-title>
       <v-card-text>
-        <v-row align="center">
-          <v-col cols="6" class="text-center">
-            {{ match.puntosPartida }} pts
-          </v-col>
-
-          <v-col cols="6" class="player-nick">
-            {{ fechaPartidaFormateada }}
-          </v-col>
-        </v-row>
-
-        <v-row class="mt-3 match-scenario">
-          <v-col cols="12" class="text-center">
-            <strong>{{
-              match.escenarioPartida || "Escenario no disponible"
-            }}</strong>
-          </v-col>
-
-          <!--TODO Implementar detalles, de momento no hay nada que mostrar
-                  <v-col cols="6" class="text-center">
-                    <v-btn small color="blue lighten-2" @click.stop="goToDetallePartida()">
-                      Ver Detalles
-                    </v-btn>
-                  </v-col>-->
-        </v-row>
+        La partida contra {{ nickRival }} se borrará y no contará para nada.
       </v-card-text>
-
-      <v-card-actions style="font-family: 'Roboto', sans-serif">
-        <v-row>
-          <v-col cols="12" sm="6" class="text-center">
-            <div v-if="!IsValidadaOwner">
-              <v-btn color="success" @click="validarPartida" variant="tonal">
-                <v-icon left>mdi-check</v-icon>
-                Validar Resultado
-              </v-btn>
-            </div>
-            <div v-else>
-              <span class="no-validada partida-en-juego"
-                >Esperando la validación del rival</span
-              >
-            </div>
-          </v-col>
-          <v-col cols="12" sm="6" class="text-center">
-            <v-btn
-              :disabled="isLoading"
-              variant="tonal"
-              color="red darken-1"
-              @click="cancelPartida"
-              block
-            >
-              <v-icon left>mdi-close</v-icon>
-              Cancelar
-            </v-btn>
-          </v-col>
-        </v-row>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn variant="text" @click="confirmarCancelar = false">Volver</v-btn>
+        <v-btn color="error" variant="flat" @click="cancelar">Cancelar partida</v-btn>
       </v-card-actions>
     </v-card>
-    <v-progress-circular
-      v-else
-      indeterminate
-      color="blue darken-1"
-    ></v-progress-circular>
-
-    <ModalSuccess
-      :isVisible="showSuccessValidarModal"
-      message="Partida validada con exito."
-      @update:isVisible="showSuccessValidarModal = $event"
-    />
-
-    <ModalError
-      :isVisible="showErrorValidarModal"
-      message="No se ha podido validar la partida. Contacta con el administrador."
-      @update:isVisible="showErrorValidarModal = $event"
-    />
-
-    <ModalSuccess
-      :isVisible="showSuccessCancelarModal"
-      message="Partida cancelada con exito."
-      @update:isVisible="showSuccessCancelarModal = $event"
-    />
-
-    <ModalError
-      :isVisible="showErrorCancelarModal"
-      message="No se ha podido cancelar la partida. Contacta con el administrador."
-      @update:isVisible="showErrorCancelarModal = $event"
-    />
-  </div>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted, defineEmits, watch } from "vue";
-import {
-  ValidarPartidaDTO,
-  ViewPartidaAmistosaDTO,
-} from "@/interfaces/Partidas";
+import { computed, defineEmits, defineProps, ref } from "vue";
+import { ViewPartidaAmistosaDTO } from "@/interfaces/Partidas";
 import { useAuth } from "@/composables/useAuth";
-import {
-  cancelarPartida,
-  ValidarPartida,
-} from "@/services/PartidasAmistosasService";
-import { formatFechaSpa } from "@/utils/Fecha";
-import ModalSuccess from "../Commons/ModalSuccess.vue";
-import ModalError from "../Commons/ModalError.vue";
-import { useRouter } from "vue-router";
-
-const isLoading = ref(false);
-const { getUser, getidUsuario } = useAuth();
-const validarPartidaDTO = ref<ValidarPartidaDTO>();
-const IsValidadaRival = ref<boolean>(false);
-const IsValidadaOwner = ref<boolean>(false);
-const emailUsuario = ref<string>(getUser.value ?? "null");
-const idUsuarioOwner = ref<string>(getidUsuario.value ?? "null");
-const router = useRouter();
-
-const showSuccessValidarModal = ref<boolean>(false);
-const showErrorValidarModal = ref<boolean>(false);
-
-const showSuccessCancelarModal = ref<boolean>(false);
-const showErrorCancelarModal = ref<boolean>(false);
-
-const fechaPartidaFormateada = ref<string>("");
+import { useToast } from "@/composables/useToast";
+import { cancelarPartida, ValidarPartida } from "@/services/PartidasAmistosasService";
+import { formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
+import CardPartidaLectura from "@/components/Commons/CardPartidaLectura.vue";
 
 const props = defineProps<{
   match: ViewPartidaAmistosaDTO;
 }>();
-const emit = defineEmits(["close", "registroExitoso"]);
+// registroExitoso: la partida ha cambiado y hay que volver a cargar la lista
+const emit = defineEmits(["registroExitoso"]);
 
-onMounted(async () => {
-  isLoading.value = true;
+const { getUser, getidUsuario } = useAuth();
+const { triggerToast } = useToast();
+const idUsuario = computed(() => Number(getidUsuario.value));
 
+const soyJugador1 = computed(() => props.match.idUsuario1 === idUsuario.value);
+const validadaPorMi = computed(() =>
+  soyJugador1.value ? props.match.partidaValidadaUsuario1 : props.match.partidaValidadaUsuario2
+);
+const nickRival = computed(() =>
+  soyJugador1.value ? props.match.nickUsuario2 : props.match.nickUsuario1
+);
+
+const validando = ref(false);
+const cancelando = ref(false);
+const confirmarCancelar = ref(false);
+
+const validar = async () => {
+  validando.value = true;
   try {
-    fechaPartidaFormateada.value = await formatFechaSpa(
-      props.match.fechaPartida
-    );
-
-    controlValidacionesPartidas();
-  } catch (err) {
-    console.error(err);
-  } finally {
-    isLoading.value = false;
-  }
-});
-
-const validarPartida = async () => {
-  isLoading.value = true;
-  validarPartidaDTO.value = {
-    emailJugador: emailUsuario.value,
-    idPartida: props.match.idPartidaAmistosa,
-  };
-  try {
-    await ValidarPartida(validarPartidaDTO.value);
-    showSuccessValidarModal.value = true;
+    await ValidarPartida({
+      emailJugador: getUser.value ?? "",
+      idPartida: props.match.idPartidaAmistosa,
+    });
+    triggerToast("success", "Partida validada");
+    emit("registroExitoso");
   } catch (error) {
     console.error(error);
-    showErrorValidarModal.value = true;
+    triggerToast("error", "No se ha podido validar la partida");
   } finally {
-    isLoading.value = false;
+    validando.value = false;
   }
 };
 
-const verProfileUser = (idUser: number) => {
-  router.push({ name: "detalle-jugador", params: { idUsuario: idUser } });
-};
-
-const cancelPartida = async () => {
+const cancelar = async () => {
+  confirmarCancelar.value = false;
+  cancelando.value = true;
   try {
-    isLoading.value = true;
     await cancelarPartida(props.match.idPartidaAmistosa);
-    showSuccessCancelarModal.value = true;
-  } catch (err) {
-    showErrorCancelarModal.value = true;
+    triggerToast("success", "Partida cancelada");
+    emit("registroExitoso");
+  } catch (error) {
+    console.error(error);
+    triggerToast("error", "No se ha podido cancelar la partida");
   } finally {
-    isLoading.value = false;
-  }
-};
-
-watch([showSuccessValidarModal], ([newshowSuccessValidarModal]) => {
-  if (!newshowSuccessValidarModal) {
-    emit("registroExitoso");
-  }
-});
-watch([showSuccessCancelarModal], ([newshowSuccessCancelarModal]) => {
-  if (!newshowSuccessCancelarModal) {
-    emit("registroExitoso");
-  }
-});
-
-const controlValidacionesPartidas = () => {
-  if (
-    parseInt(idUsuarioOwner.value) == props.match.idUsuario1 &&
-    props.match.partidaValidadaUsuario1
-  ) {
-    IsValidadaOwner.value = true;
-  }
-
-  if (
-    parseInt(idUsuarioOwner.value) == props.match.idUsuario2 &&
-    props.match.partidaValidadaUsuario2
-  ) {
-    IsValidadaOwner.value = true;
-  }
-  if (
-    parseInt(idUsuarioOwner.value) != props.match.idUsuario1 &&
-    props.match.partidaValidadaUsuario1
-  ) {
-    IsValidadaRival.value = true;
-  }
-
-  if (
-    parseInt(idUsuarioOwner.value) != props.match.idUsuario2 &&
-    props.match.partidaValidadaUsuario2
-  ) {
-    IsValidadaRival.value = true;
+    cancelando.value = false;
   }
 };
 </script>
-
-<style scoped>
-.no-validada {
-  color: rgb(233, 69, 69);
-}
-
-.player-nick {
-  white-space: nowrap;
-  font-size: 1rem;
-}
-
-@media (max-width: 600px) {
-  .player-nick {
-    font-size: 0.85rem;
-  }
-}
-</style>
