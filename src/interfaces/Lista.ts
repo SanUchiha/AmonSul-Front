@@ -61,3 +61,16 @@ export interface UpdateEstadoListaMasDTO {
   idTorneo: number;
   idUsuario: number;
 }
+
+// Pestaña Listas en vivo: cada jugador con las listas que ha entregado
+export interface ListaDeJugador {
+  idLista: number;
+  ejercito: string;
+  bando: "good" | "evil" | null;
+}
+
+export interface JugadorListas {
+  idUsuario: number;
+  nick: string;
+  listas: ListaDeJugador[];
+}

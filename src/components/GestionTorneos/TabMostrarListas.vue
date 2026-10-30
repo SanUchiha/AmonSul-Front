@@ -1,241 +1,185 @@
 <template>
-  <v-card flat>
-    <v-card-title class="d-flex align-center">
-      <p v-if="torneo?.tipoTorneo == 'Individual'">
-        <v-icon left>mdi-account-group</v-icon> Participantes
-      </p>
-      <p v-else>
-        <v-icon left>mdi-account-group</v-icon>
-        {{ torneo?.tipoTorneo == "Parejas" ? "Parejas" : "Equipos" }}
-      </p>
-      <v-spacer />
+  <!-- Sencilla a propósito: cada jugador con sus ejércitos; el bando, solo en el filtro -->
+  <v-card flat class="listas-live mx-auto">
+    <!-- Cabecera: resumen, buscador y filtro por bando -->
+    <div class="pa-3">
+      <p v-if="!isLoading" class="text-caption text-medium-emphasis mb-2">{{ resumen }}</p>
+
       <v-text-field
         v-model="search"
-        label="Buscar"
-        prepend-inner-icon="mdi-magnify"
-        variant="tonal"
-        dense
+        :placeholder="porEquipos ? 'Buscar equipo, jugador o ejército' : 'Buscar jugador o ejército'"
+        variant="outlined"
+        density="compact"
+        hide-details
+        clearable
+        class="mb-2"
       />
-    </v-card-title>
+
+      <v-chip-group v-model="filtroBando" mandatory selected-class="text-primary" column>
+        <v-chip value="todos" size="small" variant="text">Todas ({{ cuentaBando.todos }})</v-chip>
+        <v-chip value="good" size="small" variant="text">Luz ({{ cuentaBando.good }})</v-chip>
+        <v-chip value="evil" size="small" variant="text">Oscuridad ({{ cuentaBando.evil }})</v-chip>
+      </v-chip-group>
+    </div>
 
     <v-divider />
 
-    <!-- INDIVIDUAL -->
-    <div v-if="torneo?.tipoTorneo == 'Individual'">
-      <v-data-table
-        v-model:search="search"
-        :items="torneoIndividual?.inscripciones"
-        :loading="isLoading"
-        :headers="headers"
-      >
-        <template v-slot:item="{ item }">
-          <tr>
-            <td>
-              <v-chip
-                @click="goToUserDetail(item.idUsuario)"
-                color="orange"
-                dark
-                >{{ item.nick }}</v-chip
-              >
-              <v-btn
-                v-if="item.idLista != 0"
-                icon
-                @click.stop="verLista(item.idLista, item.nick, item.ejercito)"
-              >
-                <img
-                  src="@/assets/icons/verdetalle.png"
-                  alt="Detalle"
-                  width="50"
-                  height="50"
-                />
-              </v-btn>
-              <v-chip v-if="item.idLista" color="orange" dark>{{
-                item.ejercito
-              }}</v-chip>
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
+    <div v-if="isLoading" class="pa-3">
+      <v-skeleton-loader v-for="n in 5" :key="n" type="list-item-avatar-two-line" />
     </div>
 
-    <!-- EQUIPOS -->
-    <div v-else>
-      <v-data-table
-        v-model:search="search"
-        :items="torneoEquipos?.equipos"
-        :loading="isLoading"
-        :headers="headersEquipos"
-        class="styled-table"
-        item-key="nombreEquipo"
-      >
-        <template v-slot:item="{ item }">
-          <tr @click="toggleExpand(item.nombreEquipo)" class="clickable-row">
-            <td>
-              <v-avatar color="indigo" size="40">
-                <img
-                  src="@/assets/icons/equipos.png"
-                  alt="Icono personalizado"
-                  width="40"
-                  height="40"
-                />
-              </v-avatar>
-              &nbsp;
-              <v-chip
-                color="orange darken-2"
-                text-color="white"
-                class="font-weight-bold"
-              >
-                {{ item.nombreEquipo }}
-              </v-chip>
-            </td>
-            <td class="text-center">
-              <v-icon>
-                {{
-                  expanded.includes(item.nombreEquipo)
-                    ? "mdi-chevron-up"
-                    : "mdi-chevron-down"
-                }}
-              </v-icon>
-            </td>
-          </tr>
+    <!-- INDIVIDUAL: un jugador por fila, con cada una de sus listas debajo -->
+    <template v-else-if="!porEquipos">
+      <p v-if="jugadoresVisibles.length === 0" class="text-center text-medium-emphasis pa-6">
+        {{ textoVacio }}
+      </p>
+      <div v-for="jugador in jugadoresVisibles" :key="jugador.idUsuario" class="fila-jugador">
+        <FilaListasJugador
+          :jugador="jugador"
+          :cargandoLista="cargandoLista"
+          @ver="verLista"
+          @perfil="goToUserDetail"
+        />
+      </div>
+    </template>
 
-          <!-- Expandido -->
-          <tr v-if="expanded.includes(item.nombreEquipo)">
-            <td colspan="3">
-              <v-card class="pa-3 mx-4 expanded-card">
-                <p class="text-subtitle-1 font-weight-bold">Participantes</p>
-                <v-list dense>
-                  <v-list-item
-                    v-for="participante in item.inscripciones"
-                    :key="participante.idUsuario"
-                  >
-                    <v-list-item-title>
-                      <v-chip
-                        @click="goToUserDetail(participante.idUsuario)"
-                        :color="
-                          item.idCapitan === participante.idUsuario
-                            ? 'teal'
-                            : 'orange'
-                        "
-                        dark
-                      >
-                        {{ participante.nick }}
-                      </v-chip>
-                      <span
-                        dark
-                        tonal
-                        small
-                        class="ml-2"
-                        :style="{
-                          color: getColorPorEjercito(participante.ejercito),
-                        }"
-                      >
-                        {{ participante.ejercito }}
-                      </span>
-
-                      <v-btn
-                        v-if="participante.idLista != 0"
-                        icon
-                        class="ml-2"
-                        @click.stop="
-                          verLista(
-                            participante.idLista,
-                            participante.nick,
-                            participante.ejercito
-                          )
-                        "
-                      >
-                        <img
-                          src="@/assets/icons/verdetalle.png"
-                          alt="Detalle"
-                          width="30"
-                          height="30"
-                        />
-                      </v-btn>
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-card>
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
-    </div>
+    <!-- EQUIPOS Y PAREJAS: un desplegable por equipo -->
+    <template v-else>
+      <p v-if="equiposVisibles.length === 0" class="text-center text-medium-emphasis pa-6">
+        {{ textoVacio }}
+      </p>
+      <v-expansion-panels v-else v-model="equiposAbiertos" multiple variant="accordion">
+        <v-expansion-panel
+          v-for="equipo in equiposVisibles"
+          :key="equipo.nombre"
+          :value="equipo.nombre"
+        >
+          <v-expansion-panel-title>
+            <div class="d-flex align-center ga-2 min-w-0">
+              <span class="font-weight-bold text-truncate">{{ equipo.nombre }}</span>
+              <!-- Los que tiene el equipo, aunque la búsqueda solo muestre a alguno -->
+              <span class="text-caption text-medium-emphasis flex-shrink-0">
+                {{ equipo.total }} {{ equipo.total === 1 ? "jugador" : "jugadores" }}
+              </span>
+            </div>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text class="panel-equipo">
+            <div v-for="jugador in equipo.jugadores" :key="jugador.idUsuario" class="fila-jugador">
+              <FilaListasJugador
+                :jugador="jugador"
+                :cargandoLista="cargandoLista"
+                @ver="verLista"
+                @perfil="goToUserDetail"
+              />
+            </div>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </template>
   </v-card>
 
-  <!-- Modal ver lista -->
-  <ModalVerLista
-    v-model:isVisible="showVerListaModal"
-    :listaJugador="listaJugador!"
-  />
-
-  <!-- Spinner carga lista -->
-  <v-dialog v-model="isLoadingLista" persistent width="300">
-    <v-card>
-      <v-card-text
-        class="d-flex justify-center align-center"
-        style="height: 150px"
-      >
-        <v-progress-circular
-          indeterminate
-          color="blue-lighten-3"
-          :size="57"
-        ></v-progress-circular>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+  <ModalVerLista v-model:isVisible="showVerListaModal" :listaJugador="listaJugador!" />
 </template>
 
 <script setup lang="ts">
+import { computed, ref, watch } from "vue";
+import { useRouter } from "vue-router";
+import { Torneo, TorneoGestionInfoDTO, TorneoGestionInfoMasDTO } from "@/interfaces/Torneo";
 import { TorneoEquipoGestionInfoDTO } from "@/interfaces/Inscripcion";
-import { ListaJugador } from "@/interfaces/Lista";
-import { Torneo, TorneoGestionInfoDTO } from "@/interfaces/Torneo";
+import { JugadorListas, ListaDeJugador, ListaJugador } from "@/interfaces/Lista";
 import { getListaById } from "@/services/ListasService";
 import {
   getInfoTorneoCreado,
+  getInfoTorneoCreadoMasAsync,
   getInfoTorneoEquipoCreado,
 } from "@/services/TorneosService";
-import { ref, defineProps, watch } from "vue";
-import ModalVerLista from "../Inscripcion/ModalVerLista.vue";
-import { useRouter } from "vue-router";
-import { ArmyDTO } from "@/interfaces/Army";
 import { appsettings } from "@/settings/appsettings";
+import { esUsuarioBye } from "@/utils/bye";
+import ModalVerLista from "../Inscripcion/ModalVerLista.vue";
+import FilaListasJugador from "./FilaListasJugador.vue";
 
 const props = defineProps<{
   torneo: Torneo | undefined;
 }>();
 
-const torneoIndividual = ref<TorneoGestionInfoDTO>();
-const torneoEquipos = ref<TorneoEquipoGestionInfoDTO>();
+type Bando = "good" | "evil";
+type Filtro = "todos" | Bando;
+interface EquipoListas {
+  nombre: string;
+  jugadores: JugadorListas[];
+}
 
-const search = ref<string>("");
-const isLoading = ref<boolean>(true);
-const isLoadingLista = ref<boolean>(false);
-const headers = [{ title: "Nick", key: "nick" }];
-const headersEquipos = [{ title: "Nombre del equipo", key: "nombreEquipo" }];
-const expanded = ref<string[]>([]);
-const listaJugador = ref<ListaJugador>();
-const showVerListaModal = ref<boolean>(false);
 const router = useRouter();
-const listadoEjercitos = ref<ArmyDTO[]>(appsettings.armies);
+const isLoading = ref(true);
+const search = ref<string | null>("");
+const filtroBando = ref<Filtro>("todos");
+const jugadores = ref<JugadorListas[]>([]);
+const equipos = ref<EquipoListas[]>([]);
+const equiposAbiertos = ref<string[]>([]);
+const cargandoLista = ref<number | null>(null);
+const listaJugador = ref<ListaJugador>();
+const showVerListaModal = ref(false);
+
+const porEquipos = computed(() => !!props.torneo && props.torneo.tipoTorneo !== "Individual");
+
+// El bando de la lista o, si no viene, el de su ejército
+const bandoDe = (bando?: string | null, ejercito?: string | null): Bando | null => {
+  if (bando === "good" || bando === "evil") return bando;
+  const band = appsettings.armies.find(e => e.name === ejercito)?.band;
+  return band === "good" || band === "evil" ? band : null;
+};
+
+const lista = (idLista?: number | null, ejercito?: string | null, bando?: string | null): ListaDeJugador[] =>
+  idLista ? [{ idLista, ejercito: ejercito ?? "Sin ejército", bando: bandoDe(bando, ejercito) }] : [];
+
+const porNick = (a: JugadorListas, b: JugadorListas) =>
+  a.nick.localeCompare(b.nick, "es", { sensitivity: "base" });
 
 watch(
   () => props.torneo,
-  async (nuevoTorneo) => {
-    if (!nuevoTorneo) return;
-
+  async torneo => {
+    if (!torneo) return;
     isLoading.value = true;
-
     try {
-      if (nuevoTorneo.tipoTorneo === "Individual") {
-        const response = await getInfoTorneoCreado(nuevoTorneo.idTorneo);
-        torneoIndividual.value = response.data;
+      if (torneo.tipoTorneo !== "Individual") {
+        const info: TorneoEquipoGestionInfoDTO = (await getInfoTorneoEquipoCreado(torneo.idTorneo)).data;
+        equipos.value = (info.equipos ?? [])
+          .filter(e => !esUsuarioBye(e.idCapitan, e.nombreEquipo))
+          .map(e => ({
+            nombre: e.nombreEquipo ?? "Equipo",
+            jugadores: e.inscripciones
+              .map(i => ({
+                idUsuario: i.idUsuario,
+                nick: i.nick,
+                listas: lista(i.idLista, i.ejercito, i.bando),
+              }))
+              .sort(porNick),
+          }))
+          .sort((a, b) => a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }));
+      } else if ((torneo.listasPorJugador ?? 1) > 1) {
+        // Varias listas por jugador: todas las que ha entregado
+        const info: TorneoGestionInfoMasDTO = (await getInfoTorneoCreadoMasAsync(torneo.idTorneo)).data;
+        jugadores.value = (info.inscripciones ?? [])
+          .filter(i => !esUsuarioBye(i.idUsuario, i.nick))
+          .map(i => ({
+            idUsuario: i.idUsuario,
+            nick: i.nick,
+            listas: (i.lista ?? []).flatMap(l => lista(l.idLista, l.ejercito, l.bando)),
+          }))
+          .sort(porNick);
       } else {
-        const response = await getInfoTorneoEquipoCreado(nuevoTorneo.idTorneo);
-        torneoEquipos.value = response.data;
+        const info: TorneoGestionInfoDTO = (await getInfoTorneoCreado(torneo.idTorneo)).data;
+        jugadores.value = (info.inscripciones ?? [])
+          .filter(i => !esUsuarioBye(i.idUsuario, i.nick))
+          .map(i => ({
+            idUsuario: i.idUsuario,
+            nick: i.nick ?? "",
+            listas: lista(i.idLista, i.ejercito, i.bando),
+          }))
+          .sort(porNick);
       }
     } catch (error) {
-      console.error("Error al obtener participantes/equipos:", error);
+      console.error("Error al obtener las listas:", error);
     } finally {
       isLoading.value = false;
     }
@@ -243,47 +187,101 @@ watch(
   { immediate: true }
 );
 
-function toggleExpand(nombreEquipo: string) {
-  if (expanded.value.includes(nombreEquipo)) {
-    expanded.value = expanded.value.filter((e) => e !== nombreEquipo);
-  } else {
-    expanded.value.push(nombreEquipo);
-  }
-}
+// Búsqueda sin tildes ni mayúsculas
+const normalizar = (texto: string) =>
+  texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const texto = computed(() => normalizar((search.value ?? "").trim()));
 
-const verLista = async (idLista: number, nombre: string, ejercito: string) => {
-  isLoadingLista.value = true;
+// Las listas que pasan el filtro de bando; con «Todas», también quien aún no ha entregado
+const filtrarJugador = (jugador: JugadorListas, extra = ""): JugadorListas | null => {
+  const listas =
+    filtroBando.value === "todos"
+      ? jugador.listas
+      : jugador.listas.filter(l => l.bando === filtroBando.value);
+  if (filtroBando.value !== "todos" && listas.length === 0) return null;
+  if (texto.value) {
+    const donde = normalizar([extra, jugador.nick, ...listas.map(l => l.ejercito)].join(" "));
+    if (!donde.includes(texto.value)) return null;
+  }
+  return { ...jugador, listas };
+};
+
+const jugadoresVisibles = computed(() =>
+  jugadores.value.map(j => filtrarJugador(j)).filter((j): j is JugadorListas => j !== null)
+);
+
+const equiposVisibles = computed(() =>
+  equipos.value
+    .map(e => ({
+      ...e,
+      total: e.jugadores.length,
+      jugadores: e.jugadores
+        .map(j => filtrarJugador(j, e.nombre))
+        .filter((j): j is JugadorListas => j !== null),
+    }))
+    .filter(e => e.jugadores.length > 0)
+);
+
+// Al buscar o filtrar se abren los equipos que coinciden
+watch([texto, filtroBando], () => {
+  equiposAbiertos.value = texto.value || filtroBando.value !== "todos" ? equiposVisibles.value.map(e => e.nombre) : [];
+});
+
+const todasLasListas = computed(() =>
+  (porEquipos.value ? equipos.value.flatMap(e => e.jugadores) : jugadores.value).flatMap(j => j.listas)
+);
+const cuentaBando = computed(() => ({
+  todos: todasLasListas.value.length,
+  good: todasLasListas.value.filter(l => l.bando === "good").length,
+  evil: todasLasListas.value.filter(l => l.bando === "evil").length,
+}));
+
+const resumen = computed(() => {
+  if (porEquipos.value) {
+    const n = equipos.value.length;
+    const nombre = props.torneo?.tipoTorneo === "Parejas" ? (n === 1 ? "pareja" : "parejas") : n === 1 ? "equipo" : "equipos";
+    return `${n} ${nombre} · ${cuentaBando.value.todos} listas`;
+  }
+  const n = jugadores.value.length;
+  return `${n} ${n === 1 ? "jugador" : "jugadores"} · ${cuentaBando.value.todos} listas`;
+});
+
+const textoVacio = computed(() =>
+  texto.value || filtroBando.value !== "todos"
+    ? "Nada coincide con la búsqueda."
+    : "Todavía no hay inscritos."
+);
+
+const verLista = async (jugador: JugadorListas, listaElegida: ListaDeJugador) => {
+  cargandoLista.value = listaElegida.idLista;
   try {
-    const responseLista = await getListaById(idLista);
-    const listaJugadorDTO: ListaJugador = {
-      listaData: responseLista.data.listaData,
-      nick: nombre,
-      nombreEjercito: ejercito,
-    };
-    listaJugador.value = listaJugadorDTO;
+    const { data } = await getListaById(listaElegida.idLista);
+    listaJugador.value = { listaData: data.listaData, nick: jugador.nick, nombreEjercito: listaElegida.ejercito };
     showVerListaModal.value = true;
   } catch (error) {
     console.error("Error al cargar la lista:", error);
   } finally {
-    isLoadingLista.value = false;
+    cargandoLista.value = null;
   }
 };
 
 const goToUserDetail = (idUsuario: number) => {
-  router.push({ name: "detalle-jugador", params: { idUsuario: idUsuario } });
+  router.push({ name: "detalle-jugador", params: { idUsuario } });
 };
-
-function getColorPorEjercito(nombreEjercito: string): string {
-  const ejercito = listadoEjercitos.value.find(
-    (e) => e.name === nombreEjercito
-  );
-  if (!ejercito) return "grey";
-  return ejercito.band === "good" ? "green" : "purple";
-}
 </script>
 
 <style scoped>
-.clickable-row {
-  cursor: pointer;
+/* En el ordenador, estrecha: Ver queda cerca del nombre */
+.listas-live {
+  max-width: 720px;
+}
+
+/* Los jugadores, alineados con el nombre del equipo: la fila ya lleva su propio margen */
+.panel-equipo :deep(.v-expansion-panel-text__wrapper) {
+  padding: 0 0 0 12px;
+}
+
+.fila-jugador + .fila-jugador {
+  border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
 </style>
