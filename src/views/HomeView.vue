@@ -6,8 +6,8 @@
         <img src="@/assets/icons/logo_horizontal2.webp" alt="Amon Sûl" height="80" class="mb-4" />
         <h1 class="text-h4 font-weight-bold">Bienvenido a Amon Sûl</h1>
         <p class="text-subtitle-1 mt-2">
-          La plataforma de gestión de torneos del wargame Middle-earth Strategy Battle Game.
-          Organiza torneos, consulta estadísticas de tus partidas, el ranking ELO y sigue la competición en tiempo real.
+          La plataforma de gestión de eventos del wargame Middle-earth Strategy Battle Game.
+          Organiza eventos, consulta estadísticas de tus partidas, el ranking ELO y sigue la competición en tiempo real.
         </p>
       </v-col>
     </v-row>
@@ -95,9 +95,9 @@ export default {
         },
         {
           fecha: "Octubre 2026",
-          titulo: "Torneos a Parejas",
+          titulo: "Torneos de Dobles",
           descripcion:
-            "Nuevo tipo de torneo: dos contra dos en la misma mesa, con un único resultado por partida que mete el capitán. El organizador elige si cada pareja entrega una lista por jugador o una lista conjunta. Las partidas cuentan para el ELO con 16 jugadores o más: se usa la media de ELO de cada pareja y los dos jugadores ganan o pierden lo mismo. Los antiguos torneos de Parejas pasan a llamarse Equipos de 2, porque cada miembro juega su propia partida.",
+            "Nuevo tipo de torneo: dos contra dos en la misma mesa, con un único resultado por partida que mete el capitán. El organizador elige si cada pareja entrega una lista por jugador o una lista conjunta. Las partidas cuentan para el ELO con 16 jugadores o más: se usa la media de ELO de cada pareja y los dos jugadores ganan o pierden lo mismo. Los antiguos torneos de Parejas, en los que cada miembro juega su propia partida, pasan a llamarse Equipos de 2.",
         },
         {
           fecha: "Octubre 2026",
@@ -153,7 +153,7 @@ export default {
           icon: gestionTorneos,
           title: "Gestión de eventos",
           description:
-            "Crea y administra torneos individuales, por parejas o por equipos con emparejamientos automáticos, ligas de todos contra todos por jornadas y copas con fase de grupos y eliminatoria.",
+            "Crea y administra torneos individuales, de dobles o por equipos con emparejamientos automáticos, ligas de todos contra todos por jornadas y copas con fase de grupos y eliminatoria.",
         },
         {
           icon: ELO,

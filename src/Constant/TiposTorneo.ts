@@ -1,5 +1,5 @@
 export const torneoType = [
-  // 2 contra 2 en la misma mesa. Hasta octubre de 2026 era el nombre de Equipos_2
+  // 2 contra 2 en la misma mesa: se enseña como Dobles. Hasta octubre de 2026 era el nombre de Equipos_2
   "Parejas",
   "Equipos_2",
   "Equipos_4",
@@ -21,7 +21,7 @@ export const tipoTorneoOptions: {
     subtitle: "Cada jugador juega sus partidas",
   },
   {
-    label: "Parejas",
+    label: "Dobles",
     value: "Parejas",
     subtitle: "2 contra 2 en la misma mesa",
   },
@@ -42,7 +42,7 @@ export const tipoTorneoOptions: {
   },
 ];
 
-// Solo en Parejas: cómo entrega las listas cada pareja
+// Solo en Dobles: cómo entrega las listas cada pareja
 export const modoListasParejaOptions = [
   { label: "Una lista por jugador", value: false },
   { label: "Una lista conjunta por pareja", value: true },
