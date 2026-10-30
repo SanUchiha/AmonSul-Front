@@ -5,7 +5,7 @@
     </div>
     <div v-else>
       <!-- TABS -->
-      <v-tabs v-model="activeTab" fixed-tabs>
+      <v-tabs v-model="pestana" show-arrows grow>
         <v-tab
           :key="-1"
           text="Resumen"
@@ -16,13 +16,8 @@
           :text="`Listas`"
           :value="tabListas"
         ></v-tab>
-        <v-tab
-          v-for="n in numeroRondas"
-          :key="n"
-          :text="`Ronda ${n}`"
-          :value="n"
-        >
-        </v-tab>
+        <!-- Todas las rondas en una pestaña, con pastillas para elegir cada una -->
+        <v-tab :value="TAB_RONDAS" text="Rondas"></v-tab>
         <v-tab
           :key="tabClasificacion"
           :text="`Clasificación`"
@@ -38,6 +33,12 @@
         class="mt-1 mb-1"
         @click="activeTab = -1"
       >Resumen</v-btn>
+      <SelectorRondas
+        v-if="enRondas"
+        v-model="activeTab"
+        :rondas="numeroRondas"
+        :partidasPorRonda="partidasPorRonda"
+      />
       <v-window v-model="activeTab">
         <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion">
           <p>Aún no se ha generado ninguna ronda</p>
@@ -266,6 +267,8 @@
 </template>
 
 <script setup lang="ts">
+import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
+import { useRondasEnPestana } from "@/composables/useRondasEnPestana";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import CardPartidaTorneoMasLive from "@/components/PartidasTorneo/CardPartidaTorneoMasLive.vue";
 import TabResumenTorneo from "@/components/GestionTorneos/TabResumenTorneo.vue";
@@ -862,6 +865,13 @@ const soloValidarPJ = (partida: PartidaTorneoMasDTO) => {
 //   if (!date) return "N/A";
 //   return new Date(date).toLocaleDateString();
 // };
+
+// Las rondas en una sola pestaña: activeTab sigue siendo el número de ronda
+const { pestana, enRondas, TAB_RONDAS } = useRondasEnPestana(
+  activeTab,
+  numeroRondas,
+  partidasPorRonda
+);
 </script>
 <style>
 .good-bando {

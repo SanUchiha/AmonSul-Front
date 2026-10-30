@@ -5,7 +5,7 @@
       <span class="text-subtitle-1 font-weight-bold">Circuitos</span>
     </div>
     <p class="text-caption text-medium-emphasis mb-3">
-      {{ esLiga ? "La liga" : "El torneo" }} suma para la clasificación de los
+      {{ capitalizar(textos.el) }} suma para la clasificación de los
       circuitos en los que esté.
     </p>
 
@@ -66,7 +66,7 @@
   <v-dialog v-model="showQuitar" max-width="420">
     <v-card>
       <v-card-title class="text-wrap">
-        ¿Quitar {{ esLiga ? "la liga" : "el torneo" }} de
+        ¿Quitar {{ textos.el }} de
         {{ circuitoQuitar?.nombreCircuito }}?
       </v-card-title>
       <v-card-text>
@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, onMounted } from "vue";
+import { computed, ref, defineProps, onMounted } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import {
@@ -116,12 +116,17 @@ import {
   getCircuitosNoTorneoAsync,
 } from "@/services/CircuitosService";
 import { AddCircuitoTorneoDTO, CircuitoDTO } from "@/interfaces/Circuito";
+import { textosEvento } from "@/Constant/FormatoTorneo";
 
 const props = defineProps<{
   idTorneo: number;
   // Solo cambia los textos
-  esLiga?: boolean;
+  formato?: string | null;
 }>();
+
+// Los textos hablan del tipo de evento: torneo, liga o copa
+const textos = computed(() => textosEvento(props.formato));
+const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1);
 
 const circuitosDisponibles = ref<CircuitoDTO[]>([]);
 const circuitosAsociados = ref<CircuitoDTO[]>([]);
@@ -164,7 +169,7 @@ const confirmar = async () => {
     };
 
     await addTorneoToCircuitoAsync(request);
-    mensajeExito.value = `${props.esLiga ? "Liga añadida" : "Torneo añadido"} a ${circuitoSelected.value.nombreCircuito}.`;
+    mensajeExito.value = `${capitalizar(textos.value.el)} se ha añadido a ${circuitoSelected.value.nombreCircuito}.`;
     showSuccessModal.value = true;
     circuitoSelected.value = null;
     await cargarCircuitos();

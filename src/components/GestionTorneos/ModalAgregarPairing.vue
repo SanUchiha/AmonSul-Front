@@ -58,14 +58,14 @@
   <!-- Modal response eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Pairing agregado correctamente."
+    message="Emparejamiento añadido correctamente."
     @update:isVisible="showSuccessModal = $event"
   />
 
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido agregar el pairing. Contacta con el administrador."
+    message="No se ha podido añadir el emparejamiento. Contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
 </template>

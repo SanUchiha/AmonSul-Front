@@ -34,7 +34,7 @@
             color="secondary"
             @click="modificarTorneo"
             block
-            >{{ esLiga ? "Modificar liga" : "Modificar torneo" }}</v-btn
+            >Modificar {{ nombreEvento(props.torneo?.torneo.formatoTorneo).toLowerCase() }}</v-btn
           >
         </v-col>
         <v-col>
@@ -82,7 +82,7 @@
         <v-col cols="12">
           <CardAddTorneoCircuito
             :idTorneo="props.torneo?.torneo.idTorneo!"
-            :esLiga="esLiga"
+            :formato="props.torneo?.torneo.formatoTorneo"
           />
         </v-col>
       </v-row>
@@ -122,13 +122,13 @@
   <!-- modal torneo modificado con exito -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    :message="`${esLiga ? 'Liga modificada' : 'Torneo modificado'} con éxito.`"
+    :message="`${nombreEvento(props.torneo?.torneo.formatoTorneo)} ${esLiga ? 'modificada' : 'modificado'} con éxito.`"
     @update:isVisible="showSuccessModal = $event"
   />
   <!-- modal Error al modificar el torneo -->
   <ModalError
     :isVisible="showErrorModal"
-    :message="`No se ha podido modificar ${esLiga ? 'la liga' : 'el torneo'}. Intentalo de nuevo y si el error persiste contacta con el administrador.`"
+    :message="`No se ha podido modificar ${textosEvento(props.torneo?.torneo.formatoTorneo).el}. Intentalo de nuevo y si el error persiste contacta con el administrador.`"
     @update:isVisible="showErrorModal = $event"
   />
   <LoadingLOTR
@@ -152,7 +152,7 @@ import ModalModificarTorneo from "./ModalModificarTorneo.vue";
 import { getListasTorneoAsync, getTorneo } from "@/services/TorneosService";
 import ModalModificarBasesTorneo from "./ModalModificarBasesTorneo.vue";
 import CardAddTorneoCircuito from "./CardAddTorneoCircuito.vue";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { esPorJornadas, nombreEvento, textosEvento } from "@/Constant/FormatoTorneo";
 import ModalHandlerMostrarListas from "./ModalHandlerMostrarListas.vue";
 import ModalHandlerMostrarClasificacion from "./ModalHandlerMostrarClasificacion.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
@@ -165,9 +165,8 @@ import { descargarListasPDF } from "@/utils/descargarListas";
 
 // eslint-disable-next-line
 const props = defineProps<{ torneo: TorneoGestionInfoDTO | null }>();
-const esLiga = computed(
-  () => props.torneo?.torneo.formatoTorneo === FORMATO_LIGA
-);
+// Liga y Copa: "modificada" en femenino
+const esLiga = computed(() => esPorJornadas(props.torneo?.torneo.formatoTorneo));
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const showModificarTorneoModal = ref<boolean>(false);

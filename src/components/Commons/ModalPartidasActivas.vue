@@ -11,9 +11,11 @@
               :idUsuario="idUsuario"
               :match="partida"
               :mesa="
-                esLiga
-                  ? `Jornada ${partida.numeroRonda}`
-                  : `Mesa ${partida.numeroMesa}`
+                esCopa
+                  ? etiquetaPartidaCopa(partida)
+                  : esLiga
+                    ? `Jornada ${partida.numeroRonda}`
+                    : `Mesa ${partida.numeroMesa}`
               "
               :completa="
                 partida.partidaValidadaUsuario1 === true &&
@@ -21,7 +23,7 @@
               "
               :editarPartidaPJ="editarPartidaPJ(partida)"
               :soloValidarPJ="soloValidarPJ(partida)"
-              :listaDePartida="esLiga"
+              :listaDePartida="esLiga || esCopa"
             />
           </div>
           <div v-else>
@@ -60,7 +62,8 @@
 <script setup lang="ts">
 import { EstaJugandoDTO, PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { computed } from "vue";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { FORMATO_COPA, FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { etiquetaPartidaCopa } from "@/utils/cuadroCopa";
 import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import CardPartidaTorneoEquipoLive from "@/components/PartidasTorneo/CardPartidaTorneoEquipoLive.vue";
 
@@ -90,6 +93,10 @@ const modelValueProxy = computed({
 
 const esLiga = computed(
   () => props.estaJugando?.formatoTorneo === FORMATO_LIGA
+);
+// En la copa, por su grupo y jornada o su ronda del cuadro
+const esCopa = computed(
+  () => props.estaJugando?.formatoTorneo === FORMATO_COPA
 );
 
 function close() {

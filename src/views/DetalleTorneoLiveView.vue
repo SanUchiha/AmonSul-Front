@@ -3,11 +3,12 @@
     <div v-if="isLoading">
       <LoadingGandalf />
     </div>
-    <!-- La liga tiene su propia vista: jornadas y no rondas -->
+    <!-- La liga y la copa tienen su propia vista: jornadas y no rondas -->
     <LigaEnVivo v-else-if="esLiga && torneo" :torneo="torneo" :idUsuario="idUsuario" />
+    <CopaEnVivo v-else-if="esCopa && torneo" :torneo="torneo" :idUsuario="idUsuario" />
     <div v-else>
       <!-- TABS -->
-      <v-tabs v-model="activeTab" fixed-tabs>
+      <v-tabs v-model="pestana" show-arrows grow>
         <v-tab
           :key="-1"
           text="Resumen"
@@ -18,13 +19,8 @@
           :text="`Listas`"
           :value="tabListas"
         ></v-tab>
-        <v-tab
-          v-for="n in numeroRondas"
-          :key="n"
-          :text="`Ronda ${n}`"
-          :value="n"
-        >
-        </v-tab>
+        <!-- Todas las rondas en una pestaña, con pastillas para elegir cada una -->
+        <v-tab :value="TAB_RONDAS" text="Rondas"></v-tab>
         <v-tab
           v-if="torneo?.tipoTorneo != 'Individual'"
           :key="tabClasificacion"
@@ -49,6 +45,12 @@
         class="mt-1 mb-1"
         @click="activeTab = -1"
       >Resumen</v-btn>
+      <SelectorRondas
+        v-if="enRondas"
+        v-model="activeTab"
+        :rondas="numeroRondas"
+        :partidasPorRonda="partidasPorRonda"
+      />
       <v-window v-model="activeTab">
         <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion && activeTab !== tabClasificacionIndividual">
           <p>Aún no se ha generado ninguna ronda</p>
@@ -171,6 +173,8 @@
 </template>
 
 <script setup lang="ts">
+import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
+import { useRondasEnPestana } from "@/composables/useRondasEnPestana";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import CardEmparejamientos from "@/components/GestionTorneos/Equipos/CardEmparejamientos.vue";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
@@ -179,7 +183,8 @@ import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import TabResumenTorneo from "@/components/GestionTorneos/TabResumenTorneo.vue";
 import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import LigaEnVivo from "@/components/ResultadosTorneos/LigaEnVivo.vue";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import CopaEnVivo from "@/components/ResultadosTorneos/CopaEnVivo.vue";
+import { FORMATO_COPA, FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import { useAuth } from "@/composables/useAuth";
 import {
   ResultMatchMatchedPlayType,
@@ -237,6 +242,7 @@ const resumen = ref<ResumenTorneoDTO | null>(null);
 const TAB_RESUMEN = -1;
 const isLoadingPartidas = ref(true);
 const esLiga = computed(() => torneo.value?.formatoTorneo === FORMATO_LIGA);
+const esCopa = computed(() => torneo.value?.formatoTorneo === FORMATO_COPA);
 const podioEquipos = computed(() =>
   clasificacionEquipos.value.slice(0, 3).map(e => e.nombreEquipo)
 );
@@ -272,8 +278,8 @@ onMounted(async () => {
 
   activeTab.value = TAB_RESUMEN;
   isLoading.value = false;
-  // La liga carga lo suyo
-  if (esLiga.value) return;
+  // La liga y la copa cargan lo suyo
+  if (esLiga.value || esCopa.value) return;
 
   // Llamadas secundarias en background — actualizan reactivamente
   Promise.allSettled([
@@ -722,8 +728,11 @@ const calcularClasificacion = async () => {
 
   const jugadoresConEjercitos = partidas.value.reduce<JugadorConEjercito[]>(
     (acc, partida) => {
-      acc.push({ nick: partida.nick1, ejercito: partida.ejercitoUsuario1 });
-      acc.push({ nick: partida.nick2, ejercito: partida.ejercitoUsuario2 });
+      // Solo las que tienen ejército: en la primera ronda puede faltar si aún no había entregado la lista
+      if (partida.ejercitoUsuario1)
+        acc.push({ nick: partida.nick1, ejercito: partida.ejercitoUsuario1 });
+      if (partida.ejercitoUsuario2)
+        acc.push({ nick: partida.nick2, ejercito: partida.ejercitoUsuario2 });
       return acc;
     },
     []
@@ -804,4 +813,11 @@ const soloValidarPJ = (partida: PartidaTorneoDTO) => {
     return false;
   }
 };
+
+// Las rondas en una sola pestaña: activeTab sigue siendo el número de ronda
+const { pestana, enRondas, TAB_RONDAS } = useRondasEnPestana(
+  activeTab,
+  numeroRondas,
+  partidasPorRonda
+);
 </script>

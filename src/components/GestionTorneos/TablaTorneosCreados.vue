@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2"
-      >Torneos propios
+      >Eventos propios
 
       <v-spacer></v-spacer>
 
@@ -33,10 +33,14 @@
           <td>{{ item.nombreTorneo }}</td>
 
           <td class="action-buttons">
-            <!-- Las ligas tienen su propia gestión -->
-            <div v-if="item.formatoTorneo === FORMATO_LIGA">
+            <!-- Las ligas y las copas tienen su propia gestión -->
+            <div v-if="esPorJornadas(item.formatoTorneo)">
               <v-btn
-                @click="viewDetailsLiga(item.idTorneo)"
+                @click="
+                  item.formatoTorneo === FORMATO_COPA
+                    ? viewDetailsCopa(item.idTorneo)
+                    : viewDetailsLiga(item.idTorneo)
+                "
                 icon="mdi-eye"
                 color="primary"
                 elevation="2"
@@ -96,16 +100,19 @@
     </v-data-table>
   </v-card>
 
-  <!-- Modal confirmar borrado torneo -->
+  <!-- Modal confirmar borrado: torneo, liga o copa -->
   <v-dialog
     v-model="showConfirmarBorrarModal"
     :persistent="isDeleting"
     max-width="400"
   >
     <v-card>
-      <v-card-title> Eliminar torneo </v-card-title>
+      <v-card-title>
+        Eliminar {{ nombreEvento(torneoAEliminar?.formatoTorneo).toLowerCase() }}
+      </v-card-title>
       <v-card-text>
-        ¿Estás seguro que deseas eliminar el torneo
+        ¿Estás seguro que deseas eliminar
+        {{ textosEvento(torneoAEliminar?.formatoTorneo).el }}
         <strong>{{ torneoAEliminar?.nombreTorneo }}</strong>? Esta acción no se
         puede deshacer.
       </v-card-text>
@@ -134,13 +141,13 @@
 
   <ModalSuccess
     :isVisible="showSuccessBorrarModal"
-    message="Torneo borrado con éxito."
+    :message="`Se ha borrado ${eventoBorrado.el}.`"
     @update:isVisible="showSuccessBorrarModal = $event"
   />
 
   <ModalError
     :isVisible="showErrorBorrarModal"
-    message="No se ha podido borrar el torneo. Contacta con el administrador."
+    :message="`No se ha podido borrar ${eventoBorrado.el}. Contacta con el administrador.`"
     @update:isVisible="showErrorBorrarModal = $event"
   />
 </template>
@@ -159,7 +166,12 @@ import {
   VTextField,
 } from "vuetify/components";
 import { useAuth } from "@/composables/useAuth";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import {
+  FORMATO_COPA,
+  esPorJornadas,
+  nombreEvento,
+  textosEvento,
+} from "@/Constant/FormatoTorneo";
 import {
   getTorneosCreadosUsuario,
   deleteTorneo,
@@ -189,6 +201,10 @@ const viewDetailsLiga = (idTorneo: number) => {
   router.push({ name: "detalle-torneo-gestion-liga", params: { idTorneo } });
 };
 
+const viewDetailsCopa = (idTorneo: number) => {
+  router.push({ name: "detalle-torneo-gestion-copa", params: { idTorneo } });
+};
+
 const viewDetailsTorneoEquipos = (idTorneo: number) => {
   router.push({ name: "detalle-torneo-gestion-equipos", params: { idTorneo } });
 };
@@ -205,9 +221,13 @@ const pedirConfirmacionBorrado = (torneo: TorneoPropioDTO) => {
   showConfirmarBorrarModal.value = true;
 };
 
+// Para los avisos de después, cuando ya no está en la lista
+const eventoBorrado = ref(textosEvento(null));
+
 const confirmarBorrado = async () => {
   if (!torneoAEliminar.value) return;
   const idTorneo = torneoAEliminar.value.idTorneo;
+  eventoBorrado.value = textosEvento(torneoAEliminar.value.formatoTorneo);
   try {
     isDeleting.value = true;
     await deleteTorneo(idTorneo);

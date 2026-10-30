@@ -40,6 +40,12 @@ export interface Torneo {
   // Solo en Liga
   cuentaElo?: boolean;
   idaYVuelta?: boolean;
+  // Solo en Copa
+  numeroGrupos?: number | null;
+  clasificadosPorGrupo?: number | null;
+  repartoGrupos?: string | null;
+  desempateEliminatoria?: string | null;
+  tercerPuesto?: boolean;
 }
 
 export interface TorneoReducidoDTO {
@@ -89,6 +95,12 @@ export interface TorneoCreadoDTO {
   formatoTorneo?: string;
   cuentaElo?: boolean;
   idaYVuelta?: boolean;
+  // Solo en Copa
+  numeroGrupos?: number | null;
+  clasificadosPorGrupo?: number | null;
+  repartoGrupos?: string | null;
+  desempateEliminatoria?: string | null;
+  tercerPuesto?: boolean;
 }
 
 export interface InscripcionTorneoCreadoDTO {
@@ -109,6 +121,9 @@ export interface InscripcionTorneoCreadoDTO {
   // Solo en Liga: el ejército que eligió al inscribirse y RETIRADO si se le ha retirado
   ejercitoElegido?: string | null;
   estadoInscripcion?: string | null;
+  // Solo en Copa: su grupo y su hueco en la primera ronda del cuadro
+  grupo?: number | null;
+  posicionCuadro?: number | null;
 }
 
 export interface InscripcionTorneoCreadoMasDTO {
@@ -165,6 +180,12 @@ export interface CrearTorneoDTO {
   // Solo en Liga
   cuentaElo?: boolean;
   idaYVuelta?: boolean;
+  // Solo en Copa
+  numeroGrupos?: number | null;
+  clasificadosPorGrupo?: number | null;
+  repartoGrupos?: string | null;
+  desempateEliminatoria?: string | null;
+  tercerPuesto?: boolean;
 }
 
 export interface ModificarTorneoDTO {
@@ -197,6 +218,12 @@ export interface ModificarTorneoDTO {
   // Solo en Liga y mientras no tenga partidas
   cuentaElo?: boolean;
   idaYVuelta?: boolean;
+  // Solo en Copa
+  numeroGrupos?: number | null;
+  clasificadosPorGrupo?: number | null;
+  repartoGrupos?: string | null;
+  desempateEliminatoria?: string | null;
+  tercerPuesto?: boolean;
 }
 
 export interface ModificarBasesTorneoDTO {

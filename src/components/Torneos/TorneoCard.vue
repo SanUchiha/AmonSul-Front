@@ -14,7 +14,7 @@
       {{ torneo.nombreTorneo }}
     </v-card-title>
     <div v-if="esLiga" class="d-flex justify-center mb-2">
-      <v-chip size="small" color="primary">Liga</v-chip>
+      <v-chip size="small" color="primary">{{ nombreEvento(torneo.formatoTorneo) }}</v-chip>
     </div>
     <v-card-subtitle class="text-center mb-3">
       <p class="text-wrap" v-if="formattedAddress.trim()">
@@ -48,7 +48,8 @@
           <p>
             <v-icon color="cyan">mdi-format-list-bulleted</v-icon>
             <template v-if="esLiga">
-              <strong>Formato:</strong> todos contra todos,
+              <strong>Formato:</strong>
+              {{ torneo.formatoTorneo === FORMATO_COPA ? "grupos y eliminatoria" : "todos contra todos" }},
               {{ torneo.idaYVuelta ? "ida y vuelta" : "solo ida" }}
             </template>
             <template v-else>
@@ -84,13 +85,14 @@
 
 <script setup lang="ts">
 import { Torneo } from "@/interfaces/Torneo";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { FORMATO_COPA, esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
 import { formatFechaSpa } from "@/utils/Fecha";
 import { defineProps, ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps<{ torneo: Torneo; verClasificacion: boolean }>();
-const esLiga = computed(() => props.torneo.formatoTorneo === FORMATO_LIGA);
+// Liga o Copa
+const esLiga = computed(() => esPorJornadas(props.torneo.formatoTorneo));
 const router = useRouter();
 const fechaTorneo = ref<string>("");
 

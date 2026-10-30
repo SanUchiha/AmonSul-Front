@@ -21,8 +21,11 @@ export interface InscripcionUsuarioIndividualDTO {
   torneo: TorneoReducidoDTO;
   idEquipo?: number;
   puntosExtra?: number;
-  // Liga: el ejército que lleva toda la liga
+  // Liga y Copa: el ejército que lleva todo el torneo
   ejercitoElegido?: string | null;
+  // Solo en Copa
+  grupo?: number | null;
+  posicionCuadro?: number | null;
 }
 
 export interface InscripcionUsuarioEquipoDTO {

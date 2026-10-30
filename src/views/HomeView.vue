@@ -133,9 +133,9 @@ export default {
       features: [
         {
           icon: gestionTorneos,
-          title: "Gestión de torneos",
+          title: "Gestión de eventos",
           description:
-            "Crea y administra torneos individuales, por parejas o por equipos con emparejamientos automáticos, y ligas de todos contra todos por jornadas.",
+            "Crea y administra torneos individuales, por parejas o por equipos con emparejamientos automáticos, ligas de todos contra todos por jornadas y copas con fase de grupos y eliminatoria.",
         },
         {
           icon: ELO,

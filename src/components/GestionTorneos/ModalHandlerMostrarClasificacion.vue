@@ -15,7 +15,7 @@
         ¿Estás seguro de que quieres
         {{ torneo?.mostrarClasificacion ? "ocultar" : "mostrar" }} la
         clasificación
-        {{ torneo?.formatoTorneo === FORMATO_LIGA ? "de la liga" : "del torneo" }}?
+        {{ textosEvento(torneo?.formatoTorneo).del }}?
       </v-card-text>
       <v-card-actions>
         <v-row justify="center" class="my-4 ga-5">
@@ -66,7 +66,7 @@ import { ref, defineProps, defineEmits, watch } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { HandlerMostarClasificacionDTO, Torneo } from "@/interfaces/Torneo";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { textosEvento } from "@/Constant/FormatoTorneo";
 import { HandlerMostarClasificacionAsync } from "@/services/TorneosService";
 
 const props = defineProps<{

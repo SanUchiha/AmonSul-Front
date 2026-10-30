@@ -62,7 +62,8 @@
 </template>
 
 <script setup lang="ts">
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { FORMATO_COPA, esPorJornadas } from "@/Constant/FormatoTorneo";
+import { etiquetaPartidaCopa } from "@/utils/cuadroCopa";
 import { computed, ref } from "vue";
 import { ViewPartidaTorneoDTO } from "@/interfaces/Partidas";
 import { formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
@@ -96,9 +97,15 @@ const ejercitoLista = ref<string>();
 const contexto = computed(() =>
   [
     props.mostrarTorneo ? props.match.nombreTorneo : "",
-    props.match.numeroRonda
-      ? `${props.match.formatoTorneo === FORMATO_LIGA ? "Jornada" : "Ronda"} ${props.match.numeroRonda}`
-      : "",
+    props.match.formatoTorneo === FORMATO_COPA && props.match.fase && props.match.numeroRonda
+      ? etiquetaPartidaCopa({
+          fase: props.match.fase,
+          grupo: props.match.grupo,
+          numeroRonda: props.match.numeroRonda,
+        })
+      : props.match.numeroRonda
+        ? `${esPorJornadas(props.match.formatoTorneo) ? "Jornada" : "Ronda"} ${props.match.numeroRonda}`
+        : "",
   ]
     .filter(Boolean)
     .join(" · ")

@@ -5,7 +5,7 @@
     </div>
     <div v-else>
       <!-- TABS -->
-      <v-tabs v-model="activeTab" fixed-tabs>
+      <v-tabs v-model="pestana" show-arrows grow>
         <v-tab
           :key="-1"
           text="Resumen"
@@ -17,13 +17,8 @@
           :text="`Mis partidas`"
           :value="tabMisPartidas"
         ></v-tab>
-        <v-tab
-          v-for="n in numeroRondas"
-          :key="n"
-          :text="`Ronda ${n}`"
-          :value="n"
-        >
-        </v-tab>
+        <!-- Todas las rondas en una pestaña, con pastillas para elegir cada una -->
+        <v-tab :value="TAB_RONDAS" text="Rondas"></v-tab>
         <v-tab
           :key="tabListas"
           :text="`Listas`"
@@ -51,6 +46,12 @@
         class="mt-1 mb-1"
         @click="activeTab = -1"
       >Resumen</v-btn>
+      <SelectorRondas
+        v-if="enRondas"
+        v-model="activeTab"
+        :rondas="numeroRondas"
+        :partidasPorRonda="partidasPorRonda"
+      />
       <v-window v-model="activeTab">
         <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion && activeTab !== tabClasificacionIndividual">
           <p>Aún no se ha generado ninguna ronda</p>
@@ -229,6 +230,8 @@
 </template>
 
 <script setup lang="ts">
+import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
+import { useRondasEnPestana } from "@/composables/useRondasEnPestana";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import CardEmparejamientos from "@/components/GestionTorneos/Equipos/CardEmparejamientos.vue";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
@@ -780,8 +783,11 @@ const calcularClasificacion = async () => {
 
   const jugadoresConEjercitos = partidas.value.reduce<JugadorConEjercito[]>(
     (acc, partida) => {
-      acc.push({ nick: partida.nick1, ejercito: partida.ejercitoUsuario1 });
-      acc.push({ nick: partida.nick2, ejercito: partida.ejercitoUsuario2 });
+      // Solo las que tienen ejército: en la primera ronda puede faltar si aún no había entregado la lista
+      if (partida.ejercitoUsuario1)
+        acc.push({ nick: partida.nick1, ejercito: partida.ejercitoUsuario1 });
+      if (partida.ejercitoUsuario2)
+        acc.push({ nick: partida.nick2, ejercito: partida.ejercitoUsuario2 });
       return acc;
     },
     []
@@ -862,6 +868,13 @@ const soloValidarCapitan = (partida: PartidaTorneoDTO) => {
     return false;
   }
 };
+
+// Las rondas en una sola pestaña: activeTab sigue siendo el número de ronda
+const { pestana, enRondas, TAB_RONDAS } = useRondasEnPestana(
+  activeTab,
+  numeroRondas,
+  partidasPorRonda
+);
 </script>
 <style>
 .good-bando {

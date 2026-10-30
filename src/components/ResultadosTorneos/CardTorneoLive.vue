@@ -43,10 +43,12 @@
               {{ torneo.nombreTorneo }}
             </v-card-title>
             <div
-              v-if="torneo.formatoTorneo === FORMATO_LIGA"
+              v-if="esPorJornadas(torneo.formatoTorneo)"
               class="d-flex justify-center pb-3"
             >
-              <v-chip size="small" color="primary">Liga</v-chip>
+              <v-chip size="small" color="primary">
+                {{ nombreEvento(torneo.formatoTorneo) }}
+              </v-chip>
             </div>
           </v-card>
         </v-col>
@@ -79,7 +81,7 @@
 import { ref, computed, onMounted } from "vue";
 import router from "@/router";
 import { getTorneos } from "@/services/TorneosService";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 import { Torneo } from "@/interfaces/Torneo";
 

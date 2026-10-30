@@ -82,6 +82,11 @@ export interface PartidaTorneoDTO {
   // ELO ganado o perdido en la partida; null si no ha contado
   eloVariacionUsuario1?: number | null;
   eloVariacionUsuario2?: number | null;
+  // Solo en Copa: fase, grupo, cruce del cuadro y quién pasa
+  fase?: string | null;
+  grupo?: number | null;
+  cruce?: number | null;
+  idUsuarioPasa?: number | null;
 }
 
 export interface PartidaTorneoMasDTO {
@@ -128,6 +133,9 @@ export interface ViewPartidaTorneoDTO {
   mostrarListas?: boolean | null;
   // En una liga la partida se nombra por su jornada
   formatoTorneo?: string | null;
+  // Solo en Copa: por su grupo y jornada o por la eliminatoria
+  fase?: string | null;
+  grupo?: number | null;
   eloVariacionUsuario1?: number | null;
   eloVariacionUsuario2?: number | null;
   // Solo en Parejas: compañeros de los capitanes idUsuario1 e idUsuario2

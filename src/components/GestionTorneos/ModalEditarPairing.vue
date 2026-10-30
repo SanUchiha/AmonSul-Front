@@ -55,14 +55,14 @@
   <!-- Modal response eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Pairing modificado correctamente."
+    message="Emparejamiento modificado correctamente."
     @update:isVisible="showSuccessModal = $event"
   />
 
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido modificar el pairing. Contacta con el administrador."
+    message="No se ha podido modificar el emparejamiento. Contacta con el administrador."
     @update:isVisible="showErrorModal = $event"
   />
 </template>

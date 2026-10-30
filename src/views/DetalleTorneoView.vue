@@ -29,7 +29,7 @@
                     {{ torneo.nombreTorneo }}
                   </v-card-title>
                   <div v-if="esLiga" class="d-flex flex-wrap justify-center ga-1 mb-2">
-                    <v-chip size="small" color="primary">Liga</v-chip>
+                    <v-chip size="small" color="primary">{{ nombreEvento(torneo.formatoTorneo) }}</v-chip>
                     <v-chip size="small">
                       {{ torneo.idaYVuelta ? "Ida y vuelta" : "Solo ida" }}
                     </v-chip>
@@ -128,7 +128,7 @@
                         </p>
                         <p>
                           <v-icon left color="pink">mdi-dice-multiple</v-icon>
-                          <!-- Antes de generar la liga aún no hay jornadas -->
+                          <!-- Antes de generar la liga o los grupos aún no hay jornadas -->
                           <template v-if="esLiga">
                             <strong>Jornadas:</strong>
                             {{
@@ -509,7 +509,7 @@ import {
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalElegirEjercito from "@/components/Inscripcion/ModalElegirEjercito.vue";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
 
@@ -519,7 +519,8 @@ const router = useRouter();
 const idTorneo = ref<number>(parseInt(route.params.idTorneo as string));
 
 const torneo = ref<Torneo>();
-const esLiga = computed(() => torneo.value?.formatoTorneo === FORMATO_LIGA);
+// Liga y Copa comparten ficha: jornadas, ejército fijo y sin horario
+const esLiga = computed(() => esPorJornadas(torneo.value?.formatoTorneo));
 const participantes = ref<InscripcionUsuarioIndividualDTO[]>([]);
 const idUsuario = ref<string | null>(getidUsuario.value);
 const estaApuntado = ref<boolean>(false);
@@ -828,7 +829,7 @@ const showElegirEjercito = ref<boolean>(false);
 
 const inscripcionIndividual = async () => {
   // En una liga primero se elige el ejército que se llevará toda la liga
-  if (torneo.value?.formatoTorneo === FORMATO_LIGA && idInscripcion.value == 0) {
+  if (esPorJornadas(torneo.value?.formatoTorneo) && idInscripcion.value == 0) {
     showElegirEjercito.value = true;
     return;
   }

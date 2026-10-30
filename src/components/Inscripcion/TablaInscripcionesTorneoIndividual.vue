@@ -56,7 +56,7 @@
                 color="primary"
                 class="ml-1"
               >
-                Liga
+                {{ nombreEvento(torneo.torneo.formatoTorneo) }}
               </v-chip>
             </v-list-item-title>
             <template v-slot:append>
@@ -88,7 +88,9 @@
                     "
                   >
                     <v-list-item-title>{{
-                      esLiga(torneo) ? "Ver la liga" : "Ver resultados"
+                      esLiga(torneo)
+                        ? `Ver ${textosEvento(torneo.torneo.formatoTorneo).el}`
+                        : "Ver resultados"
                     }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -162,10 +164,11 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { useAuth } from "@/composables/useAuth";
 import ModalInscripcion from "./ModalInscripcion.vue";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { esPorJornadas, nombreEvento, textosEvento } from "@/Constant/FormatoTorneo";
 
+// Liga o Copa
 const esLiga = (inscripcion: InscripcionUsuarioIndividualDTO) =>
-  inscripcion.torneo.formatoTorneo === FORMATO_LIGA;
+  esPorJornadas(inscripcion.torneo.formatoTorneo);
 
 const props = defineProps<{
   isLoading: boolean;

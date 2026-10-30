@@ -349,7 +349,7 @@ import { ListaDTO } from "@/interfaces/Usuario";
 import ModalModificarLista from "./ModalModificarLista.vue";
 import ModalEnviarLista from "./ModalEnviarLista.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { esPorJornadas } from "@/Constant/FormatoTorneo";
 
 const props = defineProps<{
   idInscripcion: number;
@@ -438,7 +438,8 @@ const torneo = ref<Torneo>({
   mostrarClasificacion: false,
   classificationType: ClassificationType.NORMAL
 });
-const esLiga = computed(() => torneo.value.formatoTorneo === FORMATO_LIGA);
+// Liga y Copa: el ejército es el de la inscripción
+const esLiga = computed(() => esPorJornadas(torneo.value.formatoTorneo));
 const ejercitoFijo = computed(() =>
   esLiga.value ? props.ejercitoElegido ?? null : null
 );

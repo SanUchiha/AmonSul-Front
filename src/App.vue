@@ -25,7 +25,7 @@
           <v-list-item-title>Clasificaciones</v-list-item-title>
         </v-list-item>
         <v-list-item link to="/gestion-torneos" v-if="isAuthenticated">
-          <v-list-item-title>Gestión Torneos</v-list-item-title>
+          <v-list-item-title>Gestión Eventos</v-list-item-title>
         </v-list-item>
         <v-list-item link to="/circuitos" v-if="isAuthenticated">
           <v-list-item-title>Circuitos</v-list-item-title>

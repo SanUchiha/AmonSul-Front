@@ -16,7 +16,7 @@
           >
             <div style="white-space: pre-line">{{ toastMessage }}</div>
           </v-snackbar>
-          <!-- Tipo de evento: torneo (suizo) o liga -->
+          <!-- Tipo de evento: torneo (suizo), liga o copa -->
           <v-select
             v-model="formatoTorneo"
             label="Tipo de evento"
@@ -29,13 +29,19 @@
             </template>
           </v-select>
 
-          <!-- Opciones de la liga -->
-          <template v-if="esLiga">
-            <v-alert type="info" variant="tonal" density="compact" class="mb-4 text-left">
+          <!-- Opciones de liga y copa -->
+          <template v-if="porJornadas">
+            <v-alert v-if="esLiga" type="info" variant="tonal" density="compact" class="mb-4 text-left">
               Cada jugador se enfrenta a todos los demás y elige su ejército al
               inscribirse. Las jornadas se generan desde la gestión cuando
               cierres las inscripciones: con N jugadores salen N−1 jornadas (N
               si son impares), el doble con ida y vuelta.
+            </v-alert>
+            <v-alert v-else type="info" variant="tonal" density="compact" class="mb-4 text-left">
+              Los jugadores se reparten en grupos y en cada grupo juegan todos
+              contra todos, por jornadas y con calendario abierto. Los mejores
+              de cada grupo pasan a una eliminatoria que avanza sola. Cada
+              jugador elige su ejército al inscribirse.
             </v-alert>
             <v-select
               v-model="cuentaElo"
@@ -46,8 +52,56 @@
             />
             <v-select
               v-model="idaYVuelta"
-              label="¿Solo ida o ida y vuelta?"
+              :label="esCopa ? '¿Grupos a solo ida o ida y vuelta?' : '¿Solo ida o ida y vuelta?'"
               :items="idaYVueltaOptions"
+              item-title="label"
+              item-value="value"
+            />
+          </template>
+
+          <!-- Opciones de la copa -->
+          <template v-if="esCopa">
+            <v-text-field
+              v-model.number="numeroGrupos"
+              type="number"
+              label="¿Cuántos grupos?"
+              :rules="[(v: number) => v >= 1 || 'Al menos un grupo']"
+            />
+            <v-text-field
+              v-model.number="clasificadosPorGrupo"
+              type="number"
+              label="¿Cuántos pasan de cada grupo?"
+              hint="Si no llenan el cuadro, entran los mejores siguientes"
+              persistent-hint
+              :rules="[(v: number) => v >= 1 || 'Al menos uno']"
+              class="mb-2"
+            />
+            <v-select
+              v-model="repartoGrupos"
+              label="¿Cómo se reparten los grupos?"
+              :items="repartoGruposOptions"
+              item-title="label"
+              item-value="value"
+            >
+              <template #item="{ item, props }">
+                <v-list-item v-bind="props" :subtitle="item.raw.subtitle" />
+              </template>
+            </v-select>
+            <v-select
+              v-model="desempateEliminatoria"
+              label="Empate en la eliminatoria"
+              :items="desempateEliminatoriaOptions"
+              item-title="label"
+              item-value="value"
+            >
+              <template #item="{ item, props }">
+                <v-list-item v-bind="props" :subtitle="item.raw.subtitle" />
+              </template>
+            </v-select>
+            <v-select
+              v-model="tercerPuesto"
+              label="¿Tercer puesto?"
+              :items="tercerPuestoOptions"
               item-title="label"
               item-value="value"
             />
@@ -140,7 +194,7 @@
 
           <!-- listasPorJugador: en Liga una -->
           <v-text-field
-            v-if="!esLiga"
+            v-if="!porJornadas"
             v-model="listasPorJugador"
             label="¿Cúantas listas necesitará un jugador?"
             required
@@ -157,7 +211,7 @@
 
           <!-- Numero de rondas: en Liga salen de las jornadas -->
           <v-text-field
-            v-if="!esLiga"
+            v-if="!porJornadas"
             v-model="numeroPartidas"
             label="¿Cuantas rondas tiene el torneo?"
             required
@@ -171,7 +225,7 @@
 
           <!-- Tipo de torneo: la Liga es individual -->
           <v-select
-            v-if="!esLiga"
+            v-if="!porJornadas"
             v-model="tipoTorneo"
             label="¿De qué tipo es el torneo?"
             required
@@ -188,7 +242,7 @@
 
           <!-- Modo de listas, solo en Parejas -->
           <v-select
-            v-if="tipoTorneo === 'Parejas' && !esLiga"
+            v-if="tipoTorneo === 'Parejas' && !porJornadas"
             v-model="listaPorPareja"
             label="¿Cómo entregan las listas las parejas?"
             :items="modoListasParejaOptions"
@@ -303,12 +357,12 @@
           <v-text-field
             v-model="fechaFinEntregaListas"
             :label="
-              esLiga
+              porJornadas
                 ? 'Último día para entregar la primera lista'
                 : 'Último día para entregar las listas'
             "
             :hint="
-              esLiga ? 'Después cada jugador puede cambiarla en cada jornada' : ''
+              porJornadas ? 'Después cada jugador puede cambiarla en cada jornada' : ''
             "
             persistent-hint
             type="date"
@@ -349,7 +403,7 @@
 
           <!-- hora del comienza del torneo: la liga no tiene horario -->
           <v-text-field
-            v-if="!esLiga"
+            v-if="!porJornadas"
             v-model="horaInicioTorneo"
             label="Hora de inicio del torneo (HH:MM)"
             clearable
@@ -361,7 +415,7 @@
           ></v-text-field>
           <!-- hora a la que acaba del torneo -->
           <v-text-field
-            v-if="!esLiga"
+            v-if="!porJornadas"
             v-model="horaFinTorneo"
             label="Hora de finalización del torneo (HH:MM)"
             clearable
@@ -445,11 +499,19 @@ import {
   ClassificationTypeLabels,
 } from "@/Constant/TipoClasificacion";
 import {
+  DESEMPATE_GRUPOS,
+  FORMATO_COPA,
   FORMATO_LIGA,
   FORMATO_SUIZO,
-  tipoEventoOptions,
+  REPARTO_ELO,
   cuentaEloOptions,
+  desempateEliminatoriaOptions,
+  esPorJornadas,
   idaYVueltaOptions,
+  repartoGruposOptions,
+  tercerPuestoOptions,
+  textosEvento,
+  tipoEventoOptions,
 } from "@/Constant/FormatoTorneo";
 
 const showToast = ref<boolean>(false);
@@ -578,15 +640,19 @@ const formatoTorneo = ref<string>(FORMATO_SUIZO);
 const cuentaElo = ref<boolean>(false);
 const idaYVuelta = ref<boolean>(false);
 const esLiga = computed(() => formatoTorneo.value === FORMATO_LIGA);
+const esCopa = computed(() => formatoTorneo.value === FORMATO_COPA);
+const porJornadas = computed(() => esPorJornadas(formatoTorneo.value));
+// Solo en Copa
+const numeroGrupos = ref<number>(2);
+const clasificadosPorGrupo = ref<number>(2);
+const repartoGrupos = ref<string>(REPARTO_ELO);
+const desempateEliminatoria = ref<string>(DESEMPATE_GRUPOS);
+const tercerPuesto = ref<boolean>(false);
 // Los textos del formulario hablan del tipo de evento elegido
-const textos = computed(() =>
-  esLiga.value
-    ? { el: "la liga", del: "de la liga", al: "a la liga" }
-    : { el: "el torneo", del: "del torneo", al: "al torneo" }
-);
-// La Liga es individual, con una lista por jugador, sin horario, y sus rondas son las jornadas que se generen
-watch(esLiga, liga => {
-  if (!liga) return;
+const textos = computed(() => textosEvento(formatoTorneo.value));
+// Liga y Copa son individuales, con una lista por jugador, sin horario, y sus rondas son las jornadas que se generen
+watch(porJornadas, jornadas => {
+  if (!jornadas) return;
   tipoTorneo.value = "Individual";
   listasPorJugador.value = 1;
   numeroPartidas.value = 1;
@@ -825,8 +891,15 @@ const confirmarConfiguracion = async () => {
     classificationType: classificationType.value ?? ClassificationType.NORMAL,
     contacto: contacto.value || undefined,
     formatoTorneo: formatoTorneo.value,
-    cuentaElo: esLiga.value && cuentaElo.value,
-    idaYVuelta: esLiga.value && idaYVuelta.value,
+    cuentaElo: porJornadas.value && cuentaElo.value,
+    idaYVuelta: porJornadas.value && idaYVuelta.value,
+    ...(esCopa.value && {
+      numeroGrupos: numeroGrupos.value,
+      clasificadosPorGrupo: clasificadosPorGrupo.value,
+      repartoGrupos: repartoGrupos.value,
+      desempateEliminatoria: desempateEliminatoria.value,
+      tercerPuesto: tercerPuesto.value,
+    }),
   };
   try {
     isGenerating.value = true;
@@ -834,7 +907,9 @@ const confirmarConfiguracion = async () => {
 
     mensajeCreado.value = esLiga.value
       ? "Liga creada correctamente."
-      : "Torneo creado correctamente.";
+      : esCopa.value
+        ? "Copa creada correctamente."
+        : "Torneo creado correctamente.";
     showSuccessModal.value = true;
     resetElement();
   } catch (error) {
@@ -868,6 +943,11 @@ const resetElement = () => {
   listaPorPareja.value = false;
   contacto.value = undefined;
   formatoTorneo.value = FORMATO_SUIZO;
+  numeroGrupos.value = 2;
+  clasificadosPorGrupo.value = 2;
+  repartoGrupos.value = REPARTO_ELO;
+  desempateEliminatoria.value = DESEMPATE_GRUPOS;
+  tercerPuesto.value = false;
   cuentaElo.value = false;
   idaYVuelta.value = false;
 };

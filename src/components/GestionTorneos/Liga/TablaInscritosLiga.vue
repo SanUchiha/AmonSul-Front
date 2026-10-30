@@ -32,6 +32,9 @@
           {{ inscripcion.ejercitoElegido ?? "Sin ejército elegido" }}
         </v-list-item-subtitle>
         <div class="d-flex flex-wrap ga-1 mt-1">
+          <v-chip v-if="numeroGrupos" size="x-small" color="primary" variant="tonal">
+            {{ inscripcion.grupo ? `Grupo ${inscripcion.grupo}` : "Sin grupo" }}
+          </v-chip>
           <v-chip v-if="esRetirado(inscripcion)" size="x-small" color="error">
             Retirado
           </v-chip>
@@ -69,11 +72,21 @@
                 title="Cambiar ejército"
                 @click="pedirEjercito(inscripcion)"
               />
+              <!-- Copa: mover de grupo mientras no haya jornadas -->
+              <template v-if="numeroGrupos && !ligaGenerada && !esRetirado(inscripcion)">
+                <v-list-item
+                  v-for="g in gruposPara(inscripcion)"
+                  :key="g"
+                  prepend-icon="mdi-account-switch"
+                  :title="`Al grupo ${g}`"
+                  @click="moverAGrupo(inscripcion, g)"
+                />
+              </template>
               <v-list-item
                 v-if="ligaGenerada && !ligaCerrada && !esRetirado(inscripcion)"
                 prepend-icon="mdi-account-remove"
                 base-color="error"
-                title="Retirar de la liga"
+                :title="`Retirar ${textos.del}`"
                 @click="pedirRetirar(inscripcion)"
               />
             </v-list>
@@ -102,20 +115,24 @@
 
   <ModalElegirEjercito
     :isVisible="showEjercito"
-    titulo="Ejército en la liga"
-    texto="El jugador lleva este ejército en todas sus partidas de la liga. Se puede cambiar hasta que se generen las jornadas."
+    :titulo="`Ejército en ${textos.el}`"
+    :texto="`El jugador lleva este ejército en todas sus partidas ${textos.del}. Se puede cambiar hasta que se generen las jornadas.`"
     :ejercitoActual="inscripcionEjercito?.ejercitoElegido"
     @update:isVisible="showEjercito = $event"
     @confirm="cambiarEjercito"
   />
 
-  <!-- Retirar: borra todas sus partidas, también las jugadas -->
+  <!-- Retirar: en la liga y en los grupos se borran todas sus partidas; en la eliminatoria pasa su rival -->
   <v-dialog v-model="showRetirar" max-width="420">
     <v-card>
       <v-card-title class="text-wrap">
-        ¿Retirar a {{ inscripcionRetirar?.nick }} de la liga?
+        ¿Retirar a {{ inscripcionRetirar?.nick }} {{ textos.del }}?
       </v-card-title>
-      <v-card-text>
+      <v-card-text v-if="enEliminatoria">
+        En su cruce pendiente pasa el rival. Lo que ya ha jugado sigue
+        contando. Esta acción no se puede deshacer.
+      </v-card-text>
+      <v-card-text v-else>
         Se borran todas sus partidas, también las ya jugadas, y no cuentan ni
         en la clasificación ni en el ELO. Esta acción no se puede deshacer.
       </v-card-text>
@@ -155,6 +172,11 @@ import {
 } from "@/interfaces/Torneo";
 import { cambiarEjercitoElegidoAsync } from "@/services/InscripcionesService";
 import { retirarJugadorLigaAsync } from "@/services/LigaService";
+import {
+  cambiarGrupoAsync,
+  retirarJugadorCopaAsync,
+} from "@/services/CopaService";
+import { FORMATO_COPA, textosEvento } from "@/Constant/FormatoTorneo";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import ModalAddJugadorTorneo from "@/components/GestionTorneos/ModalAddJugadorTorneo.vue";
 import ModalDetalleInscripcion from "@/components/GestionTorneos/ModalDetalleInscripcion.vue";
@@ -168,18 +190,44 @@ const props = defineProps<{
   torneo: TorneoGestionInfoDTO;
   ligaGenerada: boolean;
   ligaCerrada: boolean;
+  // Solo en Copa: con grupos se ve el de cada uno y se puede mover hasta generar las jornadas
+  numeroGrupos?: number | null;
+  enEliminatoria?: boolean;
 }>();
+
+const esCopa = computed(() => props.torneo.torneo.formatoTorneo === FORMATO_COPA);
+const textos = computed(() => textosEvento(props.torneo.torneo.formatoTorneo));
 
 const emit = defineEmits<{ (e: "actualizado"): void }>();
 
-// Los retirados al final
+// Los retirados al final; en la copa, por grupos y los que aún no tienen grupo después
 const inscripciones = computed(() =>
   [...props.torneo.inscripciones].sort(
     (a, b) =>
       Number(esRetirado(a)) - Number(esRetirado(b)) ||
+      (props.numeroGrupos ? (a.grupo ?? 999) - (b.grupo ?? 999) : 0) ||
       (a.nick ?? "").localeCompare(b.nick ?? "")
   )
 );
+
+function gruposPara(inscripcion: InscripcionTorneoCreadoDTO) {
+  return Array.from({ length: props.numeroGrupos ?? 0 }, (_, i) => i + 1).filter(
+    g => g !== inscripcion.grupo
+  );
+}
+
+async function moverAGrupo(inscripcion: InscripcionTorneoCreadoDTO, grupo: number) {
+  isGuardando.value = true;
+  try {
+    await cambiarGrupoAsync(props.torneo.torneo.idTorneo, inscripcion.idInscripcion, grupo);
+    inscripcion.grupo = grupo;
+  } catch (error) {
+    mensaje.value = mensajeDelBack(error, "No se ha podido cambiar de grupo.");
+    showError.value = true;
+  } finally {
+    isGuardando.value = false;
+  }
+}
 const activos = computed(
   () => props.torneo.inscripciones.filter(i => !esRetirado(i)).length
 );
@@ -251,11 +299,9 @@ async function retirar() {
   if (!inscripcionRetirar.value) return;
   isGuardando.value = true;
   try {
-    await retirarJugadorLigaAsync(
-      props.torneo.torneo.idTorneo,
-      inscripcionRetirar.value.idInscripcion
-    );
-    mensaje.value = `${inscripcionRetirar.value.nick} se ha retirado de la liga.`;
+    const retirar = esCopa.value ? retirarJugadorCopaAsync : retirarJugadorLigaAsync;
+    await retirar(props.torneo.torneo.idTorneo, inscripcionRetirar.value.idInscripcion);
+    mensaje.value = `${inscripcionRetirar.value.nick} se ha retirado ${textos.value.del}.`;
     showSuccess.value = true;
     emit("actualizado");
   } catch (error) {

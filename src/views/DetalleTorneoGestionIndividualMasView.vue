@@ -9,24 +9,27 @@
         <!-- tab -->
         <div v-else class="center">
           <v-card class="mx-auto" max-width="800">
-            <v-tabs v-model="activeTab" grow center-active fixed-tabs>
+            <v-tabs v-model="pestana" grow center-active fixed-tabs>
               <v-tab :key="0" :text="`Gestión`" :value="0">Gestión</v-tab>
-              <v-tab
-                v-for="n in numeroRondas"
-                :key="n"
-                :text="`Ronda ${n}`"
-                :value="n"
-              >
-              </v-tab>
+              <!-- Todas las rondas en una pestaña, con pastillas para elegir cada una -->
+              <v-tab :value="TAB_RONDAS" text="Rondas"></v-tab>
               <v-tab
                 :key="tabClasificacion"
                 :text="`Clasificación`"
                 :value="tabClasificacion"
               ></v-tab>
             </v-tabs>
+            <SelectorRondas
+              v-if="enRondas"
+              v-model="activeTab"
+              :rondas="numeroRondas"
+              :partidasPorRonda="partidasPorRonda"
+            />
 
             <!-- Contenido de las Tabs -->
-            <v-tabs-window v-model="activeTab">
+            <!-- Las rondas no son pestañas del contenedor: tienen un hueco vacío propio y su contenido va debajo según
+                 activeTab. Si el contenedor recibiera el número de ronda, al no encontrarlo activaría otra pestaña -->
+            <v-tabs-window v-model="pestana">
               <!-- tab Gestion -->
               <v-tabs-window-item :value="0" :key="0">
                 <div>
@@ -170,271 +173,41 @@
                 </div>
               </div>
 
-              <!-- tab rondas dinamicas -->
-              <v-tabs-item
-                v-for="(partida, index) in partidasPorRonda[activeTab!]"
-                :key="partida.idPartidaTorneo"
-                :value="activeTab"
+              <!-- Partidas de la ronda, con la misma tarjeta que la liga y la copa -->
+              <div
+                v-if="partidasPorRonda[activeTab!]?.length"
+                class="pa-2 text-left"
               >
-                <div class="card-container">
-                  <v-card class="ma-3 bordered-card" max-width="400">
-                    <v-card-title class="underlined-title"
-                      >Mesa {{ index + 1 }}</v-card-title
+                <CardPartidaGestion
+                  v-for="(partida, index) in partidasPorRonda[activeTab!]"
+                  :key="partida.idPartidaTorneo"
+                  :partida="partida"
+                  :editable="true"
+                  :etiqueta="`Mesa ${index + 1}`"
+                  @partidaActualizada="actualizarPartida"
+                >
+                  <div class="d-flex flex-wrap align-center justify-end ga-1 mt-1">
+                    <v-btn
+                      size="small"
+                      variant="text"
+                      prepend-icon="mdi-swap-horizontal"
+                      @click="modificarPairing(partida)"
                     >
-                    <v-card-subtitle> </v-card-subtitle>
-                    <v-divider></v-divider>
-
-                    <v-card-text>
-                      <div class="player-container">
-                        <!-- jugador 1 -->
-                        <div class="player-details">
-                          <!-- Validar 1 -->
-                          <div class="player-info">
-                            <span>
-                              <v-icon
-                                v-if="partida.partidaValidadaUsuario1"
-                                color="green"
-                                >mdi-check</v-icon
-                              >
-                              <v-icon v-else color="red">mdi-close</v-icon>
-
-                              <v-btn
-                                class="mt-2"
-                                variant="tonal"
-                                color="primary"
-                                size="small"
-                                @click="
-                                  abrirModalValidar(partida.idPartidaTorneo, 1)
-                                "
-                              >
-                                Validar
-                              </v-btn>
-                            </span>
-                          </div>
-                          <!-- nick 1 -->
-                          <div class="player-info">
-                            <span
-                              :class="{
-                                highlight: partida.idUsuario1 === idUsuario,
-                              }"
-                            >
-                              {{ partida.nick1 }}
-                            </span>
-                          </div>
-                          <!-- resultado 1 -->
-                          <div class="player-info">
-                            <span v-if="partida.resultadoUsuario1 != null"
-                              >{{ partida.resultadoUsuario1 }}
-                            </span>
-                            <span v-else>
-                              <v-icon color="red">mdi-close</v-icon>
-                            </span>
-                          </div>
-                          <!-- lider 1 -->
-                          <div class="player-info">
-                            <span v-if="partida.liderMuertoUsuario1 != null">
-                              ¿General?
-                              {{
-                                partida.liderMuertoUsuario1 === true
-                                  ? "Sí"
-                                  : partida.liderMuertoUsuario1 === false
-                                    ? "No"
-                                    : "N/A"
-                              }}
-                            </span>
-                            <span v-else>
-                              ¿General?
-                              <v-icon color="red">mdi-close</v-icon>
-                            </span>
-                          </div>
-                          <!-- ejercito 1 -->
-                          <div class="player-info">
-                            <v-icon>mdi-shield-outline</v-icon>
-                            <span>{{ partida.ejercitoUsuario1 ?? null }}</span>
-                          </div>
-                          <!-- lista 1 -->
-                          <div class="player-info">
-                            <v-btn
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              size="small"
-                              @click="
-                                verLista(
-                                  partida.idUsuario1,
-                                  partida.idTorneo,
-                                  partida.nick1
-                                )
-                              "
-                            >
-                              Lista
-                            </v-btn>
-                          </div>
-                        </div>
-
-                        <v-divider vertical class="divider"></v-divider>
-
-                        <!-- jugador 2 -->
-                        <div class="player-details">
-                          <!-- validar 2 -->
-                          <div class="player-info">
-                            <span>
-                              <v-icon
-                                v-if="partida.partidaValidadaUsuario2"
-                                color="green"
-                                >mdi-check</v-icon
-                              >
-                              <v-icon v-else color="red">mdi-close</v-icon>
-
-                              <v-btn
-                                class="mt-2"
-                                variant="tonal"
-                                color="primary"
-                                size="small"
-                                @click="
-                                  abrirModalValidar(partida.idPartidaTorneo, 2)
-                                "
-                              >
-                                Validar
-                              </v-btn>
-                            </span>
-                          </div>
-                          <!-- nick 2 -->
-                          <div class="player-info">
-                            <span
-                              :class="{
-                                highlight: partida.idUsuario2 === idUsuario,
-                              }"
-                            >
-                              {{ partida.nick2 }}
-                            </span>
-                          </div>
-                          <!-- resultado 2 -->
-                          <div class="player-info">
-                            <span v-if="partida.resultadoUsuario2 != null"
-                              >{{ partida.resultadoUsuario2 }}
-                            </span>
-                            <span v-else>
-                              <v-icon color="red">mdi-close</v-icon>
-                            </span>
-                          </div>
-                          <!-- lider 2 -->
-                          <div class="player-info">
-                            <span v-if="partida.liderMuertoUsuario2 != null">
-                              ¿General?
-                              {{
-                                partida.liderMuertoUsuario2 === true
-                                  ? "Sí"
-                                  : partida.liderMuertoUsuario2 === false
-                                    ? "No"
-                                    : "N/A"
-                              }}
-                            </span>
-                            <span v-else>
-                              ¿General?
-                              <v-icon color="red">mdi-close</v-icon>
-                            </span>
-                          </div>
-                          <!-- ejercito 2 -->
-                          <div class="player-info">
-                            <v-icon>mdi-shield-outline</v-icon>
-                            <span>{{ partida.ejercitoUsuario2 ?? null }}</span>
-                          </div>
-                          <!-- lista 2 -->
-                          <div class="player-info">
-                            <v-btn
-                              class="mt-2"
-                              variant="tonal"
-                              color="primary"
-                              size="small"
-                              @click="
-                                verLista(
-                                  partida.idUsuario2,
-                                  partida.idTorneo,
-                                  partida.nick2
-                                )
-                              "
-                            >
-                              Lista
-                            </v-btn>
-                          </div>
-                        </div>
-                      </div>
-                      <v-divider></v-divider>
-                      <v-list class="centered-list">
-                        <!-- ganador -->
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <v-icon>mdi-trophy</v-icon>
-                              {{ getGanador(partida) }}
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <!-- fecha -->
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <v-icon>mdi-calendar</v-icon>
-                              {{ formatDate(partida.fechaPartida) }}
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <!-- escenario -->
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <v-icon>mdi-map-marker</v-icon>
-                              {{ partida.escenarioPartida }}
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                        <!-- Modificar partida -->
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              <div class="flex-column align-items-center">
-                                <v-btn
-                                  class="mt-2"
-                                  variant="tonal"
-                                  color="secondary"
-                                  @click="modificarPartida(partida)"
-                                >
-                                  Modificar Resultado
-                                </v-btn>
-                              </div>
-                            </v-list-item-title>
-                            <v-list-item-title>
-                              <div class="flex-column align-items-center">
-                                <v-btn
-                                  class="mt-2"
-                                  variant="tonal"
-                                  color="secondary"
-                                  @click="modificarPairing(partida)"
-                                >
-                                  Modificar Pairing
-                                </v-btn>
-                              </div>
-                            </v-list-item-title>
-                            <v-list-item-title>
-                              <div class="flex-column align-items-center">
-                                <v-btn
-                                  class="mt-2"
-                                  variant="tonal"
-                                  color="error"
-                                  @click="eliminarPartida(partida)"
-                                >
-                                  Eliminar partida
-                                </v-btn>
-                              </div>
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                      </v-list>
-                    </v-card-text>
-                  </v-card>
-                </div>
-              </v-tabs-item>
+                      Cambiar emparejamiento
+                    </v-btn>
+                    <!-- Solo el icono: con el texto no caben los dos en móvil -->
+                    <v-btn
+                      size="small"
+                      variant="text"
+                      color="error"
+                      icon="mdi-delete"
+                      aria-label="Eliminar partida"
+                      title="Eliminar partida"
+                      @click="eliminarPartida(partida)"
+                    />
+                  </div>
+                </CardPartidaGestion>
+              </div>
 
               <!-- Tab clasificacion -->
               <v-tabs-window-item
@@ -442,7 +215,7 @@
                 :key="tabClasificacion"
               >
                 <!-- División en dos zonas a a partir de la ronda 3 -->
-                <div v-if="torneo!.idTorneo === 7">
+                <div v-if="torneo?.idTorneo === 7">
                   <div
                     v-if="
                       clasificacionZona1.length > 0 &&
@@ -578,27 +351,14 @@
                   <div v-else><p>Esperando resultados...</p></div>
                 </div>
               </v-tabs-window-item>
+              <!-- Al final: las pestañas sin valor usan su posición y así no se mueven -->
+              <v-tabs-window-item :value="TAB_RONDAS" />
             </v-tabs-window>
           </v-card>
         </div>
       </v-col>
     </v-row>
 
-    <!-- Modal Lista -->
-    <ModalListaResultadoTorneo
-      v-if="isModalListaVisible"
-      :listaData="listaData"
-      :nickJugador="nickJugador"
-      :ejercito="currentEjercito"
-      @close="isModalListaVisible = false"
-    />
-    <!-- Sin lista o con las listas ocultas -->
-    <ModalError
-      :isVisible="showErrorLista"
-      titulo="Aviso"
-      :message="mensajeErrorLista"
-      @update:isVisible="showErrorLista = $event"
-    />
 
     <!-- Spinner Modal -->
     <v-dialog v-model="isLoadingImage" persistent width="300">
@@ -616,44 +376,9 @@
       </v-card>
     </v-dialog>
 
-    <!-- Modal añadir puntos partida -->
-    <ModalAddPuntosPartida
-      v-if="isModalPuntosVisible"
-      :isVisible="isModalPuntosVisible"
-      :idPartidaTorneo="idPartidaSeleccionada"
-      :usuario="usuarioSeleccionado"
-      @confirmar="confirmarPuntos"
-      @cerrar="cerrarModal"
-    />
 
-    <!-- Modal añadir lider partida -->
-    <ModalLiderPartida
-      v-if="isModalLiderVisible"
-      :isVisible="isModalLiderVisible"
-      :idPartidaTorneo="idPartidaSeleccionada"
-      :usuario="usuarioSeleccionado"
-      @confirmar="confirmarLider"
-      @cerrar="cerrarModalLider"
-    />
 
-    <!-- Modal añadir escenario partida -->
-    <ModalAddEscenarioPartida
-      v-if="isModalEscenarioVisible"
-      :isVisible="isModalEscenarioVisible"
-      :idPartidaTorneo="idPartidaSeleccionada"
-      :usuario="usuarioSeleccionado"
-      @confirmar="confirmarEscenario"
-      @cerrar="cerrarModalEscenario"
-    />
 
-    <!-- Modal validar partida -->
-    <ModalValidarPartida
-      v-if="isModalValidarVisible"
-      :isVisible="isModalValidarVisible"
-      :idPartidaTorneo="idPartidaSeleccionada"
-      @confirmar="confirmarValidar"
-      @cerrar="cerrarModalValidar"
-    />
 
     <!-- Modal generar siguiente ronda -->
     <ModalParametrosRondasMas
@@ -666,13 +391,6 @@
       @confirm="handleConfigConfirm"
     />
 
-    <!-- Modal modificar partida -->
-    <ModalEditarPartidaGestion
-      :isVisible="showModificarPartidaTorneoModal"
-      :partida="partidaActual"
-      @cerrar="closeModificarPartidaTorneoModal"
-      @confirm="handleModificarPartidaTorneoConfirm"
-    />
 
     <!-- Modal cambiar pairing -->
     <ModalEditarPairing
@@ -736,6 +454,9 @@
 </template>
 
 <script setup lang="ts">
+import CardPartidaGestion from "@/components/GestionTorneos/CardPartidaGestion.vue";
+import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
+import { useRondasEnPestana } from "@/composables/useRondasEnPestana";
 import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import router from "@/router";
@@ -750,21 +471,9 @@ import {
   TorneoGestionInfoMasDTO,
 } from "@/interfaces/Torneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
-import ModalAddEscenarioPartida from "@/components/ResultadosTorneos/ModalAddEscenarioPartida.vue";
-import ModalAddPuntosPartida from "@/components/ResultadosTorneos/ModalAddPuntosPartida.vue";
-import ModalLiderPartida from "@/components/ResultadosTorneos/ModalLiderPartida.vue";
-import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
-import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
-import { ListaTorneoRequestDTO } from "@/interfaces/Lista";
-import {
-  Clasificacion,
-  GenerarRonda,
-  UpdatePartidaTorneoDTO,
-} from "@/interfaces/Live";
+import { Clasificacion, GenerarRonda } from "@/interfaces/Live";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { Torneo } from "@/interfaces/Torneo";
-import { getlistaTorneo } from "@/services/ListasService";
-import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
 import {
   getPartidasTorneo,
   getTorneo,
@@ -772,7 +481,6 @@ import {
 } from "@/services/TorneosService";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
-import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPartidaGestion.vue";
 import ModalEditarPairing from "@/components/GestionTorneos/ModalEditarPairing.vue";
 import ModalEliminarPartidaTorneo from "@/components/GestionTorneos/ModalEliminarPartidaTorneo.vue";
 import ModalEliminarRondaTorneo from "@/components/GestionTorneos/ModalEliminarRondaTorneo.vue";
@@ -781,7 +489,6 @@ import ModalAgregarPairing from "@/components/GestionTorneos/ModalAgregarPairing
 import ModalParametrosRondasMas from "@/components/GestionTorneos/Mas/ModalParametrosRondasMas.vue";
 import CardGestionTorneoMas from "@/components/GestionTorneos/Mas/CardGestionTorneoMas.vue";
 import TablaInscritosMas from "@/components/GestionTorneos/Mas/TablaInscritosMas.vue";
-import { ListaDTO } from "@/interfaces/Usuario";
 import { getInscripcionesTorneo } from "@/services/InscripcionesService";
 import {
   MatchResultGeneral,
@@ -790,7 +497,6 @@ import {
   ResultMatchMatchedPlayType,
 } from "@/Constant/TipoClasificacion";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
-import { motivoSinLista, SIN_LISTA } from "@/utils/avisoLista";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
@@ -798,24 +504,11 @@ const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
 const activeTab = ref<number>(1);
 const partidasPorRonda = ref<Record<number, PartidaTorneoDTO[]>>({});
-const idUsuario = ref<number>();
-const isModalListaVisible = ref<boolean>(false);
-const showErrorLista = ref<boolean>(false);
-const mensajeErrorLista = ref<string>("");
-const listaDTO = ref<ListaDTO>();
-const listaData = ref<string>("");
-const nickJugador = ref<string>("");
-const currentEjercito = ref<string>();
-const idPartidaSeleccionada = ref<number>();
-const usuarioSeleccionado = ref<1 | 2>();
-const isModalPuntosVisible = ref<boolean>(false);
-const isModalLiderVisible = ref<boolean>(false);
-const isModalEscenarioVisible = ref<boolean>(false);
-const isModalValidarVisible = ref<boolean>(false);
 const tabClasificacion = ref<number>();
 const route = useRoute();
 const idTorneo = ref<number>(parseInt(route.params.idTorneo.toString()));
-const isLoading = ref<boolean>(false);
+// Hasta tener el torneo no se pinta nada: así las pestañas se montan ya con sus valores
+const isLoading = ref<boolean>(true);
 const torneoGestion = ref<TorneoGestionInfoMasDTO>({
   torneo: {
     idTorneo: 0,
@@ -841,7 +534,6 @@ const ultimaRonda = ref<number>();
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
 const isGenerating = ref<boolean>(false);
-const showModificarPartidaTorneoModal = ref<boolean>(false);
 const showModificarPairingModal = ref<boolean>(false);
 const showAgregarPairingModal = ref<boolean>(false);
 const showEliminarPartidaModal = ref<boolean>(false);
@@ -1001,69 +693,8 @@ const handleConfigConfirm = () => {
   closeConfigModal();
 };
 
-const closeModificarPartidaTorneoModal = () => {
-  showModificarPartidaTorneoModal.value = false;
-};
 
-const handleModificarPartidaTorneoConfirm = async (
-  partidaEditada: PartidaTorneoDTO
-) => {
-  isGenerating.value = true;
 
-  if (partidaEditada !== null) {
-    if (
-      partidaEditada.resultadoUsuario1 == null ||
-      partidaEditada.resultadoUsuario2 == null
-    ) {
-      partidaEditada.ganadorPartidaTorneo = null;
-    } else if (
-      partidaEditada.resultadoUsuario1 === partidaEditada.resultadoUsuario2
-    ) {
-      partidaEditada.ganadorPartidaTorneo = null;
-    } else if (
-      partidaEditada.resultadoUsuario1 < partidaEditada.resultadoUsuario2
-    ) {
-      partidaEditada.ganadorPartidaTorneo = partidaEditada.idUsuario2;
-    } else if (
-      partidaEditada.resultadoUsuario1 > partidaEditada.resultadoUsuario2
-    ) {
-      partidaEditada.ganadorPartidaTorneo = partidaEditada.idUsuario1;
-    }
-
-    try {
-      const response = await updatePartidaTorneo(partidaEditada);
-      const index = partidas.value.findIndex(
-        partida => partida.idPartidaTorneo === response.idPartidaTorneo
-      );
-      if (index !== -1) {
-        partidas.value[index] = response;
-      }
-      partidasPorRonda.value = partidas.value.reduce(
-        (acc, partida) => {
-          const { numeroRonda } = partida;
-          if (!acc[numeroRonda]) {
-            acc[numeroRonda] = [];
-          }
-          acc[numeroRonda].push(partida);
-          return acc;
-        },
-        {} as Record<number, PartidaTorneoDTO[]>
-      );
-      showSuccessModal.value = true;
-    } catch (error) {
-      console.error(error);
-      showErrorModal.value = true;
-    } finally {
-      isGenerating.value = false;
-      closeModificarPartidaTorneoModal();
-    }
-  }
-};
-
-const modificarPartida = (partidaRecibida: PartidaTorneoDTO) => {
-  partidaActual.value = partidaRecibida;
-  showModificarPartidaTorneoModal.value = true;
-};
 
 const closeModificarPairingModal = () => {
   showModificarPairingModal.value = false;
@@ -1132,6 +763,33 @@ const handleEliminarPartidaConfirm = (idPartidaEliminada: number) => {
     closeEliminarPartidaModal();
   }
 };
+// La tarjeta ya ha guardado el resultado o la validación: aquí solo se refleja. La respuesta puede venir sin nicks
+const actualizarPartida = (actualizada: PartidaTorneoDTO) => {
+  partidas.value = partidas.value.map(partida =>
+    partida.idPartidaTorneo === actualizada.idPartidaTorneo
+      ? {
+          ...partida,
+          ...actualizada,
+          nick1: actualizada.nick1 ?? partida.nick1,
+          nick2: actualizada.nick2 ?? partida.nick2,
+        }
+      : partida
+  );
+  partidasPorRonda.value = partidas.value.reduce(
+    (acc, partida) => {
+      const { numeroRonda } = partida;
+      if (!acc[numeroRonda]) {
+        acc[numeroRonda] = [];
+      }
+      acc[numeroRonda].push(partida);
+      return acc;
+    },
+    {} as Record<number, PartidaTorneoDTO[]>
+  );
+  // El resultado mueve la clasificación
+  calcularClasificacion();
+};
+
 const modificarPairing = (partidaRecibida: PartidaTorneoDTO) => {
   partidaActual.value = partidaRecibida;
   showModificarPairingModal.value = true;
@@ -1590,8 +1248,11 @@ const calcularClasificacion = () => {
 
   const jugadoresConEjercitos = partidas.value.reduce<JugadorConEjercito[]>(
     (acc, partida) => {
-      acc.push({ nick: partida.nick1, ejercito: partida.ejercitoUsuario1 });
-      acc.push({ nick: partida.nick2, ejercito: partida.ejercitoUsuario2 });
+      // Solo las que tienen ejército: en la primera ronda puede faltar si aún no había entregado la lista
+      if (partida.ejercitoUsuario1)
+        acc.push({ nick: partida.nick1, ejercito: partida.ejercitoUsuario1 });
+      if (partida.ejercitoUsuario2)
+        acc.push({ nick: partida.nick2, ejercito: partida.ejercitoUsuario2 });
       return acc;
     },
     []
@@ -1650,49 +1311,7 @@ const handleInscripcionEliminada = (idInscripcion: number) => {
   }
 };
 
-const getGanador = (partida: PartidaTorneoDTO) => {
-  if (partida.ganadorPartidaTorneo === partida.idUsuario1) {
-    return partida.nick1;
-  } else if (partida.ganadorPartidaTorneo === partida.idUsuario2) {
-    return partida.nick2;
-  } else {
-    return "Empate";
-  }
-};
 
-const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
-  isLoadingImage.value = true;
-  if (idTorneo && idUsuario && nick) {
-    const body: ListaTorneoRequestDTO = {
-      idTorneo: idTorneo,
-      idUsuario: idUsuario,
-    };
-
-    try {
-      const listaResponse = await getlistaTorneo(body);
-      listaDTO.value = listaResponse.data;
-      // Sin lista el modal saldría vacío: mejor avisar
-      if (!listaDTO.value?.listaData) {
-        mensajeErrorLista.value = SIN_LISTA;
-        showErrorLista.value = true;
-        return;
-      }
-      listaData.value = listaDTO.value.listaData;
-      nickJugador.value = nick;
-      currentEjercito.value = listaDTO.value?.ejercito;
-      isModalListaVisible.value = true;
-    } catch (error) {
-      console.error(error);
-      isModalListaVisible.value = false;
-      isLoadingImage.value = false;
-      // Sin lista o con las listas ocultas: se dice por qué en vez de no hacer nada
-      mensajeErrorLista.value = motivoSinLista(error);
-      showErrorLista.value = true;
-    } finally {
-      isLoadingImage.value = false;
-    }
-  }
-};
 
 // const abrirModalPuntos = (idPartida: number, usuario: 1 | 2) => {
 //   idPartidaSeleccionada.value = idPartida;
@@ -1711,130 +1330,22 @@ const verLista = async (idUsuario: number, idTorneo: number, nick: string) => {
 //   isModalEscenarioVisible.value = true;
 // };
 
-const abrirModalValidar = (idPartida: number, usuario: 1 | 2) => {
-  idPartidaSeleccionada.value = idPartida;
-  usuarioSeleccionado.value = usuario;
-  isModalValidarVisible.value = true;
-};
 
-const confirmarPuntos = async (puntos: number) => {
-  if (idPartidaSeleccionada.value && usuarioSeleccionado.value !== null) {
-    const body: UpdatePartidaTorneoDTO = {
-      idPartidaTorneo: idPartidaSeleccionada.value,
-    };
 
-    if (usuarioSeleccionado.value === 1) body.resultadoUsuario1 = puntos;
-    else body.resultadoUsuario2 = puntos;
 
-    try {
-      await updatePartidaTorneo(body);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isModalPuntosVisible.value = false;
-      window.location.reload();
-    }
-  }
-};
 
-const confirmarLider = async (lider: boolean) => {
-  if (idPartidaSeleccionada.value && usuarioSeleccionado.value !== null) {
-    const body: UpdatePartidaTorneoDTO = {
-      idPartidaTorneo: idPartidaSeleccionada.value,
-    };
 
-    if (usuarioSeleccionado.value === 1) body.liderMuertoUsuario1 = lider;
-    else body.liderMuertoUsuario2 = lider;
 
-    try {
-      await updatePartidaTorneo(body);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isModalLiderVisible.value = false;
-      window.location.reload();
-    }
-  }
-};
 
-const confirmarEscenario = async (escenario: string) => {
-  if (idPartidaSeleccionada.value) {
-    const body: UpdatePartidaTorneoDTO = {
-      idPartidaTorneo: idPartidaSeleccionada.value,
-    };
 
-    body.escenarioPartida = escenario;
 
-    try {
-      await updatePartidaTorneo(body);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isModalEscenarioVisible.value = false;
-      window.location.reload();
-    }
-  }
-};
 
-const confirmarValidar = async () => {
-  if (idPartidaSeleccionada.value) {
-    const body: UpdatePartidaTorneoDTO = {
-      idPartidaTorneo: idPartidaSeleccionada.value,
-    };
-
-    if (usuarioSeleccionado.value === 1) body.partidaValidadaUsuario1 = true;
-    else body.partidaValidadaUsuario2 = true;
-
-    try {
-      const response = await updatePartidaTorneo(body);
-      const updatedPartida: PartidaTorneoDTO = response;
-      // Actualiza la partida en el array partidas
-      const index = partidas.value.findIndex(
-        partida => partida.idPartidaTorneo === updatedPartida.idPartidaTorneo
-      );
-      if (index !== -1) {
-        partidas.value[index] = updatedPartida;
-      }
-      // Refresca partidasPorRonda
-      partidasPorRonda.value = partidas.value.reduce(
-        (acc, partida) => {
-          const { numeroRonda } = partida;
-          if (!acc[numeroRonda]) {
-            acc[numeroRonda] = [];
-          }
-          acc[numeroRonda].push(partida);
-          return acc;
-        },
-        {} as Record<number, PartidaTorneoDTO[]>
-      );
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isModalValidarVisible.value = false;
-    }
-  }
-};
-
-const cerrarModal = () => {
-  isModalPuntosVisible.value = false;
-};
-
-const cerrarModalLider = () => {
-  isModalLiderVisible.value = false;
-};
-
-const cerrarModalEscenario = () => {
-  isModalEscenarioVisible.value = false;
-};
-
-const cerrarModalValidar = () => {
-  isModalValidarVisible.value = false;
-};
-
-const formatDate = (date: string | null | undefined) => {
-  if (!date) return "N/A";
-  return new Date(date).toLocaleDateString();
-};
+// Las rondas en una sola pestaña: activeTab sigue siendo el número de ronda
+const { pestana, enRondas, TAB_RONDAS } = useRondasEnPestana(
+  activeTab,
+  numeroRondas,
+  partidasPorRonda
+);
 </script>
 <style scoped>
 .card-container {

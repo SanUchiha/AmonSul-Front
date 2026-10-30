@@ -72,7 +72,7 @@ import { JugadorParaEmparejamiento } from "@/interfaces/Live";
 import { TorneoGestionInfoDTO } from "@/interfaces/Torneo";
 import { ref, computed, defineProps, defineEmits, watch, onMounted } from "vue";
 import { appsettings } from "@/settings/appsettings";
-import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
+import { esPorJornadas } from "@/Constant/FormatoTorneo";
 import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { UsuarioFastDTO } from "@/interfaces/Usuario";
 import { CrearInscripcionDTO } from "@/interfaces/Inscripcion";
@@ -100,7 +100,8 @@ watch(
 const isGenerating = ref<boolean>(false);
 const jugadorSelected = ref<JugadorParaEmparejamiento>();
 const jugadores = ref<UsuarioFastDTO[]>();
-const esLiga = computed(() => props.torneo?.torneo.formatoTorneo === FORMATO_LIGA);
+// Liga y Copa: hay que elegir ejército
+const esLiga = computed(() => esPorJornadas(props.torneo?.torneo.formatoTorneo));
 const ejercitos = [...appsettings.armies].sort((a, b) => a.name.localeCompare(b.name));
 const ejercitoElegido = ref<string | null>(null);
 
