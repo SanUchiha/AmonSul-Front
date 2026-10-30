@@ -9,8 +9,9 @@
         <v-list-item link to="/home" v-if="isAuthenticated">
           <v-list-item-title>Home</v-list-item-title>
         </v-list-item>
-        <v-list-item link to="/mis-partidas" v-if="isAuthenticated">
-          <v-list-item-title>Mis partidas</v-list-item-title>
+        <!-- Tu ficha: tus partidas, las amistosas por validar y tus estadísticas -->
+        <v-list-item link :to="`/detalle-jugador/${getidUsuario}`" v-if="isAuthenticated">
+          <v-list-item-title>Ficha de jugador</v-list-item-title>
         </v-list-item>
         <v-list-item link to="/mis-torneos" v-if="isAuthenticated">
           <v-list-item-title>Mis eventos</v-list-item-title>

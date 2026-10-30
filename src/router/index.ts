@@ -19,7 +19,6 @@ import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
 import DetalleTorneoLiveEquiposView from "@/views/DetalleTorneoLiveEquiposView.vue";
 import DetalleTorneoLiveMasView from "@/views/DetalleTorneoLiveMasView.vue";
 import ResultadosTorneosView from "@/views/ResultadosTorneosView.vue";
-import MisPartidasView from "@/views/MisPartidasView.vue";
 import MisTorneosView from "@/views/MisTorneosView.vue";
 import CircuitosView from "@/views/CircuitosView.vue";
 import DetalleTorneoGestionIndividualMasView from "@/views/DetalleTorneoGestionIndividualMasView.vue";
@@ -124,10 +123,15 @@ const routes: Array<RouteRecordRaw> = [
     component: RegistroUsuarioView,
   },
   {
+    // Mis partidas pasó a la ficha de jugador: los enlaces antiguos van a la pestaña de amistosas de la tuya
     path: "/mis-partidas",
     name: "mis-partidas",
-    component: MisPartidasView,
-    meta: { requiresAuth: true },
+    redirect: () => {
+      const idUsuario = JSON.parse(localStorage.getItem("idUsuario") || "null");
+      return idUsuario
+        ? { name: "detalle-jugador", params: { idUsuario: String(idUsuario) }, query: { pestana: "amistosas" } }
+        : { name: "inicio-sesion" };
+    },
   },
   {
     path: "/mis-torneos",

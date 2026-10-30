@@ -113,7 +113,7 @@ const submitForm = async () => {
 
 watch(showSuccessModal, (newValue) => {
   if (!newValue) {
-    router.push("mis-partidas");
+    router.push({ name: "home" });
   }
 });
 

@@ -32,6 +32,35 @@
 
             <v-window-item value="amistosas">
               <div class="pa-2">
+                <!-- En tu propia ficha: registrar una amistosa y las que faltan por validar -->
+                <div v-if="esMiFicha" class="text-left">
+                  <div class="text-center mb-3">
+                    <v-btn color="primary" @click="abrirRegistro">
+                      Registrar partida
+                    </v-btn>
+                  </div>
+                  <template v-if="pendientes.length > 0">
+                    <h2 class="text-subtitle-1 font-weight-bold mb-1">
+                      Pendientes de validar ({{ pendientes.length }})
+                    </h2>
+                    <p v-if="porValidar > 0" class="text-body-2 text-medium-emphasis mb-2">
+                      {{ porValidar === 1 ? "Tienes 1 partida" : `Tienes ${porValidar} partidas` }}
+                      esperando tu validación.
+                    </p>
+                    <v-row dense class="mb-3">
+                      <v-col
+                        v-for="partida in pendientes"
+                        :key="partida.idPartidaAmistosa"
+                        cols="12"
+                        sm="6"
+                        lg="4"
+                      >
+                        <PendingMatchCard :match="partida" @registroExitoso="recargarAmistosas" />
+                      </v-col>
+                    </v-row>
+                    <h2 class="text-subtitle-1 font-weight-bold mb-1">Jugadas</h2>
+                  </template>
+                </div>
                 <PartidasJugador
                   :partidas="partidas"
                   origen="amistosa"
@@ -81,6 +110,18 @@
       </v-row>
     </v-row>
   </v-container>
+
+  <!-- Se monta de nuevo cada vez: así se puede volver a abrir aunque se cierre pulsando fuera -->
+  <ModalRegistrarPartida
+    v-if="registrando"
+    :key="vecesRegistro"
+    @close="registrando = false"
+    @registroExitoso="recargarAmistosas"
+  />
+  <ModalProteccionDatos
+    v-if="showModalProteccionDatos"
+    @modalClosed="showModalProteccionDatos = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -100,6 +141,9 @@ import { useUsuariosStore } from "@/store/usuarios";
 import PartidasJugador from "@/components/DetalleJugador/PartidasJugador.vue";
 import { getTournamentMatches } from "@/services/PartidaTorneoService";
 import TablaTorneosDisputados from "@/components/DetalleJugador/TablaTorneosDisputados.vue";
+import PendingMatchCard from "@/components/PartidaAmistosa/PendingMatchCard.vue";
+import ModalRegistrarPartida from "@/components/PartidaAmistosa/ModalRegistrarPartida.vue";
+import ModalProteccionDatos from "@/components/Usuarios/ModalProteccionDatos.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -176,6 +220,30 @@ const idUsuarioQueMira = computed(() =>
   getidUsuario.value ? Number(getidUsuario.value) : null
 );
 
+// Tu propia ficha hace de Mis partidas: registrar amistosas y validar las pendientes
+const esMiFicha = computed(
+  () => !!usuarioData.value?.idUsuario && usuarioData.value.idUsuario === idUsuarioQueMira.value
+);
+const validadaPorMi = (partida: ViewPartidaAmistosaDTO) =>
+  partida.idUsuario1 === idUsuarioQueMira.value
+    ? partida.partidaValidadaUsuario1
+    : partida.partidaValidadaUsuario2;
+// Primero las que te toca validar, luego las que esperan al rival
+const pendientes = computed(() =>
+  [...pendingMatches.value].sort(
+    (a, b) => Number(validadaPorMi(a)) - Number(validadaPorMi(b))
+  )
+);
+const porValidar = computed(() => pendientes.value.filter(p => !validadaPorMi(p)).length);
+
+const registrando = ref(false);
+const vecesRegistro = ref(0);
+const abrirRegistro = () => {
+  vecesRegistro.value++;
+  registrando.value = true;
+};
+const showModalProteccionDatos = ref(false);
+
 const cargarPartidasTorneos = async () => {
   try {
     isLoadingTournamentMatches.value = true;
@@ -200,29 +268,36 @@ const initializeComponent = async () => {
     const idRecibido = String(route.params.idUsuario);
     await usuariosStore.requestUsuarioData(parseInt(idRecibido));
 
-    // Verifica la estructura de usuarioResponse
     if (usuarioData.value.idUsuario) {
-      validMatches.value = usuarioData.value.partidasValidadas.sort((a, b) => {
-        return (
-          new Date(b.fechaPartida).getTime() -
-          new Date(a.fechaPartida).getTime()
-        );
-      });
-      pendingMatches.value = usuarioData.value.partidasPendientes.sort(
-        (a, b) => {
-          return (
-            new Date(b.fechaPartida).getTime() -
-            new Date(a.fechaPartida).getTime()
-          );
-        }
-      );
+      ordenarAmistosas();
       cargarPartidasTorneos();
+      // Como hacía Mis partidas: en tu ficha, si aún no has aceptado la protección de datos
+      if (esMiFicha.value && usuarioData.value.proteccionDatos == null)
+        showModalProteccionDatos.value = true;
     }
   } catch (error) {
     console.error(error);
     router.push({ name: "error" });
   } finally {
     isLoading.value = false;
+  }
+};
+
+// Las amistosas jugadas y las pendientes, de la más reciente a la más antigua
+function ordenarAmistosas() {
+  const reciente = (a: ViewPartidaAmistosaDTO, b: ViewPartidaAmistosaDTO) =>
+    new Date(b.fechaPartida).getTime() - new Date(a.fechaPartida).getTime();
+  validMatches.value = [...usuarioData.value.partidasValidadas].sort(reciente);
+  pendingMatches.value = [...usuarioData.value.partidasPendientes].sort(reciente);
+}
+
+// Tras registrar, validar o cancelar una amistosa: otra vez sus partidas, sin recargar toda la ficha
+const recargarAmistosas = async () => {
+  try {
+    await usuariosStore.requestUsuarioData(usuarioData.value.idUsuario);
+    ordenarAmistosas();
+  } catch (error) {
+    console.error(error);
   }
 };
 

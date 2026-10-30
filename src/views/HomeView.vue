@@ -66,6 +66,12 @@ export default {
       novedades: [
         {
           fecha: "Octubre 2026",
+          titulo: "Mis partidas pasa a tu ficha de jugador",
+          descripcion:
+            "En el menú, Mis partidas se convierte en Ficha de jugador: tu propia ficha, con todas tus partidas y estadísticas. En la pestaña Amistosas registras una partida nueva y validas o cancelas las pendientes. Además, en el resumen puedes tocar un ejército o un rival para ver esas partidas, y la racha de arriba son tus últimas partidas de eventos: pulsando una se abre entera.",
+        },
+        {
+          fecha: "Octubre 2026",
           titulo: "Nueva ficha de jugador",
           descripcion:
             "La ficha de cada jugador se ha rediseñado. Arriba, siempre a la vista, su ELO, su puesto en la clasificación y la racha de sus cinco últimas partidas. La pestaña Resumen junta la evolución del ELO, el balance de victorias, empates y derrotas en eventos y en amistosas, sus ejércitos más jugados, sus mejores resultados y, si miras la ficha de otro jugador, cómo os ha ido el uno contra el otro. Amistosas y Eventos tienen filtros por resultado y formato y un buscador de rival o evento, y en Resultados cada evento muestra la posición sobre el total de jugadores, como 3/45. Ah, y quien no tiene foto lleva ahora un Señor Oscuro muy poco temible.",
@@ -188,9 +194,9 @@ export default {
         },
         {
           icon: misPartidas,
-          title: "Mis partidas",
+          title: "Ficha de jugador",
           description:
-            "Registra tus partidas amistosas y lleva un historial completo de tus resultados.",
+            "Registra tus partidas amistosas, valida las pendientes y consulta tu historial, tu ELO y tus estadísticas.",
         },
 
         {
