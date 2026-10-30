@@ -1,294 +1,110 @@
 <template>
-  <div v-if="isLoading" class="center">
-    <LoadingGandalf />
-  </div>
-  <div v-else class="center">
-    <v-dialog v-model="show" max-width="800px">
-      <v-card elevation="12">
-        <v-card-title
-          class="modal-title d-flex align-center justify-space-between"
-        >
-          <h3 class="text-h5 font-weight-bold">Detalle de la inscripción</h3>
-          <v-btn icon @click="close" class="close-button">
-            <v-icon color="grey darken-1">mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-divider></v-divider>
+  <!-- Tu inscripción: pago, listas y darse de baja. En móvil, a pantalla completa para ver bien la lista -->
+  <v-dialog v-model="show" max-width="560" :fullscreen="xs" scrollable @update:model-value="alCambiarVisible">
+    <v-card>
+      <v-card-title class="d-flex align-start ga-2 text-wrap pt-3">
+        <div class="flex-grow-1 min-w-0">
+          <div class="text-subtitle-1 font-weight-bold">Mi inscripción</div>
+          <div v-if="torneo" class="text-body-2 text-medium-emphasis nombre">
+            {{ torneo.nombreTorneo }}
+          </div>
+        </div>
+        <v-btn icon="mdi-close" variant="text" density="comfortable" aria-label="Cerrar" @click="close" />
+      </v-card-title>
+      <v-divider />
 
-        <!-- Lista por jugador = 1 -->
-        <v-card-text v-if="torneo.listasPorJugador == 1" class="px-6 py-4">
-          <v-list>
-            <v-list-item v-if="ejercitoFijo">
-              <v-list-item-title class="list-item-title text-wrap">
-                <v-icon color="primary" class="mr-2">mdi-shield</v-icon>
-                <strong>Ejército de la liga:</strong>&nbsp;{{ ejercitoFijo }}
-              </v-list-item-title>
-              <!-- El subtítulo de Vuetify corta a una línea: en móvil no se leería -->
-              <p class="text-caption text-medium-emphasis mt-1">
-                Puedes cambiar de lista antes de cada partida, siempre de este
-                ejército.
-              </p>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title class="list-item-title">
-                <v-icon color="primary" class="mr-2">mdi-file-document</v-icon>
-                <strong>Lista:</strong> &nbsp;{{ inscripcionData?.estadoLista }}
-              </v-list-item-title>
-              <v-btn
-                v-if="inscripcionData?.listaData"
-                color="primary"
-                variant="tonal"
-                block
-                @click="toggleLista"
-              >
-                <v-icon left>mdi-eye</v-icon
-                >{{ showLista ? "Ocultar lista" : "Ver lista" }}
-              </v-btn>
-              <v-btn
-                v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"
-                color="primary"
-                block
-                variant="tonal"
-                class="elevated-btn"
-                @click="handleVerLista(inscripcionData?.idInscripcion)"
-              >
-                <v-icon left>mdi-mail</v-icon> Enviar / Modificar Lista
-              </v-btn>
-            </v-list-item>
-
-            <v-divider class="mt-3 mb-1"></v-divider>
-            <v-expand-transition>
-              <v-list-item v-if="showLista">
-                <v-list-item-content>
-                  <h3 class="text-h6 font-weight-bold text-primary">
-                    {{ inscripcionData?.ejercito }}
-                  </h3>
-                  <v-divider class="my-3"></v-divider>
-                  <template v-if="listaBase64">
-                    <v-img
-                      :src="listaBase64"
-                      alt="Lista de ejército"
-                      max-width="100%"
-                      class="rounded-img"
-                      contain
-                    />
-                  </template>
-                  <template v-else>
-                    <p class="text-grey-darken-1 text-center">
-                      No hay lista disponible
-                    </p>
-                  </template>
-                </v-list-item-content>
-              </v-list-item>
-            </v-expand-transition>
-
-            <v-list-item>
-              <v-list-item-title class="list-item-title">
-                <v-icon
-                  :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'"
-                  class="mr-2"
-                  >mdi-credit-card</v-icon
-                >
-                <span class="font-weight-bold">Estado de pago:</span>
-                <v-chip
-                  :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'"
-                  dark
-                  class="ml-2"
-                >
-                  {{
-                    inscripcionData?.esPago === "SI" ? "Pagado" : "No pagado"
-                  }}
-                </v-chip>
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item
-              v-if="
-                new Date(torneo!.fechaFinTorneo) >= new Date() && !ligaEnMarcha
-              "
+      <v-card-text class="text-left">
+        <div v-if="cargando || !inscripcionData || !torneo" class="d-flex justify-center py-8">
+          <v-progress-circular indeterminate color="primary" />
+        </div>
+        <template v-else>
+          <!-- De un vistazo: el pago y, en ligas y copas, el ejército de todo el evento -->
+          <div class="d-flex flex-wrap ga-1 mb-2">
+            <v-chip
+              size="small"
+              variant="tonal"
+              :color="pagado ? 'success' : 'warning'"
+              prepend-icon="mdi-cash"
             >
+              {{ pagado ? "Pagado" : "Sin pagar" }}
+            </v-chip>
+            <v-chip v-if="ejercitoFijo" size="small" variant="tonal" prepend-icon="mdi-shield">
+              {{ ejercitoFijo }}
+            </v-chip>
+          </div>
+          <p v-if="ejercitoFijo" class="text-caption text-medium-emphasis mb-3">
+            Puedes cambiar de lista antes de cada partida, siempre de este ejército.
+          </p>
+
+          <!-- Una tarjeta por lista: su estado, verla y enviarla o cambiarla -->
+          <h3 class="text-subtitle-2 font-weight-bold mt-2 mb-2">
+            {{ listas.length > 1 ? "Tus listas" : "Tu lista" }}
+          </h3>
+          <v-card v-for="lista in listas" :key="lista.indice" variant="outlined" class="pa-3 mb-2">
+            <div class="d-flex flex-wrap align-center ga-2">
+              <span v-if="listas.length > 1" class="text-body-2 font-weight-bold">
+                Lista {{ lista.indice }}
+              </span>
+              <v-chip size="small" variant="tonal" :color="estadoLista(lista.estado).color">
+                {{ estadoLista(lista.estado).texto }}
+              </v-chip>
+              <span v-if="lista.ejercito" class="text-body-2 text-medium-emphasis">{{ lista.ejercito }}</span>
+            </div>
+            <div v-if="lista.tieneLista || abierta" class="d-flex flex-wrap ga-2 mt-3">
               <v-btn
-                color="red-darken-3"
+                v-if="lista.tieneLista"
+                size="small"
                 variant="tonal"
-                block
-                class="elevated-btn"
-                @click="eliminarInscripcion(idInscripcion!)"
+                :prepend-icon="listaVisible === lista.indice ? 'mdi-eye-off' : 'mdi-eye'"
+                :loading="cargandoLista === lista.indice"
+                @click="alternarLista(lista.indice)"
               >
-                <v-icon left>mdi-delete</v-icon> Darse de baja del torneo
+                {{ listaVisible === lista.indice ? "Ocultar" : "Ver lista" }}
               </v-btn>
-            </v-list-item>
-            <v-list-item v-else-if="ligaEnMarcha">
-              <p class="text-caption text-medium-emphasis">
-                La liga ya está en marcha: si tienes que dejarla, habla con el
-                organizador.
-              </p>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
-
-        <!-- Listas por jugador > 1 -->
-        <v-card-text v-else class="px-6 py-4">
-          <v-list>
-            <!-- Repetir para cada posible lista -->
-            <v-list-item v-for="index in torneo.listasPorJugador" :key="index">
-              <v-list-item-title class="list-item-title">
-                <v-icon color="primary" class="mr-2">mdi-file-document</v-icon>
-                <strong>Lista {{ index }}:</strong>&nbsp;
-                <span v-if="listasPorJugador[index - 1]">
-                  {{ listasPorJugador[index - 1].estadoLista }}
-                </span>
-                <v-chip v-else color="red" dark class="ml-2">
-                  NO ENTREGADA
-                </v-chip>
-              </v-list-item-title>
-              <!-- Si hay lista -->
-              <div v-if="listasPorJugador[index - 1]?.listaData">
-                <!-- Botón de ver lista si existe -->
-                <v-btn
-                  v-if="listasPorJugador[index - 1]?.listaData"
-                  color="primary"
-                  variant="tonal"
-                  block
-                  @click="
-                    toggleListaMasDeUna(
-                      index,
-                      listasPorJugador[index - 1].listaData!,
-                      listasPorJugador[index - 1].ejercito!
-                    )
-                  "
-                >
-                  <v-icon left>mdi-eye</v-icon>
-                  {{ showLista ? "Ocultar lista" : "Ver lista" }}
-                </v-btn>
-
-                <!-- Mostrar lista expandida -->
-                <v-expand-transition>
-                  <v-list-item v-if="showListaPorIndex[index]">
-                    <v-list-item-content>
-                      <h3 class="text-h6 font-weight-bold text-primary">
-                        {{ currentNombreEjercito }}
-                      </h3>
-                      <v-divider class="my-3"></v-divider>
-                      <template v-if="listasPorJugador[index - 1]?.listaData">
-                        <v-img
-                          :src="listasPorJugador[index - 1].listaData"
-                          alt="Lista de ejército"
-                          max-width="100%"
-                          class="rounded-img"
-                          contain
-                        />
-                      </template>
-                      <template v-else>
-                        <p class="text-grey-darken-1 text-center">
-                          No hay lista disponible
-                        </p>
-                      </template>
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-expand-transition>
-
-                <!-- Botón para modificar lista -->
-                <v-btn
-                  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"
-                  color="primary"
-                  block
-                  variant="tonal"
-                  class="elevated-btn"
-                  @click="
-                    handleModificarListaMasDeUnaListaPorJugador(
-                      listasPorJugador[index - 1].idLista!
-                    )
-                  "
-                >
-                  <v-icon left>mdi-mail</v-icon> Modificar
-                </v-btn>
-              </div>
-              <!-- Si no hay lista -->
-              <div v-else>
-                <!-- Botón para enviar -->
-                <v-btn
-                  v-if="new Date(torneo!.fechaFinTorneo) >= new Date()"
-                  color="primary"
-                  block
-                  variant="tonal"
-                  class="elevated-btn"
-                  @click="
-                    handleEnviarListaMasDeUnaListaPorJugador(
-                      inscripcionData.idInscripcion
-                    )
-                  "
-                >
-                  <v-icon left>mdi-mail</v-icon> Enviar
-                </v-btn>
-              </div>
-
-              <v-divider class="mt-3 mb-1"></v-divider>
-            </v-list-item>
-
-            <v-list-item>
-              <v-list-item-title class="list-item-title">
-                <v-icon
-                  :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'"
-                  class="mr-2"
-                  >mdi-credit-card</v-icon
-                >
-                <span class="font-weight-bold">Estado de pago:</span>
-                <v-chip
-                  :color="inscripcionData?.esPago === 'SI' ? 'green' : 'red'"
-                  dark
-                  class="ml-2"
-                >
-                  {{
-                    inscripcionData?.esPago === "SI" ? "Pagado" : "No pagado"
-                  }}
-                </v-chip>
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item v-if="new Date(torneo!.fechaFinTorneo) >= new Date()">
               <v-btn
-                color="red-darken-3"
-                variant="tonal"
-                block
-                class="elevated-btn"
-                @click="eliminarInscripcion(idInscripcion!)"
+                v-if="abierta"
+                size="small"
+                color="primary"
+                variant="flat"
+                prepend-icon="mdi-upload"
+                @click="enviarOCambiar(lista.indice)"
               >
-                <v-icon left>mdi-delete</v-icon> Darse de baja del torneo
+                {{ lista.tieneLista ? "Cambiar lista" : "Enviar lista" }}
               </v-btn>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-  </div>
+            </div>
+            <v-expand-transition>
+              <div v-if="listaVisible === lista.indice && imagenVisible" class="mt-3">
+                <v-img :src="imagenVisible" alt="Lista de ejército" class="rounded" contain />
+              </div>
+            </v-expand-transition>
+          </v-card>
 
-  <!-- Modal response eliminar inscripcion -->
-  <ModalSuccess
-    :isVisible="showSuccessModalEliminar"
-    message="Inscripción eliminada."
-    @update:isVisible="showSuccessModalEliminar = $event"
-  />
+          <!-- Darse de baja: solo antes del evento; en una liga o copa en marcha, con el organizador -->
+          <div v-if="abierta && !ligaEnMarcha" class="text-center mt-4">
+            <v-btn variant="text" color="error" prepend-icon="mdi-account-remove" @click="eliminarInscripcion">
+              Darme de baja
+            </v-btn>
+          </div>
+          <p v-else-if="ligaEnMarcha" class="text-caption text-medium-emphasis mt-3 mb-0">
+            {{ esCopa ? "La copa" : "La liga" }} ya está en marcha: si tienes que dejarla, habla con el
+            organizador.
+          </p>
+        </template>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 
-  <!-- Modal response si error -->
-  <ModalError
-    :isVisible="showErrorModal"
-    message="No se ha podido actualizar la inscripción. Contacta con el administrador."
-    @update:isVisible="showErrorModal = $event"
-  />
-
-  <!-- Modal lista -->
+  <!-- Subir y cambiar listas: los mismos modales de siempre -->
   <ModalLista
-    v-if="currentInscripcionId != undefined && currentInscripcionId != null"
+    v-if="currentInscripcionId != null"
     :isVisible="showVerListaModal"
     :hasLista="hasLista"
     :idInscripcion="currentInscripcionId"
     :ejercitoFijo="ejercitoFijo"
     @update:isVisible="showVerListaModal = $event"
-    @enviarLista="handleEnviarLista"
-    @modificarLista="handleModificarLista"
+    @enviarLista="enviarLista"
+    @modificarLista="modificarLista"
   />
-
-  <!-- Modal enviar lista -->
   <ModalEnviarLista
     v-if="showEnviarListaModal"
     :key="currentInscripcionId"
@@ -300,8 +116,6 @@
     @enviarLista="enviarLista"
     @modificarLista="modificarLista"
   />
-
-  <!-- Modal modificar lista -->
   <ModalModificarLista
     :isVisible="showModificarListaModal"
     :idLista="currentIdLista!"
@@ -309,32 +123,15 @@
     @update:isVisible="showModificarListaModal = $event"
     @modificarListaMasDeUna="modificarLista"
   />
-
-  <!-- Modales de respuesta a la subida de la lista -->
-  <ModalSuccess
-    :isVisible="showSuccessModalLista"
-    message="Lista enviada con éxito."
-    @update:isVisible="showSuccessModalLista = $event"
-  />
-
-  <ModalError
-    :isVisible="showErrorModalLista"
-    message="No se ha podido enviar la lista. Contacta con el administrador."
-    @update:isVisible="showErrorModalLista = $event"
-  />
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, ref, defineEmits, onMounted, watch } from "vue";
-import ModalSuccess from "../Commons/ModalSuccess.vue";
-import ModalError from "../Commons/ModalError.vue";
-import LoadingGandalf from "../Commons/LoadingGandalf.vue";
+import { computed, defineEmits, defineProps, onMounted, ref } from "vue";
+import { useDisplay } from "vuetify";
 import { getIncripcionById } from "@/services/InscripcionesService";
-import { InscripcionTorneoCreadoDTO, Torneo } from "@/interfaces/Torneo";
-import ModalLista from "./ModalLista.vue";
+import { InscripcionTorneoCreadoDTO } from "@/interfaces/Torneo";
 import {
   CrearListaTorneoRequestDTO,
-  ListaTorneoRequestDTO,
   ModificarListaTorneoRequestDTO,
   RequesListaDTO,
 } from "@/interfaces/Lista";
@@ -344,12 +141,14 @@ import {
   modificarListaTorneo,
   subirListaTorneo,
 } from "@/services/ListasService";
-import { ArmyDTO } from "@/interfaces/Army";
 import { ListaDTO } from "@/interfaces/Usuario";
+import { esPorJornadas, FORMATO_COPA } from "@/Constant/FormatoTorneo";
+import { useToast } from "@/composables/useToast";
+import { diaDeHoy, ultimoDiaEvento } from "@/utils/Fecha";
+import { estadoLista } from "@/utils/misEventos";
+import ModalLista from "./ModalLista.vue";
 import ModalModificarLista from "./ModalModificarLista.vue";
 import ModalEnviarLista from "./ModalEnviarLista.vue";
-import { ClassificationType } from "@/Constant/TipoClasificacion";
-import { esPorJornadas } from "@/Constant/FormatoTorneo";
 
 const props = defineProps<{
   idInscripcion: number;
@@ -363,243 +162,145 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "close"): void;
   (e: "eliminar-inscripcion", idInscripcion: number): void;
+  // Ha cambiado una lista: quien lo abrió puede refrescar su estado
+  (e: "actualizada"): void;
 }>();
 
+const { xs } = useDisplay();
+const { triggerToast } = useToast();
+
 const show = ref(true);
-const showSuccessModalEliminar = ref<boolean>(false);
-const showErrorModal = ref<boolean>(false);
+const cargando = ref(true);
+const inscripcionData = ref<InscripcionTorneoCreadoDTO | null>(null);
+const listasPorJugador = ref<ListaDTO[]>([]);
+const torneo = computed(() => inscripcionData.value?.torneo ?? null);
 
-const isLoading = ref(true);
-const isRegistering = ref(false);
-
-const inscripcionData = ref<InscripcionTorneoCreadoDTO>({
-  idInscripcion: 0,
-  idUsuario: 0,
-  torneo: {
-    idTorneo: 0,
-    idUsuario: 0,
-    nombreTorneo: "",
-    descripcionTorneo: "",
-    fechaInicioTorneo: "",
-    fechaFinTorneo: "",
-    precioTorneo: 0,
-    numeroPartidas: 0,
-    puntosTorneo: 0,
-    estadoTorneo: "ESPERANDO",
-    lugarTorneo: "",
-    esPrivadoTorneo: false,
-    idRangoTorneo: 0,
-    esMatchedPlayTorneo: false,
-    fechaEntregaListas: "",
-    fechaFinInscripcion: "",
-    basesTorneo: "",
-    cartelTorneo: "",
-    metodosPago: [],
-    horaInicioTorneo: "",
-    horaFinTorneo: "",
-    tieneBases: false,
-    inicioInscripciones: "",
-    listasPorJugador: 0,
-    tipoTorneo: "Individual",
-    mostrarListas: false,
-    mostrarClasificacion: false,
-    classificationType: ClassificationType.NORMAL
-  },
-  idTorneo: 0,
-  puntosExtra: 0
-});
-const torneo = ref<Torneo>({
-  idTorneo: 0,
-  idUsuario: 0,
-  nombreTorneo: "",
-  descripcionTorneo: "",
-  fechaInicioTorneo: "",
-  fechaFinTorneo: "",
-  precioTorneo: 0,
-  numeroPartidas: 0,
-  puntosTorneo: 0,
-  estadoTorneo: "ESPERANDO",
-  lugarTorneo: "",
-  esPrivadoTorneo: false,
-  idRangoTorneo: 0,
-  esMatchedPlayTorneo: false,
-  fechaEntregaListas: "",
-  fechaFinInscripcion: "",
-  basesTorneo: "",
-  cartelTorneo: "",
-  metodosPago: [],
-  horaInicioTorneo: "",
-  horaFinTorneo: "",
-  tieneBases: false,
-  inicioInscripciones: "",
-  listasPorJugador: 0,
-  tipoTorneo: "Individual",
-  mostrarListas: false,
-  mostrarClasificacion: false,
-  classificationType: ClassificationType.NORMAL
-});
 // Liga y Copa: el ejército es el de la inscripción
-const esLiga = computed(() => esPorJornadas(torneo.value.formatoTorneo));
-const ejercitoFijo = computed(() =>
-  esLiga.value ? props.ejercitoElegido ?? null : null
-);
+const esLiga = computed(() => esPorJornadas(torneo.value?.formatoTorneo));
+const esCopa = computed(() => torneo.value?.formatoTorneo === FORMATO_COPA);
+const ejercitoFijo = computed(() => (esLiga.value ? props.ejercitoElegido ?? null : null));
 // Al generar las jornadas el torneo pasa a tener tantas partidas como jornadas
-const ligaEnMarcha = computed(
-  () => esLiga.value && torneo.value.numeroPartidas > 1
+const ligaEnMarcha = computed(() => esLiga.value && (torneo.value?.numeroPartidas ?? 0) > 1);
+// Hasta su último día, incluido, se pueden enviar listas y darse de baja
+const abierta = computed(
+  () =>
+    !!torneo.value &&
+    ultimoDiaEvento(torneo.value.fechaInicioTorneo, torneo.value.fechaFinTorneo) >= diaDeHoy()
 );
+const pagado = computed(() => (inscripcionData.value?.esPago ?? "").toUpperCase() === "SI");
+
+// Con una lista por jugador va en la inscripción; con varias, cada una por separado
+const listas = computed(() => {
+  const inscripcion = inscripcionData.value;
+  if (!inscripcion || !torneo.value) return [];
+  if (torneo.value.listasPorJugador <= 1)
+    return [
+      {
+        indice: 1,
+        estado: inscripcion.estadoLista,
+        ejercito: inscripcion.ejercito,
+        tieneLista: !!inscripcion.listaData,
+        lista: null as ListaDTO | null,
+      },
+    ];
+  return Array.from({ length: torneo.value.listasPorJugador }, (_, i) => {
+    const lista = listasPorJugador.value[i] ?? null;
+    return {
+      indice: i + 1,
+      estado: lista?.estadoLista ?? null,
+      ejercito: lista?.ejercito ?? null,
+      tieneLista: !!lista?.listaData,
+      lista,
+    };
+  });
+});
+
+// Ver una lista: con una por jugador hay que pedir la imagen; con varias ya viene
+const listaVisible = ref<number | null>(null);
+const imagenVisible = ref<string | null>(null);
+const cargandoLista = ref<number | null>(null);
+const alternarLista = async (indice: number) => {
+  if (listaVisible.value === indice) {
+    listaVisible.value = null;
+    return;
+  }
+  const lista = listas.value.find(l => l.indice === indice);
+  if (lista?.lista) {
+    imagenVisible.value = lista.lista.listaData ?? null;
+    listaVisible.value = indice;
+    return;
+  }
+  cargandoLista.value = indice;
+  try {
+    const response = await getlistaTorneo({ idTorneo: props.idTorneo, idUsuario: props.idUsuario });
+    imagenVisible.value = response.data.listaData;
+    listaVisible.value = indice;
+  } catch (error) {
+    console.error(error);
+    triggerToast("error", "No se ha podido cargar la lista");
+  } finally {
+    cargandoLista.value = null;
+  }
+};
+
+// Enviar o cambiar: los mismos modales y llamadas que antes
 const currentInscripcionId = ref<number>();
 const currentIdLista = ref<number>();
+const showVerListaModal = ref(false);
+const showModificarListaModal = ref(false);
+const showEnviarListaModal = ref(false);
+const hasLista = ref(false);
 
-const showVerListaModal = ref<boolean>(false);
-const showModificarListaModal = ref<boolean>(false);
-const showEnviarListaModal = ref<boolean>(false);
-const hasLista = ref<boolean>(false);
-const listaText = ref<string>("");
-const ejercito = ref<ArmyDTO>({
-  name: "",
-  band: "",
-});
-const showSuccessModalLista = ref<boolean>(false);
-const showErrorModalLista = ref<boolean>(false);
-const idLista = ref<number | null>();
-const showLista = ref<boolean>(false);
-const showListaPorIndex = ref<Record<number, boolean>>({});
-const listaBase64 = ref<string | null>();
-
-const currentListaData = ref<string | null>();
-const currentNombreEjercito = ref<string | null>();
-
-const listasPorJugador = ref<ListaDTO[]>([]);
-
-watch(
-  () => showSuccessModalLista.value,
-  (newValue, oldValue) => {
-    if (oldValue && !newValue) {
-      recargarPagina();
-    }
-  }
-);
-
-const recargarPagina = () => {
-  window.location.reload();
-};
-
-const handleVerLista = async (idInscripcion: number) => {
-  currentInscripcionId.value = idInscripcion;
-  idLista.value = inscripcionData.value?.idLista;
-
-  if (inscripcionData.value?.bando) hasLista.value = true;
-  if (idLista.value)
-    await handleModificarListaMasDeUnaListaPorJugador(idLista.value);
-  else {
-    await verLista();
-  }
-};
-
-const handleEnviarListaMasDeUnaListaPorJugador = async (
-  idInscripcion: number
-) => {
-  currentInscripcionId.value = idInscripcion;
-  showEnviarListaModal.value = true;
-};
-
-const handleModificarListaMasDeUnaListaPorJugador = async (id: number) => {
-  currentIdLista.value = id;
-  showModificarListaModal.value = true;
-};
-
-const toggleLista = async () => {
-  if (!props.idTorneo || !props.idUsuario) {
-    console.error("Faltan datos necesarios: idTorneo o idUsuario.");
+const enviarOCambiar = (indice: number) => {
+  const inscripcion = inscripcionData.value;
+  if (!inscripcion || !torneo.value) return;
+  currentInscripcionId.value = inscripcion.idInscripcion;
+  if (torneo.value.listasPorJugador <= 1) {
+    hasLista.value = !!inscripcion.bando;
+    if (inscripcion.idLista) {
+      currentIdLista.value = inscripcion.idLista;
+      showModificarListaModal.value = true;
+    } else showVerListaModal.value = true;
     return;
   }
-
-  showLista.value = !showLista.value;
-  isLoading.value = true;
-
-  const requestLista: ListaTorneoRequestDTO = {
-    idTorneo: props.idTorneo,
-    idUsuario: props.idUsuario,
-  };
-  try {
-    const response = await getlistaTorneo(requestLista);
-    listaBase64.value = response.data.listaData;
-    ejercito.value.name = response.data.ejercito;
-    ejercito.value.band = response.data.bando;
-  } catch (error) {
-    console.error("Error al recuperar la lista.");
-  } finally {
-    isLoading.value = false;
-  }
+  const lista = listas.value.find(l => l.indice === indice)?.lista;
+  if (lista?.idLista) {
+    currentIdLista.value = lista.idLista;
+    showModificarListaModal.value = true;
+  } else showEnviarListaModal.value = true;
 };
 
-const toggleListaMasDeUna = async (
-  index: number,
-  listaData: string,
-  nombreEjercito: string
-) => {
-  if (!listaData) {
-    console.error("Faltan el data de la lista");
-    return;
-  }
-  showListaPorIndex.value[index] = !showListaPorIndex.value[index];
-
-  currentListaData.value = listaData;
-  currentNombreEjercito.value = nombreEjercito;
-
-  if (!showListaPorIndex.value[index]) {
-    currentListaData.value = "";
-    currentNombreEjercito.value = "";
-  }
-};
-
-const verLista = async () => {
-  showVerListaModal.value = true;
-};
-
-const handleEnviarLista = async (newLista: RequesListaDTO) => {
-  listaText.value = newLista.listaData;
-  ejercito.value = newLista.ejercito;
-  await enviarLista(newLista);
+const alGuardarLista = async (texto: string) => {
+  triggerToast("success", texto);
+  listaVisible.value = null;
+  emit("actualizada");
+  await cargar();
 };
 
 const enviarLista = async (newLista: RequesListaDTO) => {
-  if (currentInscripcionId.value && props.idUsuario && props.idTorneo) {
-    isRegistering.value = true;
-    const requestLista: CrearListaTorneoRequestDTO = {
-      idInscripcion: currentInscripcionId.value,
-      listaData: newLista.listaData,
-      ejercito: newLista.ejercito,
-      idUsuario: props.idUsuario,
-      idTorneo: props.idTorneo,
-    };
-
-    try {
-      await subirListaTorneo(requestLista);
-      showSuccessModalLista.value = true;
-    } catch {
-      isRegistering.value = false;
-      showErrorModalLista.value = true;
-    } finally {
-      isRegistering.value = false;
-      showVerListaModal.value = false;
-      showEnviarListaModal.value = false;
-    }
+  if (!currentInscripcionId.value) return;
+  const request: CrearListaTorneoRequestDTO = {
+    idInscripcion: currentInscripcionId.value,
+    listaData: newLista.listaData,
+    ejercito: newLista.ejercito,
+    idUsuario: props.idUsuario,
+    idTorneo: props.idTorneo,
+  };
+  try {
+    await subirListaTorneo(request);
+    await alGuardarLista("Lista enviada");
+  } catch (error) {
+    console.error(error);
+    triggerToast("error", "No se ha podido enviar la lista");
+  } finally {
+    showVerListaModal.value = false;
+    showEnviarListaModal.value = false;
   }
-};
-
-const handleModificarLista = async (newLista: RequesListaDTO) => {
-  ejercito.value = newLista.ejercito;
-  listaText.value = newLista.listaData;
-  await modificarLista(newLista);
 };
 
 const modificarLista = async (newLista: RequesListaDTO) => {
-  isRegistering.value = true;
-  if (currentIdLista.value == null) {
-    return;
-  }
-  const requestLista: ModificarListaTorneoRequestDTO = {
+  if (currentIdLista.value == null) return;
+  const request: ModificarListaTorneoRequestDTO = {
     listaData: newLista.listaData,
     idLista: currentIdLista.value,
     ejercito: newLista.ejercito,
@@ -607,20 +308,19 @@ const modificarLista = async (newLista: RequesListaDTO) => {
     idTorneo: props.idTorneo,
   };
   try {
-    await modificarListaTorneo(requestLista);
-    showSuccessModalLista.value = true;
-  } catch {
-    isRegistering.value = false;
-    showErrorModalLista.value = true;
+    await modificarListaTorneo(request);
+    await alGuardarLista("Lista cambiada");
+  } catch (error) {
+    console.error(error);
+    triggerToast("error", "No se ha podido cambiar la lista");
   } finally {
-    isRegistering.value = false;
     showVerListaModal.value = false;
     showModificarListaModal.value = false;
   }
 };
 
-const eliminarInscripcion = async (idInscripcion: number) => {
-  emit("eliminar-inscripcion", idInscripcion);
+const eliminarInscripcion = () => {
+  emit("eliminar-inscripcion", props.idInscripcion);
   show.value = false;
   emit("close");
 };
@@ -629,49 +329,32 @@ const close = () => {
   show.value = false;
   emit("close");
 };
+// Cerrarlo pulsando fuera también avisa
+const alCambiarVisible = (visible: boolean) => {
+  if (!visible) emit("close");
+};
 
-onMounted(async () => {
+const cargar = async () => {
   try {
-    isLoading.value = true;
-
     const response = await getIncripcionById(props.idInscripcion);
     inscripcionData.value = response.data;
-    if (inscripcionData.value) torneo.value = inscripcionData.value.torneo;
-
-    if (
-      torneo.value != null &&
-      inscripcionData.value != null &&
-      torneo.value?.listasPorJugador > 1
-    ) {
-      const responseTorneo = await getListasByInscripcion(
-        inscripcionData.value.idInscripcion
-      );
-      listasPorJugador.value = responseTorneo.data;
+    if (inscripcionData.value && (inscripcionData.value.torneo?.listasPorJugador ?? 0) > 1) {
+      const listasResponse = await getListasByInscripcion(inscripcionData.value.idInscripcion);
+      listasPorJugador.value = listasResponse.data;
     }
   } catch (error) {
     console.error("Error al obtener datos de la inscripcion:", error);
+    triggerToast("error", "No se ha podido cargar la inscripción");
   } finally {
-    isLoading.value = false;
+    cargando.value = false;
   }
-});
+};
+
+onMounted(cargar);
 </script>
 
 <style scoped>
-.rounded-modal {
-  border-radius: 12px;
-}
-.modal-title {
-  padding: 16px;
-  font-weight: bold;
-}
-.close-button {
-  margin-right: 8px;
-}
-.info-card {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-}
-.elevated-btn {
-  margin: auto;
+.nombre {
+  overflow-wrap: anywhere;
 }
 </style>

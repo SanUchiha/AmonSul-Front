@@ -47,6 +47,7 @@
     :idOrganizador="abierta.idOrganizador ?? 0"
     :ejercitoElegido="abierta.ejercitoElegido ?? null"
     @eliminar-inscripcion="pedirBaja(abierta)"
+    @actualizada="cargarInscripciones"
     @close="abierta = null"
   />
   <v-dialog

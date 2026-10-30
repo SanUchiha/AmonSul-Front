@@ -35,3 +35,11 @@ export const ordenTerminados = (a: MiInscripcion, b: MiInscripcion) =>
   ultimoDia(b).localeCompare(ultimoDia(a));
 
 export { primerDia };
+
+// El estado de una lista como se enseña. OK: la ha dado por buena el organizador
+export const estadoLista = (estado?: string | null) => {
+  const valor = (estado ?? "").toUpperCase();
+  if (valor === "OK") return { texto: "Lista validada", color: "success" };
+  if (valor === "ENTREGADA") return { texto: "Lista entregada", color: "info" };
+  return { texto: "Lista sin entregar", color: "warning" };
+};

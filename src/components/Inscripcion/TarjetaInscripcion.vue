@@ -55,6 +55,7 @@ import { esPorJornadas, nombreEvento, textosEvento } from "@/Constant/FormatoTor
 import { tipoTorneoOptions } from "@/Constant/TiposTorneo";
 import { formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
 import {
+  estadoLista,
   estaEnCurso,
   haTerminado,
   MiInscripcion,
@@ -86,13 +87,7 @@ const tipo = computed(
     props.inscripcion.torneo.tipoTorneo
 );
 
-// OK: la ha dado por buena el organizador
-const lista = computed(() => {
-  const estado = (props.inscripcion.estadoLista ?? "").toUpperCase();
-  if (estado === "OK") return { texto: "Lista validada", color: "success" };
-  if (estado === "ENTREGADA") return { texto: "Lista entregada", color: "info" };
-  return { texto: "Lista sin entregar", color: "warning" };
-});
+const lista = computed(() => estadoLista(props.inscripcion.estadoLista));
 const pagado = computed(
   () => props.inscripcion.esPago === true || String(props.inscripcion.esPago).toUpperCase() === "SI"
 );
