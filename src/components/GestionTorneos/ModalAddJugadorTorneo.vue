@@ -14,8 +14,22 @@
             item-value="idUsuario"
             label="Selecciona el jugador a añadir"
           ></v-combobox>
+          <!-- En una liga cada jugador lleva un ejército toda la liga -->
+          <v-autocomplete
+            v-if="esLiga"
+            v-model="ejercitoElegido"
+            :items="ejercitos"
+            item-title="name"
+            item-value="name"
+            label="Ejército que llevará en la liga"
+          />
           <v-row justify="center" class="my-4 ga-5">
-            <v-btn variant="tonal" color="primary" @click="addJugador" large
+            <v-btn
+              variant="tonal"
+              color="primary"
+              :disabled="esLiga && !ejercitoElegido"
+              @click="addJugador"
+              large
               >Agregar jugador al torneo</v-btn
             >
             <v-btn variant="tonal" color="secondary" @click="closeModal" large
@@ -56,7 +70,9 @@
 <script setup lang="ts">
 import { JugadorParaEmparejamiento } from "@/interfaces/Live";
 import { TorneoGestionInfoDTO } from "@/interfaces/Torneo";
-import { ref, defineProps, defineEmits, watch, onMounted } from "vue";
+import { ref, computed, defineProps, defineEmits, watch, onMounted } from "vue";
+import { appsettings } from "@/settings/appsettings";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { UsuarioFastDTO } from "@/interfaces/Usuario";
 import { CrearInscripcionDTO } from "@/interfaces/Inscripcion";
@@ -84,6 +100,9 @@ watch(
 const isGenerating = ref<boolean>(false);
 const jugadorSelected = ref<JugadorParaEmparejamiento>();
 const jugadores = ref<UsuarioFastDTO[]>();
+const esLiga = computed(() => props.torneo?.torneo.formatoTorneo === FORMATO_LIGA);
+const ejercitos = [...appsettings.armies].sort((a, b) => a.name.localeCompare(b.name));
+const ejercitoElegido = ref<string | null>(null);
 
 const closeModal = () => {
   internalIsVisible.value = false;
@@ -102,6 +121,7 @@ const addJugador = async () => {
     const addInscripcion: CrearInscripcionDTO = {
       idTorneo: idTorneo,
       idUsuario: idUsuario,
+      ejercitoElegido: esLiga.value ? ejercitoElegido.value ?? undefined : undefined,
     };
 
     await registrarInscripcion(addInscripcion);

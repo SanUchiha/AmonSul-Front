@@ -23,6 +23,17 @@ export const registrarInscripcion = async (
   return http.post(`Inscripcion`, nuevaInscripcion);
 };
 
+// Solo en Liga y antes de generarla: el jugador o el organizador cambian el ejército elegido
+export const cambiarEjercitoElegidoAsync = async (
+  idInscripcion: number,
+  ejercitoElegido: string
+) => {
+  return http.put(`Inscripcion/Ejercito-Elegido`, {
+    idInscripcion,
+    ejercitoElegido,
+  });
+};
+
 export const cancelarInscripcion = async (idInscripcion: number) => {
   return http.delete(`Inscripcion/${idInscripcion}`);
 };

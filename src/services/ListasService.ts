@@ -34,6 +34,11 @@ export const getListasByInscripcion = async (idInscripcion: number) => {
   return http.get(`lista/listas/${idInscripcion}`);
 };
 
+// Lista de un lado de la partida (1 o 2): en una liga, la que llevaba cuando se registró el resultado
+export const getListaPartidaAsync = async (idPartida: number, lado: 1 | 2) => {
+  return http.get(`Lista/Partida/${idPartida}/${lado}`);
+};
+
 export const getlistaTorneo = async (request: ListaTorneoRequestDTO) => {
   return http.get(
     `Lista/Lista-Torneo/${request.idTorneo}/${request.idUsuario}`

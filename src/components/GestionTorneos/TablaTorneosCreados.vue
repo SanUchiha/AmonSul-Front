@@ -33,7 +33,18 @@
           <td>{{ item.nombreTorneo }}</td>
 
           <td class="action-buttons">
-            <div v-if="item.tipoTorneo != 'Individual'">
+            <!-- Las ligas tienen su propia gestión -->
+            <div v-if="item.formatoTorneo === FORMATO_LIGA">
+              <v-btn
+                @click="viewDetailsLiga(item.idTorneo)"
+                icon="mdi-eye"
+                color="primary"
+                elevation="2"
+                variant="tonal"
+              >
+              </v-btn>
+            </div>
+            <div v-else-if="item.tipoTorneo != 'Individual'">
               <v-btn
                 @click="viewDetailsTorneoEquipos(item.idTorneo)"
                 icon="mdi-eye"
@@ -148,6 +159,7 @@ import {
   VTextField,
 } from "vuetify/components";
 import { useAuth } from "@/composables/useAuth";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import {
   getTorneosCreadosUsuario,
   deleteTorneo,
@@ -171,6 +183,10 @@ const headers = [{ title: "NOMBRE", key: "nombreTorneo" }];
 
 const viewDetails = (idTorneo: number) => {
   router.push({ name: "detalle-torneo-gestion", params: { idTorneo } });
+};
+
+const viewDetailsLiga = (idTorneo: number) => {
+  router.push({ name: "detalle-torneo-gestion-liga", params: { idTorneo } });
 };
 
 const viewDetailsTorneoEquipos = (idTorneo: number) => {

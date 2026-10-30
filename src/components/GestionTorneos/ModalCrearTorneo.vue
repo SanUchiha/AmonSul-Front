@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="internalIsVisible" max-width="600px">
     <v-card>
-      <v-card-title>Crear torneo</v-card-title>
+      <v-card-title>Crear evento</v-card-title>
 
       <v-divider></v-divider>
 
@@ -16,10 +16,47 @@
           >
             <div style="white-space: pre-line">{{ toastMessage }}</div>
           </v-snackbar>
+          <!-- Tipo de evento: torneo (suizo) o liga -->
+          <v-select
+            v-model="formatoTorneo"
+            label="Tipo de evento"
+            :items="tipoEventoOptions"
+            item-title="label"
+            item-value="value"
+          >
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props" :subtitle="item.raw.subtitle" />
+            </template>
+          </v-select>
+
+          <!-- Opciones de la liga -->
+          <template v-if="esLiga">
+            <v-alert type="info" variant="tonal" density="compact" class="mb-4 text-left">
+              Cada jugador se enfrenta a todos los demás y elige su ejército al
+              inscribirse. Las jornadas se generan desde la gestión cuando
+              cierres las inscripciones: con N jugadores salen N−1 jornadas (N
+              si son impares), el doble con ida y vuelta.
+            </v-alert>
+            <v-select
+              v-model="cuentaElo"
+              label="¿Cuenta para el ELO?"
+              :items="cuentaEloOptions"
+              item-title="label"
+              item-value="value"
+            />
+            <v-select
+              v-model="idaYVuelta"
+              label="¿Solo ida o ida y vuelta?"
+              :items="idaYVueltaOptions"
+              item-title="label"
+              item-value="value"
+            />
+          </template>
+
           <!-- Nombre del torneo -->
           <v-text-field
             v-model="nombreTorneo"
-            label="Nombre del torneo"
+            :label="`Nombre ${textos.del}`"
             required
             type="text"
             :rules="[(v: string) => !!v || 'Campo obligatorio']"
@@ -29,7 +66,7 @@
           <!-- Descripción del torneo -->
           <v-textarea
             v-model="descripcionTorneo"
-            label="Descripción del torneo (opcional)"
+            :label="`Descripción ${textos.del} (opcional)`"
             type="text"
             clearable
           ></v-textarea>
@@ -38,7 +75,7 @@
           <!-- Campo de búsqueda de dirección -->
           <v-text-field
             v-model="searchQuery"
-            label="¿Dónde se celebra el torneo?"
+            :label="`¿Dónde se celebra ${textos.el}?`"
             placeholder="Ej: Calle Gran Vía, Madrid"
             @keyup.enter="searchLocation"
             required
@@ -91,7 +128,7 @@
           <!-- puntosTorneo -->
           <v-text-field
             v-model="puntosTorneo"
-            label="¿A cuantos puntos es el torneo?"
+            :label="`¿A cuántos puntos es ${textos.el}?`"
             required
             type="number"
             :rules="[
@@ -101,8 +138,9 @@
             :error="missingFieldsSet.has('Puntos del torneo')"
           ></v-text-field>
 
-          <!-- listasPorJugador -->
+          <!-- listasPorJugador: en Liga una -->
           <v-text-field
+            v-if="!esLiga"
             v-model="listasPorJugador"
             label="¿Cúantas listas necesitará un jugador?"
             required
@@ -117,8 +155,9 @@
             :error="missingFieldsSet.has('Listas por jugador')"
           ></v-text-field>
 
-          <!-- Numero de rondas -->
+          <!-- Numero de rondas: en Liga salen de las jornadas -->
           <v-text-field
+            v-if="!esLiga"
             v-model="numeroPartidas"
             label="¿Cuantas rondas tiene el torneo?"
             required
@@ -130,8 +169,9 @@
             :error="missingFieldsSet.has('Numero de rondas')"
           ></v-text-field>
 
-          <!-- Tipo de torneo -->
+          <!-- Tipo de torneo: la Liga es individual -->
           <v-select
+            v-if="!esLiga"
             v-model="tipoTorneo"
             label="¿De qué tipo es el torneo?"
             required
@@ -148,7 +188,7 @@
 
           <!-- Modo de listas, solo en Parejas -->
           <v-select
-            v-if="tipoTorneo === 'Parejas'"
+            v-if="tipoTorneo === 'Parejas' && !esLiga"
             v-model="listaPorPareja"
             label="¿Cómo entregan las listas las parejas?"
             :items="modoListasParejaOptions"
@@ -175,7 +215,7 @@
           <!-- fecha de inicio -->
           <v-text-field
             v-model="fechaInicioTorneo"
-            label="Fecha de inicio del torneo"
+            :label="`Fecha de inicio ${textos.del}`"
             type="date"
             :rules="[
               validateRequired,
@@ -190,7 +230,7 @@
           <!-- Fecha de fin del torneo -->
           <v-text-field
             v-model="fechaFinTorneo"
-            label="Fecha de fin del torneo"
+            :label="`Fecha de fin ${textos.del}`"
             type="date"
             :rules="[validateRequired, validateFechaFinInicioTorneo]"
             required
@@ -201,7 +241,7 @@
           <!-- Precio del torneo -->
           <v-text-field
             v-model="precioTorneo"
-            label="¿Cuál es el precio del torneo?"
+            :label="`¿Cuál es el precio ${textos.del}?`"
             required
             type="number"
             :rules="[(v: number) => !isNaN(v) || 'Debe ser un número']"
@@ -229,7 +269,7 @@
               ),
               validateAntesDe(
                 fechaInicioTorneo,
-                'Debe ser antes de la fecha de inicio del torneo'
+                `Debe ser antes de la fecha de inicio ${textos.del}`
               ),
             ]"
             required
@@ -241,7 +281,7 @@
           <!-- Último día para apuntarse -->
           <v-text-field
             v-model="fechaFinInscripcion"
-            label="Último día para apuntarse al torneo"
+            :label="`Último día para apuntarse ${textos.al}`"
             type="date"
             :rules="[
               validateRequired,
@@ -251,7 +291,7 @@
               ),
               validateAntesDe(
                 fechaInicioTorneo,
-                'Debe ser antes del inicio del torneo'
+                `Debe ser antes del inicio ${textos.del}`
               ),
             ]"
             required
@@ -262,7 +302,15 @@
           <!-- Último día para entregar las listas -->
           <v-text-field
             v-model="fechaFinEntregaListas"
-            label="Último día para entregar las listas"
+            :label="
+              esLiga
+                ? 'Último día para entregar la primera lista'
+                : 'Último día para entregar las listas'
+            "
+            :hint="
+              esLiga ? 'Después cada jugador puede cambiarla en cada jornada' : ''
+            "
+            persistent-hint
             type="date"
             :rules="[
               validateRequired,
@@ -272,7 +320,7 @@
               ),
               validateAntesDe(
                 fechaInicioTorneo,
-                'Debe ser antes del inicio del torneo'
+                `Debe ser antes del inicio ${textos.del}`
               ),
             ]"
             required
@@ -283,7 +331,7 @@
           <!-- bases del torneo -->
           <v-file-input
             clearable
-            label="Bases del torneo"
+            :label="`Bases ${textos.del}`"
             required
             accept="application/pdf"
             show-size
@@ -299,8 +347,9 @@
             show-size
           ></v-file-input>
 
-          <!-- hora del comienza del torneo -->
+          <!-- hora del comienza del torneo: la liga no tiene horario -->
           <v-text-field
+            v-if="!esLiga"
             v-model="horaInicioTorneo"
             label="Hora de inicio del torneo (HH:MM)"
             clearable
@@ -312,6 +361,7 @@
           ></v-text-field>
           <!-- hora a la que acaba del torneo -->
           <v-text-field
+            v-if="!esLiga"
             v-model="horaFinTorneo"
             label="Hora de finalización del torneo (HH:MM)"
             clearable
@@ -358,21 +408,21 @@
         color="primary"
         size="70"
       ></v-progress-circular>
-      <div class="text-center">Guardando torneo...</div>
+      <div class="text-center">Guardando {{ textos.el }}...</div>
     </v-card>
   </v-dialog>
 
   <!-- Modal response eliminar inscripcion -->
   <ModalSuccess
     :isVisible="showSuccessModal"
-    message="Torneo creado correctamente."
+    :message="mensajeCreado"
     @update:isVisible="showSuccessModal = $event"
   />
 
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    message="No se ha podido crear el torneo. Intentalo de nuevo y si el error persiste contacta con el administrador."
+    :message="`No se ha podido crear ${textos.el}. Intentalo de nuevo y si el error persiste contacta con el administrador.`"
     @update:isVisible="showErrorModal = $event"
   />
 </template>
@@ -394,6 +444,13 @@ import {
   ClassificationType,
   ClassificationTypeLabels,
 } from "@/Constant/TipoClasificacion";
+import {
+  FORMATO_LIGA,
+  FORMATO_SUIZO,
+  tipoEventoOptions,
+  cuentaEloOptions,
+  idaYVueltaOptions,
+} from "@/Constant/FormatoTorneo";
 
 const showToast = ref<boolean>(false);
 const toastMessage = ref<string>("");
@@ -517,6 +574,26 @@ const listaPorPareja = ref<boolean>(false);
 const esListaConjunta = computed(
   () => tipoTorneo.value === "Parejas" && listaPorPareja.value
 );
+const formatoTorneo = ref<string>(FORMATO_SUIZO);
+const cuentaElo = ref<boolean>(false);
+const idaYVuelta = ref<boolean>(false);
+const esLiga = computed(() => formatoTorneo.value === FORMATO_LIGA);
+// Los textos del formulario hablan del tipo de evento elegido
+const textos = computed(() =>
+  esLiga.value
+    ? { el: "la liga", del: "de la liga", al: "a la liga" }
+    : { el: "el torneo", del: "del torneo", al: "al torneo" }
+);
+// La Liga es individual, con una lista por jugador, sin horario, y sus rondas son las jornadas que se generen
+watch(esLiga, liga => {
+  if (!liga) return;
+  tipoTorneo.value = "Individual";
+  listasPorJugador.value = 1;
+  numeroPartidas.value = 1;
+  listaPorPareja.value = false;
+  horaInicioTorneo.value = "00:00";
+  horaFinTorneo.value = "00:00";
+});
 // Con lista conjunta cada pareja entrega una sola lista
 watch(esListaConjunta, conjunta => {
   if (conjunta) listasPorJugador.value = 1;
@@ -538,6 +615,7 @@ const byteArrayBases = ref<Uint8Array | null>(null);
 const isGenerating = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
 const showSuccessModal = ref<boolean>(false);
+const mensajeCreado = ref<string>("");
 const classificationType = ref<ClassificationType>();
 
 const closeModal = () => {
@@ -746,11 +824,17 @@ const confirmarConfiguracion = async () => {
     listaPorPareja: esListaConjunta.value,
     classificationType: classificationType.value ?? ClassificationType.NORMAL,
     contacto: contacto.value || undefined,
+    formatoTorneo: formatoTorneo.value,
+    cuentaElo: esLiga.value && cuentaElo.value,
+    idaYVuelta: esLiga.value && idaYVuelta.value,
   };
   try {
     isGenerating.value = true;
     await crearTorneo(nuevoTorneo);
 
+    mensajeCreado.value = esLiga.value
+      ? "Liga creada correctamente."
+      : "Torneo creado correctamente.";
     showSuccessModal.value = true;
     resetElement();
   } catch (error) {
@@ -775,14 +859,17 @@ const resetElement = () => {
   lugarTorneo.value = "";
   fechaFinEntregaListas.value = "";
   fechaFinInscripcion.value = "";
-  horaInicioTorneo.value = ":00";
-  horaFinTorneo.value = ":00";
+  horaInicioTorneo.value = "00:00";
+  horaFinTorneo.value = "00:00";
   imageBase64.value = "";
   descripcionTorneo.value = "";
   fechaInicioInscripcion.value = "";
   listasPorJugador.value = 1;
   listaPorPareja.value = false;
   contacto.value = undefined;
+  formatoTorneo.value = FORMATO_SUIZO;
+  cuentaElo.value = false;
+  idaYVuelta.value = false;
 };
 
 const today = new Date().toISOString().split("T")[0];

@@ -3,6 +3,8 @@ import { TorneoReducidoDTO } from "./Torneo";
 export interface CrearInscripcionDTO {
   idTorneo: number;
   idUsuario: number;
+  // Solo en Liga, obligatorio: el ejército que lleva toda la liga
+  ejercitoElegido?: string;
 }
 
 export interface InscripcionUsuarioIndividualDTO {

@@ -12,7 +12,7 @@
               class="login-form__button"
               @click="handlerCrearTorneo"
             >
-              Crear torneo
+              Crear evento
             </v-btn>
           </v-row>
           <v-row justify="center" v-if="isLoading" class="mt-3">

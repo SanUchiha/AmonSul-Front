@@ -408,6 +408,14 @@
       @update:isVisible="showModalInscripcionPorEquipos = $event"
     />
 
+    <!-- En una liga, el ejército de toda la liga antes de inscribirse -->
+    <ModalElegirEjercito
+      :isVisible="showElegirEjercito"
+      titulo="¿Con qué ejército juegas la liga?"
+      @update:isVisible="showElegirEjercito = $event"
+      @confirm="registrarIndividual"
+    />
+
     <!-- Modal Success -->
     <ModalSuccess
       :isVisible="showSuccessModal"
@@ -465,6 +473,8 @@ import {
 } from "@/interfaces/Inscripcion";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
+import ModalElegirEjercito from "@/components/Inscripcion/ModalElegirEjercito.vue";
+import { FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
 
@@ -778,7 +788,18 @@ const descargarBases = async () => {
   }
 };
 
+const showElegirEjercito = ref<boolean>(false);
+
 const inscripcionIndividual = async () => {
+  // En una liga primero se elige el ejército que se llevará toda la liga
+  if (torneo.value?.formatoTorneo === FORMATO_LIGA && idInscripcion.value == 0) {
+    showElegirEjercito.value = true;
+    return;
+  }
+  await registrarIndividual();
+};
+
+const registrarIndividual = async (ejercitoElegido?: string) => {
   isRegistering.value = true;
 
   if (
@@ -790,6 +811,7 @@ const inscripcionIndividual = async () => {
     const inscripcion: CrearInscripcionDTO = {
       idUsuario: parseInt(idUsuario.value),
       idTorneo: idTorneo.value,
+      ejercitoElegido,
     };
     try {
       await registrarInscripcion(inscripcion);

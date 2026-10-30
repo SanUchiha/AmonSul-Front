@@ -36,6 +36,10 @@ export interface Torneo {
   mostrarClasificacion: boolean;
   classificationType: ClassificationType;
   contacto?: string;
+  formatoTorneo?: string;
+  // Solo en Liga
+  cuentaElo?: boolean;
+  idaYVuelta?: boolean;
 }
 
 export interface TorneoReducidoDTO {
@@ -55,6 +59,7 @@ export interface TorneoPropioDTO {
   nombreTorneo: string; // Nombre del torneo
   tipoTorneo: string;
   listasPorJugador: number;
+  formatoTorneo?: string;
 }
 
 export interface TorneoGestionInfoDTO {
@@ -80,6 +85,9 @@ export interface TorneoCreadoDTO {
   listasPorJugador: number;
   mostrarListas: boolean;
   mostrarClasificacion: boolean;
+  formatoTorneo?: string;
+  cuentaElo?: boolean;
+  idaYVuelta?: boolean;
 }
 
 export interface InscripcionTorneoCreadoDTO {
@@ -97,6 +105,9 @@ export interface InscripcionTorneoCreadoDTO {
   listaData?: string | null;
   idTorneo: number;
   puntosExtra: number;
+  // Solo en Liga: el ejército que eligió al inscribirse y RETIRADO si se le ha retirado
+  ejercitoElegido?: string | null;
+  estadoInscripcion?: string | null;
 }
 
 export interface InscripcionTorneoCreadoMasDTO {
@@ -149,6 +160,10 @@ export interface CrearTorneoDTO {
   listaPorPareja: boolean;
   classificationType: ClassificationType;
   contacto?: string;
+  formatoTorneo?: string;
+  // Solo en Liga
+  cuentaElo?: boolean;
+  idaYVuelta?: boolean;
 }
 
 export interface ModificarTorneoDTO {
@@ -178,6 +193,9 @@ export interface ModificarTorneoDTO {
   listaPorPareja?: boolean;
   classificationType: ClassificationType;
   contacto?: string;
+  // Solo en Liga y mientras no tenga partidas
+  cuentaElo?: boolean;
+  idaYVuelta?: boolean;
 }
 
 export interface ModificarBasesTorneoDTO {

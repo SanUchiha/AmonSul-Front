@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="internalIsVisible" max-width="600px">
     <v-card>
-      <v-card-title>Modificar torneo</v-card-title>
+      <v-card-title>{{ esLiga ? "Modificar liga" : "Modificar torneo" }}</v-card-title>
 
       <v-divider></v-divider>
 
@@ -92,8 +92,32 @@
             ]"
           ></v-text-field>
 
-          <!-- listasPorJugador -->
+          <!-- Opciones de la liga: se pueden cambiar mientras no esté generada -->
+          <template v-if="esLiga">
+            <v-select
+              v-model="cuentaElo"
+              label="¿Cuenta para el ELO?"
+              :items="cuentaEloOptions"
+              item-title="label"
+              item-value="value"
+              hint="Con la liga ya generada no se puede cambiar"
+              persistent-hint
+            />
+            <v-select
+              v-model="idaYVuelta"
+              label="¿Solo ida o ida y vuelta?"
+              :items="idaYVueltaOptions"
+              item-title="label"
+              item-value="value"
+              hint="Con la liga ya generada no se puede cambiar"
+              persistent-hint
+              class="mt-2"
+            />
+          </template>
+
+          <!-- listasPorJugador: en Liga una -->
           <v-text-field
+            v-if="!esLiga"
             v-model="listasPorJugador"
             label="¿Cúantas listas necesitará un jugador?"
             required
@@ -107,8 +131,9 @@
             ]"
           ></v-text-field>
 
-          <!-- Numero de rondas -->
+          <!-- Numero de rondas: en Liga son las jornadas generadas -->
           <v-text-field
+            v-if="!esLiga"
             v-model="numeroPartidas"
             label="¿Cuantas rondas tiene el torneo?"
             required
@@ -119,8 +144,9 @@
             ]"
           ></v-text-field>
 
-          <!-- Tipo de torneo -->
+          <!-- Tipo de torneo: la Liga es individual -->
           <v-select
+            v-if="!esLiga"
             v-model="tipoTorneo"
             label="¿De qué tipo es el torneo?"
             required
@@ -136,7 +162,7 @@
 
           <!-- Modo de listas, solo en Parejas -->
           <v-select
-            v-if="tipoTorneo === 'Parejas'"
+            v-if="tipoTorneo === 'Parejas' && !esLiga"
             v-model="listaPorPareja"
             label="¿Cómo entregan las listas las parejas?"
             :items="modoListasParejaOptions"
@@ -377,6 +403,11 @@ import {
   ClassificationType,
   ClassificationTypeLabels,
 } from "@/Constant/TipoClasificacion";
+import {
+  FORMATO_LIGA,
+  cuentaEloOptions,
+  idaYVueltaOptions,
+} from "@/Constant/FormatoTorneo";
 
 // eslint-disable-next-line no-undef
 const props = defineProps<{
@@ -505,6 +536,10 @@ const listaPorPareja = ref<boolean>(false);
 const esListaConjunta = computed(
   () => tipoTorneo.value === "Parejas" && listaPorPareja.value
 );
+// El formato no se cambia al modificar: solo sus opciones, en Liga
+const esLiga = computed(() => props.torneo?.formatoTorneo === FORMATO_LIGA);
+const cuentaElo = ref<boolean>(false);
+const idaYVuelta = ref<boolean>(false);
 const classificationType = ref<ClassificationType>();
 const idRangoTorneo = ref<number>(1);
 const esMatchedPlayTorneo = ref<boolean>(false);
@@ -561,6 +596,8 @@ watch(
       listaPorPareja.value = newTorneo.listaPorPareja ?? false;
       classificationType.value = newTorneo.classificationType;
       contacto.value = newTorneo.contacto || undefined;
+      cuentaElo.value = newTorneo.cuentaElo ?? false;
+      idaYVuelta.value = newTorneo.idaYVuelta ?? false;
     }
   },
   { immediate: true }
@@ -730,6 +767,8 @@ const confirmarConfiguracion = async () => {
     listaPorPareja: esListaConjunta.value,
     classificationType: classificationType.value ?? ClassificationType.NORMAL,
     contacto: contacto.value || undefined,
+    cuentaElo: esLiga.value ? cuentaElo.value : undefined,
+    idaYVuelta: esLiga.value ? idaYVuelta.value : undefined,
   };
   try {
     isGenerating.value = true;
