@@ -17,7 +17,7 @@
     <div v-if="!terminado && inscripcion.estadoLista" class="text-caption mt-1">
       <span :class="`text-${lista.color}`">{{ lista.texto }}</span>
       <span class="text-medium-emphasis"> · </span>
-      <span :class="pagado ? 'text-success' : 'text-warning'">{{ pagado ? "Pagado" : "Sin pagar" }}</span>
+      <span :class="pagado ? 'text-success' : 'text-warning'">{{ pagado ? "Pagado" : "No pagado" }}</span>
     </div>
     <div v-if="inscripcion.ejercitoElegido" class="text-caption text-medium-emphasis mt-1">
       {{ inscripcion.ejercitoElegido }}

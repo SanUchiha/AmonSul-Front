@@ -28,14 +28,16 @@
           />
         </template>
         <v-list density="compact">
+          <!-- En los dos sentidos, como en varias listas: pagado y no pagado -->
           <v-list-item
-            v-if="equipo.esPago !== 'SI'"
-            prepend-icon="mdi-cash-check"
-            title="Marcar como pagado"
+            prepend-icon="mdi-cash-sync"
+            :title="equipo.esPago === 'SI' ? 'Marcar como no pagado' : 'Marcar como pagado'"
             @click="
               abrirModalConfirmacion(
-                esParejas ? '¿Marcar la pareja como pagada?' : '¿Marcar el equipo como pagado?',
-                '¿Seguro que quieres actualizar el estado de pago a SI?',
+                equipo.esPago === 'SI'
+                  ? esParejas ? '¿Marcar la pareja como no pagada?' : '¿Marcar el equipo como no pagado?'
+                  : esParejas ? '¿Marcar la pareja como pagada?' : '¿Marcar el equipo como pagado?',
+                'Se cambia el pago de todos sus miembros y se avisa al capitán por correo.',
                 confirmarActualizarPago
               )
             "
@@ -73,7 +75,7 @@
       </span>
       <span class="text-medium-emphasis"> · </span>
       <span :class="equipo.esPago === 'SI' ? 'text-success' : 'text-warning'">
-        {{ equipo.esPago === "SI" ? "Pagado" : "Sin pagar" }}
+        {{ equipo.esPago === "SI" ? "Pagado" : "No pagado" }}
       </span>
     </div>
     <div class="text-caption text-medium-emphasis mt-1">
@@ -605,13 +607,14 @@ const abrirModalConfirmacion = (
 const confirmarActualizarPago = async () => {
   isLoading.value = true;
   try {
+    const nuevoPago = esPago.value === "SI" ? "NO" : "SI";
     const response = await updateEstadoPagoEquipo({
       idEquipo: props.equipo.idEquipo,
-      esPago: "SI",
+      esPago: nuevoPago,
     });
     if (response.status >= 200 && response.status < 300) {
       showSuccessModalPago.value = true;
-      esPago.value = "SI";
+      esPago.value = nuevoPago;
     } else {
       console.error("error:", response);
       showErrorModal.value = true;

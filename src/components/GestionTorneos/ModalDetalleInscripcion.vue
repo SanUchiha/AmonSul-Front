@@ -50,6 +50,8 @@
               <v-select
                 v-model="localInscripcion.esPago"
                 :items="pagoOptions"
+                item-title="texto"
+                item-value="valor"
                 label="Estado"
                 dense
                 hide-details
@@ -219,7 +221,11 @@ const listaBase64 = ref<string>();
 const listaText = ref<string>("");
 const ejercito = ref<ArmyDTO>();
 
-const pagoOptions = ["NO", "SI"] as const;
+// Se guarda SI o NO; se enseña como en el resto de la aplicación
+const pagoOptions = [
+  { valor: "NO", texto: "No pagado" },
+  { valor: "SI", texto: "Pagado" },
+];
 
 const showSuccessModalPago = ref<boolean>(false);
 const showSuccessModalLista = ref<boolean>(false);

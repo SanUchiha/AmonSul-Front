@@ -29,7 +29,7 @@
         <v-chip-group v-model="filtro" mandatory column selected-class="text-primary" class="mb-1">
           <v-chip value="todos" size="small" filter>Todos ({{ inscripciones.length }})</v-chip>
           <v-chip value="faltanListas" size="small" filter>Faltan listas ({{ faltanListas.length }})</v-chip>
-          <v-chip value="sinPagar" size="small" filter>Sin pagar ({{ sinPagar.length }})</v-chip>
+          <v-chip value="sinPagar" size="small" filter>No pagado ({{ sinPagar.length }})</v-chip>
         </v-chip-group>
       </template>
     </div>
@@ -129,7 +129,7 @@
             </span>
             <span class="text-medium-emphasis"> · </span>
             <span :class="inscripcion.esPago === 'SI' ? 'text-success' : 'text-warning'">
-              {{ inscripcion.esPago === "SI" ? "Pagado" : "Sin pagar" }}
+              {{ inscripcion.esPago === "SI" ? "Pagado" : "No pagado" }}
             </span>
           </div>
         </v-card>

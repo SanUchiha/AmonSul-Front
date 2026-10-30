@@ -21,7 +21,7 @@
           <!-- De un vistazo: el equipo, su capitán, el pago y cuándo se inscribió -->
           <div class="text-body-2 font-weight-bold nombre">{{ inscripcionData.nombreEquipo }}</div>
           <div class="text-body-2 mb-1">
-            <span :class="pagado ? 'text-success' : 'text-warning'">{{ pagado ? "Pagado" : "Sin pagar" }}</span>
+            <span :class="pagado ? 'text-success' : 'text-warning'">{{ pagado ? "Pagado" : "No pagado" }}</span>
             <span class="text-medium-emphasis">
               · Capitán: {{ nickCapitan }}
               <template v-if="fechaInscripcion"> · Inscrito el {{ fechaInscripcion }}</template>

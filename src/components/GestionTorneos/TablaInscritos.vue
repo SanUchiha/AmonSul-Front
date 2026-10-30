@@ -23,7 +23,7 @@
         <v-chip v-if="ilegales.length > 0" value="ilegal" size="small" filter>
           Lista ilegal ({{ ilegales.length }})
         </v-chip>
-        <v-chip value="sinPagar" size="small" filter>Sin pagar ({{ sinPagar.length }})</v-chip>
+        <v-chip value="sinPagar" size="small" filter>No pagado ({{ sinPagar.length }})</v-chip>
       </v-chip-group>
     </div>
 
@@ -66,7 +66,7 @@
             </span>
             <span class="text-medium-emphasis"> · </span>
             <span :class="estaPagado(item) ? 'text-success' : 'text-warning'">
-              {{ estaPagado(item) ? "Pagado" : "Sin pagar" }}
+              {{ estaPagado(item) ? "Pagado" : "No pagado" }}
             </span>
           </div>
           <!-- Las fechas, en amarillo si llegaron fuera de plazo -->

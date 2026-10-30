@@ -22,7 +22,7 @@
       <v-chip-group v-model="filtro" mandatory column selected-class="text-primary" class="mb-1">
         <v-chip value="todos" size="small" filter>Todos ({{ localInscripciones.length }})</v-chip>
         <v-chip value="faltanListas" size="small" filter>Faltan listas ({{ faltanListas.length }})</v-chip>
-        <v-chip value="sinPagar" size="small" filter>Sin pagar ({{ sinPagar.length }})</v-chip>
+        <v-chip value="sinPagar" size="small" filter>No pagado ({{ sinPagar.length }})</v-chip>
       </v-chip-group>
     </div>
 
@@ -102,7 +102,7 @@
             </template>
             <span class="text-medium-emphasis"> · </span>
             <span :class="item.esPago === 'SI' ? 'text-success' : 'text-warning'">
-              {{ item.esPago === "SI" ? "Pagado" : "Sin pagar" }}
+              {{ item.esPago === "SI" ? "Pagado" : "No pagado" }}
             </span>
           </div>
           <!-- Las fechas, en amarillo si llegaron fuera de plazo -->

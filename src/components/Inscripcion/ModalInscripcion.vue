@@ -20,7 +20,7 @@
         <template v-else>
           <!-- De un vistazo, como en Mis eventos: el pago y, en ligas y copas, el ejército de todo el evento -->
           <div class="text-body-2 mb-1">
-            <span :class="pagado ? 'text-success' : 'text-warning'">{{ pagado ? "Pagado" : "Sin pagar" }}</span>
+            <span :class="pagado ? 'text-success' : 'text-warning'">{{ pagado ? "Pagado" : "No pagado" }}</span>
             <template v-if="ejercitoFijo">
               <span class="text-medium-emphasis"> · {{ ejercitoFijo }}</span>
             </template>
