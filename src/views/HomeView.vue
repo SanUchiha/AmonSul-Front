@@ -66,6 +66,24 @@ export default {
       novedades: [
         {
           fecha: "Octubre 2026",
+          titulo: "Nueva ficha de jugador",
+          descripcion:
+            "La ficha de cada jugador se ha rediseñado. Arriba, siempre a la vista, su ELO, su puesto en la clasificación y la racha de sus cinco últimas partidas. La pestaña Resumen junta la evolución del ELO, el balance de victorias, empates y derrotas en eventos y en amistosas, sus ejércitos más jugados, sus mejores resultados y, si miras la ficha de otro jugador, cómo os ha ido el uno contra el otro. Amistosas y Eventos tienen filtros por resultado y formato y un buscador de rival o evento, y en Resultados cada evento muestra la posición sobre el total de jugadores, como 3/45. Ah, y quien no tiene foto lleva ahora un Señor Oscuro muy poco temible.",
+        },
+        {
+          fecha: "Octubre 2026",
+          titulo: "Perfil renovado y avisos por correo",
+          descripcion:
+            "Tu perfil queda para tus datos: los personales, los de jugador y los de tu cuenta, con un formulario de edición más cómodo en el móvil; la foto se reduce sola al subirla. El ELO y las partidas están en tu ficha de jugador, con un botón para ir a ella. Además, ahora puedes desactivar los avisos por correo de nuevos eventos, rondas, inscripciones, pagos, listas y partidas amistosas. El correo para recuperar la contraseña te llegará siempre.",
+        },
+        {
+          fecha: "Octubre 2026",
+          titulo: "Rondas con nombre y eventos más claros",
+          descripcion:
+            "En Partidas de hoy y en el historial, las partidas de la eliminatoria de una copa aparecen con el nombre de su ronda: octavos de final, cuartos de final, semifinales o final. Mis torneos pasa a llamarse Mis eventos, y al crear o modificar un evento cada tipo de clasificación explica cómo se puntúa.",
+        },
+        {
+          fecha: "Octubre 2026",
           titulo: "Llegan las Copas",
           descripcion:
             "Nuevo formato de evento: fase de grupos y eliminatoria, como un mundial. Al crear un evento, elige Copa y decide cuántos grupos hay, cuántos pasan de cada uno, cómo se reparten los jugadores (por ELO con bombos, al azar o a mano), quién pasa si un cruce de la eliminatoria acaba en empate y si hay partido por el tercer puesto. En cada grupo se juega todos contra todos con calendario abierto, como en la liga, y cada jugador lleva su ejército toda la copa. Al cerrar los grupos se monta el cuadro con los mejores, que avanza solo según se validan los cruces. Si la copa cuenta para el ELO, cada partida suma en cuanto la validan los dos jugadores.",
