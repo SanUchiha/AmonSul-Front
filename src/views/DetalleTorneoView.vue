@@ -131,7 +131,7 @@
                 </v-expansion-panel-title>
                 <v-expansion-panel-text class="panel-equipo">
                   <div v-for="jugador in equipo.jugadores" :key="jugador.idUsuario" class="fila px-3 py-2">
-                    <a class="nick" role="link" tabindex="0" @click="goToUserDetail(jugador.idUsuario)">
+                    <a class="nick nick--jugador" role="link" tabindex="0" @click="goToUserDetail(jugador.idUsuario)">
                       {{ jugador.nick }}
                     </a>
                   </div>
@@ -835,8 +835,16 @@ const inscripcionPorEquipos = async () => {
   text-decoration: underline;
 }
 
-/* Los jugadores, alineados con el nombre del equipo */
+/* Los jugadores, por debajo del equipo: más a la derecha, sobre un fondo algo distinto y en letra más
+   pequeña y suave, para que el nombre del equipo destaque */
 .panel-equipo :deep(.v-expansion-panel-text__wrapper) {
-  padding: 0 0 0 12px;
+  padding: 0 0 0 24px;
+  background: rgba(var(--v-theme-on-surface), 0.04);
+}
+
+.nick--jugador {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
 }
 </style>

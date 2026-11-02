@@ -1,5 +1,6 @@
 <template>
-  <v-card class="pa-3">
+  <!-- Toda la tarjeta lleva al evento: allí están el detalle, los inscritos y los resultados -->
+  <v-card class="pa-3" link @click="goToDetalle">
     <v-img
       :src="torneo.cartelTorneo || require('@/assets/images/cartelMissing.jpg')"
       height="250px"
@@ -20,7 +21,8 @@
     <v-card-subtitle class="text-center mb-3">
       <p class="text-wrap" v-if="formattedAddress.trim()">
         <v-icon left class="location-icon">mdi-map-marker</v-icon>
-        <a :href="googleMapsUrl" target="_blank" rel="noopener noreferrer">
+        <!-- La dirección abre el mapa, no el evento -->
+        <a :href="googleMapsUrl" target="_blank" rel="noopener noreferrer" @click.stop>
           {{ formattedAddress }}
         </a>
       </p>
@@ -66,15 +68,6 @@
         </v-col>
       </v-row>
     </v-card-text>
-
-    <v-divider class="mb-3"></v-divider>
-
-    <!-- Un solo botón: en el evento están el detalle, los inscritos y los resultados -->
-    <v-card-actions>
-      <v-btn variant="tonal" color="primary" block class="text-none" @click="goToDetalle">
-        Ver evento
-      </v-btn>
-    </v-card-actions>
   </v-card>
 </template>
 
