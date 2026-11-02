@@ -32,7 +32,12 @@
               </template>
             </v-select>
 
-            <v-alert v-if="esLiga" type="info" variant="tonal" density="compact" class="mb-4 text-left">
+            <v-alert v-if="!porJornadas" type="info" variant="tonal" density="compact" class="mb-4 text-left">
+              Se juega por rondas. Las rondas se generan una a una desde la gestión del torneo y emparejan a
+              jugadores con resultados parecidos según la clasificación. Cada jugador entrega su lista antes de
+              empezar.
+            </v-alert>
+            <v-alert v-else-if="esLiga" type="info" variant="tonal" density="compact" class="mb-4 text-left">
               Cada jugador se enfrenta a todos los demás y elige su ejército al inscribirse. Las jornadas se
               generan desde la gestión cuando cierres las inscripciones: con N jugadores salen N−1 jornadas (N si
               son impares), el doble con ida y vuelta.
@@ -51,6 +56,8 @@
                 :items="tipoTorneoOptions"
                 item-title="label"
                 item-value="value"
+                :hint="tipoTorneoOptions.find(t => t.value === tipoTorneo)?.subtitle"
+                persistent-hint
                 :rules="[(v: string) => !!v || 'Campo obligatorio']"
               >
                 <template #item="{ item, props }">
@@ -75,7 +82,11 @@
               v-model="nombreTorneo"
               :label="`Nombre ${textos.del}`"
               type="text"
-              :rules="[(v: string) => !!v || 'Campo obligatorio']"
+              counter="200"
+              :rules="[
+                (v: string) => !!v || 'Campo obligatorio',
+                (v: string) => !v || v.length <= 200 || 'Como mucho 200 caracteres',
+              ]"
             />
             <v-textarea
               v-model="descripcionTorneo"
@@ -190,7 +201,10 @@
                 v-model.number="numeroGrupos"
                 type="number"
                 label="¿Cuántos grupos?"
-                :rules="[(v: number) => v >= 1 || 'Al menos un grupo']"
+                :rules="[
+                  (v: number) => v >= 1 || 'Al menos un grupo',
+                  (v: number) => v <= 32 || 'Como mucho 32 grupos',
+                ]"
               />
               <v-text-field
                 v-model.number="clasificadosPorGrupo"
@@ -198,7 +212,10 @@
                 label="¿Cuántos pasan de cada grupo?"
                 hint="Si no llenan el cuadro, entran los mejores siguientes"
                 persistent-hint
-                :rules="[(v: number) => v >= 1 || 'Al menos uno']"
+                :rules="[
+                  (v: number) => v >= 1 || 'Al menos uno',
+                  (v: number) => numeroGrupos * v >= 2 || 'A la eliminatoria tienen que pasar al menos dos',
+                ]"
                 class="mb-2"
               />
               <v-select
@@ -383,6 +400,10 @@
 
           <!-- 6. Revisar antes de crear: cada bloque se puede cambiar volviendo a su paso -->
           <template v-else>
+            <v-alert v-if="errorCreacion" type="error" variant="tonal" density="compact" class="mb-4 text-left">
+              <div class="font-weight-bold">No se ha podido crear {{ textos.el }}</div>
+              {{ errorCreacion }}
+            </v-alert>
             <div v-for="bloque in resumen" :key="bloque.paso" class="mb-3">
               <div class="d-flex align-center">
                 <div class="text-subtitle-2 font-weight-bold flex-grow-1">{{ PASOS[bloque.paso - 1] }}</div>
@@ -425,18 +446,12 @@
     :message="mensajeCreado"
     @update:isVisible="showSuccessModal = $event"
   />
-  <ModalError
-    :isVisible="showErrorModal"
-    :message="`No se ha podido crear ${textos.el}. Intentalo de nuevo y si el error persiste contacta con el administrador.`"
-    @update:isVisible="showErrorModal = $event"
-  />
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
 import { useDisplay } from "vuetify";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
-import ModalError from "../Commons/ModalError.vue";
 import { CrearTorneoDTO } from "@/interfaces/Torneo";
 import { crearTorneo } from "@/services/TorneosService";
 import { modoListasParejaOptions, tipoTorneoOptions, etiquetaLimitePlazas } from "@/Constant/TiposTorneo";
@@ -601,7 +616,8 @@ const fechaFinTorneo = ref<string>("");
 const fechaFinEntregaListas = ref<string>("");
 const fechaFinInscripcion = ref<string>("");
 const isGenerating = ref<boolean>(false);
-const showErrorModal = ref<boolean>(false);
+// Por qué no se ha podido crear, tal como lo cuenta el servidor
+const errorCreacion = ref<string>("");
 const showSuccessModal = ref<boolean>(false);
 const mensajeCreado = ref<string>("");
 const classificationType = ref<ClassificationType>();
@@ -835,28 +851,48 @@ const confirmarConfiguracion = async () => {
     }),
   };
 
+  errorCreacion.value = "";
   try {
     isGenerating.value = true;
-    await crearTorneo(nuevoTorneo);
+    const respuesta = await crearTorneo(nuevoTorneo);
     mensajeCreado.value = esLiga.value
       ? "Liga creada correctamente."
       : esCopa.value
         ? "Copa creada correctamente."
         : "Torneo creado correctamente.";
+    // Creado, pero con algo que avisar (p. ej. las bases no se han podido guardar)
+    if (respuesta?.data?.aviso) mensajeCreado.value += ` ${respuesta.data.aviso}`;
     showSuccessModal.value = true;
     resetElement();
     emit("confirm");
     closeModal();
   } catch (error) {
-    // Se queda abierto con todo rellenado, para volver a intentarlo
-    showErrorModal.value = true;
+    // Se queda abierto con todo rellenado, para corregirlo o volver a intentarlo
+    errorCreacion.value =
+      motivoDelError(error) ??
+      "Ha fallado algo inesperado. Inténtalo de nuevo en un rato y, si sigue fallando, escríbenos desde Contacto.";
     console.error(error);
   } finally {
     isGenerating.value = false;
   }
 };
 
+// El motivo que manda el servidor: su mensaje, o qué datos no tienen el formato que espera
+const motivoDelError = (error: unknown): string | null => {
+  if (!axios.isAxiosError(error)) return null;
+  if (!error.response) return "No se ha podido conectar con el servidor. Comprueba tu conexión y vuelve a intentarlo.";
+  const data = error.response.data;
+  if (typeof data === "string" && data.trim()) return data;
+  if (data?.message) return data.message;
+  if (data?.errors) {
+    const campos = Object.keys(data.errors).map(campo => campo.replace(/^\$\./, ""));
+    return `Algún dato no tiene el formato correcto (${campos.join(", ")}). Revisa los pasos y vuelve a intentarlo.`;
+  }
+  return null;
+};
+
 const resetElement = () => {
+  errorCreacion.value = "";
   paso.value = 1;
   nombreTorneo.value = "";
   limiteParticipantes.value = undefined;
