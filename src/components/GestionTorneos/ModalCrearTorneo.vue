@@ -1,6 +1,6 @@
 <template>
   <!-- Crear un evento paso a paso: no se pasa al siguiente hasta que el actual es válido -->
-  <v-dialog v-model="internalIsVisible" max-width="600px" :fullscreen="xs" scrollable persistent>
+  <v-dialog v-model="internalIsVisible" max-width="600px" scrollable persistent>
     <v-card>
       <v-card-title class="d-flex align-center pt-3">
         <span class="flex-grow-1">Crear evento</span>
@@ -32,21 +32,31 @@
               </template>
             </v-select>
 
-            <v-alert v-if="!porJornadas" type="info" variant="tonal" density="compact" class="mb-4 text-left">
+            <v-alert v-if="!porJornadas" type="info" variant="tonal" density="compact" class="mb-4 text-left text-body-2">
               Se juega por rondas. Las rondas se generan una a una desde la gestión del torneo y emparejan a
               jugadores con resultados parecidos según la clasificación. Cada jugador entrega su lista antes de
               empezar.
             </v-alert>
-            <v-alert v-else-if="esLiga" type="info" variant="tonal" density="compact" class="mb-4 text-left">
+            <v-alert v-else-if="esLiga" type="info" variant="tonal" density="compact" class="mb-4 text-left text-body-2">
               Cada jugador se enfrenta a todos los demás y elige su ejército al inscribirse. Las jornadas se
               generan desde la gestión cuando cierres las inscripciones: con N jugadores salen N−1 jornadas (N si
               son impares), el doble con ida y vuelta.
             </v-alert>
-            <v-alert v-else-if="esCopa" type="info" variant="tonal" density="compact" class="mb-4 text-left">
+            <v-alert v-else-if="esCopa" type="info" variant="tonal" density="compact" class="mb-4 text-left text-body-2">
               Los jugadores se reparten en grupos y en cada grupo juegan todos contra todos, por jornadas y con
               calendario abierto. Los mejores de cada grupo pasan a una eliminatoria que avanza sola. Cada jugador
               elige su ejército al inscribirse.
             </v-alert>
+
+            <!-- Liga y Copa: solo ida o ida y vuelta es parte de qué evento es -->
+            <v-select
+              v-if="porJornadas"
+              v-model="idaYVuelta"
+              :label="esCopa ? '¿Grupos a solo ida o ida y vuelta?' : '¿Solo ida o ida y vuelta?'"
+              :items="idaYVueltaOptions"
+              item-title="label"
+              item-value="value"
+            />
 
             <!-- Tipo de torneo: la Liga y la Copa son individuales -->
             <template v-if="!porJornadas">
@@ -183,13 +193,6 @@
                 v-model="cuentaElo"
                 label="¿Cuenta para el ELO?"
                 :items="cuentaEloOptions"
-                item-title="label"
-                item-value="value"
-              />
-              <v-select
-                v-model="idaYVuelta"
-                :label="esCopa ? '¿Grupos a solo ida o ida y vuelta?' : '¿Solo ida o ida y vuelta?'"
-                :items="idaYVueltaOptions"
                 item-title="label"
                 item-value="value"
               />
@@ -450,7 +453,6 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
-import { useDisplay } from "vuetify";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import { CrearTorneoDTO } from "@/interfaces/Torneo";
 import { crearTorneo } from "@/services/TorneosService";
@@ -487,8 +489,6 @@ const props = defineProps<{
   idUsuario: number;
 }>();
 const emit = defineEmits(["close", "confirm"]);
-
-const { xs } = useDisplay();
 
 const PASOS = ["Formato", "Datos", "Reglas", "Fechas", "Inscripción", "Revisar"];
 const paso = ref(1);
@@ -740,7 +740,10 @@ const resumen = computed(() => {
   return [
     {
       paso: 1,
-      filas: [{ etiqueta: "Evento", valor: `${nombreEvento(formatoTorneo.value)} · ${tipo}` }],
+      filas: [
+        { etiqueta: "Evento", valor: `${nombreEvento(formatoTorneo.value)} · ${tipo}` },
+        ...(porJornadas.value ? [{ etiqueta: "Partidos", valor: opcion(idaYVueltaOptions, idaYVuelta.value) }] : []),
+      ],
     },
     {
       paso: 2,
@@ -755,10 +758,7 @@ const resumen = computed(() => {
       filas: [
         { etiqueta: "Puntos", valor: conValor(puntosTorneo.value) },
         ...(porJornadas.value
-          ? [
-              { etiqueta: "ELO", valor: opcion(cuentaEloOptions, cuentaElo.value) },
-              { etiqueta: "Partidos", valor: opcion(idaYVueltaOptions, idaYVuelta.value) },
-            ]
+          ? [{ etiqueta: "ELO", valor: opcion(cuentaEloOptions, cuentaElo.value) }]
           : [
               { etiqueta: "Listas por jugador", valor: conValor(listasPorJugador.value) },
               { etiqueta: "Rondas", valor: conValor(numeroPartidas.value) },
