@@ -6,6 +6,25 @@
       <v-chip value="jugadores" filter>Jugadores</v-chip>
     </v-chip-group>
 
+    <!-- Cómo se calcula, plegado para no quitar sitio -->
+    <div class="text-center mb-1">
+      <v-btn
+        variant="text"
+        size="small"
+        color="primary"
+        class="text-none"
+        prepend-icon="mdi-information-outline"
+        @click="verComo = !verComo"
+      >
+        ¿Cómo se calcula?
+      </v-btn>
+    </div>
+    <v-expand-transition>
+      <v-card v-if="verComo" variant="tonal" class="pa-4 mb-3">
+        <ComoSeCalcula />
+      </v-card>
+    </v-expand-transition>
+
     <!-- El bando solo filtra el ranking: en los cruces se elige el rival -->
     <FiltrosEstadisticas v-model="filtro" :con-bando="seccion === 'ejercitos'" />
 
@@ -33,12 +52,14 @@ import RankingEjercitos from "@/components/Estadisticas/Ejercitos/RankingEjercit
 import CrucesEjercitos from "@/components/Estadisticas/Ejercitos/CrucesEjercitos.vue";
 import JugadoresEjercitos from "@/components/Estadisticas/Ejercitos/JugadoresEjercitos.vue";
 import FichaEjercito from "@/components/Estadisticas/Ejercitos/FichaEjercito.vue";
+import ComoSeCalcula from "@/components/Estadisticas/Ejercitos/ComoSeCalcula.vue";
 
 type Seccion = "ejercitos" | "cruces" | "jugadores";
 const SECCIONES: Seccion[] = ["ejercitos", "cruces", "jugadores"];
 
 const route = useRoute();
 const router = useRouter();
+const verComo = ref(false);
 
 // La sección va en la URL (?seccion=cruces): al recargar se queda donde estaba. La ficha de un jugador enlaza aquí
 // con ?seccion=jugadores&jugador=id

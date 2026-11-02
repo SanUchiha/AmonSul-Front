@@ -11,7 +11,18 @@
       class="mb-2"
     />
 
+    <!-- Dos formas de verlo: cómo le va en las partidas o cuántos torneos gana -->
     <div class="d-flex flex-wrap justify-center align-center ga-1 mb-2">
+      <span class="text-caption text-medium-emphasis mr-1">Ver por</span>
+      <v-chip size="small" :color="vista === 'partidas' ? 'primary' : undefined" @click="vista = 'partidas'">
+        Partidas
+      </v-chip>
+      <v-chip size="small" :color="vista === 'torneos' ? 'primary' : undefined" @click="vista = 'torneos'">
+        Torneos
+      </v-chip>
+    </div>
+
+    <div v-if="vista === 'partidas'" class="d-flex flex-wrap justify-center align-center ga-1 mb-2">
       <span class="text-caption text-medium-emphasis mr-1">Ordenar por</span>
       <v-chip
         v-for="opcion in ORDENES"
@@ -31,6 +42,49 @@
     <p v-else-if="visibles.length === 0" class="text-body-2 text-medium-emphasis text-center">
       {{ busqueda ? "Ningún ejército coincide con la búsqueda." : "No hay partidas con estos filtros." }}
     </p>
+    <!-- Por torneos: los que más ganan, y aparte los que ganan partidas pero no torneos -->
+    <template v-else-if="vista === 'torneos'">
+      <v-card v-if="sinRematar.length" variant="tonal" color="warning" class="pa-3 mb-3">
+        <div class="text-subtitle-2 font-weight-bold mb-1">Ganan partidas, pero no torneos</div>
+        <div v-for="fila in sinRematar" :key="fila.ejercito" class="text-body-2">
+          {{ fila.ejercito }}: {{ textoPorcentaje(fila.porcentaje) }} de victorias y ninguno de sus {{ fila.torneos }}
+          torneos ({{ fila.podios }} {{ fila.podios === 1 ? "podio" : "podios" }})
+        </div>
+      </v-card>
+      <p v-if="porTorneos.length === 0" class="text-body-2 text-medium-emphasis text-center">
+        Ningún ejército ha jugado torneos individuales con estos filtros.
+      </p>
+      <template v-else>
+        <div class="fila-torneos cabecera text-caption text-medium-emphasis">
+          <span>Ejército</span>
+          <span class="text-right">Torn.</span>
+          <span class="text-right">1º</span>
+          <span class="text-right">Podios</span>
+          <span class="text-right">% vict.</span>
+        </div>
+        <div
+          v-for="fila in porTorneos"
+          :key="fila.ejercito"
+          class="fila-torneos pulsable text-body-2"
+          role="button"
+          tabindex="0"
+          @click="emit('ver', fila.ejercito)"
+          @keydown.enter="emit('ver', fila.ejercito)"
+        >
+          <span class="nombre">
+            <v-icon :color="colorBando(fila.bando)" size="10" class="mr-1">mdi-circle</v-icon>{{ fila.ejercito }}
+          </span>
+          <span class="text-right">{{ fila.torneos }}</span>
+          <span class="text-right" :class="{ 'font-weight-bold oro': fila.torneosGanados > 0 }">{{ fila.torneosGanados }}</span>
+          <span class="text-right">{{ fila.podios }}</span>
+          <span class="text-right">{{ textoPorcentaje(fila.porcentaje) }}</span>
+        </div>
+        <p class="text-caption text-medium-emphasis mt-2 mb-0">
+          Torneos individuales con clasificación final. Podio es quedar 1º, 2º o 3º, y el ejército es el que más llevó
+          cada jugador en sus partidas de ese torneo.
+        </p>
+      </template>
+    </template>
     <template v-else>
       <div class="fila cabecera text-caption text-medium-emphasis">
         <span>Ejército</span>
@@ -60,12 +114,6 @@
 
       <p class="text-caption text-medium-emphasis mt-2 mb-0">
         * Menos de {{ POCAS_PARTIDAS }} partidas: tómalo con cautela.
-        <a href="#" class="text-primary" @click.prevent="verComo = !verComo">¿Qué es «Rinde»?</a>
-      </p>
-      <p v-if="verComo" class="text-caption text-medium-emphasis mt-1 mb-0">
-        El % de victorias engaña: un ejército parece mejor si lo llevan los mejores jugadores. «Rinde» compara cada
-        resultado con lo que esperaba el ELO de los dos jugadores: +5 es que gana 5 puntos de porcentaje más de lo
-        esperado y −5, que gana 5 menos. Un empate cuenta como media victoria.
       </p>
     </template>
 
@@ -106,7 +154,11 @@ const error = ref<string | null>(null);
 const busqueda = ref<string | null>("");
 const orden = ref<(typeof ORDENES)[number]["valor"]>("porcentaje");
 const todos = ref(false);
-const verComo = ref(false);
+const vista = ref<"partidas" | "torneos">("partidas");
+
+// Para decir que a un ejército «no le da para ganar» hacen falta bastantes torneos y un buen % de victorias
+const MINIMO_TORNEOS = 10;
+const PORCENTAJE_ALTO = 55;
 
 const cargar = async () => {
   cargando.value = true;
@@ -124,6 +176,26 @@ watch([() => props.filtro, todos], cargar, { deep: true, immediate: true });
 // Sin distinguir mayúsculas ni tildes
 const normalizar = (texto: string) =>
   texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+// Los que han jugado algún torneo, del que más gana al que menos
+const porTorneos = computed(() => {
+  const buscado = normalizar(busqueda.value ?? "");
+  return filas.value
+    .filter(fila => fila.torneos > 0 && (!buscado || normalizar(fila.ejercito).includes(buscado)))
+    .sort(
+      (a, b) =>
+        b.torneosGanados - a.torneosGanados ||
+        b.podios - a.podios ||
+        b.porcentaje - a.porcentaje ||
+        b.torneos - a.torneos
+    );
+});
+
+const sinRematar = computed(() =>
+  porTorneos.value
+    .filter(f => f.torneos >= MINIMO_TORNEOS && f.porcentaje >= PORCENTAJE_ALTO && f.torneosGanados === 0)
+    .sort((a, b) => b.porcentaje - a.porcentaje)
+);
 
 const visibles = computed(() => {
   const buscado = normalizar(busqueda.value ?? "");
@@ -148,6 +220,23 @@ const visibles = computed(() => {
 
 .cabecera {
   padding-top: 0;
+}
+
+/* Por torneos, una columna más y algo más estrechas */
+.fila-torneos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px 24px 44px 44px;
+  column-gap: 6px;
+  padding: 8px 4px;
+  align-items: center;
+}
+
+.fila-torneos + .fila-torneos {
+  border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.oro {
+  color: #ffd700;
 }
 
 .pulsable {

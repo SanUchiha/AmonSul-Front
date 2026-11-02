@@ -53,6 +53,27 @@
               </div>
             </div>
 
+            <!-- Ganar partidas no es lo mismo que ganar torneos -->
+            <template v-if="ficha.resumen.torneos > 0">
+              <h3 class="text-subtitle-2 font-weight-bold mb-1">En torneos</h3>
+              <div class="d-flex flex-wrap ga-1 mb-1">
+                <v-chip size="small" variant="tonal">
+                  {{ ficha.resumen.torneos }} {{ ficha.resumen.torneos === 1 ? "torneo" : "torneos" }}
+                </v-chip>
+                <v-chip
+                  size="small"
+                  :variant="ficha.resumen.torneosGanados > 0 ? 'flat' : 'tonal'"
+                  :color="ficha.resumen.torneosGanados > 0 ? '#FFD700' : undefined"
+                >
+                  {{ ficha.resumen.torneosGanados }} {{ ficha.resumen.torneosGanados === 1 ? "ganado" : "ganados" }}
+                </v-chip>
+                <v-chip size="small" variant="tonal">
+                  {{ ficha.resumen.podios }} {{ ficha.resumen.podios === 1 ? "podio" : "podios" }}
+                </v-chip>
+              </div>
+              <p class="text-body-2 text-medium-emphasis mb-4">{{ fraseTorneos }}</p>
+            </template>
+
             <h3 class="text-subtitle-2 font-weight-bold mb-1">Según los puntos</h3>
             <div v-for="tramo in ficha.porTramo" :key="tramo.tramo" class="barra text-body-2">
               <span class="text-medium-emphasis">{{ textoTramo(tramo.tramo) }}</span>
@@ -224,6 +245,17 @@ const descripcionFiltro = computed(() => {
     props.filtro.amistosas ? "con amistosas" : "sin amistosas",
   ];
   return partes.join(" · ");
+});
+
+// Lo que gana en partidas frente a lo que gana en torneos, dicho en una frase
+const fraseTorneos = computed(() => {
+  const resumen = ficha.value?.resumen;
+  if (!resumen || resumen.torneos === 0) return "";
+  const partidas = `Gana el ${textoPorcentaje(resumen.porcentaje)} de sus partidas`;
+  const deSus = resumen.torneos === 1 ? "su único torneo" : `sus ${resumen.torneos} torneos`;
+  if (resumen.torneosGanados === 0)
+    return `${partidas}, pero ${resumen.torneos === 1 ? "no ha ganado" : "ninguno de"} ${deSus}.`;
+  return `${partidas} y ${resumen.torneosGanados} de ${deSus}.`;
 });
 
 // Los tres mejores y los tres peores; o todos, si se piden
