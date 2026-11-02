@@ -24,17 +24,34 @@
         Aún no hay resultados en este circuito.
       </p>
       <template v-else>
+        <!-- Todo en una línea: puesto, jugador, total y los puntos de sus 4 mejores resultados -->
         <div class="fila cabecera text-caption text-medium-emphasis">
           <span>#</span>
           <span>Jugador</span>
-          <span class="text-right">Puntos</span>
+          <span class="text-right">Total</span>
+          <span class="mejores text-center">Sus 4 mejores</span>
         </div>
-        <div v-for="jugador in visibles" :key="jugador.nick" class="fila text-body-2">
+        <div v-for="jugador in visibles" :key="jugador.idUsuario" class="fila text-body-2">
           <span class="text-medium-emphasis">{{ jugador.posicion }}</span>
-          <span class="nick" :class="{ 'font-weight-bold': jugador.posicion <= 3 }">{{ jugador.nick }}</span>
-          <span class="text-right">{{ jugador.totalPuntos }}</span>
+          <span class="nick">{{ jugador.nick }}</span>
+          <strong class="text-right">{{ jugador.totalPuntos }}</strong>
+          <!-- Cada uno abre la clasificación del evento en que los ganó -->
+          <v-chip
+            v-for="resultado in jugador.mejores"
+            :key="resultado.idTorneo"
+            size="x-small"
+            :variant="COLOR_PODIO[resultado.resultado] ? 'flat' : 'tonal'"
+            :color="COLOR_PODIO[resultado.resultado]"
+            class="punto"
+            :aria-label="`${resultado.resultado}º en ${resultado.nombreTorneo}: ${resultado.puntos} puntos`"
+            @click="verEvento(resultado, jugador.idUsuario)"
+          >
+            {{ resultado.puntos }}
+          </v-chip>
         </div>
-        <p class="text-caption text-medium-emphasis mt-2 mb-0">Suma de sus 4 mejores resultados en el circuito.</p>
+        <p class="text-caption text-medium-emphasis mt-2 mb-0">
+          Suma de sus 4 mejores resultados en el circuito. Pulsa en unos puntos para ver la clasificación de ese evento.
+        </p>
         <div v-if="clasificacion.length > DE_ENTRADA" class="text-center mt-1">
           <v-btn variant="text" size="small" color="primary" class="text-none" @click="verToda = !verToda">
             {{ verToda ? "Ver menos" : `Ver toda la clasificación (${clasificacion.length})` }}
@@ -63,6 +80,14 @@
       <v-btn size="small" variant="text" color="error" class="text-none" @click="showBorrar = true">Borrar</v-btn>
     </div>
   </div>
+
+  <ModalClasificacionEvento
+    v-model="showEvento"
+    :evento="eventoVisto"
+    :posiciones="eventoVisto ? posicionesDe(eventoVisto.idTorneo) : []"
+    :idUsuario="jugadorVisto"
+    :puntosPorResultado="puntosPorResultado"
+  />
 
   <ModalNombreCircuito
     v-model="showRenombrar"
@@ -97,14 +122,17 @@
 <script lang="ts" setup>
 import { computed, defineEmits, defineProps, onMounted, ref } from "vue";
 import { CircuitoDTO } from "@/interfaces/Circuito";
-import { useCircuitoData } from "@/composables/useCircuitoData";
+import { ResultadoCircuito, useCircuitoData } from "@/composables/useCircuitoData";
 import { useAuth } from "@/composables/useAuth";
 import { borrarCircuitoAsync, renombrarCircuitoAsync } from "@/services/CircuitosService";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import { esCircuitoAmonSul } from "@/utils/circuitoAmonSul";
 import ModalNombreCircuito from "./components/ModalNombreCircuito.vue";
+import ModalClasificacionEvento from "./components/ModalClasificacionEvento.vue";
 
 const DE_ENTRADA = 5;
+// Oro, plata y bronce para los resultados de podio, como en el resumen de un torneo
+const COLOR_PODIO: Record<number, string> = { 1: "#FFD700", 2: "#C0C0C0", 3: "#CD7F32" };
 
 const props = defineProps<{ circuito: CircuitoDTO }>();
 const emit = defineEmits<{
@@ -117,7 +145,8 @@ const verToda = ref(false);
 const cargando = ref(true);
 
 // Se carga al desplegarlo por primera vez; al recogerlo y volver a abrirlo ya está
-const { torneos, clasificacion, loadTorneos, prepareClasificacion } = useCircuitoData();
+const { torneos, clasificacion, puntosPorResultado, loadTorneos, prepareClasificacion, posicionesDe } =
+  useCircuitoData();
 const visibles = computed(() => (verToda.value ? clasificacion.value : clasificacion.value.slice(0, DE_ENTRADA)));
 
 onMounted(async () => {
@@ -130,6 +159,16 @@ onMounted(async () => {
     cargando.value = false;
   }
 });
+
+// La clasificación de un evento en un modal: al cerrarlo se sigue en el circuito, como estaba
+const showEvento = ref(false);
+const eventoVisto = ref<ResultadoCircuito | null>(null);
+const jugadorVisto = ref<number | null>(null);
+const verEvento = (resultado: ResultadoCircuito, idUsuario: number) => {
+  eventoVisto.value = resultado;
+  jugadorVisto.value = idUsuario;
+  showEvento.value = true;
+};
 
 const { getidUsuario } = useAuth();
 const esCreador = computed(
@@ -182,9 +221,21 @@ const borrar = async () => {
 <style scoped>
 .fila {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) 56px;
-  column-gap: 8px;
+  grid-template-columns: 24px minmax(0, 1fr) 32px repeat(4, 28px);
+  column-gap: 6px;
+  align-items: center;
   padding: 6px 0;
+}
+
+.mejores {
+  grid-column: span 4;
+}
+
+/* Los puntos centrados y del mismo ancho, para que se lean en columna */
+.punto {
+  width: 100%;
+  justify-content: center;
+  padding: 0;
 }
 
 .fila + .fila {
