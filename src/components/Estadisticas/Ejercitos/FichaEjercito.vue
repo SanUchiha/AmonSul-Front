@@ -94,7 +94,16 @@
                 <span class="text-right">% vict.</span>
                 <span class="text-right">Rinde</span>
               </div>
-              <div v-for="rival in rivalesVisibles" :key="rival.ejercito" class="fila-cuatro text-body-2">
+              <!-- Cada rival lleva a su cruce -->
+              <div
+                v-for="rival in rivalesVisibles"
+                :key="rival.ejercito"
+                class="fila-cuatro pulsable text-body-2"
+                role="button"
+                tabindex="0"
+                @click="verCruce(rival.ejercito)"
+                @keydown.enter="verCruce(rival.ejercito)"
+              >
                 <span class="nombre">
                   <v-icon :color="colorBando(rival.bando)" size="10" class="mr-1">mdi-circle</v-icon>{{ rival.ejercito }}
                 </span>
@@ -107,7 +116,9 @@
                   {{ todosRivales ? "Solo los extremos" : `Ver los ${ficha.rivales.length}` }}
                 </v-btn>
               </div>
-              <p class="text-caption text-medium-emphasis mb-0">Del que mejor se le da al que peor, con 5 partidas o más.</p>
+              <p class="text-caption text-medium-emphasis mb-0">
+                Del que mejor se le da al que peor, con 5 partidas o más. Pulsa uno para ver el cruce entero.
+              </p>
             </template>
 
             <h3 class="text-subtitle-2 font-weight-bold mt-4 mb-1">Quién lo lleva mejor</h3>
@@ -169,7 +180,10 @@ import {
 const JUGADORES_DE_ENTRADA = 5;
 
 const props = defineProps<{ modelValue: boolean; ejercito: string | null; filtro: FiltroEstadisticas }>();
-const emit = defineEmits<{ (event: "update:modelValue", valor: boolean): void }>();
+const emit = defineEmits<{
+  (event: "update:modelValue", valor: boolean): void;
+  (event: "cruce", cruce: { ejercito: string; rival: string }): void;
+}>();
 
 const { smAndDown } = useDisplay();
 const ficha = ref<FichaEjercitoDTO | null>(null);
@@ -179,6 +193,9 @@ const todosRivales = ref(false);
 const todosJugadores = ref(false);
 
 const cerrar = () => emit("update:modelValue", false);
+const verCruce = (rival: string) => {
+  if (ficha.value) emit("cruce", { ejercito: ficha.value.resumen.ejercito, rival });
+};
 
 // Se carga cada vez que se abre, con los filtros que haya en ese momento
 watch(
@@ -257,6 +274,14 @@ const jugadoresVisibles = computed(() => {
 
 .cabecera {
   padding-bottom: 2px;
+}
+
+.pulsable {
+  cursor: pointer;
+}
+
+.pulsable:hover {
+  background: rgba(var(--v-theme-on-surface), 0.04);
 }
 
 .nombre {

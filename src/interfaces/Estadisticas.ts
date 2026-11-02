@@ -92,3 +92,43 @@ export interface FichaEjercitoDTO {
   rivales: EjercitoBalanceDTO[];
   jugadores: JugadorBalanceDTO[];
 }
+
+// Un ejército contra otro, o contra un bando, visto desde el primero
+export interface PartidaCruceDTO {
+  idPartida: number;
+  esAmistosa: boolean;
+  idTorneo: number | null;
+  nombreTorneo: string | null;
+  ronda: number | null;
+  fecha: string;
+  puntos: number | null;
+  idUsuario: number;
+  nick: string;
+  ejercito: string;
+  resultado: number;
+  idUsuarioRival: number;
+  nickRival: string;
+  ejercitoRival: string;
+  resultadoRival: number;
+  // 1 si ganó el del ejército, 0,5 si empataron y 0 si perdió
+  puntuacion: number;
+}
+
+export interface CruceEjercitosDTO {
+  ejercito: string;
+  rival: string;
+  resumen: BalanceDTO;
+  porTramo: TramoBalanceDTO[];
+  partidas: PartidaCruceDTO[];
+}
+
+export interface CruceResumenDTO extends BalanceDTO {
+  ejercito: string;
+  rival: string;
+}
+
+// Cada cruce visto desde el ejército que se impone
+export interface CrucesDestacadosDTO {
+  masJugados: CruceResumenDTO[];
+  masDesequilibrados: CruceResumenDTO[];
+}
