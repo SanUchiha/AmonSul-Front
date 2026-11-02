@@ -59,7 +59,10 @@
               </div>
               <div class="dato">
                 <dt>Plazas</dt>
-                <dd>{{ participantesReales.length }} / {{ torneo.limiteParticipantes || "sin límite" }}</dd>
+                <dd>
+                  {{ plazasOcupadas }} / {{ torneo.limiteParticipantes || "sin límite" }}
+                  <template v-if="porEquipos && torneo.limiteParticipantes">{{ esParejas ? "parejas" : "equipos" }}</template>
+                </dd>
               </div>
               <div class="dato">
                 <dt>{{ esLiga ? "Jornadas" : "Partidas" }}</dt>
@@ -263,7 +266,6 @@ const esLiga = computed(() => esPorJornadas(torneo.value?.formatoTorneo));
 const participantes = ref<InscripcionUsuarioIndividualDTO[]>([]);
 const idUsuario = ref<string | null>(getidUsuario.value);
 const estaApuntado = ref<boolean>(false);
-const isTorneoCompletado = ref<boolean>(false);
 const idInscripcion = ref<number>(0);
 const idEquipo = ref<number | undefined>(undefined);
 
@@ -466,12 +468,6 @@ onMounted(async () => {
           }
         });
 
-        // Verificar si el torneo está completo
-        if (torneo.value && torneo.value.limiteParticipantes) {
-          if (participantesReales.value.length >= torneo.value.limiteParticipantes) {
-            isTorneoCompletado.value = true;
-          }
-        }
       }
     }
 
@@ -566,6 +562,14 @@ const lugar = computed(() => formattedAddress.value.trim() || (isValidCoordinate
 const participantesReales = computed(() => participantes.value.filter(p => !esUsuarioBye(p.idUsuario, p.nick)));
 const equiposReales = computed(() => infoEquipos.value.filter(e => !esUsuarioBye(e.idCapitan, e.nombreEquipo)));
 
+// En los eventos por equipos o parejas, el límite es de equipos o parejas, como cuenta la gestión del organizador
+const plazasOcupadas = computed(() =>
+  porEquipos.value ? equiposReales.value.length : participantesReales.value.length
+);
+const torneoCompleto = computed(
+  () => !!torneo.value?.limiteParticipantes && plazasOcupadas.value >= torneo.value.limiteParticipantes
+);
+
 const normalizar = (texto: string) => texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const texto = computed(() => normalizar((search.value ?? "").trim()));
 const porNick = (a: { nick?: string | null }, b: { nick?: string | null }) =>
@@ -656,7 +660,7 @@ const estado = computed<{ texto: string; acciones: AccionEstado[] }>(() => {
       t.inicioInscripciones && diaDeHoy() < t.inicioInscripciones.slice(0, 10)
         ? `Las inscripciones abren el ${fechaCorta(t.inicioInscripciones)}.`
         : "Inscripción cerrada.";
-  } else if (isTorneoCompletado.value) {
+  } else if (torneoCompleto.value) {
     texto = "Plazas agotadas.";
   } else {
     acciones.push({

@@ -169,7 +169,7 @@
           <!-- Límite de participantes -->
           <v-text-field
             v-model="limiteParticipantes"
-            label="Limite de jugadores"
+            :label="etiquetaLimitePlazas(tipoTorneo)"
             required
             type="number"
             :rules="[
@@ -501,6 +501,7 @@ import { crearTorneo } from "@/services/TorneosService";
 import {
   modoListasParejaOptions,
   tipoTorneoOptions,
+  etiquetaLimitePlazas,
 } from "@/Constant/TiposTorneo";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";

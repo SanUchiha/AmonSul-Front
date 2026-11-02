@@ -9,6 +9,14 @@ export const torneoType = [
 
 export type TorneoType = (typeof torneoType)[number];
 
+// El límite de plazas cuenta jugadores en un evento individual, y parejas o equipos en los demás
+export const etiquetaLimitePlazas = (tipo?: string | null) =>
+  !tipo || tipo === "Individual"
+    ? "Límite de jugadores"
+    : tipo === "Parejas"
+      ? "Límite de parejas"
+      : "Límite de equipos";
+
 // Opciones del selector de tipo al crear o modificar un torneo. Subtítulos cortos: en móvil se cortan
 export const tipoTorneoOptions: {
   label: string;

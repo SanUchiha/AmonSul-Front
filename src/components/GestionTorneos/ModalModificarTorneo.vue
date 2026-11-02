@@ -71,7 +71,7 @@
           <!-- Límite de participantes -->
           <v-text-field
             v-model="limiteParticipantes"
-            label="Limite de jugadores"
+            :label="etiquetaLimitePlazas(tipoTorneo)"
             required
             type="number"
             :rules="[
@@ -471,6 +471,7 @@ import {
   tipoTorneoOptions,
   torneoType,
   TorneoType,
+  etiquetaLimitePlazas,
 } from "@/Constant/TiposTorneo";
 import {
   ClassificationType,
