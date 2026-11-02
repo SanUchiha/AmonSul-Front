@@ -113,8 +113,10 @@
     <ul>
       <li>Mientras tengas la cuenta.</li>
       <li>
-        Si pides borrarla, eliminamos tus datos personales. Tus resultados y partidas siguen en las clasificaciones y
-        en los eventos, sin nada que te identifique: aparecerás como «Desconocido».
+        Si la borras, desde tu perfil o escribiéndonos, eliminamos tus datos personales. Tus resultados y partidas
+        siguen en las clasificaciones y en los eventos, sin nada que te identifique: aparecerás como «Desconocido»
+        seguido de un número. Si estás inscrito en un evento que no ha terminado, o lo organizas, podrás borrarla
+        cuando termine.
       </li>
       <li>El permiso para que el organizador vea tu correo dura lo que tu inscripción, o hasta que lo retires.</li>
       <li>Los enlaces para recuperar la contraseña caducan en una hora.</li>
@@ -130,7 +132,8 @@
     <p>
       Puedes pedir acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad de tus datos,
       y retirar cuando quieras un consentimiento que hayas dado, escribiendo a
-      <a :href="`mailto:${CONTACTO}`">{{ CONTACTO }}</a>. Muchos datos puedes cambiarlos tú en tu perfil.
+      <a :href="`mailto:${CONTACTO}`">{{ CONTACTO }}</a>. Muchos datos puedes cambiarlos tú en tu perfil, y desde ahí
+      también puedes borrar tu cuenta.
     </p>
     <p>
       Si crees que no hemos tratado bien tus datos, puedes reclamar ante la Agencia Española de Protección de Datos

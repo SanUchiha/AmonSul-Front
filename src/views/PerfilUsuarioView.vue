@@ -108,13 +108,24 @@
         />
         <p class="text-caption text-medium-emphasis mb-0 mt-1">
           Nuevos eventos, rondas, inscripciones, pagos, listas y partidas amistosas. Si los
-          desactivas, solo te llegará el correo para recuperar la contraseña.
+          desactivas, solo te llegarán los correos de tu cuenta, como el de recuperar la contraseña.
         </p>
+      </v-card>
+
+      <h2 class="text-subtitle-1 font-weight-bold mb-1">Borrar la cuenta</h2>
+      <v-card variant="outlined" class="pa-3 mb-3">
+        <p class="text-caption text-medium-emphasis mb-2">
+          Borra tus datos personales. Tus resultados se quedan en los eventos como «Desconocido».
+        </p>
+        <v-btn variant="text" color="error" size="small" class="text-none px-0" @click="borrarCuenta = true">
+          Borrar mi cuenta
+        </v-btn>
       </v-card>
     </template>
   </v-container>
 
   <ModalCambiarPass v-if="cambiarPass" @close="cambiarPass = false" />
+  <ModalBorrarCuenta v-model:isVisible="borrarCuenta" @borrada="alBorrarCuenta" />
 </template>
 
 <script setup lang="ts">
@@ -130,6 +141,8 @@ import { fechaConocida } from "@/utils/Fecha";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import FormularioPerfil from "@/components/Perfil/FormularioPerfil.vue";
 import ModalCambiarPass from "@/components/Perfil/ModalCambiarPass.vue";
+import ModalBorrarCuenta from "@/components/Perfil/ModalBorrarCuenta.vue";
+import { useRouter } from "vue-router";
 import avatarPorDefecto from "@/assets/icons/perfil.png";
 
 interface Dato {
@@ -140,12 +153,23 @@ interface Dato {
 }
 
 const usuariosStore = useUsuariosStore();
-const { getUser } = useAuth();
+const { getUser, logout } = useAuth();
+const router = useRouter();
 const { triggerToast } = useToast();
 
 const isLoading = ref(true);
 const editando = ref(false);
 const cambiarPass = ref(false);
+const borrarCuenta = ref(false);
+
+// Ya no existe: fuera la sesión y a la pantalla de entrar
+const alBorrarCuenta = () => {
+  borrarCuenta.value = false;
+  usuariosStore.usuario = {} as UsuarioViewDTO;
+  logout();
+  triggerToast("success", "Tu cuenta se ha borrado");
+  router.push({ name: "inicio-sesion" });
+};
 const guardandoAvisos = ref(false);
 const facciones = ref<FaccionDTO[]>([]);
 

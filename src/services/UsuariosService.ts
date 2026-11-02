@@ -86,6 +86,11 @@ export const restablecerContrasena = async (body: {
   return http.post(`Usuario/Restablecer-Pass`, body);
 };
 
+// Borra los datos personales; los resultados se quedan como «Desconocido». Pide la contraseña
+export const borrarMiCuenta = async (contrasena: string) => {
+  return http.post(`Usuario/Borrar-Mi-Cuenta`, { contrasena });
+};
+
 export const getUsuariosIdNick = async () => {
   return http.get(`Usuario/IdNick`);
 };
