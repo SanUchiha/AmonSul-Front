@@ -13,7 +13,7 @@
           Tienes derecho a acceder, rectificar y suprimir tus datos, así como
           otros derechos reconocidos en la normativa vigente. Al continuar
           utilizando esta aplicación, confirmas que has leído y aceptas nuestra
-          política de protección de datos.
+          <a href="/politica-privacidad" target="_blank" rel="noopener" class="enlace">política de privacidad</a>.
         </p>
         <p>Si no aceptas esta política, no podrás utilizar la aplicación.</p>
         <p>Solo tendrás que aceptarlas una vez.</p>
@@ -93,5 +93,9 @@ watch(showSuccessModal, (newValue) => {
 </script>
 
 <style scoped>
+.enlace {
+  color: rgb(var(--v-theme-primary));
+}
+
 /* Añade cualquier estilo personalizado aquí */
 </style>

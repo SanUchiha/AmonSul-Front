@@ -106,10 +106,11 @@
                 v-model="fechaNacimiento"
                 label="Fecha de Nacimiento"
                 type="date"
-                :rules="[rules.required, rules.validDate]"
+                :rules="[rules.required, rules.validDate, rules.edadMinima]"
                 required
                 :error="errors.fechaNacimiento"
               ></v-text-field>
+              <CasillaPrivacidad v-model="aceptaPrivacidad" :error="errors.privacidad" />
               <v-row justify="center" class="my-4">
                 <v-btn
                   variant="tonal"
@@ -217,6 +218,7 @@ import { FaccionDTO } from "@/interfaces/Faccion";
 import ModalError from "../Commons/ModalError.vue";
 import ErrorEmail from "./ErrorEmail.vue";
 import ErrorNick from "./ErrorNick.vue";
+import CasillaPrivacidad from "../Commons/CasillaPrivacidad.vue";
 
 const usuariosStore = useUsuariosStore();
 
@@ -238,6 +240,8 @@ const dialogDuplicado = ref(false);
 const dialogAddFaccion = ref(false);
 const loading = ref<boolean>(false);
 const telefono = ref("");
+const aceptaPrivacidad = ref(false);
+const EDAD_MINIMA = 14;
 const listaFacciones = ref<FaccionDTO[]>([]);
 const nombreFacciones = ref<string[]>([]);
 const faccionSelected = ref<string>("");
@@ -277,6 +281,13 @@ const rules = {
       "La fecha debe ser menor que la fecha actual."
     );
   },
+  // Art. 7 LOPDGDD: con menos de 14 años hace falta el consentimiento de los padres
+  edadMinima: (value: string | null) => {
+    const nacimiento = new Date(value as string);
+    const hace14 = new Date();
+    hace14.setFullYear(hace14.getFullYear() - EDAD_MINIMA);
+    return nacimiento <= hace14 || `Necesitas tener al menos ${EDAD_MINIMA} años para registrarte.`;
+  },
   phone: (value: string | null) =>
     /^\d{9}$/.test(value as string) ||
     "El número de teléfono debe tener 9 dígitos.",
@@ -293,6 +304,7 @@ const errors = reactive({
   provincia: false,
   fechaNacimiento: false,
   telefono: false,
+  privacidad: false,
 });
 
 const loadFacciones = async () => {
@@ -351,7 +363,10 @@ const validateForm = () => {
   errors.ciudad = !ciudad.value;
   errors.provincia= !provincia.value;
   errors.fechaNacimiento =
-    !fechaNacimiento.value || !rules.validDate(fechaNacimiento.value);
+    !fechaNacimiento.value ||
+    rules.validDate(fechaNacimiento.value) !== true ||
+    rules.edadMinima(fechaNacimiento.value) !== true;
+  errors.privacidad = !aceptaPrivacidad.value;
   errors.telefono = !!telefono.value && !rules.phone(telefono.value);
 
   const formIsValid = Object.values(errors).every((error) => !error);
@@ -390,6 +405,7 @@ const handlerNewUser = async () => {
     idFaccion: idFaccionSelected.value,
     FechaNacimiento: formatFecha(fechaNacimiento.value),
     Telefono: telefono.value,
+    AceptaPrivacidad: aceptaPrivacidad.value,
   };
   try {
     await usuariosStore.postUser(newUserDTO);
@@ -403,6 +419,8 @@ const handlerNewUser = async () => {
           dialogEmail.value = true;
         } else if (message === "El nick ya está en uso.") {
           dialogNick.value = true;
+        } else {
+          alert(message);
         }
       } else {
         router.push({ name: "error" });

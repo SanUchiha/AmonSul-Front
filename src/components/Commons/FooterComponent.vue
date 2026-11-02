@@ -17,6 +17,9 @@
             &copy; {{ new Date().getFullYear() }} Amon Sûl. Una App para
             gobernarlos a todos.
           </p>
+          <router-link to="/politica-privacidad" class="text-caption enlace">
+            Política de privacidad
+          </router-link>
         </v-col>
       </v-row>
     </v-container>
@@ -24,6 +27,11 @@
 </template>
 
 <style scoped>
+.enlace {
+  color: inherit;
+  opacity: 0.8;
+}
+
 .footer {
   background-color: #1e1e1e;
   color: white;

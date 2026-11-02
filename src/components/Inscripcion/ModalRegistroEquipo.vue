@@ -73,6 +73,8 @@
             label="Compartir mi correo con el organizador"
             messages="Para que pueda contactarte si hace falta. Puedes cambiarlo cuando quieras en Mi inscripción."
           />
+
+          <CasillaPrivacidad v-model="aceptaPrivacidad" class="mt-2" />
         </v-form>
       </v-card-text>
 
@@ -82,7 +84,7 @@
           variant="tonal"
           color="primary"
           @click="submitForm"
-          :disabled="isRegistering"
+          :disabled="isRegistering || !aceptaPrivacidad"
           >{{ esParejas ? "Registrar pareja" : "Registrar equipo" }}</v-btn
         >
         <v-btn variant="tonal" color="secondary" @click="closeDialog"
@@ -136,6 +138,7 @@ import { registrarEquipo } from "@/services/InscripcionesService";
 import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { InscripcionEquipoDTO } from "@/interfaces/Inscripcion";
 import { UsuarioSinEquipoDTO } from "@/interfaces/Usuario";
+import CasillaPrivacidad from "@/components/Commons/CasillaPrivacidad.vue";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -158,6 +161,7 @@ const snackBarTimeOut = ref<number>(3000);
 const loading = ref<boolean>(false);
 // Sin marcar: el correo solo se comparte si el capitán lo elige
 const compartirEmail = ref<boolean>(false);
+const aceptaPrivacidad = ref<boolean>(false);
 
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
@@ -267,6 +271,7 @@ const closeDialog = () => {
   selectedPlayers.value = [];
   idsSelected.value = [];
   compartirEmail.value = false;
+  aceptaPrivacidad.value = false;
 };
 
 onMounted(async () => {

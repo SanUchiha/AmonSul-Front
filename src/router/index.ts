@@ -5,6 +5,7 @@ import InicioSesionView from "@/views/InicioSesionView.vue";
 import JugadoresView from "@/views/JugadoresView.vue";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
 import RestablecerContrasenaView from "@/views/RestablecerContrasenaView.vue";
+import PoliticaPrivacidadView from "@/views/PoliticaPrivacidadView.vue";
 import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
 import TorneosView from "@/views/TorneosView.vue";
 import ErrorView from "@/views/ErrorView.vue";
@@ -121,6 +122,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/registro-usuario",
     name: "registro-usuario",
     component: RegistroUsuarioView,
+  },
+  {
+    // Pública: se enlaza desde el registro, la inscripción y el pie de página
+    path: "/politica-privacidad",
+    name: "politica-privacidad",
+    component: PoliticaPrivacidadView,
   },
   {
     // Llega desde el correo de recuperar la contraseña, con el enlace en ?token=

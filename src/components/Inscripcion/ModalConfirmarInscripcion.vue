@@ -20,6 +20,8 @@
           label="Compartir mi correo con el organizador"
           messages="Para que pueda contactarte si hace falta. Puedes cambiarlo cuando quieras en Mi inscripción."
         />
+
+        <CasillaPrivacidad v-model="aceptaPrivacidad" class="mt-2" />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -27,7 +29,7 @@
         <v-btn
           color="primary"
           variant="tonal"
-          :disabled="pedirEjercito && !ejercito"
+          :disabled="(pedirEjercito && !ejercito) || !aceptaPrivacidad"
           @click="confirmar"
         >
           Inscribirme
@@ -40,6 +42,7 @@
 <script setup lang="ts">
 import { computed, defineEmits, defineProps, ref, watch } from "vue";
 import SelectorEjercito from "./SelectorEjercito.vue";
+import CasillaPrivacidad from "@/components/Commons/CasillaPrivacidad.vue";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -61,6 +64,7 @@ const visible = computed({
 const ejercito = ref<string | null>(null);
 // Sin marcar: el correo solo se comparte si el jugador lo elige
 const compartirEmail = ref(false);
+const aceptaPrivacidad = ref(false);
 
 watch(
   () => props.isVisible,
@@ -68,11 +72,12 @@ watch(
     if (!abierto) return;
     ejercito.value = null;
     compartirEmail.value = false;
+    aceptaPrivacidad.value = false;
   }
 );
 
 const confirmar = () => {
-  if (props.pedirEjercito && !ejercito.value) return;
+  if ((props.pedirEjercito && !ejercito.value) || !aceptaPrivacidad.value) return;
   emit("confirm", { ejercito: ejercito.value, compartirEmail: compartirEmail.value });
   visible.value = false;
 };

@@ -21,6 +21,8 @@ export interface NewUserDTO {
   Telefono: string;
   nickLGDA: string;
   imagen?: string;
+  // Obligatorio: sin aceptar la política de privacidad el servidor no registra
+  AceptaPrivacidad: boolean;
 }
 
 export interface EditarUsuarioDTO {
