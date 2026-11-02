@@ -5,7 +5,7 @@
         <v-card
           max-width="400"
           prepend-icon="mdi-alert"
-          text="Usuario y/o contraseña incorrecta"
+          :text="mensaje || 'Usuario y/o contraseña incorrecta'"
           title="Error login"
         >
           <template v-slot:actions>
@@ -23,6 +23,11 @@ const props = defineProps({
   isVisible: {
     type: Boolean,
     required: true,
+  },
+  // El que manda el servidor, p. ej. tras demasiados intentos fallidos
+  mensaje: {
+    type: String,
+    default: "",
   },
 });
 

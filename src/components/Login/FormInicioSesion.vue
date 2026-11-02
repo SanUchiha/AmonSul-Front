@@ -78,6 +78,7 @@
     <ErrorLogin
       v-if="dialog"
       :isVisible="dialog"
+      :mensaje="mensajeError"
       @update:isVisible="dialog = $event"
     />
     <ResponseLogin
@@ -106,6 +107,7 @@ const password = ref("");
 const { login } = useAuth();
 const router = useRouter();
 const dialog = ref(false);
+const mensajeError = ref("");
 const dialogOk = ref(false);
 
 const isLoading = ref(false);
@@ -127,6 +129,7 @@ const handleLogin = async () => {
       router.push({ name: "error" });
     } else {
       if (!response.data.isAccess) {
+        mensajeError.value = response.data.mensaje ?? "";
         dialog.value = true;
       } else {
         dialogOk.value = true;
