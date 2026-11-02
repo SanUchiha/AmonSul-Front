@@ -29,7 +29,8 @@
       <li><strong>Si nos escribes desde Contacto:</strong> lo que pongas en el formulario, para responderte.</li>
       <li>
         <strong>Datos técnicos:</strong> como cualquier web, el servidor registra datos de las conexiones, como la
-        dirección IP, por seguridad.
+        dirección IP, por seguridad. De tu cuenta guardamos también cuántas veces has iniciado sesión y cuándo fue la
+        última.
       </li>
     </ul>
     <p>
@@ -58,6 +59,10 @@
         web.</strong> Base: el servicio (art. 6.1.b) y el interés legítimo en informarte del servicio que usas (art.
         6.1.f). Puedes desactivarlos en tu perfil; los correos de tu cuenta, como el de recuperar la contraseña, te
         llegan siempre.
+      </li>
+      <li>
+        <strong>Contar cuánto se usa la web</strong> (cuántas veces inicias sesión y cuándo fue la última): solo para
+        estadísticas de uso. Base: el interés legítimo en mantener y mejorar el servicio (art. 6.1.f).
       </li>
       <li>
         <strong>Proteger la web frente a abusos</strong> (límite de intentos al iniciar sesión, registros del
