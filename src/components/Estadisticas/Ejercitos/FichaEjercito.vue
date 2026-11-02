@@ -1,175 +1,316 @@
 <template>
-  <!-- Todo de un ejército con los filtros de la vista; al cerrarla se sigue en el ranking como estaba -->
+  <!-- Todo de un ejército con los filtros de la vista, en un modal que deja ver la página detrás; al cerrarlo se sigue
+       en el ranking como estaba -->
   <v-dialog
     :model-value="modelValue"
-    :fullscreen="smAndDown"
     max-width="560"
     scrollable
     @update:model-value="cerrar"
   >
     <v-card>
-      <v-card-title class="d-flex align-start ga-2 pb-0">
+      <v-card-title class="d-flex align-start ga-2 pb-0 pr-2">
         <span class="text-wrap flex-grow-1">{{ ejercito }}</span>
-        <v-chip v-if="ficha?.resumen.bando" size="x-small" :color="colorBando(ficha.resumen.bando)" class="mt-1">
+        <v-chip
+          v-if="ficha?.resumen.bando"
+          size="x-small"
+          :color="colorBando(ficha.resumen.bando)"
+          class="mt-1"
+        >
           {{ textoBando(ficha.resumen.bando) }}
         </v-chip>
+        <!-- Cerrar sin bajar hasta el final -->
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          size="small"
+          density="comfortable"
+          class="mt-n1"
+          aria-label="Cerrar"
+          @click="cerrar"
+        />
       </v-card-title>
-      <v-card-subtitle class="pb-2">{{ descripcionFiltro }}</v-card-subtitle>
+      <v-card-subtitle class="pb-2 text-wrap">{{
+        descripcionFiltro
+      }}</v-card-subtitle>
 
-      <v-card-text class="pt-0">
+      <v-card-text class="pt-0 px-3 px-sm-6">
         <div v-if="cargando" class="text-center py-6">
           <v-progress-circular indeterminate color="primary" />
         </div>
         <p v-else-if="error" class="text-body-2 text-error">{{ error }}</p>
         <template v-else-if="ficha">
-          <p v-if="ficha.resumen.partidas === 0" class="text-body-2 text-medium-emphasis">
+          <p
+            v-if="ficha.resumen.partidas === 0"
+            class="text-body-2 text-medium-emphasis"
+          >
             No hay partidas de este ejército con estos filtros.
           </p>
           <template v-else>
-            <div class="metricas mb-4">
+            <div class="metricas mb-3">
               <div class="metrica">
                 <div class="text-caption text-medium-emphasis">Partidas</div>
                 <div class="text-h6">{{ ficha.resumen.partidas }}</div>
                 <div class="text-caption text-medium-emphasis">
-                  {{ ficha.resumen.victorias }}-{{ ficha.resumen.empates }}-{{ ficha.resumen.derrotas }}
+                  {{ ficha.resumen.victorias }}-{{ ficha.resumen.empates }}-{{
+                    ficha.resumen.derrotas
+                  }}
                 </div>
               </div>
               <div class="metrica">
                 <div class="text-caption text-medium-emphasis">% victorias</div>
-                <div class="text-h6">{{ textoPorcentaje(ficha.resumen.porcentaje) }}</div>
+                <div class="text-h6">
+                  {{ textoPorcentaje(ficha.resumen.porcentaje) }}
+                </div>
                 <div class="text-caption text-medium-emphasis">
-                  {{ textoDecimal(ficha.resumen.puntosFavor) }} a {{ textoDecimal(ficha.resumen.puntosContra) }} de media
+                  {{ textoDecimal(ficha.resumen.puntosFavor) }} a
+                  {{ textoDecimal(ficha.resumen.puntosContra) }} de media
                 </div>
               </div>
               <div class="metrica">
                 <div class="text-caption text-medium-emphasis">Rinde</div>
-                <div class="text-h6" :class="colorRinde(ficha.resumen.rinde)">{{ textoRinde(ficha.resumen.rinde) }}</div>
-                <div class="text-caption text-medium-emphasis">frente a su ELO</div>
+                <div class="text-h6" :class="colorRinde(ficha.resumen.rinde)">
+                  {{ textoRinde(ficha.resumen.rinde) }}
+                </div>
+                <div class="text-caption text-medium-emphasis">
+                  frente a su ELO
+                </div>
               </div>
               <div v-if="ficha.generalesMatados !== null" class="metrica">
-                <div class="text-caption text-medium-emphasis">Mata al general</div>
-                <div class="text-h6">{{ textoPorcentaje(ficha.generalesMatados) }}</div>
-                <div class="text-caption text-medium-emphasis">de sus partidas</div>
+                <div class="text-caption text-medium-emphasis">
+                  Mata al general
+                </div>
+                <div class="text-h6">
+                  {{ textoPorcentaje(ficha.generalesMatados) }}
+                </div>
+                <div class="text-caption text-medium-emphasis">
+                  de sus partidas
+                </div>
               </div>
             </div>
 
             <!-- Ganar partidas no es lo mismo que ganar torneos -->
-            <template v-if="ficha.resumen.torneos > 0">
-              <h3 class="text-subtitle-2 font-weight-bold mb-1">En torneos</h3>
+            <v-card
+              v-if="ficha.resumen.torneos > 0"
+              variant="outlined"
+              class="seccion"
+            >
+              <h3 class="text-subtitle-2 font-weight-bold mb-2">En torneos</h3>
               <div class="d-flex flex-wrap ga-1 mb-1">
                 <v-chip size="small" variant="tonal">
-                  {{ ficha.resumen.torneos }} {{ ficha.resumen.torneos === 1 ? "torneo" : "torneos" }}
+                  {{ ficha.resumen.torneos }}
+                  {{ ficha.resumen.torneos === 1 ? "torneo" : "torneos" }}
                 </v-chip>
                 <v-chip
                   size="small"
                   :variant="ficha.resumen.torneosGanados > 0 ? 'flat' : 'tonal'"
-                  :color="ficha.resumen.torneosGanados > 0 ? '#FFD700' : undefined"
+                  :color="
+                    ficha.resumen.torneosGanados > 0 ? '#FFD700' : undefined
+                  "
                 >
-                  {{ ficha.resumen.torneosGanados }} {{ ficha.resumen.torneosGanados === 1 ? "ganado" : "ganados" }}
+                  {{ ficha.resumen.torneosGanados }}
+                  {{
+                    ficha.resumen.torneosGanados === 1 ? "ganado" : "ganados"
+                  }}
                 </v-chip>
                 <v-chip size="small" variant="tonal">
-                  {{ ficha.resumen.podios }} {{ ficha.resumen.podios === 1 ? "podio" : "podios" }}
+                  {{ ficha.resumen.podios }}
+                  {{ ficha.resumen.podios === 1 ? "podio" : "podios" }}
                 </v-chip>
               </div>
-              <p class="text-body-2 text-medium-emphasis mb-4">{{ fraseTorneos }}</p>
-            </template>
+              <p class="text-body-2 text-medium-emphasis mb-0">
+                {{ fraseTorneos }}
+              </p>
+            </v-card>
 
-            <h3 class="text-subtitle-2 font-weight-bold mb-1">Según los puntos</h3>
-            <div v-for="tramo in ficha.porTramo" :key="tramo.tramo" class="barra text-body-2">
-              <span class="text-medium-emphasis">{{ textoTramo(tramo.tramo) }}</span>
-              <v-progress-linear
-                :model-value="tramo.partidas ? tramo.porcentaje : 0"
-                color="primary"
-                bg-color="grey"
-                height="8"
-                rounded
-              />
-              <span class="text-right">{{ tramo.partidas ? textoPorcentaje(tramo.porcentaje) : "—" }}</span>
-              <span class="text-right text-caption text-medium-emphasis">{{ tramo.partidas }}</span>
-            </div>
+            <v-card variant="outlined" class="seccion">
+              <h3 class="text-subtitle-2 font-weight-bold mb-2">
+                Según los puntos
+              </h3>
+              <div
+                v-for="tramo in ficha.porTramo"
+                :key="tramo.tramo"
+                class="barra text-body-2"
+              >
+                <span class="text-medium-emphasis">{{
+                  textoTramo(tramo.tramo)
+                }}</span>
+                <v-progress-linear
+                  :model-value="tramo.partidas ? tramo.porcentaje : 0"
+                  color="primary"
+                  bg-color="grey"
+                  height="8"
+                  rounded
+                />
+                <span class="text-right">{{
+                  tramo.partidas ? textoPorcentaje(tramo.porcentaje) : "—"
+                }}</span>
+                <span class="text-right text-caption text-medium-emphasis">{{
+                  tramo.partidas
+                }}</span>
+              </div>
+            </v-card>
 
-            <template v-if="ficha.porTemporada.length > 1">
-              <h3 class="text-subtitle-2 font-weight-bold mt-4 mb-1">Por temporada</h3>
-              <div class="fila-cuatro cabecera text-caption text-medium-emphasis">
+            <v-card
+              v-if="ficha.porTemporada.length > 1"
+              variant="outlined"
+              class="seccion"
+            >
+              <h3 class="text-subtitle-2 font-weight-bold mb-2">
+                Por temporada
+              </h3>
+              <div
+                class="fila-cuatro cabecera text-caption text-medium-emphasis"
+              >
                 <span>Temporada</span>
                 <span class="text-right">Part.</span>
                 <span class="text-right">% vict.</span>
                 <span class="text-right">Rinde</span>
               </div>
-              <div v-for="temporada in ficha.porTemporada" :key="temporada.temporada" class="fila-cuatro text-body-2">
-                <span class="text-medium-emphasis">{{ temporada.temporada }}</span>
-                <span class="text-right">{{ temporada.partidas }}</span>
-                <span class="text-right">{{ textoPorcentaje(temporada.porcentaje) }}</span>
-                <span class="text-right" :class="colorRinde(temporada.rinde)">{{ textoRinde(temporada.rinde) }}</span>
-              </div>
-            </template>
-
-            <h3 class="text-subtitle-2 font-weight-bold mt-4 mb-1">Contra quién</h3>
-            <p v-if="ficha.rivales.length === 0" class="text-caption text-medium-emphasis mb-0">
-              Aún no tiene 5 partidas contra ningún ejército.
-            </p>
-            <template v-else>
-              <div class="fila-cuatro cabecera text-caption text-medium-emphasis">
-                <span>Rival</span>
-                <span class="text-right">Part.</span>
-                <span class="text-right">% vict.</span>
-                <span class="text-right">Rinde</span>
-              </div>
-              <!-- Cada rival lleva a su cruce -->
               <div
-                v-for="rival in rivalesVisibles"
-                :key="rival.ejercito"
-                class="fila-cuatro pulsable text-body-2"
-                role="button"
-                tabindex="0"
-                @click="verCruce(rival.ejercito)"
-                @keydown.enter="verCruce(rival.ejercito)"
+                v-for="temporada in ficha.porTemporada"
+                :key="temporada.temporada"
+                class="fila-cuatro text-body-2"
               >
-                <span class="nombre">
-                  <v-icon :color="colorBando(rival.bando)" size="10" class="mr-1">mdi-circle</v-icon>{{ rival.ejercito }}
-                </span>
-                <span class="text-right">{{ rival.partidas }}</span>
-                <span class="text-right">{{ textoPorcentaje(rival.porcentaje) }}</span>
-                <span class="text-right" :class="colorRinde(rival.rinde)">{{ textoRinde(rival.rinde) }}</span>
+                <span class="text-medium-emphasis">{{
+                  temporada.temporada
+                }}</span>
+                <span class="text-right">{{ temporada.partidas }}</span>
+                <span class="text-right">{{
+                  textoPorcentaje(temporada.porcentaje)
+                }}</span>
+                <span class="text-right" :class="colorRinde(temporada.rinde)">{{
+                  textoRinde(temporada.rinde)
+                }}</span>
               </div>
-              <div v-if="ficha.rivales.length > 6" class="text-center">
-                <v-btn variant="text" size="small" class="text-none" @click="todosRivales = !todosRivales">
-                  {{ todosRivales ? "Solo los extremos" : `Ver los ${ficha.rivales.length}` }}
-                </v-btn>
-              </div>
-              <p class="text-caption text-medium-emphasis mb-0">
-                Del que mejor se le da al que peor, con 5 partidas o más. Pulsa uno para ver el cruce entero.
-              </p>
-            </template>
+            </v-card>
 
-            <h3 class="text-subtitle-2 font-weight-bold mt-4 mb-1">Quién lo lleva mejor</h3>
-            <p v-if="ficha.jugadores.length === 0" class="text-caption text-medium-emphasis mb-0">
-              Nadie lo ha llevado 5 veces o más.
-            </p>
-            <template v-else>
-              <div class="fila-cuatro cabecera text-caption text-medium-emphasis">
-                <span>Jugador</span>
-                <span class="text-right">Part.</span>
-                <span class="text-right">% vict.</span>
-                <span class="text-right">Rinde</span>
-              </div>
-              <div v-for="jugador in jugadoresVisibles" :key="jugador.idUsuario" class="fila-cuatro text-body-2">
-                <router-link :to="`/detalle-jugador/${jugador.idUsuario}`" class="nombre enlace">
-                  {{ jugador.nick }}
-                </router-link>
-                <span class="text-right">{{ jugador.partidas }}</span>
-                <span class="text-right">{{ textoPorcentaje(jugador.porcentaje) }}</span>
-                <span class="text-right" :class="colorRinde(jugador.rinde)">{{ textoRinde(jugador.rinde) }}</span>
-              </div>
-              <div v-if="ficha.jugadores.length > JUGADORES_DE_ENTRADA" class="text-center">
-                <v-btn variant="text" size="small" class="text-none" @click="todosJugadores = !todosJugadores">
-                  {{ todosJugadores ? "Ver menos" : `Ver los ${ficha.jugadores.length}` }}
-                </v-btn>
-              </div>
-              <p class="text-caption text-medium-emphasis mb-0">
-                Ordenados por «Rinde», con 5 partidas o más: lo bien que les va con él frente a lo que espera su ELO.
+            <v-card variant="outlined" class="seccion">
+              <h3 class="text-subtitle-2 font-weight-bold mb-2">
+                Contra quién
+              </h3>
+              <p
+                v-if="ficha.rivales.length === 0"
+                class="text-caption text-medium-emphasis mb-0"
+              >
+                Aún no tiene 5 partidas contra ningún ejército.
               </p>
-            </template>
+              <template v-else>
+                <div
+                  class="fila-cuatro cabecera text-caption text-medium-emphasis"
+                >
+                  <span>Rival</span>
+                  <span class="text-right">Part.</span>
+                  <span class="text-right">% vict.</span>
+                  <span class="text-right">Rinde</span>
+                </div>
+                <!-- Cada rival lleva a su cruce -->
+                <div
+                  v-for="rival in rivalesVisibles"
+                  :key="rival.ejercito"
+                  class="fila-cuatro pulsable text-body-2"
+                  role="button"
+                  tabindex="0"
+                  @click="verCruce(rival.ejercito)"
+                  @keydown.enter="verCruce(rival.ejercito)"
+                >
+                  <span class="nombre">
+                    <v-icon
+                      :color="colorBando(rival.bando)"
+                      size="10"
+                      class="mr-1"
+                      >mdi-circle</v-icon
+                    >{{ rival.ejercito }}
+                  </span>
+                  <span class="text-right">{{ rival.partidas }}</span>
+                  <span class="text-right">{{
+                    textoPorcentaje(rival.porcentaje)
+                  }}</span>
+                  <span class="text-right" :class="colorRinde(rival.rinde)">{{
+                    textoRinde(rival.rinde)
+                  }}</span>
+                </div>
+                <div v-if="ficha.rivales.length > 6" class="text-center">
+                  <v-btn
+                    variant="text"
+                    size="small"
+                    class="text-none"
+                    @click="todosRivales = !todosRivales"
+                  >
+                    {{
+                      todosRivales
+                        ? "Solo los extremos"
+                        : `Ver los ${ficha.rivales.length}`
+                    }}
+                  </v-btn>
+                </div>
+                <p class="text-caption text-medium-emphasis mb-0">
+                  Del que mejor se le da al que peor, con 5 partidas o más.
+                  Pulsa uno para ver el cruce entero.
+                </p>
+              </template>
+            </v-card>
+
+            <v-card variant="outlined" class="seccion mb-0">
+              <h3 class="text-subtitle-2 font-weight-bold mb-2">
+                Quién lo lleva mejor
+              </h3>
+              <p
+                v-if="ficha.jugadores.length === 0"
+                class="text-caption text-medium-emphasis mb-0"
+              >
+                Nadie lo ha llevado 5 veces o más.
+              </p>
+              <template v-else>
+                <div
+                  class="fila-cuatro cabecera text-caption text-medium-emphasis"
+                >
+                  <span>Jugador</span>
+                  <span class="text-right">Part.</span>
+                  <span class="text-right">% vict.</span>
+                  <span class="text-right">Rinde</span>
+                </div>
+                <div
+                  v-for="jugador in jugadoresVisibles"
+                  :key="jugador.idUsuario"
+                  class="fila-cuatro text-body-2"
+                >
+                  <router-link
+                    :to="`/detalle-jugador/${jugador.idUsuario}`"
+                    class="nombre enlace"
+                  >
+                    {{ jugador.nick }}
+                  </router-link>
+                  <span class="text-right">{{ jugador.partidas }}</span>
+                  <span class="text-right">{{
+                    textoPorcentaje(jugador.porcentaje)
+                  }}</span>
+                  <span class="text-right" :class="colorRinde(jugador.rinde)">{{
+                    textoRinde(jugador.rinde)
+                  }}</span>
+                </div>
+                <div
+                  v-if="ficha.jugadores.length > JUGADORES_DE_ENTRADA"
+                  class="text-center"
+                >
+                  <v-btn
+                    variant="text"
+                    size="small"
+                    class="text-none"
+                    @click="todosJugadores = !todosJugadores"
+                  >
+                    {{
+                      todosJugadores
+                        ? "Ver menos"
+                        : `Ver los ${ficha.jugadores.length}`
+                    }}
+                  </v-btn>
+                </div>
+                <p class="text-caption text-medium-emphasis mb-0">
+                  Ordenados por «Rinde», con 5 partidas o más: lo bien que les
+                  va con él frente a lo que espera su ELO.
+                </p>
+              </template>
+            </v-card>
           </template>
         </template>
       </v-card-text>
@@ -184,8 +325,10 @@
 
 <script setup lang="ts">
 import { computed, defineEmits, defineProps, ref, watch } from "vue";
-import { useDisplay } from "vuetify";
-import type { FichaEjercitoDTO, FiltroEstadisticas } from "@/interfaces/Estadisticas";
+import type {
+  FichaEjercitoDTO,
+  FiltroEstadisticas,
+} from "@/interfaces/Estadisticas";
 import { getFichaEjercito } from "@/services/EstadisticasService";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import {
@@ -200,13 +343,16 @@ import {
 
 const JUGADORES_DE_ENTRADA = 5;
 
-const props = defineProps<{ modelValue: boolean; ejercito: string | null; filtro: FiltroEstadisticas }>();
+const props = defineProps<{
+  modelValue: boolean;
+  ejercito: string | null;
+  filtro: FiltroEstadisticas;
+}>();
 const emit = defineEmits<{
   (event: "update:modelValue", valor: boolean): void;
   (event: "cruce", cruce: { ejercito: string; rival: string }): void;
 }>();
 
-const { smAndDown } = useDisplay();
 const ficha = ref<FichaEjercitoDTO | null>(null);
 const cargando = ref(false);
 const error = ref<string | null>(null);
@@ -215,7 +361,8 @@ const todosJugadores = ref(false);
 
 const cerrar = () => emit("update:modelValue", false);
 const verCruce = (rival: string) => {
-  if (ficha.value) emit("cruce", { ejercito: ficha.value.resumen.ejercito, rival });
+  if (ficha.value)
+    emit("cruce", { ejercito: ficha.value.resumen.ejercito, rival });
 };
 
 // Se carga cada vez que se abre, con los filtros que haya en ese momento
@@ -231,17 +378,34 @@ watch(
     try {
       ficha.value = await getFichaEjercito(props.ejercito, props.filtro);
     } catch (e) {
-      error.value = mensajeDelBack(e, "No se ha podido cargar el ejército. Inténtalo de nuevo.");
+      error.value = mensajeDelBack(
+        e,
+        "No se ha podido cargar el ejército. Inténtalo de nuevo."
+      );
     } finally {
       cargando.value = false;
     }
   }
 );
 
+// «2025 y 2026», «hasta 550, 600-650 y 700-750»
+const enLista = (textos: string[]) =>
+  textos.length <= 1
+    ? textos.join("")
+    : `${textos.slice(0, -1).join(", ")} y ${textos[textos.length - 1]}`;
+
 const descripcionFiltro = computed(() => {
+  const temporadas = [...(props.filtro.temporadas ?? [])].sort();
+  const tramos = props.filtro.tramos ?? [];
   const partes = [
-    props.filtro.temporada ? `Temporada ${props.filtro.temporada}` : "Todas las temporadas",
-    props.filtro.tramo ? `${textoTramo(props.filtro.tramo)} puntos` : "todos los puntos",
+    temporadas.length === 0
+      ? "Todas las temporadas"
+      : `${temporadas.length === 1 ? "Temporada" : "Temporadas"} ${enLista(
+          temporadas.map(String)
+        )}`,
+    tramos.length === 0
+      ? "todos los puntos"
+      : `${enLista(tramos.map(t => textoTramo(t).toLowerCase()))} puntos`,
     props.filtro.amistosas ? "con amistosas" : "sin amistosas",
   ];
   return partes.join(" · ");
@@ -252,7 +416,10 @@ const fraseTorneos = computed(() => {
   const resumen = ficha.value?.resumen;
   if (!resumen || resumen.torneos === 0) return "";
   const partidas = `Gana el ${textoPorcentaje(resumen.porcentaje)} de sus partidas`;
-  const deSus = resumen.torneos === 1 ? "su único torneo" : `sus ${resumen.torneos} torneos`;
+  const deSus =
+    resumen.torneos === 1
+      ? "su único torneo"
+      : `sus ${resumen.torneos} torneos`;
   if (resumen.torneosGanados === 0)
     return `${partidas}, pero ${resumen.torneos === 1 ? "no ha ganado" : "ninguno de"} ${deSus}.`;
   return `${partidas} y ${resumen.torneosGanados} de ${deSus}.`;
@@ -267,11 +434,20 @@ const rivalesVisibles = computed(() => {
 
 const jugadoresVisibles = computed(() => {
   const jugadores = ficha.value?.jugadores ?? [];
-  return todosJugadores.value ? jugadores : jugadores.slice(0, JUGADORES_DE_ENTRADA);
+  return todosJugadores.value
+    ? jugadores
+    : jugadores.slice(0, JUGADORES_DE_ENTRADA);
 });
 </script>
 
 <style scoped>
+/* Cada sección en su tarjeta, para separar la información */
+.seccion {
+  padding: 12px;
+  margin-bottom: 12px;
+  border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
 .metricas {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

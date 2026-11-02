@@ -1,31 +1,31 @@
 <template>
-  <!-- Los filtros comunes, en pastillas que se envuelven: temporada, puntos y, si se pide, bando; y las amistosas -->
+  <!-- Los filtros comunes, en pastillas que se envuelven: temporada, puntos y, si se pide, bando; y las amistosas.
+       De temporadas y puntos se pueden marcar varias; «Todas» y «Todos los puntos» quitan las marcadas -->
   <div class="d-flex flex-column align-center ga-1 mb-3">
     <div class="d-flex flex-wrap justify-center ga-1">
       <v-chip
-        v-for="opcion in temporadas"
-        :key="String(opcion.valor)"
+        v-for="anio in ANIOS"
+        :key="anio"
         size="small"
-        :color="modelValue.temporada === opcion.valor ? 'primary' : undefined"
-        @click="cambiar({ temporada: opcion.valor })"
+        :color="temporadas.includes(anio) ? 'primary' : undefined"
+        @click="cambiar({ temporadas: alternar(temporadas, anio) })"
       >
-        {{ opcion.texto }}
+        {{ anio }}
+      </v-chip>
+      <v-chip size="small" :color="temporadas.length === 0 ? 'primary' : undefined" @click="cambiar({ temporadas: [] })">
+        Todas
       </v-chip>
     </div>
     <div class="d-flex flex-wrap justify-center ga-1">
-      <v-chip
-        size="small"
-        :color="!modelValue.tramo ? 'primary' : undefined"
-        @click="cambiar({ tramo: null })"
-      >
+      <v-chip size="small" :color="tramos.length === 0 ? 'primary' : undefined" @click="cambiar({ tramos: [] })">
         Todos los puntos
       </v-chip>
       <v-chip
         v-for="tramo in TRAMOS"
         :key="tramo.valor"
         size="small"
-        :color="modelValue.tramo === tramo.valor ? 'primary' : undefined"
-        @click="cambiar({ tramo: tramo.valor })"
+        :color="tramos.includes(tramo.valor) ? 'primary' : undefined"
+        @click="cambiar({ tramos: alternar(tramos, tramo.valor) })"
       >
         {{ tramo.texto }}
       </v-chip>
@@ -55,20 +55,23 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, defineProps } from "vue";
+import { computed, defineEmits, defineProps } from "vue";
 import type { FiltroEstadisticas } from "@/interfaces/Estadisticas";
 import { TRAMOS } from "@/utils/estadisticasEjercitos";
 
 const props = defineProps<{ modelValue: FiltroEstadisticas; conBando?: boolean }>();
 const emit = defineEmits<{ (event: "update:modelValue", filtro: FiltroEstadisticas): void }>();
 
-// Este año, el anterior y todas: antes de 2025 apenas hay partidas
-const anio = new Date().getFullYear();
-const temporadas: { valor: number | null; texto: string }[] = [
-  { valor: anio, texto: String(anio) },
-  { valor: anio - 1, texto: String(anio - 1) },
-  { valor: null, texto: "Todas" },
-];
+// Este año y el anterior, más «Todas»: antes de 2025 apenas hay partidas
+const ACTUAL = new Date().getFullYear();
+const ANIOS = [ACTUAL, ACTUAL - 1];
+
+const temporadas = computed(() => props.modelValue.temporadas ?? []);
+const tramos = computed(() => props.modelValue.tramos ?? []);
+
+// Marca o desmarca una pastilla dentro de su grupo
+const alternar = <T,>(lista: T[], valor: T): T[] =>
+  lista.includes(valor) ? lista.filter(v => v !== valor) : [...lista, valor];
 
 const cambiar = (cambio: Partial<FiltroEstadisticas>) => emit("update:modelValue", { ...props.modelValue, ...cambio });
 </script>

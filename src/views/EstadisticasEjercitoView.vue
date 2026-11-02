@@ -77,8 +77,8 @@ watch(seccion, valor => {
 // cuenta sus partidas la ficha
 const filtro = ref<FiltroEstadisticas>(
   jugadorInicial.value
-    ? { temporada: null, tramo: null, bando: null, amistosas: true }
-    : { temporada: new Date().getFullYear(), tramo: null, bando: null, amistosas: false }
+    ? { temporadas: [], tramos: [], bando: null, amistosas: true }
+    : { temporadas: [new Date().getFullYear()], tramos: [], bando: null, amistosas: false }
 );
 
 const verFicha = ref(false);

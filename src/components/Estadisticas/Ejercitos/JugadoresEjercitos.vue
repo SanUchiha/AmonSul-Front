@@ -9,11 +9,16 @@
       prepend-inner-icon="mdi-account-search"
       variant="outlined"
       density="compact"
+      clearable
       hide-details
       class="mb-3"
     />
 
-    <div v-if="cargando" class="text-center py-6">
+    <p v-if="!idUsuario" class="text-body-2 text-medium-emphasis text-center">
+      Busca un jugador para ver con qué ejércitos juega.
+    </p>
+
+    <div v-else-if="cargando" class="text-center py-6">
       <v-progress-circular indeterminate color="primary" />
     </div>
     <p v-else-if="error" class="text-body-2 text-error text-center">{{ error }}</p>
@@ -141,7 +146,11 @@ watch(
 );
 
 const cargar = async () => {
-  if (!idUsuario.value) return;
+  // Al limpiar el buscador no queda nadie elegido
+  if (!idUsuario.value) {
+    datos.value = null;
+    return;
+  }
   cargando.value = true;
   error.value = null;
   try {

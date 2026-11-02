@@ -3,10 +3,11 @@
 export type TramoPuntos = "hasta-550" | "600-650" | "700-750" | "800+";
 export type Bando = "good" | "evil";
 
-// Filtros comunes: sin ninguno, todas las temporadas y todos los puntos, sin amistosas
+// Filtros comunes: sin ninguno, todas las temporadas y todos los puntos, sin amistosas. Temporadas y tramos admiten
+// varios a la vez; vacíos, valen todos
 export interface FiltroEstadisticas {
-  temporada?: number | null;
-  tramo?: TramoPuntos | null;
+  temporadas?: number[];
+  tramos?: TramoPuntos[];
   bando?: Bando | null;
   amistosas?: boolean;
 }
