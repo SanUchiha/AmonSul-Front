@@ -18,18 +18,15 @@
       <v-chip v-if="esLiga" size="small" color="primary">{{ nombreEvento(torneo.formatoTorneo) }}</v-chip>
       <v-chip v-if="enCurso" size="small" color="success" prepend-icon="mdi-sword-cross">En curso</v-chip>
     </div>
-    <v-card-subtitle class="text-center mb-3">
-      <p class="text-wrap" v-if="formattedAddress.trim()">
-        <v-icon left class="location-icon">mdi-map-marker</v-icon>
+    <!-- La dirección, sin icono; sin dirección, nada -->
+    <v-card-subtitle v-if="formattedAddress.trim() || torneo.lugarTorneo?.trim()" class="text-center mb-3">
+      <p v-if="formattedAddress.trim()" class="text-wrap">
         <!-- La dirección abre el mapa, no el evento -->
         <a :href="googleMapsUrl" target="_blank" rel="noopener noreferrer" @click.stop>
           {{ formattedAddress }}
         </a>
       </p>
-      <p v-else>
-        <v-icon left class="location-icon">mdi-map-marker</v-icon>
-        {{ torneo.lugarTorneo }}
-      </p>
+      <p v-else class="text-wrap">{{ torneo.lugarTorneo }}</p>
     </v-card-subtitle>
 
     <v-divider class="my-3"></v-divider>
