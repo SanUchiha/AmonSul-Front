@@ -3,11 +3,11 @@
     <LoadingGandalf />
   </div>
   <v-container v-else class="gestion text-left">
-    <v-btn color="primary" variant="flat" prepend-icon="mdi-plus" class="mb-3 crear" @click="crear = true">
+    <v-btn color="primary" variant="flat" class="mb-3 mx-auto d-flex crear" @click="crear = true">
       Crear evento
     </v-btn>
 
-    <v-chip-group v-model="vista" mandatory column selected-class="text-primary" class="mb-2">
+    <v-chip-group v-model="vista" mandatory column selected-class="text-primary" class="mb-2 fichas">
       <v-chip value="proximos" filter>Próximos y en curso ({{ proximos.length }})</v-chip>
       <v-chip value="terminados" filter>Terminados ({{ terminados.length }})</v-chip>
     </v-chip-group>
@@ -198,6 +198,11 @@ onMounted(cargar);
 .crear {
   width: 100%;
   max-width: 360px;
+}
+
+/* Las fichas, centradas como el botón */
+.fichas :deep(.v-slide-group__content) {
+  justify-content: center;
 }
 
 .nombre {
