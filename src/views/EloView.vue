@@ -1,9 +1,11 @@
 <template>
-  <v-container class="text-center">
+  <v-container class="elo">
     <div v-if="isLoading">
       <LoadingGandalf />
     </div>
     <div v-else>
+      <h1 class="text-h5 font-weight-bold text-left mb-3">ELO</h1>
+      <!-- Solo la clasificación: el ELO de cada uno, con su gráfica, está en su ficha de jugador -->
       <v-tabs v-model="tab" color="primary" grow>
         <v-tab value="Individual"> Individual </v-tab>
         <!-- <v-tab value="Mensual"> Mensual </v-tab> -->
@@ -13,7 +15,6 @@
       <v-tabs-window v-model="tab">
         <!-- TAB 1. -->
         <v-tabs-window-item value="Individual" v-if="tab === 'Individual'">
-          <SparklineElo :idUsuario="idUsuarioLogger" class="separated" />
           <TablaClasificacionElo class="separated" :items="eloClasificacion" />
         </v-tabs-window-item>
 
@@ -31,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import TablaClasificacionElo from "@/components/Elo/TablaClasificacionElo.vue";
 import TablaClasificacionEloEquipos from "@/components/Elo/TablaClasificacionEloEquipos.vue";
 import { UsuarioEloTablaClasificacion } from "@/interfaces/Elo";
@@ -94,6 +94,11 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* En el ordenador, estrecha y centrada: se lee como en el móvil */
+.elo {
+  max-width: 720px;
+}
+
 .separated {
   margin-bottom: 20px;
 }
