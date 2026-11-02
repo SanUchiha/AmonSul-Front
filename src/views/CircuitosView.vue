@@ -57,28 +57,22 @@
         {{ busqueda ? "Ningún circuito coincide con la búsqueda." : "No hay circuitos este año." }}
       </p>
     </v-card>
-    <v-card v-else variant="outlined">
-      <v-list density="compact" bg-color="transparent" class="py-0">
-        <template v-for="(circuito, i) in filtrados" :key="circuito.idCircuito">
-          <v-divider v-if="i > 0" />
-          <v-list-item append-icon="mdi-chevron-right" @click="openDialog(circuito)">
-            <v-list-item-title class="font-weight-bold nombre">{{ circuito.nombreCircuito }}</v-list-item-title>
+    <!-- Al pulsar uno se despliega debajo con su clasificación y sus eventos; solo uno abierto a la vez -->
+    <v-expansion-panels v-else v-model="abierto" variant="accordion" class="lista">
+      <v-expansion-panel v-for="circuito in filtrados" :key="circuito.idCircuito" :value="circuito.idCircuito" elevation="0">
+        <v-expansion-panel-title>
+          <div class="min-w-0">
+            <div class="font-weight-bold nombre">{{ circuito.nombreCircuito }}</div>
             <div v-if="circuito.numeroEventos != null" class="text-caption text-medium-emphasis">
               {{ circuito.numeroEventos }} {{ circuito.numeroEventos === 1 ? "evento" : "eventos" }}
             </div>
-          </v-list-item>
-        </template>
-      </v-list>
-    </v-card>
-
-    <ModalCircuito
-      v-if="showModalCircuito"
-      :circuito="selectedCircuito"
-      :showModalCircuito="showModalCircuito"
-      @close="closeModal"
-      @renombrado="onRenombrado"
-      @borrado="onBorrado"
-    />
+          </div>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <DetalleCircuito :circuito="circuito" @renombrado="onRenombrado" @borrado="onBorrado" />
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
 
     <ModalNombreCircuito
       v-model="showCrear"
@@ -98,7 +92,7 @@
 </template>
 
 <script lang="ts" setup>
-import ModalCircuito from "@/components/Circuito/ModalCircuito.vue";
+import DetalleCircuito from "@/components/Circuito/DetalleCircuito.vue";
 import ModalNombreCircuito from "@/components/Circuito/components/ModalNombreCircuito.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import { CircuitoDTO } from "@/interfaces/Circuito";
@@ -106,8 +100,8 @@ import { crearCircuitoAsync, getCircuitos } from "@/services/CircuitosService";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import { ref, onMounted, computed, watch } from "vue";
 
-const showModalCircuito = ref<boolean>(false);
-const selectedCircuito = ref<CircuitoDTO | null>(null);
+// El circuito desplegado
+const abierto = ref<number | null>(null);
 
 // Referencia para almacenar los circuitos
 const circuitos = ref<CircuitoDTO[]>([]);
@@ -166,15 +160,6 @@ const loadCircuitos = async () => {
   }
 };
 
-// Función para abrir el modal con los detalles del circuito seleccionado
-const openDialog = (circuito: CircuitoDTO) => {
-  selectedCircuito.value = circuito;
-  showModalCircuito.value = true;
-};
-
-const closeModal = () => {
-  showModalCircuito.value = false;
-};
 
 // Crear un circuito: queda a nombre de quien lo crea
 const showCrear = ref(false);
@@ -204,14 +189,13 @@ const crear = async (nombre: string) => {
   }
 };
 
-// El creador lo ha renombrado o borrado desde su ventana
-const onRenombrado = async (nombre: string) => {
-  if (selectedCircuito.value) selectedCircuito.value = { ...selectedCircuito.value, nombreCircuito: nombre };
+// El creador lo ha renombrado o borrado desde el desplegable
+const onRenombrado = async () => {
   await loadCircuitos();
 };
 
 const onBorrado = async (nombre: string) => {
-  showModalCircuito.value = false;
+  abierto.value = null;
   await loadCircuitos();
   mensajeExito.value = `Circuito «${nombre}» borrado.`;
   showSuccess.value = true;
@@ -238,5 +222,16 @@ onMounted(() => {
 .nombre {
   overflow-wrap: anywhere;
   white-space: normal;
+}
+
+/* Como las demás listas: un borde alrededor y una línea entre circuitos */
+.lista {
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 4px;
+}
+
+.lista :deep(.v-expansion-panel-title) {
+  padding: 10px 16px;
+  min-height: 0;
 }
 </style>
