@@ -1,91 +1,41 @@
 <template>
+  <!-- Los eventos del circuito: cada uno lleva a su página -->
   <div>
-    <v-divider class="my-2"></v-divider>
-    
-    <div class="torneos-header">
-      <v-icon size="small" color="primary" class="mr-1">mdi-trophy</v-icon>
-      <span class="torneos-count">{{ numeroTorneos }} {{ numeroTorneos === 1 ? "torneo disputado" : "torneos disputados" }}</span>
-    </div>
-    
-    <div v-if="torneos.length > 0" class="torneos-container">
-      <div 
-        v-for="torneo in torneos" 
-        :key="torneo.idTorneo"
-        class="torneo-item"
-      >
-        <v-icon x-small color="secondary" class="mr-1">mdi-sword-cross</v-icon>
-        <span class="torneo-name">{{ torneo.torneoNombre }}</span>
-      </div>
-    </div>
-    
-    <v-alert
-      v-else
-      type="info"
-      density="compact"
-      variant="tonal"
-      icon="mdi-information-outline"
-      class="my-2"
-    >
-      No hay torneos asociados a este circuito.
-    </v-alert>
+    <p class="text-caption text-medium-emphasis mb-2">
+      {{ torneos.length }} {{ torneos.length === 1 ? "evento" : "eventos" }}
+    </p>
+    <v-card v-if="torneos.length > 0" variant="outlined" class="lista">
+      <v-list density="compact" bg-color="transparent" class="py-0">
+        <template v-for="(torneo, i) in torneos" :key="torneo.idTorneo">
+          <v-divider v-if="i > 0" />
+          <v-list-item :to="`/detalle-evento/${torneo.idTorneo}`" append-icon="mdi-chevron-right">
+            <v-list-item-title class="text-body-2 nombre">{{ torneo.torneoNombre }}</v-list-item-title>
+          </v-list-item>
+        </template>
+      </v-list>
+    </v-card>
+    <p v-else class="text-body-2 text-medium-emphasis mb-0">Aún no tiene eventos.</p>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, defineProps } from "vue";
+import { defineProps } from "vue";
 import { CircuitoTorneosDTO } from "@/interfaces/Circuito";
 
-const props = defineProps<{
+defineProps<{
   torneos: CircuitoTorneosDTO[];
 }>();
-
-const numeroTorneos = computed(() => props.torneos.length);
 </script>
 
 <style lang="scss" scoped>
-.torneos-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  padding: 4px 0;
-}
-
-.torneos-count {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.torneos-container {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 200px;
+/* Con muchos eventos, la lista se desplaza y los botones quedan a la vista */
+.lista {
+  max-height: 320px;
   overflow-y: auto;
-  padding: 8px 0;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.02);
 }
 
-.torneo-item {
-  display: flex;
-  align-items: center;
-  padding: 4px 8px;
-  font-size: 0.875rem;
-  line-height: 1.2;
-  border-radius: 4px;
-  margin: 0 4px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-}
-
-.torneo-name {
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.nombre {
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 </style>

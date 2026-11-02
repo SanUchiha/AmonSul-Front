@@ -10,6 +10,9 @@ export interface CircuitoDTO {
   nombreCircuito: string;
   // Quien lo creó desde la web, el único que lo renombra o lo borra. Los antiguos no tienen
   idUsuario?: number | null;
+  // Los años en que empiezan sus eventos y cuántos son, para la lista de circuitos
+  anios?: number[];
+  numeroEventos?: number;
 }
 
 export interface AddCircuitoTorneoDTO {

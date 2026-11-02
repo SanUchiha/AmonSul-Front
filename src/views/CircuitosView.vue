@@ -1,57 +1,74 @@
 <template>
-  <v-container>
-    <v-card class="elevation-2 rounded">
-      <v-card-title>
-        <v-icon color="primary" class="mr-2">mdi-trophy-variant</v-icon>
-        Circuitos
-      </v-card-title>
-      
-      <v-card-text>
-        <div class="circuitos-header">
-          <v-icon size="small" color="primary" class="mr-1">mdi-format-list-bulleted</v-icon>
-          <span class="circuitos-count">{{ numeroCircuitos }} {{ numeroCircuitos === 1 ? 'circuito disponible' : 'circuitos disponibles' }}</span>
-        </div>
+  <v-container class="circuitos text-left">
+    <!-- Cualquiera puede crear uno: los organizadores meten sus eventos desde la gestión -->
+    <v-btn color="primary" variant="flat" class="mb-3 mx-auto d-flex crear" @click="abrirCrear">
+      Crear circuito
+    </v-btn>
 
-        <!-- Cualquiera puede crear uno: los organizadores meten sus torneos desde la gestión -->
-        <v-btn
-          color="primary"
-          variant="tonal"
-          prepend-icon="mdi-plus"
-          block
-          class="my-3"
-          @click="abrirCrear"
-        >
-          Crear circuito
-        </v-btn>
-        
-        <div v-if="circuitos.length > 0" class="circuitos-container">
-          <div 
-            v-for="circuito in circuitos" 
-            :key="circuito.idCircuito"
-            class="circuito-item"
-            @click="openDialog(circuito)"
+    <v-text-field
+      v-model="busqueda"
+      placeholder="Buscar circuito"
+      prepend-inner-icon="mdi-magnify"
+      variant="outlined"
+      density="compact"
+      clearable
+      hide-details
+      class="mb-2"
+    />
+
+    <!-- Los tres últimos años, el actual primero; los demás y «Todos», en el desplegable -->
+    <div class="d-flex flex-wrap justify-center ga-2 mb-3">
+      <v-chip
+        v-for="a in aniosRecientes"
+        :key="a"
+        size="small"
+        :color="anio === a ? 'primary' : undefined"
+        :prepend-icon="anio === a ? 'mdi-check' : undefined"
+        @click="anio = a"
+      >
+        {{ a }} ({{ deAnio(a).length }})
+      </v-chip>
+      <v-menu>
+        <template #activator="{ props: menu }">
+          <v-chip
+            v-bind="menu"
+            size="small"
+            :color="enDesplegable ? 'primary' : undefined"
+            :prepend-icon="enDesplegable ? 'mdi-check' : undefined"
+            append-icon="mdi-menu-down"
           >
-            <v-icon x-small color="secondary" class="mr-1">mdi-shield-crown</v-icon>
-            <span class="circuito-name">{{ circuito.nombreCircuito }}</span>
-            <v-icon x-small color="grey" class="ml-auto">mdi-chevron-right</v-icon>
-          </div>
-        </div>
-        
-        <v-alert
-          v-else-if="!loading"
-          type="info"
-          density="compact"
-          variant="tonal"
-          icon="mdi-information-outline"
-          class="my-2"
-        >
-          No hay circuitos disponibles en este momento.
-        </v-alert>
-        
-        <div v-if="loading" class="text-center py-4">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
-        </div>
-      </v-card-text>
+            {{ enDesplegable ? textoAnio(anio) : "Más" }}
+          </v-chip>
+        </template>
+        <v-list density="compact">
+          <v-list-item v-for="a in aniosOtros" :key="a" :active="anio === a" @click="anio = a">
+            {{ a }} ({{ deAnio(a).length }})
+          </v-list-item>
+          <v-list-item :active="anio === TODOS" @click="anio = TODOS">Todos ({{ circuitos.length }})</v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
+
+    <div v-if="loading" class="text-center py-6">
+      <v-progress-circular indeterminate color="primary" />
+    </div>
+    <v-card v-else-if="filtrados.length === 0" variant="outlined" class="pa-4 text-center">
+      <p class="text-body-2 text-medium-emphasis mb-0">
+        {{ busqueda ? "Ningún circuito coincide con la búsqueda." : "No hay circuitos este año." }}
+      </p>
+    </v-card>
+    <v-card v-else variant="outlined">
+      <v-list density="compact" bg-color="transparent" class="py-0">
+        <template v-for="(circuito, i) in filtrados" :key="circuito.idCircuito">
+          <v-divider v-if="i > 0" />
+          <v-list-item append-icon="mdi-chevron-right" @click="openDialog(circuito)">
+            <v-list-item-title class="font-weight-bold nombre">{{ circuito.nombreCircuito }}</v-list-item-title>
+            <div v-if="circuito.numeroEventos != null" class="text-caption text-medium-emphasis">
+              {{ circuito.numeroEventos }} {{ circuito.numeroEventos === 1 ? "evento" : "eventos" }}
+            </div>
+          </v-list-item>
+        </template>
+      </v-list>
     </v-card>
 
     <ModalCircuito
@@ -87,7 +104,7 @@ import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import { CircuitoDTO } from "@/interfaces/Circuito";
 import { crearCircuitoAsync, getCircuitos } from "@/services/CircuitosService";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 
 const showModalCircuito = ref<boolean>(false);
 const selectedCircuito = ref<CircuitoDTO | null>(null);
@@ -96,8 +113,43 @@ const selectedCircuito = ref<CircuitoDTO | null>(null);
 const circuitos = ref<CircuitoDTO[]>([]);
 const loading = ref<boolean>(false);
 
-// Computed para el número de circuitos
-const numeroCircuitos = computed(() => circuitos.value.length);
+// El año de un circuito es el de sus eventos (puede tener de dos); sin eventos, el que lleve en el nombre
+const TODOS = 0;
+const ANIO_ACTUAL = new Date().getFullYear();
+const aniosDe = (circuito: CircuitoDTO): number[] => {
+  if (circuito.anios?.length) return circuito.anios;
+  const enElNombre = circuito.nombreCircuito.match(/\b(20\d{2})\b/);
+  return enElNombre ? [Number(enElNombre[1])] : [];
+};
+const deAnio = (anio: number) => circuitos.value.filter(c => aniosDe(c).includes(anio));
+// El actual primero; los demás, del más nuevo al más antiguo
+const anios = computed(() => {
+  const todos = [...new Set(circuitos.value.flatMap(aniosDe))];
+  return todos.sort((a, b) => (a === ANIO_ACTUAL ? -1 : b === ANIO_ACTUAL ? 1 : b - a));
+});
+// Fichas para el año actual y los dos anteriores (los que haya); el resto, al desplegable
+const aniosRecientes = computed(() =>
+  anios.value.filter(a => a <= ANIO_ACTUAL && a > ANIO_ACTUAL - 3)
+);
+const aniosOtros = computed(() => anios.value.filter(a => !aniosRecientes.value.includes(a)));
+const anio = ref<number>(TODOS);
+const enDesplegable = computed(() => !aniosRecientes.value.includes(anio.value));
+const textoAnio = (a: number) => (a === TODOS ? `Todos (${circuitos.value.length})` : `${a} (${deAnio(a).length})`);
+// Al cargar, el año actual; si no hay circuitos de este año, el primero que haya
+watch(anios, lista => {
+  if (anio.value === TODOS || !lista.includes(anio.value)) anio.value = lista[0] ?? TODOS;
+});
+
+// Sin tildes ni mayúsculas
+const busqueda = ref<string | null>("");
+const normalizar = (texto?: string | null) =>
+  (texto ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+const filtrados = computed(() => {
+  const texto = normalizar(busqueda.value);
+  return (anio.value === TODOS ? circuitos.value : deAnio(anio.value)).filter(
+    c => !texto || normalizar(c.nombreCircuito).includes(texto)
+  );
+});
 
 // Función para cargar los circuitos
 const loadCircuitos = async () => {
@@ -171,52 +223,19 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.circuitos-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  padding: 4px 0;
+/* En el ordenador, estrecha y centrada: se lee como en el móvil */
+.circuitos {
+  max-width: 720px;
 }
 
-.circuitos-count {
-  font-size: 0.9rem;
-  font-weight: 600;
+/* A todo lo ancho en el móvil; en el ordenador, sin estirarse */
+.crear {
+  width: 100%;
+  max-width: 360px;
 }
 
-.circuitos-container {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 8px 0;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.circuito-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-  line-height: 1.2;
-  border-radius: 4px;
-  margin: 0 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: rgba(25, 118, 210, 0.08);
-    transform: translateX(4px);
-  }
-}
-
-.circuito-name {
-  font-weight: 500;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.nombre {
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 </style>

@@ -1,27 +1,8 @@
 <template>
-  <!-- En el móvil los dos botones no caben en una fila -->
-  <v-card-actions class="d-flex flex-wrap ga-2 justify-space-between">
-    <!-- Botón para ver clasificación -->
-    <v-btn
-      color="primary"
-      variant="tonal"
-      text
-      @click="$emit('ver-clasificacion')"
-    >
-      <v-icon class="mr-2">mdi-podium</v-icon>
-      Ver clasificación
-    </v-btn>
-
-    <!-- Botón para cerrar -->
-    <v-btn 
-      color="primary" 
-      variant="tonal" 
-      text 
-      @click="$emit('close')"
-    >
-      <v-icon class="mr-2">mdi-close</v-icon>
-      Cerrar
-    </v-btn>
+  <v-card-actions class="px-4 py-3">
+    <v-btn variant="text" @click="$emit('close')">Cerrar</v-btn>
+    <v-spacer />
+    <v-btn color="primary" variant="flat" @click="$emit('ver-clasificacion')">Clasificación</v-btn>
   </v-card-actions>
 </template>
 

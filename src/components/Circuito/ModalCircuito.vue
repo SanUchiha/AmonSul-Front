@@ -1,37 +1,23 @@
 <template>
-  <v-dialog v-model="show" max-width="800px">
-    <v-card class="elevation-2 rounded">
-      <v-card-title class="d-flex justify-space-between align-center ga-2 text-wrap">
-        <span class="headline flex-grow-1">{{ props.circuito?.nombreCircuito }}</span>
-        <v-btn 
-          icon 
-          size="small" 
-          variant="text"
-          @click="close"
-          class="close-button flex-shrink-0"
-        >
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
+  <v-dialog v-model="show" max-width="560px" scrollable>
+    <v-card>
+      <v-card-title class="d-flex align-start ga-2 text-wrap pt-3">
+        <span class="flex-grow-1 nombre">{{ props.circuito?.nombreCircuito }}</span>
+        <v-btn icon="mdi-close" variant="text" density="comfortable" aria-label="Cerrar" @click="close" />
       </v-card-title>
 
       <v-card-text>
         <CircuitoTorneosList :torneos="torneos" />
 
         <!-- Solo quien lo creó lo renombra o lo borra -->
-        <div v-if="esCreador" class="mt-4">
-          <p class="text-caption text-medium-emphasis mb-2">Has creado este circuito.</p>
-          <div class="d-flex flex-wrap ga-2">
-            <v-btn size="small" variant="tonal" prepend-icon="mdi-pencil" @click="abrirRenombrar">
-              Renombrar
-            </v-btn>
-            <v-btn size="small" variant="tonal" color="error" prepend-icon="mdi-delete" @click="showBorrar = true">
-              Borrar
-            </v-btn>
-          </div>
+        <div v-if="esCreador" class="d-flex align-center flex-wrap ga-2 mt-4">
+          <span class="text-caption text-medium-emphasis flex-grow-1">Lo has creado tú.</span>
+          <v-btn size="small" variant="text" class="text-none" @click="abrirRenombrar">Renombrar</v-btn>
+          <v-btn size="small" variant="text" color="error" class="text-none" @click="showBorrar = true">Borrar</v-btn>
         </div>
       </v-card-text>
-      
-      <v-divider class="my-3"></v-divider>
+
+      <v-divider />
 
       <CircuitoModalActions 
         @ver-clasificacion="abrirModalClasificacion"
@@ -194,13 +180,7 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.close-button {
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 1;
-    background-color: rgba(0, 0, 0, 0.05);
-  }
+.nombre {
+  overflow-wrap: anywhere;
 }
 </style>

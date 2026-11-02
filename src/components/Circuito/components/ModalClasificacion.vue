@@ -3,10 +3,7 @@
     <v-card class="elevation-2 rounded">
       <!-- En el móvil el nombre del circuito baja de línea: si no, empujaba la x fuera -->
       <v-card-title class="d-flex justify-space-between align-center ga-2 text-wrap">
-        <span class="headline flex-grow-1">
-          <v-icon color="primary" class="mr-2">mdi-podium</v-icon>
-          Clasificación - {{ circuitoNombre }}
-        </span>
+        <span class="flex-grow-1">Clasificación · {{ circuitoNombre }}</span>
         <v-btn 
           icon 
           variant="text"
@@ -103,14 +100,7 @@
 
       <v-card-actions class="pa-4">
         <v-spacer></v-spacer>
-        <v-btn 
-          color="primary" 
-          variant="tonal" 
-          @click="close"
-        >
-          <v-icon class="mr-2">mdi-close</v-icon>
-          Cerrar
-        </v-btn>
+        <v-btn variant="text" @click="close">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
