@@ -65,11 +65,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/gestion-torneos",
-    name: "gestion-torneos",
+    // Torneos, ligas y copas: antes se llamaba gestion-torneos
+    path: "/gestion-eventos",
+    name: "gestion-eventos",
     component: GestionTorneosView,
     meta: { requiresAuth: true },
   },
+  { path: "/gestion-torneos", redirect: "/gestion-eventos" },
   {
     path: "/detalle-inscripcion/:idTorneo",
     name: "detalle-inscripcion",

@@ -25,7 +25,7 @@
         <v-list-item link to="/elo" v-if="isAuthenticated">
           <v-list-item-title>ELO</v-list-item-title>
         </v-list-item>
-        <v-list-item link to="/gestion-torneos" v-if="isAuthenticated">
+        <v-list-item link to="/gestion-eventos" v-if="isAuthenticated">
           <v-list-item-title>Gestión Eventos</v-list-item-title>
         </v-list-item>
         <v-list-item link to="/circuitos" v-if="isAuthenticated">

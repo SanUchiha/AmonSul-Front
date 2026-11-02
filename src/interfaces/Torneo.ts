@@ -68,6 +68,9 @@ export interface TorneoPropioDTO {
   tipoTorneo: string;
   listasPorJugador: number;
   formatoTorneo?: string;
+  // Para separar los próximos y en curso de los terminados
+  fechaInicioTorneo?: string;
+  fechaFinTorneo?: string | null;
 }
 
 export interface TorneoGestionInfoDTO {
