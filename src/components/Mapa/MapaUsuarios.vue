@@ -31,7 +31,7 @@
 <script setup>
 import { onMounted, ref, defineProps } from "vue";
 import * as d3 from "d3";
-import poblaciones from "@/settings/poblaciones";
+import { codigoProvinciaDeCiudad } from "@/utils/provincia";
 import LoadingGandalf from "../Commons/LoadingGandalf.vue";
 
 const props = defineProps({
@@ -142,42 +142,11 @@ const createChart = async () => {
 
 onMounted(async () => {
   users.value = [...props.usersView];
-  users.value = users.value.map(user => {
-    // Log Usuarios no detectados
-    // if (!poblaciones.some(
-    //       (poblacion) =>
-    //         poblacion.label
-    //           .toLowerCase()
-    //           .replace(/\s/g, '')
-    //           .normalize('NFD')
-    //           .replace(/[\u0300-\u036f]/g, '') ===
-    //         user.ciudad
-    //           .toLowerCase()
-    //           .replace(/\s/g, '')
-    //           .normalize('NFD')
-    //           .replace(/[\u0300-\u036f]/g, '')
-    //     )) {
-    // }
-    return {
-      id: user.idUsuario,
-      comunidad: parseInt(
-        poblaciones.find(
-          poblacion =>
-            poblacion.label
-              .toLowerCase()
-              .replace(/\s/g, "")
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "") ===
-            // Sin ciudad (p. ej. una cuenta borrada) no está en ninguna provincia
-            (user.ciudad ?? "")
-              .toLowerCase()
-              .replace(/\s/g, "")
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-        )?.parent_code || "0"
-      ),
-    };
-  });
+  // Por provincia, deducida de la ciudad; sin ciudad reconocible, en ninguna
+  users.value = users.value.map(user => ({
+    id: user.idUsuario,
+    comunidad: parseInt(codigoProvinciaDeCiudad(user.ciudad) || "0"),
+  }));
   users.value = Object.groupBy(users.value, ({ comunidad }) => comunidad);
   createChart();
 });
