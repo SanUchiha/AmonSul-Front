@@ -127,6 +127,8 @@ export interface InscripcionTorneoCreadoDTO {
   // Solo en Copa: su grupo y su hueco en la primera ronda del cuadro
   grupo?: number | null;
   posicionCuadro?: number | null;
+  // Si el jugador deja que el organizador vea su correo
+  compartirEmail?: boolean | null;
 }
 
 export interface InscripcionTorneoCreadoMasDTO {

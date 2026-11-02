@@ -68,6 +68,12 @@
             </v-expand-transition>
           </v-card>
 
+          <InterruptorCompartirEmail
+            :idInscripcion="inscripcionData.idInscripcion"
+            :valor="inscripcionData.compartirEmail"
+            class="mt-3"
+          />
+
           <!-- Darse de baja: solo antes del evento; en una liga o copa en marcha, con el organizador -->
           <div v-if="abierta && !ligaEnMarcha" class="text-center mt-4">
             <v-btn variant="text" color="error" size="small" class="text-none" @click="eliminarInscripcion">
@@ -137,6 +143,7 @@ import { estadoLista } from "@/utils/estadoLista";
 import ModalLista from "./ModalLista.vue";
 import ModalModificarLista from "./ModalModificarLista.vue";
 import ModalEnviarLista from "./ModalEnviarLista.vue";
+import InterruptorCompartirEmail from "./InterruptorCompartirEmail.vue";
 
 const props = defineProps<{
   idInscripcion: number;

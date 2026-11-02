@@ -5,6 +5,8 @@ export interface CrearInscripcionDTO {
   idUsuario: number;
   // Solo en Liga, obligatorio: el ejército que lleva toda la liga
   ejercitoElegido?: string;
+  // Si deja que el organizador vea su correo
+  compartirEmail?: boolean | null;
 }
 
 export interface InscripcionUsuarioIndividualDTO {
@@ -69,6 +71,8 @@ export interface InscripcionEquipoDTO {
   idCapitan: number;
   nombreEquipo: string;
   miembros: number[];
+  // Al crearlo, el del capitán; al leerlo, el de esa inscripción: si deja que el organizador vea su correo
+  compartirEmail?: boolean | null;
 }
 
 export interface CreateMiembroEquipoDTO {

@@ -130,6 +130,13 @@
             </v-card>
           </template>
 
+          <InterruptorCompartirEmail
+            v-if="props.idInscripcion"
+            :idInscripcion="props.idInscripcion"
+            :valor="inscripcionData.compartirEmail"
+            class="mt-3"
+          />
+
           <!-- Dar de baja: solo el capitán y antes de que termine el evento -->
           <div v-if="esCapitan && abierta" class="text-center mt-4">
             <v-btn
@@ -205,6 +212,7 @@ import { getUsuariosNoInscritosTorneoAsync } from "@/services/UsuariosService";
 import { getTorneo } from "@/services/TorneosService";
 import { Torneo } from "@/interfaces/Torneo";
 import ModalEnviarLista from "./ModalEnviarLista.vue";
+import InterruptorCompartirEmail from "./InterruptorCompartirEmail.vue";
 import ModalAddMiembroEquipo from "../GestionTorneos/Equipos/ModalAddMiembroEquipo.vue";
 
 const props = defineProps<{

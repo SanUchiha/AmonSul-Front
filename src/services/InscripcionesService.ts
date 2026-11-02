@@ -34,6 +34,17 @@ export const cambiarEjercitoElegidoAsync = async (
   });
 };
 
+// Solo el propio jugador: si el organizador puede ver su correo
+export const cambiarCompartirEmailAsync = async (
+  idInscripcion: number,
+  compartirEmail: boolean
+) => {
+  return http.put(`Inscripcion/Compartir-Email`, {
+    idInscripcion,
+    compartirEmail,
+  });
+};
+
 export const cancelarInscripcion = async (idInscripcion: number) => {
   return http.delete(`Inscripcion/${idInscripcion}`);
 };

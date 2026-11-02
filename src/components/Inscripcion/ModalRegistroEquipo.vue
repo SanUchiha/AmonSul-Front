@@ -62,6 +62,17 @@
               {{ player.nick }}
             </v-chip>
           </div>
+
+          <!-- El tuyo: cada compañero lo decide en su inscripción -->
+          <v-checkbox
+            v-model="compartirEmail"
+            color="primary"
+            density="compact"
+            hide-details="auto"
+            class="mt-2"
+            label="Compartir mi correo con el organizador"
+            messages="Para que pueda contactarte si hace falta. Puedes cambiarlo cuando quieras en Mi inscripción."
+          />
         </v-form>
       </v-card-text>
 
@@ -145,6 +156,8 @@ const snackBarShow = ref<boolean>(false);
 const snackBarMessage = ref<string>("");
 const snackBarTimeOut = ref<number>(3000);
 const loading = ref<boolean>(false);
+// Sin marcar: el correo solo se comparte si el capitán lo elige
+const compartirEmail = ref<boolean>(false);
 
 const { getidUsuario } = useAuth();
 const idUsuarioLogger = ref<string | null>(getidUsuario.value);
@@ -224,6 +237,7 @@ const submitForm = async () => {
       idCapitan: id,
       nombreEquipo: teamName.value,
       miembros: idsSelected.value,
+      compartirEmail: compartirEmail.value,
       idInscripcion: 0,
       idUsuario: 0,
       idEquipo: 0,
@@ -252,6 +266,7 @@ const closeDialog = () => {
   teamName.value = "";
   selectedPlayers.value = [];
   idsSelected.value = [];
+  compartirEmail.value = false;
 };
 
 onMounted(async () => {

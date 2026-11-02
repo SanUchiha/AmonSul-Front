@@ -9,21 +9,7 @@
             "En la liga llevas este ejército en todas tus partidas. Puedes cambiar de lista en cada jornada, pero siempre de este ejército."
           }}
         </p>
-        <v-autocomplete
-          v-model="ejercito"
-          :items="ejercitos"
-          item-title="name"
-          item-value="name"
-          label="Ejército"
-          auto-select-first
-        >
-          <template #item="{ item, props: itemProps }">
-            <v-list-item
-              v-bind="itemProps"
-              :subtitle="item.raw.band === 'good' ? 'Luz' : 'Oscuridad'"
-            />
-          </template>
-        </v-autocomplete>
+        <SelectorEjercito v-model="ejercito" />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -45,7 +31,7 @@
 
 <script setup lang="ts">
 import { computed, defineEmits, defineProps, ref, watch } from "vue";
-import { appsettings } from "@/settings/appsettings";
+import SelectorEjercito from "./SelectorEjercito.vue";
 
 const props = defineProps<{
   isVisible: boolean;
@@ -65,9 +51,6 @@ const visible = computed({
   set: valor => emit("update:isVisible", valor),
 });
 
-const ejercitos = [...appsettings.armies].sort((a, b) =>
-  a.name.localeCompare(b.name)
-);
 const ejercito = ref<string | null>(props.ejercitoActual ?? null);
 
 watch(

@@ -181,11 +181,12 @@
       @update:isVisible="showModalInscripcionPorEquipos = $event"
     />
 
-    <!-- En una liga, el ejército de toda la liga antes de inscribirse -->
-    <ModalElegirEjercito
-      :isVisible="showElegirEjercito"
-      titulo="¿Con qué ejército juegas la liga?"
-      @update:isVisible="showElegirEjercito = $event"
+    <!-- Antes de inscribirse: en liga y copa el ejército, y si comparte su correo con el organizador -->
+    <ModalConfirmarInscripcion
+      :isVisible="showConfirmarInscripcion"
+      :titulo="pedirEjercito ? `¿Con qué ejército juegas ${textosEvento(torneo?.formatoTorneo).el}?` : `Inscribirte en ${textosEvento(torneo?.formatoTorneo).el}`"
+      :pedirEjercito="pedirEjercito"
+      @update:isVisible="showConfirmarInscripcion = $event"
       @confirm="registrarIndividual"
     />
 
@@ -239,7 +240,7 @@ import {
 } from "@/interfaces/Inscripcion";
 import ModalError from "@/components/Commons/ModalError.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
-import ModalElegirEjercito from "@/components/Inscripcion/ModalElegirEjercito.vue";
+import ModalConfirmarInscripcion from "@/components/Inscripcion/ModalConfirmarInscripcion.vue";
 import { esPorJornadas, nombreEvento, textosEvento } from "@/Constant/FormatoTorneo";
 import { esUsuarioBye } from "@/utils/bye";
 import { tipoTorneoOptions } from "@/Constant/TiposTorneo";
@@ -707,18 +708,19 @@ const descargarBases = async () => {
   }
 };
 
-const showElegirEjercito = ref<boolean>(false);
+const showConfirmarInscripcion = ref<boolean>(false);
+// En liga y copa el ejército de todo el evento se elige al inscribirse
+const pedirEjercito = computed(() => esPorJornadas(torneo.value?.formatoTorneo));
 
 const inscripcionIndividual = async () => {
-  // En una liga primero se elige el ejército que se llevará toda la liga
-  if (esPorJornadas(torneo.value?.formatoTorneo) && idInscripcion.value == 0) {
-    showElegirEjercito.value = true;
+  if (idInscripcion.value == 0) {
+    showConfirmarInscripcion.value = true;
     return;
   }
   await registrarIndividual();
 };
 
-const registrarIndividual = async (ejercitoElegido?: string) => {
+const registrarIndividual = async (datos?: { ejercito: string | null; compartirEmail: boolean }) => {
   isRegistering.value = true;
 
   if (
@@ -730,7 +732,8 @@ const registrarIndividual = async (ejercitoElegido?: string) => {
     const inscripcion: CrearInscripcionDTO = {
       idUsuario: parseInt(idUsuario.value),
       idTorneo: idTorneo.value,
-      ejercitoElegido,
+      ejercitoElegido: datos?.ejercito ?? undefined,
+      compartirEmail: datos?.compartirEmail ?? null,
     };
     try {
       await registrarInscripcion(inscripcion);
