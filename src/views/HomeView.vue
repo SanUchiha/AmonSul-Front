@@ -65,6 +65,12 @@ export default {
     return {
       novedades: [
         {
+          fecha: "Noviembre 2026",
+          titulo: "Nueva puntuación en los circuitos",
+          descripcion:
+            "Cambia cómo se puntúa en los circuitos, también en los de años anteriores. Ahora puntúa todo el que juega, aunque sea con 1 punto. Ganar vale más cuanto más grande es el evento: 35 puntos en uno de 8 jugadores, 45 en uno de 16, 55 en uno de 32 y 65 en uno de 64 o más; a partir de ahí ya no sube, para que un Nacional no decida el circuito él solo. Por debajo, lo que cuenta es quedar arriba: los puntos bajan rápido y a mitad de tabla te llevas más o menos la cuarta parte que el ganador. El podio suma 5, 3 y 1 puntos más, solo cuentan tus 4 mejores resultados y, si hay empate, va delante quien ha ganado más eventos. Además, los torneos terminados guardan solos su clasificación a final de mes, así que ya cuentan eventos que antes se quedaban fuera. En Circuitos verás los puntos de los 4 mejores resultados de cada jugador, en oro, plata o bronce si fue podio, y al pulsarlos, la clasificación de ese evento.",
+        },
+        {
           fecha: "Octubre 2026",
           titulo: "Mis partidas pasa a tu ficha de jugador",
           descripcion:

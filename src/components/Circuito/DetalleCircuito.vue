@@ -49,14 +49,25 @@
             {{ resultado.puntos }}
           </v-chip>
         </div>
-        <p class="text-caption text-medium-emphasis mt-2 mb-0">
-          Suma de sus 4 mejores resultados en el circuito. Pulsa en unos puntos para ver la clasificación de ese evento.
-        </p>
-        <div v-if="clasificacion.length > DE_ENTRADA" class="text-center mt-1">
-          <v-btn variant="text" size="small" color="primary" class="text-none" @click="verToda = !verToda">
-            {{ verToda ? "Ver menos" : `Ver toda la clasificación (${clasificacion.length})` }}
+        <!-- Por tandas: en un circuito grande puntúan cientos de jugadores -->
+        <div v-if="clasificacion.length > DE_ENTRADA" class="d-flex justify-center flex-wrap mt-1">
+          <v-btn
+            v-if="cuantos < clasificacion.length"
+            variant="text"
+            size="small"
+            color="primary"
+            class="text-none"
+            @click="cuantos = cuantos === DE_ENTRADA ? TANDA : cuantos + TANDA"
+          >
+            Ver más ({{ clasificacion.length - cuantos }})
+          </v-btn>
+          <v-btn v-if="cuantos > DE_ENTRADA" variant="text" size="small" class="text-none" @click="cuantos = DE_ENTRADA">
+            Ver menos
           </v-btn>
         </div>
+        <p class="text-caption text-medium-emphasis mt-2 mb-0">
+          Suma de sus 4 mejores resultados. Pulsa en unos puntos para ver la clasificación de ese evento.
+        </p>
       </template>
     </template>
 
@@ -86,7 +97,6 @@
     :evento="eventoVisto"
     :posiciones="eventoVisto ? posicionesDe(eventoVisto.idTorneo) : []"
     :idUsuario="jugadorVisto"
-    :puntosPorResultado="puntosPorResultado"
   />
 
   <ModalNombreCircuito
@@ -131,6 +141,7 @@ import ModalNombreCircuito from "./components/ModalNombreCircuito.vue";
 import ModalClasificacionEvento from "./components/ModalClasificacionEvento.vue";
 
 const DE_ENTRADA = 5;
+const TANDA = 50;
 // Oro, plata y bronce para los resultados de podio, como en el resumen de un torneo
 const COLOR_PODIO: Record<number, string> = { 1: "#FFD700", 2: "#C0C0C0", 3: "#CD7F32" };
 
@@ -141,13 +152,12 @@ const emit = defineEmits<{
 }>();
 
 const pestana = ref<"clasificacion" | "eventos">("clasificacion");
-const verToda = ref(false);
+const cuantos = ref(DE_ENTRADA);
 const cargando = ref(true);
 
 // Se carga al desplegarlo por primera vez; al recogerlo y volver a abrirlo ya está
-const { torneos, clasificacion, puntosPorResultado, loadTorneos, prepareClasificacion, posicionesDe } =
-  useCircuitoData();
-const visibles = computed(() => (verToda.value ? clasificacion.value : clasificacion.value.slice(0, DE_ENTRADA)));
+const { torneos, clasificacion, loadTorneos, prepareClasificacion, posicionesDe } = useCircuitoData();
+const visibles = computed(() => clasificacion.value.slice(0, cuantos.value));
 
 onMounted(async () => {
   try {

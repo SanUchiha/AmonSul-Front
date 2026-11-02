@@ -49,6 +49,25 @@
       </v-menu>
     </div>
 
+    <!-- Cómo se puntúa, plegado para no quitar sitio a la lista -->
+    <div class="text-center mb-2">
+      <v-btn
+        variant="text"
+        size="small"
+        color="primary"
+        class="text-none"
+        prepend-icon="mdi-information-outline"
+        @click="verComo = !verComo"
+      >
+        ¿Cómo se puntúa?
+      </v-btn>
+    </div>
+    <v-expand-transition>
+      <v-card v-if="verComo" variant="tonal" class="pa-4 mb-3">
+        <ComoSePuntuaCircuito />
+      </v-card>
+    </v-expand-transition>
+
     <div v-if="loading" class="text-center py-6">
       <v-progress-circular indeterminate color="primary" />
     </div>
@@ -93,6 +112,7 @@
 
 <script lang="ts" setup>
 import DetalleCircuito from "@/components/Circuito/DetalleCircuito.vue";
+import ComoSePuntuaCircuito from "@/components/Circuito/ComoSePuntuaCircuito.vue";
 import ModalNombreCircuito from "@/components/Circuito/components/ModalNombreCircuito.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import { CircuitoDTO } from "@/interfaces/Circuito";
@@ -138,6 +158,7 @@ watch(anios, lista => {
 
 // Sin tildes ni mayúsculas
 const busqueda = ref<string | null>("");
+const verComo = ref(false);
 const normalizar = (texto?: string | null) =>
   (texto ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 // Por año, del más nuevo al más antiguo, y en cada año el Amon Sûl el primero; después, los más nuevos

@@ -18,7 +18,7 @@
         >
           <span class="text-medium-emphasis">{{ posicion.resultado }}</span>
           <span class="nick" :class="{ 'font-weight-bold': posicion.idUsuario === idUsuario }">{{ posicion.nick }}</span>
-          <span class="text-right">{{ puntosPorResultado[posicion.resultado - 1] ?? "" }}</span>
+          <span class="text-right">{{ puntosCircuito(posiciones.length, posicion.resultado) }}</span>
         </div>
       </v-card-text>
       <v-card-actions>
@@ -35,6 +35,7 @@
 <script lang="ts" setup>
 import { defineEmits, defineProps } from "vue";
 import { GanadorDTO } from "@/interfaces/Ganadores";
+import { puntosCircuito } from "@/utils/puntosCircuito";
 
 defineProps<{
   modelValue: boolean;
@@ -42,7 +43,6 @@ defineProps<{
   posiciones: GanadorDTO[];
   // El jugador desde el que se ha abierto, resaltado
   idUsuario: number | null;
-  puntosPorResultado: number[];
 }>();
 const emit = defineEmits<{ (event: "update:modelValue", valor: boolean): void }>();
 

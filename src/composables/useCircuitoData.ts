@@ -3,6 +3,7 @@ import { CircuitoDTO, CircuitoTorneosDTO } from "@/interfaces/Circuito";
 import { getTorneosOfCircuito } from "@/services/CircuitosService";
 import { getGanadores } from "@/services/GanadoresService";
 import { GanadorDTO } from "@/interfaces/Ganadores";
+import { puntosCircuito } from "@/utils/puntosCircuito";
 
 // Un resultado que suma en el circuito: el puesto en un evento y los puntos que da
 export interface ResultadoCircuito {
@@ -17,7 +18,6 @@ export interface ClasificacionItem {
   nick: string;
   totalPuntos: number;
   torneosGanados: number;
-  puntosPorTorneos: number[];
   // Sus 4 mejores resultados, los que suman, del que más da al que menos
   mejores: ResultadoCircuito[];
   posicion: number;
@@ -27,72 +27,65 @@ export function useCircuitoData() {
   const torneos = ref<CircuitoTorneosDTO[]>([]);
   const loading = ref<boolean>(false);
   const ganadores = ref<GanadorDTO[]>([]);
-  const topGanadores = ref<GanadorDTO[]>([]);
-  const puntosPorResultado = [25, 20, 18, 15, 10, 8, 6, 4, 2, 1];
+
+  // Las posiciones guardadas de cada evento del circuito
+  const posicionesPorTorneo = computed(() => {
+    const idsCircuito = new Set(torneos.value.map((torneo) => torneo.idTorneo));
+    const porTorneo = new Map<number, GanadorDTO[]>();
+    ganadores.value.forEach((ganador) => {
+      if (!idsCircuito.has(ganador.idTorneo)) return;
+      const posiciones = porTorneo.get(ganador.idTorneo) ?? [];
+      posiciones.push(ganador);
+      porTorneo.set(ganador.idTorneo, posiciones);
+    });
+    return porTorneo;
+  });
 
   const clasificacion = computed<ClasificacionItem[]>(() => {
-    const jugadoresMap = new Map<
-      number,
-      {
-        nick: string;
-        totalPuntos: number;
-        torneosGanados: number;
-        puntosPorTorneos: number[];
-        resultados: ResultadoCircuito[];
-        mejores: ResultadoCircuito[];
-      }
-    >();
-
-    // Recopilar todos los puntos por jugador
-    topGanadores.value.forEach((ganador) => {
-      const puntos = puntosPorResultado[ganador.resultado - 1] || 0;
-
-      if (!jugadoresMap.has(ganador.idUsuario)) {
-        jugadoresMap.set(ganador.idUsuario, {
-          nick: ganador.nick,
-          totalPuntos: 0,
-          torneosGanados: 0,
-          puntosPorTorneos: [],
-          resultados: [],
-          mejores: [],
-        });
-      }
-
-      const jugador = jugadoresMap.get(ganador.idUsuario);
-      if (jugador) {
+    // Todos los resultados de cada jugador: puntúa todo el que juega, según el tamaño del evento y su puesto
+    const jugadores = new Map<number, { nick: string; resultados: ResultadoCircuito[] }>();
+    posicionesPorTorneo.value.forEach((posiciones) => {
+      posiciones.forEach((ganador) => {
+        const jugador = jugadores.get(ganador.idUsuario) ?? { nick: ganador.nick, resultados: [] };
         jugador.resultados.push({
           idTorneo: ganador.idTorneo,
           nombreTorneo: ganador.nombreTorneo,
           resultado: ganador.resultado,
-          puntos,
+          puntos: puntosCircuito(posiciones.length, ganador.resultado),
         });
-        if (ganador.resultado === 1) {
-          jugador.torneosGanados += 1;
-        }
-      }
+        jugadores.set(ganador.idUsuario, jugador);
+      });
     });
 
-    // Procesar cada jugador para tomar solo sus mejores 4 resultados
-    jugadoresMap.forEach((jugador) => {
-      // Ordenar de más a menos puntos y tomar los mejores 4
-      jugador.mejores = [...jugador.resultados].sort((a, b) => b.puntos - a.puntos).slice(0, 4);
-      const mejoresPuntos = jugador.mejores.map((r) => r.puntos);
-
-      jugador.puntosPorTorneos = mejoresPuntos;
-      jugador.totalPuntos = mejoresPuntos.reduce((sum, puntos) => sum + puntos, 0);
+    // Suman sus 4 mejores
+    const filas = Array.from(jugadores, ([idUsuario, jugador]) => {
+      const mejores = [...jugador.resultados].sort((a, b) => b.puntos - a.puntos).slice(0, 4);
+      return {
+        idUsuario,
+        nick: jugador.nick,
+        totalPuntos: mejores.reduce((suma, resultado) => suma + resultado.puntos, 0),
+        torneosGanados: jugador.resultados.filter((resultado) => resultado.resultado === 1).length,
+        mejorPuesto: Math.min(...jugador.resultados.map((resultado) => resultado.resultado)),
+        jugados: jugador.resultados.length,
+        mejores,
+      };
     });
 
-    const jugadoresOrdenados = Array.from(jugadoresMap.entries()).sort(
-      ([, a], [, b]) => b.totalPuntos - a.totalPuntos
+    // A igualdad de puntos: más eventos ganados, mejor puesto y más eventos jugados
+    filas.sort(
+      (a, b) =>
+        b.totalPuntos - a.totalPuntos ||
+        b.torneosGanados - a.torneosGanados ||
+        a.mejorPuesto - b.mejorPuesto ||
+        b.jugados - a.jugados
     );
 
-    return jugadoresOrdenados.map(([idUsuario, jugador], index) => ({
-      idUsuario,
-      nick: jugador.nick,
-      totalPuntos: jugador.totalPuntos,
-      torneosGanados: jugador.torneosGanados,
-      puntosPorTorneos: jugador.puntosPorTorneos,
-      mejores: jugador.mejores,
+    return filas.map((fila, index) => ({
+      idUsuario: fila.idUsuario,
+      nick: fila.nick,
+      totalPuntos: fila.totalPuntos,
+      torneosGanados: fila.torneosGanados,
+      mejores: fila.mejores,
       posicion: index + 1,
     }));
   });
@@ -122,46 +115,16 @@ export function useCircuitoData() {
     }
   };
 
-  const mergeGanadoresXTorneo = () => {
-    if (!torneos.value.length || !ganadores.value.length) return;
-    
-    const idTorneosCircuito = torneos.value.map((torneo) => torneo.idTorneo);
-
-    const ganadoresPorTorneo = ganadores.value.reduce((acc, ganador) => {
-      if (!acc[ganador.idTorneo]) {
-        acc[ganador.idTorneo] = [];
-      }
-      acc[ganador.idTorneo].push(ganador);
-      return acc;
-    }, {} as Record<number, (typeof ganadores.value)[0][]>);
-
-    const top10PorTorneo = Object.values(ganadoresPorTorneo).flatMap(
-      (ganadoresTorneo) => ganadoresTorneo.slice(0, 10)
-    );
-
-    const soloGanadoresTorneosCircuito = top10PorTorneo.filter((ganador) =>
-      idTorneosCircuito.includes(ganador.idTorneo)
-    );
-
-    topGanadores.value = soloGanadoresTorneosCircuito;
-  };
-
   // Posiciones finales guardadas de un evento, de la primera a la última
   const posicionesDe = (idTorneo: number) =>
     ganadores.value.filter((g) => g.idTorneo === idTorneo).sort((a, b) => a.resultado - b.resultado);
-
-  const prepareClasificacion = async () => {
-    await loadGanadores();
-    mergeGanadoresXTorneo();
-  };
 
   return {
     torneos,
     loading,
     clasificacion,
-    puntosPorResultado,
     loadTorneos,
-    prepareClasificacion,
+    prepareClasificacion: loadGanadores,
     posicionesDe,
   };
 }
