@@ -96,6 +96,7 @@ import DetalleCircuito from "@/components/Circuito/DetalleCircuito.vue";
 import ModalNombreCircuito from "@/components/Circuito/components/ModalNombreCircuito.vue";
 import ModalSuccess from "@/components/Commons/ModalSuccess.vue";
 import { CircuitoDTO } from "@/interfaces/Circuito";
+import { esCircuitoAmonSul } from "@/utils/circuitoAmonSul";
 import { crearCircuitoAsync, getCircuitos } from "@/services/CircuitosService";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import { ref, onMounted, computed, watch } from "vue";
@@ -139,11 +140,18 @@ watch(anios, lista => {
 const busqueda = ref<string | null>("");
 const normalizar = (texto?: string | null) =>
   (texto ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+// Por año, del más nuevo al más antiguo, y en cada año el Amon Sûl el primero; después, los más nuevos
+const primerAnio = (c: CircuitoDTO) => aniosDe(c)[0] ?? 0;
+const ordenCircuitos = (a: CircuitoDTO, b: CircuitoDTO) =>
+  primerAnio(b) - primerAnio(a) ||
+  Number(esCircuitoAmonSul(b.nombreCircuito)) - Number(esCircuitoAmonSul(a.nombreCircuito)) ||
+  b.idCircuito - a.idCircuito;
+
 const filtrados = computed(() => {
   const texto = normalizar(busqueda.value);
-  return (anio.value === TODOS ? circuitos.value : deAnio(anio.value)).filter(
-    c => !texto || normalizar(c.nombreCircuito).includes(texto)
-  );
+  return (anio.value === TODOS ? circuitos.value : deAnio(anio.value))
+    .filter(c => !texto || normalizar(c.nombreCircuito).includes(texto))
+    .sort(ordenCircuitos);
 });
 
 // Función para cargar los circuitos
