@@ -2,10 +2,7 @@
   <v-container>
     <v-row dense>
       <v-col cols="12" md="12" class="text-center">
-        <h1 class="text-h5 font-weight-bold text-left mb-1">Calendario de eventos</h1>
-        <p class="text-body-2 text-medium-emphasis text-left mb-3">
-          Torneos, ligas y copas. Los que están en curso salen en Próximos hasta que terminan.
-        </p>
+        <h1 class="text-h5 font-weight-bold text-left mb-3">Calendario de eventos</h1>
         <v-tabs v-model="tab" color="primary" grow>
           <v-tab value="proximos"> Próximos </v-tab>
           <v-tab value="pasados"> Pasados </v-tab>
