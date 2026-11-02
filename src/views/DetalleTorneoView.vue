@@ -2,10 +2,13 @@
   <v-container class="pa-0 pa-sm-4">
     <LoadingGandalf v-if="isLoading" />
     <!-- Sencilla a propósito: lo que más se busca arriba (tu inscripción) y los datos como etiqueta y valor -->
-    <v-card v-else-if="torneo" flat class="detalle mx-auto">
-      <v-tabs v-model="tab" grow>
+    <!-- En Resultados, más ancha: las clasificaciones tienen varias columnas -->
+    <v-card v-else-if="torneo" flat class="detalle mx-auto" :class="{ 'detalle--ancha': tab === 'resultados' }">
+      <!-- Sin el número de inscritos en la pestaña: con él, las tres no caben en el móvil -->
+      <v-tabs v-model="tab" grow class="pestanas-evento">
         <v-tab value="detalle">Detalle</v-tab>
-        <v-tab value="inscritos">Inscritos ({{ porEquipos ? equiposReales.length : participantesReales.length }})</v-tab>
+        <v-tab value="inscritos">Inscritos</v-tab>
+        <v-tab value="resultados">Resultados</v-tab>
       </v-tabs>
 
       <v-window v-model="tab">
@@ -91,6 +94,7 @@
         <!-- Inscritos: como la pestaña Listas, una línea por jugador -->
         <v-window-item value="inscritos">
           <div class="pa-3">
+            <p class="text-caption text-medium-emphasis mb-2">{{ resumenInscritos }}</p>
             <v-text-field
               v-model="search"
               :placeholder="porEquipos ? 'Buscar equipo o jugador' : 'Buscar jugador'"
@@ -135,6 +139,11 @@
               </v-expansion-panel>
             </v-expansion-panels>
           </template>
+        </v-window-item>
+
+        <!-- Resultados: la vista en vivo de siempre, con sus pestañas. Se carga al abrirla -->
+        <v-window-item value="resultados">
+          <component :is="vistaResultados" />
         </v-window-item>
       </v-window>
     </v-card>
@@ -238,6 +247,9 @@ import ModalInscripcion from "@/components/Inscripcion/ModalInscripcion.vue";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { diaDeHoy, formatHora, ultimoDiaEvento } from "@/utils/Fecha";
 import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
+import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
+import DetalleTorneoLiveMasView from "@/views/DetalleTorneoLiveMasView.vue";
+import DetalleTorneoLiveEquiposView from "@/views/DetalleTorneoLiveEquiposView.vue";
 
 const { getidUsuario } = useAuth();
 const route = useRoute();
@@ -256,7 +268,7 @@ const idEquipo = ref<number | undefined>(undefined);
 
 const torneosApuntado = ref<InscripcionUsuarioIndividualDTO[]>();
 
-const tab = ref("detalle");
+const tab = ref<string>("detalle");
 const search = ref<string | null>("");
 const tipoTorneo = ref<string>("");
 
@@ -463,6 +475,9 @@ onMounted(async () => {
     }
 
     if (torneo.value) tipoTorneo.value = torneo.value.tipoTorneo;
+    const pedida = String(route.query.tab ?? "");
+    if (PESTANAS.includes(pedida)) tab.value = pedida;
+    else if (haEmpezado.value) tab.value = "resultados";
 
     if (idTorneo.value) {
       const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
@@ -582,7 +597,32 @@ watch(texto, () => {
   equiposAbiertos.value = texto.value ? equiposVisibles.value.map(e => e.nombre) : [];
 });
 
+// «45 jugadores» o «20 equipos»
+const resumenInscritos = computed(() => {
+  if (!porEquipos.value) {
+    const n = participantesReales.value.length;
+    return `${n} ${n === 1 ? "jugador" : "jugadores"}`;
+  }
+  const n = equiposReales.value.length;
+  if (esParejas.value) return `${n} ${n === 1 ? "pareja" : "parejas"}`;
+  return `${n} ${n === 1 ? "equipo" : "equipos"}`;
+});
+
 const textoVacio = computed(() => (texto.value ? "Nada coincide con la búsqueda." : "Todavía no hay inscritos."));
+
+// La vista en vivo que toca: la individual también lleva la liga y la copa
+const vistaResultados = computed(() => {
+  const t = torneo.value;
+  if (!t || esPorJornadas(t.formatoTorneo)) return DetalleTorneoLiveView;
+  if (t.tipoTorneo !== "Individual") return DetalleTorneoLiveEquiposView;
+  return t.listasPorJugador > 1 ? DetalleTorneoLiveMasView : DetalleTorneoLiveView;
+});
+
+// La pestaña va en la URL (?tab=resultados): Mis eventos enlaza directo a los resultados y al recargar se queda
+const PESTANAS = ["detalle", "inscritos", "resultados"];
+watch(tab, valor => {
+  if (route.query.tab !== valor) router.replace({ query: { ...route.query, tab: valor } });
+});
 
 // Tu situación y lo que puedes hacer, justo bajo el nombre
 interface AccionEstado {
@@ -630,10 +670,7 @@ const estado = computed<{ texto: string; acciones: AccionEstado[] }>(() => {
 });
 
 const goToResultados = () => {
-  const t = torneo.value;
-  if (!t) return;
-  if (t.tipoTorneo === "Individual" && t.listasPorJugador > 1) router.push(`/detalle-torneo-live-mas/${t.idTorneo}`);
-  else router.push(`/detalle-torneo-live/${t.idTorneo}`);
+  tab.value = "resultados";
 };
 
 // La inscripción individual, en la misma ventana que en Mis eventos; la de equipo se gestiona allí
@@ -726,6 +763,15 @@ const inscripcionPorEquipos = async () => {
 /* En el ordenador, estrecha y centrada: se lee como en el móvil */
 .detalle {
   max-width: 720px;
+}
+
+.detalle--ancha {
+  max-width: 1100px;
+}
+
+/* Menos margen dentro de cada pestaña: así caben las tres en mayúsculas en un móvil de 360 px */
+.pestanas-evento :deep(.v-tab) {
+  padding-inline: 10px;
 }
 
 .cartel {

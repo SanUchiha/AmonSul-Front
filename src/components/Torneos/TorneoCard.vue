@@ -69,23 +69,11 @@
 
     <v-divider class="mb-3"></v-divider>
 
-    <v-card-actions class="d-flex justify-space-between">
-      <v-row>
-        <v-col cols="12" sm="6">
-          <v-btn variant="tonal" color="orange lighten-2" @click="goToDetalle">
-            Detalle
-          </v-btn>
-        </v-col>
-        <v-col cols="12" sm="6">
-          <v-btn
-            variant="tonal"
-            color="blue lighten-2"
-            @click="goToResultadoTorneo"
-          >
-            Resultados
-          </v-btn>
-        </v-col>
-      </v-row>
+    <!-- Un solo botón: en el evento están el detalle, los inscritos y los resultados -->
+    <v-card-actions>
+      <v-btn variant="tonal" color="primary" block class="text-none" @click="goToDetalle">
+        Ver evento
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -173,14 +161,6 @@ onMounted(async () => {
 
 const goToDetalle = () => {
   router.push(`/detalle-evento/${props.torneo.idTorneo}`);
-};
-const goToResultadoTorneo = () => {
-  if (
-    props.torneo.tipoTorneo == "Individual" &&
-    props.torneo.listasPorJugador > 1
-  )
-    router.push(`/detalle-torneo-live-mas/${props.torneo.idTorneo}`);
-  else router.push(`/detalle-torneo-live/${props.torneo.idTorneo}`);
 };
 </script>
 

@@ -92,13 +92,8 @@ const textoResultados = computed(() =>
     ? `Ver ${textosEvento(props.inscripcion.torneo.formatoTorneo).el}`
     : "Resultados"
 );
-const rutaResultados = computed(() => {
-  const { idTorneo, porEquipos, torneo } = props.inscripcion;
-  if (porEquipos) return `/detalle-torneo-live-equipos/${idTorneo}`;
-  if (torneo.tipoTorneo === "Individual" && torneo.listasPorJugador > 1)
-    return `/detalle-torneo-live-mas/${idTorneo}`;
-  return `/detalle-torneo-live/${idTorneo}`;
-});
+// Los resultados están en el evento, en su pestaña
+const rutaResultados = computed(() => `/detalle-evento/${props.inscripcion.idTorneo}?tab=resultados`);
 </script>
 
 <style scoped>
