@@ -172,10 +172,12 @@ const comprobarPartidasActivas = async (idUsuario: string) => {
 };
 
 onMounted(() => {
+  // Sin sesión no se pregunta: el servidor diría 401 y mandaría a iniciar sesión desde las páginas
+  // que no la necesitan, como la de elegir una contraseña nueva o la de registro
   if (isLoggedIn.value) {
     cargarUsuario();
+    comprobarPartidasActivas(getidUsuario.value);
   }
-  comprobarPartidasActivas(getidUsuario.value);
 });
 </script>
 
