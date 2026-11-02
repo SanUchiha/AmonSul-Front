@@ -168,7 +168,8 @@ onMounted(async () => {
               .replace(/\s/g, "")
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "") ===
-            user.ciudad
+            // Sin ciudad (p. ej. una cuenta borrada) no está en ninguna provincia
+            (user.ciudad ?? "")
               .toLowerCase()
               .replace(/\s/g, "")
               .normalize("NFD")
