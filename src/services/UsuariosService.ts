@@ -74,8 +74,16 @@ export const aceptarProteccionDatos = async (body: AceptarProteccionDatos) => {
   return http.put(`Usuario/Proteccion-Datos`, body);
 };
 
-export const recordarPass = async (email: string) => {
-  return http.get(`Usuario/Recordar-Pass/${email}`);
+// Manda un enlace para elegir una contraseña nueva. Responde igual exista o no el correo
+export const pedirEnlaceContrasena = async (email: string) => {
+  return http.post(`Usuario/Recuperar-Pass`, { email });
+};
+
+export const restablecerContrasena = async (body: {
+  token: string;
+  nuevaPass: string;
+}) => {
+  return http.post(`Usuario/Restablecer-Pass`, body);
 };
 
 export const getUsuariosIdNick = async () => {

@@ -46,7 +46,7 @@
     <!-- Modal de éxito -->
     <ModalSuccess
       :isVisible="showSuccessModal"
-      message="Se te ha enviado un correo con una contraseña temporal."
+      message="Si ese correo tiene cuenta, te llegará un enlace para elegir una contraseña nueva. Vale durante 1 hora."
       @update:isVisible="handleModalClose"
     />
 
@@ -63,7 +63,7 @@
 import { ref, defineEmits } from "vue";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
-import { recordarPass } from "@/services/UsuariosService";
+import { pedirEnlaceContrasena } from "@/services/UsuariosService";
 
 const emit = defineEmits<{
   (e: "close"): void;
@@ -96,7 +96,7 @@ const recordar = async () => {
   if (emailRule(email.value) === true) {
     try {
       isLoading.value = true;
-      await recordarPass(email.value);
+      await pedirEnlaceContrasena(email.value.trim());
       showSuccessModal.value = true;
     } catch (error) {
       console.error(error);

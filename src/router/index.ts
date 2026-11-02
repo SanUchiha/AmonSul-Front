@@ -4,6 +4,7 @@ import DetalleTorneoView from "@/views/DetalleTorneoView.vue";
 import InicioSesionView from "@/views/InicioSesionView.vue";
 import JugadoresView from "@/views/JugadoresView.vue";
 import PerfilUsuarioView from "@/views/PerfilUsuarioView.vue";
+import RestablecerContrasenaView from "@/views/RestablecerContrasenaView.vue";
 import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
 import TorneosView from "@/views/TorneosView.vue";
 import ErrorView from "@/views/ErrorView.vue";
@@ -120,6 +121,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/registro-usuario",
     name: "registro-usuario",
     component: RegistroUsuarioView,
+  },
+  {
+    // Llega desde el correo de recuperar la contraseña, con el enlace en ?token=
+    path: "/restablecer-contrasena",
+    name: "restablecer-contrasena",
+    component: RestablecerContrasenaView,
   },
   {
     // Mis partidas pasó a la ficha de jugador: los enlaces antiguos van a la pestaña de amistosas de la tuya
