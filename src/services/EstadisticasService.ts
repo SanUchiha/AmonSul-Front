@@ -4,6 +4,7 @@ import type {
   CruceEjercitosDTO,
   CrucesDestacadosDTO,
   EjercitoBalanceDTO,
+  EjercitosJugadorDTO,
   FichaEjercitoDTO,
   FiltroEstadisticas,
   RatingEjercitoRequestDTO,
@@ -59,3 +60,8 @@ export const getCruce = async (
 
 export const getCrucesDestacados = async (filtro: FiltroEstadisticas) =>
   (await http.get<CrucesDestacadosDTO>("Estadisticas/ejercitos/cruces-destacados", { params: parametros(filtro) })).data;
+
+export const getEjercitosJugador = async (idUsuario: number, filtro: FiltroEstadisticas) =>
+  (
+    await http.get<EjercitosJugadorDTO>(`Estadisticas/ejercitos/jugador/${idUsuario}`, { params: parametros(filtro) })
+  ).data;

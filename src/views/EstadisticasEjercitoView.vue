@@ -3,45 +3,62 @@
     <v-chip-group v-model="seccion" mandatory selected-class="text-primary" class="mb-1 secciones">
       <v-chip value="ejercitos" filter>Ejércitos</v-chip>
       <v-chip value="cruces" filter>Cruces</v-chip>
+      <v-chip value="jugadores" filter>Jugadores</v-chip>
     </v-chip-group>
 
     <!-- El bando solo filtra el ranking: en los cruces se elige el rival -->
     <FiltrosEstadisticas v-model="filtro" :con-bando="seccion === 'ejercitos'" />
 
-    <!-- Cada sección guarda lo que tenía al cambiar de una a otra; los cruces se cargan la primera vez que se abren -->
+    <!-- Cada sección guarda lo que tenía al cambiar de una a otra; cruces y jugadores se cargan la primera vez que se abren -->
     <RankingEjercitos v-show="seccion === 'ejercitos'" :filtro="filtro" @ver="abrirFicha" />
-    <CrucesEjercitos v-if="crucesAbiertos" v-show="seccion === 'cruces'" :filtro="filtro" :inicial="cruceInicial" />
+    <CrucesEjercitos v-if="abiertas.cruces" v-show="seccion === 'cruces'" :filtro="filtro" :inicial="cruceInicial" />
+    <JugadoresEjercitos
+      v-if="abiertas.jugadores"
+      v-show="seccion === 'jugadores'"
+      :filtro="filtro"
+      :jugadorInicial="jugadorInicial"
+      @ver="abrirFicha"
+    />
 
     <FichaEjercito v-model="verFicha" :ejercito="ejercitoVisto" :filtro="filtro" @cruce="verCruce" />
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { FiltroEstadisticas } from "@/interfaces/Estadisticas";
 import FiltrosEstadisticas from "@/components/Estadisticas/Ejercitos/FiltrosEstadisticas.vue";
 import RankingEjercitos from "@/components/Estadisticas/Ejercitos/RankingEjercitos.vue";
 import CrucesEjercitos from "@/components/Estadisticas/Ejercitos/CrucesEjercitos.vue";
+import JugadoresEjercitos from "@/components/Estadisticas/Ejercitos/JugadoresEjercitos.vue";
 import FichaEjercito from "@/components/Estadisticas/Ejercitos/FichaEjercito.vue";
 
-type Seccion = "ejercitos" | "cruces";
-const SECCIONES: Seccion[] = ["ejercitos", "cruces"];
+type Seccion = "ejercitos" | "cruces" | "jugadores";
+const SECCIONES: Seccion[] = ["ejercitos", "cruces", "jugadores"];
 
 const route = useRoute();
 const router = useRouter();
 
-// La sección va en la URL (?seccion=cruces): al recargar se queda donde estaba
+// La sección va en la URL (?seccion=cruces): al recargar se queda donde estaba. La ficha de un jugador enlaza aquí
+// con ?seccion=jugadores&jugador=id
 const pedida = String(route.query.seccion ?? "") as Seccion;
 const seccion = ref<Seccion>(SECCIONES.includes(pedida) ? pedida : "ejercitos");
-const crucesAbiertos = ref(seccion.value === "cruces");
+const abiertas = reactive({ cruces: seccion.value === "cruces", jugadores: seccion.value === "jugadores" });
+const jugadorInicial = ref<number | null>(Number(route.query.jugador) || null);
 watch(seccion, valor => {
-  if (valor === "cruces") crucesAbiertos.value = true;
+  if (valor === "cruces") abiertas.cruces = true;
+  if (valor === "jugadores") abiertas.jugadores = true;
   if (route.query.seccion !== valor) router.replace({ query: { ...route.query, seccion: valor } });
 });
 
-// Se empieza por la temporada actual, con todos los puntos y sin amistosas
-const filtro = ref<FiltroEstadisticas>({ temporada: new Date().getFullYear(), tramo: null, bando: null, amistosas: false });
+// Se empieza por la temporada actual, con todos los puntos y sin amistosas. Desde la ficha de un jugador, con todo, como
+// cuenta sus partidas la ficha
+const filtro = ref<FiltroEstadisticas>(
+  jugadorInicial.value
+    ? { temporada: null, tramo: null, bando: null, amistosas: true }
+    : { temporada: new Date().getFullYear(), tramo: null, bando: null, amistosas: false }
+);
 
 const verFicha = ref(false);
 const ejercitoVisto = ref<string | null>(null);

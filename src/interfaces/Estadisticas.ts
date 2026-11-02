@@ -132,3 +132,15 @@ export interface CrucesDestacadosDTO {
   masJugados: CruceResumenDTO[];
   masDesequilibrados: CruceResumenDTO[];
 }
+
+// Con qué ejércitos juega un jugador y cómo le va con cada uno
+export interface EjercitosJugadorDTO {
+  idUsuario: number;
+  nick: string;
+  // Con todos sus ejércitos: para comparar cada uno con su media
+  resumen: BalanceDTO;
+  // Del más jugado al menos
+  ejercitos: EjercitoBalanceDTO[];
+  // Contra los que pierde más de lo que gana
+  rivalesDificiles: EjercitoBalanceDTO[];
+}

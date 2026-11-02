@@ -80,6 +80,19 @@
               : `Ver ${ejercitos.length - 3 === 1 ? "el otro" : `los otros ${ejercitos.length - 3}`}`
           }}
         </v-btn>
+        <!-- Cómo le va con cada ejército frente a lo que espera su ELO, en las estadísticas de ejércitos -->
+        <div>
+          <v-btn
+            :to="`/estadisticas-ejercito?seccion=jugadores&jugador=${usuario.idUsuario}`"
+            variant="text"
+            size="small"
+            color="primary"
+            class="px-0 text-none"
+            append-icon="mdi-chevron-right"
+          >
+            Sus estadísticas por ejército
+          </v-btn>
+        </div>
       </v-card>
     </template>
 
