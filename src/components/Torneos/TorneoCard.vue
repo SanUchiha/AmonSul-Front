@@ -31,46 +31,24 @@
 
     <v-divider class="my-3"></v-divider>
 
-    <v-card-text>
-      <v-row>
-        <v-col cols="10" offset="1" class="text-left">
-          <p>
-            <v-icon left color="green">mdi-calendar</v-icon>
-            <!-- Una liga o un evento de varios días: del primero al último -->
-            <template v-if="variosDias">
-              <strong>Fechas:</strong> del {{ fechaTorneo }} al {{ formatFechaSpaWhitoutAsync(ultimoDia) }}
-            </template>
-            <template v-else>
-              <strong>Fecha:</strong> {{ fechaTorneo }}
-              <template v-if="!esLiga">
-                a las {{ formatHora(torneo.horaInicioTorneo) }}
-              </template>
-            </template>
-          </p>
-          <p>
-            <v-icon color="cyan">mdi-trophy</v-icon> <strong>Puntos:</strong>
-            {{ torneo.puntosTorneo }}
-          </p>
-          <p>
-            <v-icon color="cyan">mdi-format-list-bulleted</v-icon>
-            <template v-if="esLiga">
-              <strong>Formato:</strong>
-              {{ torneo.formatoTorneo === FORMATO_COPA ? "grupos y eliminatoria" : "todos contra todos" }},
-              {{ torneo.idaYVuelta ? "ida y vuelta" : "solo ida" }}
-            </template>
-            <template v-else>
-              <strong>Rondas:</strong> {{ torneo.numeroPartidas }}
-            </template>
-          </p>
-        </v-col>
-      </v-row>
+    <!-- Solo la fecha: los puntos, las rondas y el formato están en el evento -->
+    <v-card-text class="text-center py-1">
+      <v-icon start color="green">mdi-calendar</v-icon>
+      <!-- Una liga o un evento de varios días: del primero al último -->
+      <template v-if="variosDias">
+        Del {{ fechaTorneo }} al {{ formatFechaSpaWhitoutAsync(ultimoDia) }}
+      </template>
+      <template v-else>
+        {{ fechaTorneo }}
+        <template v-if="!esLiga"> a las {{ formatHora(torneo.horaInicioTorneo) }}</template>
+      </template>
     </v-card-text>
   </v-card>
 </template>
 
 <script setup lang="ts">
 import { Torneo } from "@/interfaces/Torneo";
-import { FORMATO_COPA, esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
+import { esPorJornadas, nombreEvento } from "@/Constant/FormatoTorneo";
 import { diaDeHoy, formatFechaSpa, formatFechaSpaWhitoutAsync, formatHora, ultimoDiaEvento } from "@/utils/Fecha";
 import { defineProps, ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
