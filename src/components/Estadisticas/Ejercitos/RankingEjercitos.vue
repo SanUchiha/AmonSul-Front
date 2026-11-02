@@ -80,8 +80,8 @@
           <span class="text-right">{{ textoPorcentaje(fila.porcentaje) }}</span>
         </div>
         <p class="text-caption text-medium-emphasis mt-2 mb-0">
-          Torneos individuales con clasificación final. Podio es quedar 1º, 2º o 3º, y el ejército es el que más llevó
-          cada jugador en sus partidas de ese torneo.
+          Torneos, ligas y copas individuales con clasificación final. Podio es quedar 1º, 2º o 3º, y el ejército es
+          el que más llevó cada jugador en sus partidas de ese evento.
         </p>
       </template>
     </template>

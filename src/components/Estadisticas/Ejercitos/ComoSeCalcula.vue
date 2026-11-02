@@ -3,9 +3,9 @@
   <div class="text-body-2">
     <ul class="explicacion">
       <li>
-        <strong>Qué partidas cuentan.</strong> Las de torneos validadas por los dos jugadores, también las de torneos
-        por equipos, donde cada partida es uno contra uno. Las de Parejas no, porque son dos contra dos. Las amistosas,
-        solo si marcas «Con amistosas».
+        <strong>Qué partidas cuentan.</strong> Las de torneos, ligas y copas validadas por los dos jugadores, también
+        las de torneos por equipos, donde cada partida es uno contra uno. Las de Parejas no, porque son dos contra dos.
+        Las amistosas, solo si marcas «Con amistosas».
       </li>
       <li>
         <strong>Un ejército contra sí mismo no cuenta.</strong> Si los dos llevan el mismo, la partida no dice nada de
@@ -19,9 +19,9 @@
       </li>
       <li>
         <strong>Torneos ganados y podios.</strong> Cuenta quedar 1º, o entre los tres primeros, en la clasificación
-        final de los torneos individuales. En los de equipos no, porque el 1º individual no gana el torneo. El ejército
-        de cada jugador es el que más llevó en sus partidas de ese torneo. Así se ve si un ejército gana partidas pero
-        no le da para ganar torneos.
+        final de los torneos, ligas y copas individuales. En los de equipos no, porque el 1º individual no gana el
+        torneo. El ejército de cada jugador es el que más llevó en sus partidas de ese evento. Así se ve si un ejército
+        gana partidas pero no le da para ganar torneos.
       </li>
       <li>
         <strong>Los puntos.</strong> Los de la partida o, si no los tiene, los del torneo, en cuatro tramos: hasta 550,

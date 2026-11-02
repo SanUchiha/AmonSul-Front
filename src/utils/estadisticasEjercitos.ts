@@ -10,8 +10,11 @@ export const TRAMOS: { valor: TramoPuntos; texto: string }[] = [
 
 export const textoTramo = (tramo: TramoPuntos) => TRAMOS.find(t => t.valor === tramo)?.texto ?? tramo;
 
-export const textoBando = (bando: Bando | null) => (bando === "good" ? "Bien" : bando === "evil" ? "Mal" : "");
-export const colorBando = (bando: Bando | null) => (bando === "good" ? "blue" : bando === "evil" ? "red" : "grey");
+// Los mismos en todas partes: en las estadísticas y en la ficha de jugador
+export const textoBando = (bando: Bando | string | null | undefined) =>
+  bando === "good" ? "Bien" : bando === "evil" ? "Mal" : "";
+export const colorBando = (bando: Bando | string | null | undefined) =>
+  bando === "good" ? "blue" : bando === "evil" ? "red" : "grey";
 
 // Por debajo, una o dos partidas lo deciden todo
 export const POCAS_PARTIDAS = 20;

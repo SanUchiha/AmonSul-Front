@@ -53,8 +53,8 @@
           <v-icon
             size="small"
             icon="mdi-shield"
-            :color="ejercito.bando === 'good' ? 'success' : ejercito.bando === 'evil' ? 'purple' : 'grey'"
-            :title="ejercito.bando === 'good' ? 'Bien' : ejercito.bando === 'evil' ? 'Oscuridad' : ''"
+            :color="colorBando(ejercito.bando)"
+            :title="textoBando(ejercito.bando)"
           />
           <div class="flex-grow-1 min-w-0">
             <div class="text-body-2 font-weight-bold text-wrap">{{ ejercito.nombre }}</div>
@@ -289,6 +289,7 @@ import {
   ResultadoPartida,
   textoPosicion,
 } from "@/utils/historialJugador";
+import { colorBando, textoBando } from "@/utils/estadisticasEjercitos";
 import SparklineElo from "@/components/Elo/SparklineElo.vue";
 import BarraBalance from "@/components/DetalleJugador/BarraBalance.vue";
 
