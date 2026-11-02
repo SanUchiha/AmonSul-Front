@@ -30,7 +30,7 @@
         size="small"
         variant="tonal"
         class="accion text-none"
-        :to="`/detalle-torneo/${inscripcion.idTorneo}`"
+        :to="`/detalle-evento/${inscripcion.idTorneo}`"
       >
         Ver evento
       </v-btn>

@@ -172,7 +172,7 @@ onMounted(async () => {
 });
 
 const goToDetalle = () => {
-  router.push(`/detalle-torneo/${props.torneo.idTorneo}`);
+  router.push(`/detalle-evento/${props.torneo.idTorneo}`);
 };
 const goToResultadoTorneo = () => {
   if (

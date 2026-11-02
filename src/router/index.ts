@@ -101,10 +101,13 @@ const routes: Array<RouteRecordRaw> = [
   // La antigua lista de todos los torneos con sus carteles, que cargaba de golpe: los resultados de cada evento
   // están en el calendario
   { path: "/resultados-torneos", redirect: "/torneos" },
+  // Antes se llamaba detalle-torneo: los enlaces guardados y los de los correos siguen funcionando
+  { path: "/detalle-torneo/:idTorneo", redirect: to => `/detalle-evento/${to.params.idTorneo}` },
 
   {
-    path: "/detalle-torneo/:idTorneo",
-    name: "detalle-torneo",
+    // Evento: torneo, liga o copa
+    path: "/detalle-evento/:idTorneo",
+    name: "detalle-evento",
     component: DetalleTorneoView,
     meta: { requiresAuth: true },
   },
