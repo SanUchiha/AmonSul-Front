@@ -4,7 +4,6 @@
       <LoadingGandalf />
     </div>
     <div v-else>
-      <h1 class="text-h5 font-weight-bold text-left mb-3">ELO</h1>
       <!-- Solo la clasificación: el ELO de cada uno, con su gráfica, está en su ficha de jugador -->
       <v-tabs v-model="tab" color="primary" grow>
         <v-tab value="Individual"> Individual </v-tab>
