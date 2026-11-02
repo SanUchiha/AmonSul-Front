@@ -113,11 +113,12 @@ const selectedCircuito = ref<CircuitoDTO | null>(null);
 const circuitos = ref<CircuitoDTO[]>([]);
 const loading = ref<boolean>(false);
 
-// El año de un circuito es el de sus eventos (puede tener de dos); sin eventos, el que lleve en el nombre
+// Cada circuito, en un solo año: el de su creación (así la suma de los años da «Todos»). Si el servidor aún no
+// la manda, el que lleve en el nombre
 const TODOS = 0;
 const ANIO_ACTUAL = new Date().getFullYear();
 const aniosDe = (circuito: CircuitoDTO): number[] => {
-  if (circuito.anios?.length) return circuito.anios;
+  if (circuito.fechaCreacion) return [Number(circuito.fechaCreacion.slice(0, 4))];
   const enElNombre = circuito.nombreCircuito.match(/\b(20\d{2})\b/);
   return enElNombre ? [Number(enElNombre[1])] : [];
 };
