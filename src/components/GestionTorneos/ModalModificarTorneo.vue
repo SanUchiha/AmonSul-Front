@@ -459,7 +459,7 @@
   <!-- Modal response si error -->
   <ModalError
     :isVisible="showErrorModal"
-    :message="`No se ha podido modificar ${textos.el}. Intentalo de nuevo y si el error persiste contacta con el administrador.`"
+    :message="mensajeError"
     @update:isVisible="showErrorModal = $event"
   />
 </template>
@@ -471,6 +471,7 @@ import ModalError from "../Commons/ModalError.vue";
 import { ModificarTorneoDTO, Torneo } from "@/interfaces/Torneo";
 import { modificarTorneo } from "@/services/TorneosService";
 import { useTorneoCerrado } from "@/composables/useTorneoCerrado";
+import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
 import {
@@ -678,6 +679,7 @@ const imageBase64 = ref<string | null>(null);
 const byteArrayBases = ref<Uint8Array | null>(null);
 const isGenerating = ref<boolean>(false);
 const showErrorModal = ref<boolean>(false);
+const mensajeError = ref("");
 const showSuccessModal = ref<boolean>(false);
 const listasPorJugador = ref<number>();
 // Con lista conjunta cada pareja entrega una sola lista
@@ -915,6 +917,11 @@ const confirmarConfiguracion = async () => {
 
     showSuccessModal.value = true;
   } catch (error) {
+    // El back dice qué no se ha podido cambiar: por ejemplo, un nombre que ya tienen otras bases
+    mensajeError.value = mensajeDelBack(
+      error,
+      `No se ha podido modificar ${textos.value.el}. Intentalo de nuevo y si el error persiste contacta con el administrador.`
+    );
     showErrorModal.value = true;
     console.error(error);
   } finally {
