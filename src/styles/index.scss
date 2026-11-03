@@ -45,7 +45,7 @@ v-tabs-item{
 .footer {
   background-color: #1e1e1e;
   color: white;
-  padding: 10px 0;
+  padding: 10px 0 calc(10px + var(--zona-segura-abajo));
 }
 /* Extra extra pequeño (xxs): móviles */
 @media (max-width: 399px) {
@@ -102,4 +102,54 @@ v-tabs-item{
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
+}
+
+// App móvil (Capacitor): la app ocupa toda la pantalla, también detrás de la barra de estado y de la de gestos.
+// Capacitor deja sus medidas en --safe-area-inset-*; en el navegador vale env(), que es 0 salvo en móviles
+// con muesca, así que en la web no se mueve nada
+:root {
+  --zona-segura-arriba: var(
+    --safe-area-inset-top,
+    env(safe-area-inset-top, 0px)
+  );
+  --zona-segura-abajo: var(
+    --safe-area-inset-bottom,
+    env(safe-area-inset-bottom, 0px)
+  );
+}
+
+// La barra superior se alarga por detrás de la de estado y el contenido empieza debajo de las dos
+.v-app-bar.v-toolbar {
+  padding-top: var(--zona-segura-arriba);
+}
+.v-main {
+  padding-top: calc(var(--v-layout-top) + var(--zona-segura-arriba)) !important;
+}
+.v-navigation-drawer {
+  padding-top: var(--zona-segura-arriba);
+  padding-bottom: var(--zona-segura-abajo);
+}
+
+// Diálogos y avisos sin meterse debajo de las barras
+.v-dialog:not(.v-dialog--fullscreen) > .v-overlay__content {
+  margin-top: calc(24px + var(--zona-segura-arriba));
+  margin-bottom: calc(24px + var(--zona-segura-abajo));
+  max-height: calc(
+    100% - 48px - var(--zona-segura-arriba) - var(--zona-segura-abajo)
+  );
+}
+.v-dialog--fullscreen > .v-overlay__content > .v-card {
+  padding-top: var(--zona-segura-arriba);
+  padding-bottom: var(--zona-segura-abajo);
+}
+.v-snackbar {
+  margin-top: calc(8px + var(--zona-segura-arriba));
+  margin-bottom: calc(8px + var(--zona-segura-abajo));
+}
+
+// iOS amplía la página al escribir en un campo con letra de menos de 16px
+input,
+select,
+textarea {
+  font-size: max(16px, 1em);
 }
