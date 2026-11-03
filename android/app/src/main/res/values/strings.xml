@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Amon Sûl</string>
+    <string name="title_activity_main">Amon Sûl</string>
+    <string name="package_name">com.amonsul.app</string>
+    <string name="custom_url_scheme">com.amonsul.app</string>
+</resources>

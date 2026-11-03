@@ -21,3 +21,11 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# App móvil (Capacitor): firmas, builds de release y volcados que no van al repo
+*.jks
+*.keystore
+keystore.properties
+*.p8
+android/app/release/
+bugreport-*.zip

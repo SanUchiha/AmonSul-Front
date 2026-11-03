@@ -7,9 +7,15 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "format": "prettier --write \"src/**/*.{js,ts,vue,json,css,scss}\"",
-    "format:check": "prettier --check \"src/**/*.{js,ts,vue,json,css,scss}\""
+    "format:check": "prettier --check \"src/**/*.{js,ts,vue,json,css,scss}\"",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:android": "npm run build && npx cap sync && npx cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
     "@mdi/font": "^7.4.47",
     "ag-charts-community": "^11.1.1",
     "ag-charts-vue3": "^11.1.1",
@@ -32,6 +38,7 @@
     "vuetify": "^3.6.11"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
     "@types/canvas-confetti": "^1.6.4",
     "@types/lodash": "^4.17.16",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
