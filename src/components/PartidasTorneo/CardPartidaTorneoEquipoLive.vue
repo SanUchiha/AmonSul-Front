@@ -438,6 +438,8 @@ import {
   updatePairingTorneoAsync,
   updatePartidaTorneo,
 } from "@/services/PartidaTorneoService";
+import { useToast } from "@/composables/useToast";
+import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import {
   RequestUpdatePairingTorneoDTO,
   UpdatePartidaTorneoDTO,
@@ -448,6 +450,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import ModalCambiarPairingEquipo from "./ModalCambiarPairingEquipo.vue";
 
+const { triggerToast } = useToast();
 // eslint-disable-next-line no-undef
 const props = defineProps<{
   match: PartidaTorneoDTO;
@@ -682,11 +685,13 @@ const confirmarValidar = async () => {
 
     try {
       await updatePartidaTorneo(body);
+      window.location.reload();
     } catch (error) {
       console.error("confirmarValidar", error);
+      // Sin recargar, para que se vea por qué no se ha guardado: por ejemplo, que el torneo ya está cerrado
+      triggerToast("error", mensajeDelBack(error, "No se ha podido validar la partida."));
     } finally {
       isModalValidarVisible.value = false;
-      window.location.reload();
     }
   }
 };

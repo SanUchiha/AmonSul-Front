@@ -296,10 +296,13 @@ import {
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalValidarPartida from "@/components/ResultadosTorneos/ModalValidarPartida.vue";
 import { updatePartidaTorneo } from "@/services/PartidaTorneoService";
+import { useToast } from "@/composables/useToast";
+import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
 import ModalEditarPartida from "@/components/ResultadosTorneos/ModalEditarPartida.vue";
 import { ListaDTO } from "@/interfaces/Usuario";
 
+const { triggerToast } = useToast();
 const isLoading = ref(true);
 const error = ref<string | null>(null);
 const router = useRouter();
@@ -458,11 +461,13 @@ const confirmarValidar = async () => {
 
     try {
       await updatePartidaTorneo(body);
+      window.location.reload();
     } catch (error) {
       console.error("confirmarValidar", error);
+      // Sin recargar, para que se vea por qué no se ha guardado: por ejemplo, que el torneo ya está cerrado
+      triggerToast("error", mensajeDelBack(error, "No se ha podido validar la partida."));
     } finally {
       isModalValidarVisible.value = false;
-      window.location.reload();
     }
   }
 };
@@ -499,11 +504,13 @@ const confirmarEditarPartida = async (partida: PartidaTorneoDTO) => {
 
     try {
       await updatePartidaTorneo(body);
+      window.location.reload();
     } catch (error) {
       console.error(error);
+      // Sin recargar, para que se vea por qué no se ha guardado: por ejemplo, que el torneo ya está cerrado
+      triggerToast("error", mensajeDelBack(error, "No se ha podido guardar el resultado."));
     } finally {
       isModalEditarPartidaVisible.value = false;
-      window.location.reload();
     }
   }
 };
