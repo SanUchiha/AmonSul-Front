@@ -5,7 +5,7 @@
   <v-card flat>
     <div class="text-left px-3 pt-3">
       <!-- Justo encima de los inscritos -->
-      <v-btn variant="tonal" color="secondary" block class="mb-3" @click="openAddJugadorModal">
+      <v-btn v-if="!cerrado" variant="tonal" color="secondary" block class="mb-3" @click="openAddJugadorModal">
         Añadir jugador
       </v-btn>
       <h3 class="text-subtitle-1 font-weight-bold mb-2">Inscritos ({{ reales.length }})</h3>
@@ -75,6 +75,7 @@
                   :href="`mailto:${item.email}`"
                 />
                 <v-list-item
+                  v-if="!cerrado"
                   prepend-icon="mdi-delete"
                   base-color="error"
                   title="Eliminar inscripción"
@@ -330,6 +331,7 @@
 </template>
 
 <script setup lang="ts">
+import { useTorneoCerrado } from "@/composables/useTorneoCerrado";
 import { esUsuarioBye } from "@/utils/bye";
 import { bandoLista, ESTADOS_LISTA, estadoLista } from "@/utils/estadoLista";
 import { ref, computed, watch, defineEmits } from "vue";
@@ -364,6 +366,8 @@ import PuntosExtra from "../PuntosExtra.vue";
 import InterruptorPago from "../InterruptorPago.vue";
 
 const props = defineProps<{ torneo: TorneoGestionInfoMasDTO }>();
+// Cerrado, ya no entra ni sale nadie
+const cerrado = useTorneoCerrado();
 const localInscripciones = ref<InscripcionTorneoCreadoMasDTO[]>([]);
 const isLoading = ref<boolean>(true);
 const showSorteoModal = ref<boolean>(false);

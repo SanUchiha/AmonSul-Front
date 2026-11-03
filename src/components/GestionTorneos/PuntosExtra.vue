@@ -2,6 +2,7 @@
   <!-- Puntos extra que da el organizador: se tocan sin abrir lo que haya debajo -->
   <div class="d-flex align-center flex-shrink-0" @click.stop>
     <v-btn
+      v-if="!cerrado"
       icon="mdi-minus"
       size="x-small"
       variant="tonal"
@@ -11,6 +12,7 @@
     />
     <span class="mx-2 text-body-2 font-weight-bold puntos">{{ inscripcion.puntosExtra ?? 0 }}</span>
     <v-btn
+      v-if="!cerrado"
       icon="mdi-plus"
       size="x-small"
       variant="tonal"
@@ -24,6 +26,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useToast } from "@/composables/useToast";
+import { useTorneoCerrado } from "@/composables/useTorneoCerrado";
 import { updatePuntosExtraAsync } from "@/services/InscripcionesService";
 
 const props = defineProps<{
@@ -36,6 +39,8 @@ const emit = defineEmits<{
 }>();
 
 const { triggerToast } = useToast();
+// Cerrado, cuentan en las posiciones guardadas: se ven pero no se cambian
+const cerrado = useTorneoCerrado();
 const guardando = ref(false);
 
 const cambiar = async (puntos: number) => {

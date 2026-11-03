@@ -3,7 +3,7 @@
     <!-- Inscritos en tarjetas: en móvil la tabla necesitaba scroll horizontal -->
     <div class="text-left px-3 pt-3">
       <!-- Justo encima de los inscritos -->
-      <v-btn variant="tonal" color="secondary" block class="mb-3" @click="openAddJugadorModal">
+      <v-btn v-if="!cerrado" variant="tonal" color="secondary" block class="mb-3" @click="openAddJugadorModal">
         Añadir jugador
       </v-btn>
       <h3 class="text-subtitle-1 font-weight-bold mb-2">Inscritos ({{ reales.length }})</h3>
@@ -125,6 +125,7 @@
 </template>
 
 <script setup lang="ts">
+import { useTorneoCerrado } from "@/composables/useTorneoCerrado";
 import { esUsuarioBye } from "@/utils/bye";
 import { bandoLista, estadoLista } from "@/utils/estadoLista";
 import { ref, computed, watch, defineEmits } from "vue";
@@ -144,6 +145,8 @@ import InterruptorPago from "./InterruptorPago.vue";
 import { ClassificationType } from "@/Constant/TipoClasificacion";
 
 const props = defineProps<{ torneo: TorneoGestionInfoDTO }>();
+// Cerrado, ya no entra ni sale nadie
+const cerrado = useTorneoCerrado();
 const localInscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 const isLoading = ref<boolean>(true);
 const showConfigModal = ref<boolean>(false);

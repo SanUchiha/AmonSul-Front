@@ -15,7 +15,7 @@
       <v-chip v-if="puntosExtraEquipo !== 0" size="x-small" variant="tonal" class="flex-shrink-0">
         {{ puntosExtraEquipo > 0 ? "+" : "" }}{{ puntosExtraEquipo }} {{ Math.abs(puntosExtraEquipo) === 1 ? "punto extra" : "puntos extra" }}
       </v-chip>
-      <v-menu>
+      <v-menu v-if="!cerrado">
         <template #activator="{ props: menuProps }">
           <v-btn
             icon="mdi-dots-vertical"
@@ -127,8 +127,9 @@
                     :title="item.listaData ? 'Modificar lista' : 'Enviar lista'"
                     @click="enviarCambiarLista(item.idInscripcion, item.listaData!, item.idUsuario, item.nick, item.idLista)"
                   />
-                  <v-divider class="my-1" />
+                  <v-divider v-if="!cerrado" class="my-1" />
                   <v-list-item
+                    v-if="!cerrado"
                     prepend-icon="mdi-account-remove"
                     base-color="error"
                     :title="esParejas ? 'Quitar de la pareja' : 'Quitar del equipo'"
@@ -162,7 +163,7 @@
           <!-- Hueco libre: se puede completar -->
           <v-card v-else variant="tonal" class="pa-2 mt-2 d-flex align-center ga-2">
             <span class="text-body-2 text-warning flex-grow-1">Hueco libre</span>
-            <v-btn size="small" variant="tonal" class="text-none" @click="handlerModalRegistrarMiembroEquipo()">
+            <v-btn v-if="!cerrado" size="small" variant="tonal" class="text-none" @click="handlerModalRegistrarMiembroEquipo()">
               Añadir jugador
             </v-btn>
           </v-card>
@@ -292,6 +293,7 @@
 <script setup lang="ts">
 import { computed, ref, defineEmits, toRef } from "vue";
 import { defineProps } from "vue";
+import { useTorneoCerrado } from "@/composables/useTorneoCerrado";
 import type { EquipoDTO, InscripcionTorneoDTO } from "@/interfaces/Inscripcion";
 import { bandoLista, estadoLista } from "@/utils/estadoLista";
 import {
@@ -327,6 +329,8 @@ import PuntosExtra from "@/components/GestionTorneos/PuntosExtra.vue";
 import InterruptorPago from "@/components/GestionTorneos/InterruptorPago.vue";
 
 const props = defineProps<{ equipo: EquipoDTO; torneo: Torneo }>();
+// Cerrado, ya no entra ni sale nadie
+const cerrado = useTorneoCerrado();
 
 const isOpenMenuAcciones = ref<{ [id: number]: boolean }>({});
 const isExpanded = ref<boolean>(false);

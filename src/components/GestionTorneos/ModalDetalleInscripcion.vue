@@ -101,8 +101,8 @@
             </v-btn>
           </v-list-item>
 
-          <!-- Botón para eliminar la inscripcion-->
-          <v-list-item>
+          <!-- Botón para eliminar la inscripcion: cerrado el torneo ya no sale nadie -->
+          <v-list-item v-if="!cerrado">
             <v-list-item-content>
               <v-btn
                 color="red"
@@ -182,6 +182,7 @@ import {
   updateEstadoPago,
 } from "@/services/InscripcionesService";
 import { defineProps, ref, watch, defineEmits } from "vue";
+import { useTorneoCerrado } from "@/composables/useTorneoCerrado";
 import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import {
@@ -202,6 +203,7 @@ import { ArmyDTO } from "@/interfaces/Army";
 const props = defineProps<{
   inscripcion: InscripcionTorneoCreadoDTO;
 }>();
+const cerrado = useTorneoCerrado();
 
 // ModalDetalleInscripcion.vue
 const emit = defineEmits<{

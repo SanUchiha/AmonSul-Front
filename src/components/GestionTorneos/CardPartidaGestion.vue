@@ -94,7 +94,7 @@
         <div class="d-flex ga-1 ms-auto">
           <!-- Con el resultado ya metido basta con validarla, sin abrir el formulario -->
           <v-btn
-            v-if="editable && puedeValidar"
+            v-if="editable && !cerrado && puedeValidar"
             size="small"
             variant="tonal"
             color="success"
@@ -105,7 +105,7 @@
             Validar
           </v-btn>
           <v-btn
-            v-if="editable"
+            v-if="editable && !cerrado"
             size="small"
             variant="tonal"
             color="primary"
@@ -160,6 +160,7 @@ import { partidaJugada } from "@/utils/clasificacionLiga";
 import { motivoSinLista, SIN_LISTA } from "@/utils/avisoLista";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import { useToast } from "@/composables/useToast";
+import { useTorneoCerrado } from "@/composables/useTorneoCerrado";
 import ModalEditarPartidaGestion from "@/components/GestionTorneos/ModalEditarPartidaGestion.vue";
 import ModalListaResultadoTorneo from "@/components/ResultadosTorneos/ModalListaResultadoTorneo.vue";
 import ModalError from "@/components/Commons/ModalError.vue";
@@ -241,6 +242,7 @@ const colorElo = (variacion: number) =>
 
 // El aviso de éxito es el de la app: con un filtro, la tarjeta puede desaparecer al cambiar la partida
 const { triggerToast } = useToast();
+const cerrado = useTorneoCerrado();
 const showEditar = ref(false);
 const isCargando = ref(false);
 const showError = ref(false);

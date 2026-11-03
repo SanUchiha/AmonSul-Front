@@ -184,6 +184,7 @@
 </template>
 
 <script setup lang="ts">
+import { compartirTorneoCerrado } from "@/composables/useTorneoCerrado";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { Torneo, TorneoGestionInfoDTO } from "@/interfaces/Torneo";
@@ -224,6 +225,8 @@ const torneoGestion = ref<TorneoGestionInfoDTO>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
 // Con los resultados guardados ya no se retira a nadie ni se vuelve a cerrar
 const ligaCerrada = ref(false);
+// Cerrado, las tarjetas y tablas no enseñan lo que ya no se puede cambiar
+compartirTorneoCerrado(ligaCerrada);
 
 const ligaGenerada = computed(() => partidas.value.length > 0);
 const cuenta = (n: number, singular: string, plural: string) =>

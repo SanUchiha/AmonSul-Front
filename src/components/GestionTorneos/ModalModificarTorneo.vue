@@ -188,6 +188,7 @@
             v-if="!porJornadas"
             v-model="numeroPartidas"
             label="¿Cuantas rondas tiene el torneo?"
+            :disabled="cerrado"
             required
             type="number"
             :rules="[
@@ -201,6 +202,7 @@
             v-if="!porJornadas"
             v-model="tipoTorneo"
             label="¿De qué tipo es el torneo?"
+            :disabled="cerrado"
             required
             :items="tipoTorneoOptions"
             item-title="label"
@@ -217,6 +219,7 @@
             v-if="tipoTorneo === 'Parejas' && !porJornadas"
             v-model="listaPorPareja"
             label="¿Cómo entregan las listas las parejas?"
+            :disabled="cerrado"
             :items="modoListasParejaOptions"
             item-title="label"
             item-value="value"
@@ -226,6 +229,9 @@
           <v-select
             v-model="classificationType"
             label="¿Qué tipo de clasificación se utilizará?"
+            :disabled="cerrado"
+            :hint="cerrado ? 'Con los resultados guardados ya no cambia cómo puntúa.' : undefined"
+            :persistent-hint="cerrado"
             required
             :items="classificationTypeOptions"
             item-title="label"
@@ -464,6 +470,7 @@ import ModalSuccess from "../Commons/ModalSuccess.vue";
 import ModalError from "../Commons/ModalError.vue";
 import { ModificarTorneoDTO, Torneo } from "@/interfaces/Torneo";
 import { modificarTorneo } from "@/services/TorneosService";
+import { useTorneoCerrado } from "@/composables/useTorneoCerrado";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
 import {
@@ -654,6 +661,8 @@ const tercerPuesto = ref<boolean>(false);
 const cuentaElo = ref<boolean>(false);
 const idaYVuelta = ref<boolean>(false);
 const classificationType = ref<ClassificationType>();
+// Cerrado, lo que decide cómo puntúa ya no se cambia: la clasificación dejaría de ser la de las posiciones guardadas
+const cerrado = useTorneoCerrado();
 const idRangoTorneo = ref<number>(1);
 const esMatchedPlayTorneo = ref<boolean>(false);
 const metodosPago = ref<string[]>([]);

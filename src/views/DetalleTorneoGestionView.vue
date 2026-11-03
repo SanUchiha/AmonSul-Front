@@ -492,6 +492,7 @@
 </template>
 
 <script setup lang="ts">
+import { compartirTorneoCerrado } from "@/composables/useTorneoCerrado";
 import CardPartidaGestion from "@/components/GestionTorneos/CardPartidaGestion.vue";
 import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
 import { useRondasEnPestana } from "@/composables/useRondasEnPestana";
@@ -616,6 +617,8 @@ const partidaActual = ref<PartidaTorneoDTO>({
 });
 const idRondaSelected = ref<number>(0);
 const wasSave = ref<boolean>(false);
+// Cerrado, las tarjetas y tablas no enseñan lo que ya no se puede cambiar
+compartirTorneoCerrado(wasSave);
 const idTorneoComputed = computed(() => idTorneo.value ?? 0);
 const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 
