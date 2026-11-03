@@ -100,12 +100,17 @@ const resetSeleccion = () => {
   jugadorEquipo2Seleccionado.value = null;
 };
 
-watch(isVisible, (val) => {
-  if (val) {
-    cargarJugadores();
-    resetSeleccion();
-  }
-});
+// También si se monta ya abierto, como desde la tarjeta de la partida
+watch(
+  isVisible,
+  (val) => {
+    if (val) {
+      cargarJugadores();
+      resetSeleccion();
+    }
+  },
+  { immediate: true }
+);
 
 const actualizar = () => {
   if (

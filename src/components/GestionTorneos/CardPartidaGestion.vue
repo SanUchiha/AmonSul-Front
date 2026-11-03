@@ -79,7 +79,14 @@
             <div v-if="i === 1" />
             <div
               class="font-weight-bold text-wrap mt-1"
-              :class="[alineado(l), { 'text-primary': l.companero?.id === idJugador, pulsable: idJugador != null }]"
+              :class="[
+                alineado(l),
+                {
+                  'text-success': ganador === l.lado,
+                  'text-primary': ganador !== l.lado && l.companero?.id === idJugador,
+                  pulsable: idJugador != null,
+                },
+              ]"
               @click="verPerfil(l.companero?.id)"
             >
               {{ l.companero?.nick }}
