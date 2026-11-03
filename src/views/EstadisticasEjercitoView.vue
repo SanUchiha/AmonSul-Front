@@ -1,6 +1,11 @@
 <template>
   <v-container class="estadisticas text-left">
-    <v-chip-group v-model="seccion" mandatory selected-class="text-primary" class="mb-1 secciones">
+    <v-chip-group
+      v-model="seccion"
+      mandatory
+      selected-class="text-primary"
+      class="mb-1 secciones"
+    >
       <v-chip value="ejercitos" filter>Ejércitos</v-chip>
       <v-chip value="cruces" filter>Cruces</v-chip>
       <v-chip value="jugadores" filter>Jugadores</v-chip>
@@ -26,11 +31,23 @@
     </v-expand-transition>
 
     <!-- El bando solo filtra el ranking: en los cruces se elige el rival -->
-    <FiltrosEstadisticas v-model="filtro" :con-bando="seccion === 'ejercitos'" />
+    <FiltrosEstadisticas
+      v-model="filtro"
+      :con-bando="seccion === 'ejercitos'"
+    />
 
     <!-- Cada sección guarda lo que tenía al cambiar de una a otra; cruces y jugadores se cargan la primera vez que se abren -->
-    <RankingEjercitos v-show="seccion === 'ejercitos'" :filtro="filtro" @ver="abrirFicha" />
-    <CrucesEjercitos v-if="abiertas.cruces" v-show="seccion === 'cruces'" :filtro="filtro" :inicial="cruceInicial" />
+    <RankingEjercitos
+      v-show="seccion === 'ejercitos'"
+      :filtro="filtro"
+      @ver="abrirFicha"
+    />
+    <CrucesEjercitos
+      v-if="abiertas.cruces"
+      v-show="seccion === 'cruces'"
+      :filtro="filtro"
+      :inicial="cruceInicial"
+    />
     <JugadoresEjercitos
       v-if="abiertas.jugadores"
       v-show="seccion === 'jugadores'"
@@ -39,7 +56,12 @@
       @ver="abrirFicha"
     />
 
-    <FichaEjercito v-model="verFicha" :ejercito="ejercitoVisto" :filtro="filtro" @cruce="verCruce" />
+    <FichaEjercito
+      v-model="verFicha"
+      :ejercito="ejercitoVisto"
+      :filtro="filtro"
+      @cruce="verCruce"
+    />
   </v-container>
 </template>
 
@@ -47,6 +69,10 @@
 import { reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { FiltroEstadisticas } from "@/interfaces/Estadisticas";
+import {
+  filtroDesdeQuery,
+  queryConFiltro,
+} from "@/utils/estadisticasEjercitos";
 import FiltrosEstadisticas from "@/components/Estadisticas/Ejercitos/FiltrosEstadisticas.vue";
 import RankingEjercitos from "@/components/Estadisticas/Ejercitos/RankingEjercitos.vue";
 import CrucesEjercitos from "@/components/Estadisticas/Ejercitos/CrucesEjercitos.vue";
@@ -65,20 +91,36 @@ const verComo = ref(false);
 // con ?seccion=jugadores&jugador=id
 const pedida = String(route.query.seccion ?? "") as Seccion;
 const seccion = ref<Seccion>(SECCIONES.includes(pedida) ? pedida : "ejercitos");
-const abiertas = reactive({ cruces: seccion.value === "cruces", jugadores: seccion.value === "jugadores" });
+const abiertas = reactive({
+  cruces: seccion.value === "cruces",
+  jugadores: seccion.value === "jugadores",
+});
 const jugadorInicial = ref<number | null>(Number(route.query.jugador) || null);
 watch(seccion, valor => {
   if (valor === "cruces") abiertas.cruces = true;
   if (valor === "jugadores") abiertas.jugadores = true;
-  if (route.query.seccion !== valor) router.replace({ query: { ...route.query, seccion: valor } });
+  if (route.query.seccion !== valor)
+    router.replace({ query: { ...route.query, seccion: valor } });
 });
 
-// Se empieza por la temporada actual, con todos los puntos y sin amistosas. Desde la ficha de un jugador, con todo, como
-// cuenta sus partidas la ficha
+// Los filtros van en la URL: al recargar o al compartir el enlace se ven los mismos. Sin ellos se empieza por la
+// temporada actual, con todos los puntos y sin amistosas; desde la ficha de un jugador, con todo, como cuenta sus
+// partidas la ficha
+const porDefecto: FiltroEstadisticas = jugadorInicial.value
+  ? { temporadas: [], tramos: [], bando: null, amistosas: true }
+  : {
+      temporadas: [new Date().getFullYear()],
+      tramos: [],
+      bando: null,
+      amistosas: false,
+    };
 const filtro = ref<FiltroEstadisticas>(
-  jugadorInicial.value
-    ? { temporadas: [], tramos: [], bando: null, amistosas: true }
-    : { temporadas: [new Date().getFullYear()], tramos: [], bando: null, amistosas: false }
+  filtroDesdeQuery(route.query, porDefecto)
+);
+watch(
+  filtro,
+  valor => router.replace({ query: queryConFiltro(route.query, valor) }),
+  { deep: true }
 );
 
 const verFicha = ref(false);
