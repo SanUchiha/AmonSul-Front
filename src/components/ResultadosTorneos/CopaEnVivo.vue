@@ -81,32 +81,28 @@
             >
               No tienes partidas pendientes.
             </p>
-            <CardPartidaTorneoLive
+            <CardPartidaGestion
               v-for="partida in misPendientes"
               :key="partida.idPartidaTorneo"
-              :idUsuario="idUsuario!"
-              :match="partida"
-              :mesa="etiquetaPartidaCopa(partida, cuadro)"
-              :completa="false"
-              :editarPartidaPJ="faltaMiValidacion(partida)"
-              :soloValidarPJ="soloFaltaMiValidacion(partida)"
-              listaDePartida
+              :partida="partida"
+              :editable="false"
+              :etiqueta="etiquetaPartidaCopa(partida, cuadro)"
+              :idJugador="idUsuario!"
+              :meterResultado="faltaMiValidacion(partida)"
+              :soloValidar="soloFaltaMiValidacion(partida)"
             />
 
             <template v-if="misJugadas.length > 0">
               <h3 class="text-subtitle-1 font-weight-bold mt-4">
                 Jugadas ({{ misJugadas.length }})
               </h3>
-              <CardPartidaTorneoLive
+              <CardPartidaGestion
                 v-for="partida in misJugadas"
                 :key="partida.idPartidaTorneo"
-                :idUsuario="idUsuario!"
-                :match="partida"
-                :mesa="etiquetaPartidaCopa(partida, cuadro)"
-                :completa="true"
-                :editarPartidaPJ="false"
-                :soloValidarPJ="false"
-                listaDePartida
+                :partida="partida"
+                :editable="false"
+                :etiqueta="etiquetaPartidaCopa(partida, cuadro)"
+                :idJugador="idUsuario!"
               />
             </template>
           </div>
@@ -177,6 +173,8 @@
 </template>
 
 <script setup lang="ts">
+import { compartirSistemaAleman } from "@/composables/useSistemaAleman";
+import CardPartidaGestion from "@/components/GestionTorneos/CardPartidaGestion.vue";
 import { computed, defineProps, onMounted, ref } from "vue";
 import { Torneo } from "@/interfaces/Torneo";
 import { PartidaTorneoDTO } from "@/interfaces/Partidas";
@@ -191,7 +189,6 @@ import {
   etiquetaPartidaCopa,
   montarCuadro,
 } from "@/utils/cuadroCopa";
-import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import TabJornadasLiga from "@/components/GestionTorneos/Liga/TabJornadasLiga.vue";
 import TablaClasificacionLiga from "@/components/GestionTorneos/Liga/TablaClasificacionLiga.vue";
@@ -202,6 +199,8 @@ const props = defineProps<{
   torneo: Torneo;
   idUsuario?: number;
 }>();
+// Con el sistema alemán, las partidas enseñan también los puntos que dan
+compartirSistemaAleman(() => props.torneo.classificationType);
 
 const isLoading = ref(true);
 const partidas = ref<PartidaTorneoDTO[]>([]);

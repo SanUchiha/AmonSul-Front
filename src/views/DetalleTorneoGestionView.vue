@@ -492,6 +492,7 @@
 </template>
 
 <script setup lang="ts">
+import { compartirSistemaAleman } from "@/composables/useSistemaAleman";
 import { compartirTorneoCerrado } from "@/composables/useTorneoCerrado";
 import CardPartidaGestion from "@/components/GestionTorneos/CardPartidaGestion.vue";
 import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
@@ -540,6 +541,8 @@ import { esUsuarioBye } from "@/utils/bye";
 
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
+// Con el sistema alemán, las partidas enseñan también los puntos que dan
+compartirSistemaAleman(() => torneo.value?.classificationType);
 const partidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);
 // Al entrar, la pestaña Gestión: como en la gestión por equipos

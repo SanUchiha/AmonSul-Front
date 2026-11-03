@@ -77,7 +77,8 @@
 
         <!-- tab mis partidas -->
         <v-window-item :value="tabMisPartidas" :key="tabMisPartidas">
-          <v-row>
+          <!-- Sin el margen negativo de abajo: la ventana de pestañas recortaba la última tarjeta -->
+          <v-row class="mb-0">
             <v-col
               cols="12"
               sm="12"
@@ -85,49 +86,28 @@
               lg="6"
               xl="4"
               class="pb-0"
-              v-for="(partida, index) in misPartidas"
+              v-for="partida in misPartidas"
               :key="partida.idPartidaTorneo"
             >
-              <!-- Partida completada -->
-              <div
-                v-if="
-                  partida.partidaValidadaUsuario1 === true &&
-                  partida.partidaValidadaUsuario2 === true
-                "
-              >
-                <CardPartidaTorneoEquipoLive
-                  :idUsuario="parseInt(idUsuarioLogger!)"
-                  :match="partida"
-                  :mesa="`Mesa ${index + 1}`"
-                  :completa="true"
-                  :editarPartidaPJ="false"
-                  :soloValidarPJ="false"
-                  :idEquipo="idEquipo"
-                  :listaPorJugador="torneo?.listaPorPareja === false"
-                  :misPartidas="true"
-                />
-              </div>
-              <!-- Partida sin completar -->
-              <div v-else>
-                <CardPartidaTorneoEquipoLive
-                  :idUsuario="parseInt(idUsuarioLogger!)"
-                  :match="partida"
-                  :mesa="`Mesa ${index + 1}`"
-                  :completa="false"
-                  :editarPartidaPJ="editarPartidaCapitan(partida)"
-                  :soloValidarPJ="soloValidarCapitan(partida)"
-                  :idEquipo="idEquipo"
-                  :listaPorJugador="torneo?.listaPorPareja === false"
-                  :misPartidas="true"
-                />
-              </div>
+              <!-- Como en la gestión: el capitán mete el resultado, valida el del rival o cambia el emparejamiento -->
+              <CardPartidaGestion
+                :partida="partida"
+                :editable="false"
+                :etiqueta="`Ronda ${partida.numeroRonda}`"
+                :idJugador="parseInt(idUsuarioLogger!)"
+                :meterResultado="editarPartidaCapitan(partida)"
+                :soloValidar="soloValidarCapitan(partida)"
+                :listaPorPareja="torneo?.listaPorPareja === true"
+                cambiarPairing
+              />
             </v-col>
           </v-row>
         </v-window-item>
 
         <!-- tab dinamicas -->
         <v-window-item v-for="n in numeroRondas" :key="n" :value="n">
-          <v-row>
+          <!-- Sin el margen negativo de abajo: la ventana de pestañas recortaba la última tarjeta -->
+          <v-row class="mb-0">
             <v-col v-if="isLoadingPartidas" cols="12" class="d-flex justify-center pa-8">
               <v-progress-circular indeterminate color="primary" />
             </v-col>
@@ -148,39 +128,17 @@
               v-for="partida in deLaBusqueda(partidasPorRonda[n])"
               :key="partida.idPartidaTorneo"
             >
-              <!-- Partida completada -->
-              <div
-                v-if="
-                  partida.partidaValidadaUsuario1 === true &&
-                  partida.partidaValidadaUsuario2 === true
-                "
-              >
-                <CardPartidaTorneoEquipoLive
-                  :idUsuario="parseInt(idUsuarioLogger!)"
-                  :match="partida"
-                  :mesa="`Mesa ${mesaDe(partidasPorRonda[n], partida)}`"
-                  :completa="true"
-                  :editarPartidaPJ="false"
-                  :soloValidarPJ="false"
-                  :idEquipo="idEquipo"
-                  :listaPorJugador="torneo?.listaPorPareja === false"
-                  :misPartidas="false"
-                />
-              </div>
-              <!-- Partida sin completar -->
-              <div v-else>
-                <CardPartidaTorneoEquipoLive
-                  :idUsuario="parseInt(idUsuarioLogger!)"
-                  :match="partida"
-                  :mesa="`Mesa ${mesaDe(partidasPorRonda[n], partida)}`"
-                  :completa="false"
-                  :editarPartidaPJ="editarPartidaCapitan(partida)"
-                  :soloValidarPJ="soloValidarCapitan(partida)"
-                  :idEquipo="idEquipo"
-                  :listaPorJugador="torneo?.listaPorPareja === false"
-                  :misPartidas="false"
-                />
-              </div>
+              <!-- Como en la gestión: el capitán mete el resultado, valida el del rival o cambia el emparejamiento -->
+              <CardPartidaGestion
+                :partida="partida"
+                :editable="false"
+                :etiqueta="`Mesa ${mesaDe(partidasPorRonda[n], partida)}`"
+                :idJugador="parseInt(idUsuarioLogger!)"
+                :meterResultado="editarPartidaCapitan(partida)"
+                :soloValidar="soloValidarCapitan(partida)"
+                :listaPorPareja="torneo?.listaPorPareja === true"
+                cambiarPairing
+              />
             </v-col>
             </template>
           </v-row>
@@ -233,6 +191,7 @@
 </template>
 
 <script setup lang="ts">
+import { compartirSistemaAleman } from "@/composables/useSistemaAleman";
 import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
 import { useRondasEnPestana } from "@/composables/useRondasEnPestana";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
@@ -241,7 +200,7 @@ import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClas
 import TabClasificacionEquiposIndividual from "@/components/GestionTorneos/Equipos/TabClasificacionEquiposIndividual.vue";
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
 import TabResumenTorneo from "@/components/GestionTorneos/TabResumenTorneo.vue";
-import CardPartidaTorneoEquipoLive from "@/components/PartidasTorneo/CardPartidaTorneoEquipoLive.vue";
+import CardPartidaGestion from "@/components/GestionTorneos/CardPartidaGestion.vue";
 import { useAuth } from "@/composables/useAuth";
 import {
   ResultMatchMatchedPlayType,
@@ -275,6 +234,8 @@ const idTorneo = ref<number>(Number(route.params.idTorneo));
 const isLoading = ref<boolean>(false);
 const isLoadingImage = ref<boolean>(false);
 const torneo = ref<Torneo>();
+// Con el sistema alemán, las partidas enseñan también los puntos que dan
+compartirSistemaAleman(() => torneo.value?.classificationType);
 const partidas = ref<PartidaTorneoDTO[]>([]);
 const misPartidas = ref<PartidaTorneoDTO[]>([]);
 const numeroRondas = ref<number[]>([]);

@@ -4,50 +4,25 @@
       <v-card-title class="headline">Partidas de hoy</v-card-title>
       <v-card-text>
         <div v-if="estaJugando.partidas && estaJugando.partidas.length > 0">
-          <div v-if="estaJugando.torneoType == 'Individual'">
-            <CardPartidaTorneoLive
-              v-for="(partida, idx) in partidasOrdenadas"
-              :key="partida.idPartidaTorneo || idx"
-              :idUsuario="idUsuario"
-              :match="partida"
-              :mesa="
-                esCopa
-                  ? etiquetaPartidaCopa(partida, null, estaJugando.rondasEliminatoria)
-                  : esLiga
-                    ? `Jornada ${partida.numeroRonda}`
-                    : etiquetaRonda(partida)
-              "
-              :completa="
-                partida.partidaValidadaUsuario1 === true &&
-                partida.partidaValidadaUsuario2 === true
-              "
-              :editarPartidaPJ="editarPartidaPJ(partida)"
-              :soloValidarPJ="soloValidarPJ(partida)"
-              :listaDePartida="esLiga || esCopa"
-            />
-          </div>
-          <div v-else>
-            <CardPartidaTorneoEquipoLive
-              v-for="(partida, idx) in partidasOrdenadas"
-              :key="partida.idPartidaTorneo || idx"
-              :idUsuario="idUsuario"
-              :match="partida"
-              :mesa="etiquetaRonda(partida)"
-              :completa="
-                partida.partidaValidadaUsuario1 === true &&
-                partida.partidaValidadaUsuario2 === true
-              "
-              :editarPartidaPJ="editarPartidaPJ(partida)"
-              :soloValidarPJ="soloValidarPJ(partida)"
-              :idEquipo="
-                partida.idUsuario1 === idUsuario ||
-                partida.idCompanero1 === idUsuario
-                  ? partida.idEquipo1
-                  : partida.idEquipo2
-              "
-              :listaPorJugador="estaJugando.listaPorPareja === false"
-            />
-          </div>
+          <!-- Como en la gestión; si le toca, el jugador (o el capitán) mete su resultado o valida el del rival -->
+          <CardPartidaGestion
+            v-for="(partida, idx) in partidasOrdenadas"
+            :key="partida.idPartidaTorneo || idx"
+            :partida="partida"
+            :editable="false"
+            :etiqueta="
+              esCopa
+                ? etiquetaPartidaCopa(partida, null, estaJugando.rondasEliminatoria)
+                : esLiga
+                  ? `Jornada ${partida.numeroRonda}`
+                  : etiquetaRonda(partida)
+            "
+            :idJugador="idUsuario"
+            :meterResultado="editarPartidaPJ(partida)"
+            :soloValidar="soloValidarPJ(partida)"
+            :listaPorPareja="estaJugando.listaPorPareja === true"
+            :cambiarPairing="estaJugando.torneoType !== 'Individual'"
+          />
         </div>
         <div v-else>No tienes partidas activas.</div>
       </v-card-text>
@@ -60,12 +35,12 @@
 </template>
 
 <script setup lang="ts">
+import { compartirSistemaAleman } from "@/composables/useSistemaAleman";
 import { EstaJugandoDTO, PartidaTorneoDTO } from "@/interfaces/Partidas";
 import { computed } from "vue";
 import { FORMATO_COPA, FORMATO_LIGA } from "@/Constant/FormatoTorneo";
 import { etiquetaPartidaCopa } from "@/utils/cuadroCopa";
-import CardPartidaTorneoLive from "@/components/PartidasTorneo/CardPartidaTorneoLive.vue";
-import CardPartidaTorneoEquipoLive from "@/components/PartidasTorneo/CardPartidaTorneoEquipoLive.vue";
+import CardPartidaGestion from "@/components/GestionTorneos/CardPartidaGestion.vue";
 
 // eslint-disable-next-line no-undef
 const props = defineProps({
@@ -82,6 +57,8 @@ const props = defineProps({
     required: true,
   },
 });
+// Con el sistema alemán, las partidas enseñan también los puntos que dan
+compartirSistemaAleman(() => props.estaJugando.classificationType);
 
 // eslint-disable-next-line no-undef
 const emit = defineEmits(["update:modelValue"]);

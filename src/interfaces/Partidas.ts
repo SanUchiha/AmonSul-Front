@@ -172,4 +172,6 @@ export interface EstaJugandoDTO {
   formatoTorneo?: string | null;
   // En una copa, las rondas del cuadro: la partida de eliminatoria se nombra por su ronda
   rondasEliminatoria?: number | null;
+  // Con el sistema alemán (3) las partidas enseñan también los puntos que dan
+  classificationType?: number;
 }

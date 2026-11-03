@@ -291,6 +291,7 @@
 </template>
 
 <script setup lang="ts">
+import { compartirSistemaAleman } from "@/composables/useSistemaAleman";
 import { compartirTorneoCerrado } from "@/composables/useTorneoCerrado";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -345,6 +346,8 @@ const idTorneo = Number(route.params.idTorneo);
 const tab = ref("gestion");
 const isLoading = ref(true);
 const torneo = ref<Torneo>();
+// Con el sistema alemán, las partidas enseñan también los puntos que dan
+compartirSistemaAleman(() => torneo.value?.classificationType);
 const torneoGestion = ref<TorneoGestionInfoDTO>();
 const partidas = ref<PartidaTorneoDTO[]>([]);
 // Con los resultados guardados ya no se retira a nadie ni se toca el cuadro
