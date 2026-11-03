@@ -3,15 +3,28 @@ import axios from "axios";
 import { RequestLoginDTO } from "@/interfaces/Login";
 import { appsettings } from "@/settings/appsettings";
 import { AuthState } from "@/interfaces/Login";
+import {
+  borrarSesionGuardada,
+  cargarSesionGuardada,
+  guardarDatoSesion,
+  leerDatoSesion,
+} from "@/services/StorageService";
 
 const BASE_URL: string = appsettings.apiUrl;
 
-const stateAuth = reactive<AuthState>({
-  user: JSON.parse(localStorage.getItem("user") || "null"),
-  token: localStorage.getItem("token") || "",
-  error: null,
-  idUsuario: JSON.parse(localStorage.getItem("idUsuario") || "null"),
+const sesionGuardada = () => ({
+  user: JSON.parse(leerDatoSesion("user") || "null"),
+  token: leerDatoSesion("token") || "",
+  idUsuario: JSON.parse(leerDatoSesion("idUsuario") || "null"),
 });
+
+const stateAuth = reactive<AuthState>({ ...sesionGuardada(), error: null });
+
+// En main.ts, antes de montar la app: la sesión del dispositivo se lee sin esperar desde el router
+const restaurarSesion = async () => {
+  await cargarSesionGuardada();
+  Object.assign(stateAuth, sesionGuardada());
+};
 
 const login = async (credentials: RequestLoginDTO) => {
   try {
@@ -21,9 +34,11 @@ const login = async (credentials: RequestLoginDTO) => {
       const user = response.data.user;
       const idUsuario = response.data.idUsuario;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("idUsuario", JSON.stringify(idUsuario));
+      await Promise.all([
+        guardarDatoSesion("token", token),
+        guardarDatoSesion("user", JSON.stringify(user)),
+        guardarDatoSesion("idUsuario", JSON.stringify(idUsuario)),
+      ]);
 
       stateAuth.token = token;
       stateAuth.user = user;
@@ -42,9 +57,7 @@ const login = async (credentials: RequestLoginDTO) => {
 };
 
 const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  localStorage.removeItem("idUsuario");
+  void borrarSesionGuardada();
 
   stateAuth.user = "";
   stateAuth.token = "";
@@ -60,6 +73,7 @@ const getError = computed<string | null>(() => stateAuth.error);
 export function useAuth() {
   return {
     stateAuth,
+    restaurarSesion,
     login,
     logout,
     isAuthenticated,

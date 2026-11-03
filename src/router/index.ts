@@ -10,6 +10,7 @@ import RegistroUsuarioView from "@/views/RegistroUsuarioView.vue";
 import TorneosView from "@/views/TorneosView.vue";
 import ErrorView from "@/views/ErrorView.vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { leerDatoSesion } from "@/services/StorageService";
 import EloView from "@/views/EloView.vue";
 import DetalleInscripcionView from "@/views/DetalleInscripcionView.vue";
 import GestionTorneosView from "@/views/GestionTorneosView.vue";
@@ -142,7 +143,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/mis-partidas",
     name: "mis-partidas",
     redirect: () => {
-      const idUsuario = JSON.parse(localStorage.getItem("idUsuario") || "null");
+      const idUsuario = JSON.parse(leerDatoSesion("idUsuario") || "null");
       return idUsuario
         ? { name: "detalle-jugador", params: { idUsuario: String(idUsuario) }, query: { pestana: "amistosas" } }
         : { name: "inicio-sesion" };
@@ -199,8 +200,9 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
+    // Al abrir la app o la web con la sesión guardada se entra directo, sin pasar por iniciar sesión
     path: "/",
-    redirect: { name: "inicio-sesion" },
+    redirect: () => ({ name: leerDatoSesion("token") ? "home" : "inicio-sesion" }),
   },
 ];
 
@@ -210,7 +212,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const loggedIn = localStorage.getItem("token");
+  const loggedIn = leerDatoSesion("token");
   if (to.matched.some((record) => record.meta.requiresAuth) && !loggedIn) {
     next({ name: "inicio-sesion" });
   } else {

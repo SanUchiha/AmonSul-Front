@@ -3,6 +3,7 @@ import type { AxiosError } from 'axios'
 import type { AxiosResponse } from 'axios'
 import router from '@/router/index'
 import { useAuth } from '@/composables/useAuth'
+import { leerDatoSesion } from '@/services/StorageService'
 
 type errorCode = number | null
 interface interceptorError extends AxiosError {
@@ -20,7 +21,7 @@ const funcErrors = (
   errorCode: errorCode,
 ) => {
   // define each generic errors
-  const token = localStorage.getItem("token");
+  const token = leerDatoSesion("token");
   if (errorCode === 403) {
     if (!token) {
       router.push({ name: "inicio-sesion" });
