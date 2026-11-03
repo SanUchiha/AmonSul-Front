@@ -4,6 +4,10 @@
       <v-card-title> Editar partida </v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="isFormValid">
+          <AvisoSistemaAleman
+            :resultado1="partidaEditada.resultadoUsuario1"
+            :resultado2="partidaEditada.resultadoUsuario2"
+          />
           <v-text-field
             :label="`Puntos de ${lado1}`"
             v-model.number="partidaEditada.resultadoUsuario1"
@@ -66,6 +70,7 @@
 <script setup lang="ts">
 import { UpdatePartidaTorneoDTO } from "@/interfaces/Live";
 import { computed, ref, watch } from "vue";
+import AvisoSistemaAleman from "@/components/GestionTorneos/AvisoSistemaAleman.vue";
 import { PartidaTorneoDTO, PartidaTorneoMasDTO } from "@/interfaces/Partidas";
 import { appsettings } from "@/settings/appsettings";
 
