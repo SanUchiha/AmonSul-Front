@@ -5,13 +5,13 @@ import { Preferences } from "@capacitor/preferences";
 // «CapacitorStorage.*»). Se lee una vez al arrancar y se copia en memoria para que el router y los
 // interceptores puedan leerla sin esperar.
 
-const CLAVES_SESION = ["token", "user", "idUsuario"] as const;
+const CLAVES_SESION = ["token", "user", "idUsuario", "refreshToken"] as const;
 export type ClaveSesion = (typeof CLAVES_SESION)[number];
 
 const enMemoria: Partial<Record<ClaveSesion, string>> = {};
 
-// Antes de montar la app. La sesión que estaba en localStorage con las claves de antes pasa a
-// Preferences, así nadie tiene que volver a iniciar sesión tras el cambio
+// Antes de montar la app, y de nuevo al renovar la sesión por si otra pestaña la ha cambiado. La sesión que
+// estaba en localStorage con las claves de antes pasa a Preferences, así nadie tiene que volver a iniciar sesión
 export const cargarSesionGuardada = async (): Promise<void> => {
   for (const clave of CLAVES_SESION) {
     let { value } = await Preferences.get({ key: clave });
@@ -22,6 +22,7 @@ export const cargarSesionGuardada = async (): Promise<void> => {
     }
     if (antigua !== null) localStorage.removeItem(clave);
     if (value !== null) enMemoria[clave] = value;
+    else delete enMemoria[clave];
   }
 };
 

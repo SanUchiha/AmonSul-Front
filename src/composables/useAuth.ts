@@ -26,25 +26,30 @@ const restaurarSesion = async () => {
   Object.assign(stateAuth, sesionGuardada());
 };
 
+// Lo que devuelven Acceso/Login y Acceso/Refresh cuando entra
+const guardarSesion = async (data: {
+  token: string;
+  user: string;
+  idUsuario: string;
+  refreshToken?: string;
+}) => {
+  await Promise.all([
+    guardarDatoSesion("token", data.token),
+    guardarDatoSesion("user", JSON.stringify(data.user)),
+    guardarDatoSesion("idUsuario", JSON.stringify(data.idUsuario)),
+    data.refreshToken && guardarDatoSesion("refreshToken", data.refreshToken),
+  ]);
+
+  stateAuth.token = data.token;
+  stateAuth.user = data.user;
+  stateAuth.idUsuario = data.idUsuario;
+  stateAuth.error = null;
+};
+
 const login = async (credentials: RequestLoginDTO) => {
   try {
     const response = await axios.post(BASE_URL + "Acceso/Login", credentials);
-    if (response.data.isAccess) {
-      const token = response.data.token;
-      const user = response.data.user;
-      const idUsuario = response.data.idUsuario;
-
-      await Promise.all([
-        guardarDatoSesion("token", token),
-        guardarDatoSesion("user", JSON.stringify(user)),
-        guardarDatoSesion("idUsuario", JSON.stringify(idUsuario)),
-      ]);
-
-      stateAuth.token = token;
-      stateAuth.user = user;
-      stateAuth.idUsuario = idUsuario;
-      stateAuth.error = null;
-    }
+    if (response.data.isAccess) await guardarSesion(response.data);
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -53,6 +58,38 @@ const login = async (credentials: RequestLoginDTO) => {
       return errorMessage;
     }
     throw error;
+  }
+};
+
+// El token caduca a las 12 horas: con el refresh token se pide otro sin volver a iniciar sesión. Una sola
+// renovación a la vez, aunque caduquen varias peticiones juntas
+let renovacionEnCurso: Promise<boolean> | null = null;
+
+const renovarSesion = (tokenCaducado: string): Promise<boolean> => {
+  if (!renovacionEnCurso)
+    renovacionEnCurso = pedirTokenNuevo(tokenCaducado).finally(() => {
+      renovacionEnCurso = null;
+    });
+  return renovacionEnCurso;
+};
+
+const pedirTokenNuevo = async (tokenCaducado: string): Promise<boolean> => {
+  // Otra pestaña puede haberla renovado ya: se parte de lo guardado, no de la copia en memoria
+  await cargarSesionGuardada();
+  Object.assign(stateAuth, sesionGuardada());
+  if (stateAuth.token && stateAuth.token !== tokenCaducado) return true;
+
+  const refreshToken = leerDatoSesion("refreshToken");
+  if (!refreshToken) return false;
+  try {
+    const { data } = await axios.post(BASE_URL + "Acceso/Refresh", {
+      refreshToken,
+    });
+    if (!data.isAccess) return false;
+    await guardarSesion(data);
+    return true;
+  } catch {
+    return false;
   }
 };
 
@@ -74,6 +111,7 @@ export function useAuth() {
   return {
     stateAuth,
     restaurarSesion,
+    renovarSesion,
     login,
     logout,
     isAuthenticated,
