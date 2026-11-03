@@ -683,6 +683,8 @@ onMounted(async () => {
 });
 
 const resultados = async (ronda: number) => {
+  // Con lo último que hay en la página: una partida validada después de abrirla tiene que contar
+  calcularClasificacion();
   try {
     isGenerating.value = true;
     const ganadores: ResultadoJugador[] = clasificacion.value.map(
@@ -762,6 +764,8 @@ const handleModificarPairingTorneoConfirm = async (
       },
       {} as Record<number, PartidaTorneoDTO[]>
     );
+    // El cambio mueve la clasificación
+    calcularClasificacion();
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;
@@ -787,6 +791,8 @@ const handleEliminarPartidaConfirm = (idPartidaEliminada: number) => {
       },
       {} as Record<number, PartidaTorneoDTO[]>
     );
+    // El cambio mueve la clasificación
+    calcularClasificacion();
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;
