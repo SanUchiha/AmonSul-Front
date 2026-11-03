@@ -38,7 +38,12 @@ const cambiar = async (valor: boolean | null) => {
   try {
     await cambiarCompartirEmailAsync(props.idInscripcion, nuevo);
     compartir.value = nuevo;
-    triggerToast("success", nuevo ? "El organizador ya puede ver tu correo" : "El organizador ya no ve tu correo");
+    triggerToast(
+      "success",
+      nuevo
+        ? "El organizador ya puede ver tu correo"
+        : "El organizador ya no ve tu correo"
+    );
   } catch (error) {
     console.error(error);
     triggerToast("error", "No se ha podido cambiar");

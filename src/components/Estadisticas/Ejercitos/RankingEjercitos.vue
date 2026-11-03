@@ -14,15 +14,26 @@
     <!-- Dos formas de verlo: cómo le va en las partidas o cuántos torneos gana -->
     <div class="d-flex flex-wrap justify-center align-center ga-1 mb-2">
       <span class="text-caption text-medium-emphasis mr-1">Ver por</span>
-      <v-chip size="small" :color="vista === 'partidas' ? 'primary' : undefined" @click="vista = 'partidas'">
+      <v-chip
+        size="small"
+        :color="vista === 'partidas' ? 'primary' : undefined"
+        @click="vista = 'partidas'"
+      >
         Partidas
       </v-chip>
-      <v-chip size="small" :color="vista === 'torneos' ? 'primary' : undefined" @click="vista = 'torneos'">
+      <v-chip
+        size="small"
+        :color="vista === 'torneos' ? 'primary' : undefined"
+        @click="vista = 'torneos'"
+      >
         Torneos
       </v-chip>
     </div>
 
-    <div v-if="vista === 'partidas'" class="d-flex flex-wrap justify-center align-center ga-1 mb-2">
+    <div
+      v-if="vista === 'partidas'"
+      class="d-flex flex-wrap justify-center align-center ga-1 mb-2"
+    >
       <span class="text-caption text-medium-emphasis mr-1">Ordenar por</span>
       <v-chip
         v-for="opcion in ORDENES"
@@ -38,20 +49,46 @@
     <div v-if="cargando" class="text-center py-6">
       <v-progress-circular indeterminate color="primary" />
     </div>
-    <p v-else-if="error" class="text-body-2 text-error text-center">{{ error }}</p>
-    <p v-else-if="visibles.length === 0" class="text-body-2 text-medium-emphasis text-center">
-      {{ busqueda ? "Ningún ejército coincide con la búsqueda." : "No hay partidas con estos filtros." }}
+    <p v-else-if="error" class="text-body-2 text-error text-center">
+      {{ error }}
+    </p>
+    <p
+      v-else-if="visibles.length === 0"
+      class="text-body-2 text-medium-emphasis text-center"
+    >
+      {{
+        busqueda
+          ? "Ningún ejército coincide con la búsqueda."
+          : "No hay partidas con estos filtros."
+      }}
     </p>
     <!-- Por torneos: los que más ganan, y aparte los que ganan partidas pero no torneos -->
     <template v-else-if="vista === 'torneos'">
-      <v-card v-if="sinRematar.length" variant="tonal" color="warning" class="pa-3 mb-3">
-        <div class="text-subtitle-2 font-weight-bold mb-1">Ganan partidas, pero no torneos</div>
-        <div v-for="fila in sinRematar" :key="fila.ejercito" class="text-body-2">
-          {{ fila.ejercito }}: {{ textoPorcentaje(fila.porcentaje) }} de victorias y ninguno de sus {{ fila.torneos }}
-          torneos ({{ fila.podios }} {{ fila.podios === 1 ? "podio" : "podios" }})
+      <v-card
+        v-if="sinRematar.length"
+        variant="tonal"
+        color="warning"
+        class="pa-3 mb-3"
+      >
+        <div class="text-subtitle-2 font-weight-bold mb-1">
+          Ganan partidas, pero no torneos
+        </div>
+        <div
+          v-for="fila in sinRematar"
+          :key="fila.ejercito"
+          class="text-body-2"
+        >
+          {{ fila.ejercito }}: {{ textoPorcentaje(fila.porcentaje) }} de
+          victorias y ninguno de sus {{ fila.torneos }} torneos ({{
+            fila.podios
+          }}
+          {{ fila.podios === 1 ? "podio" : "podios" }})
         </div>
       </v-card>
-      <p v-if="porTorneos.length === 0" class="text-body-2 text-medium-emphasis text-center">
+      <p
+        v-if="porTorneos.length === 0"
+        class="text-body-2 text-medium-emphasis text-center"
+      >
         Ningún ejército ha jugado torneos individuales con estos filtros.
       </p>
       <template v-else>
@@ -72,16 +109,23 @@
           @keydown.enter="emit('ver', fila.ejercito)"
         >
           <span class="nombre">
-            <v-icon :color="colorBando(fila.bando)" size="10" class="mr-1">mdi-circle</v-icon>{{ fila.ejercito }}
+            <v-icon :color="colorBando(fila.bando)" size="10" class="mr-1"
+              >mdi-circle</v-icon
+            >{{ fila.ejercito }}
           </span>
           <span class="text-right">{{ fila.torneos }}</span>
-          <span class="text-right" :class="{ 'font-weight-bold oro': fila.torneosGanados > 0 }">{{ fila.torneosGanados }}</span>
+          <span
+            class="text-right"
+            :class="{ 'font-weight-bold oro': fila.torneosGanados > 0 }"
+            >{{ fila.torneosGanados }}</span
+          >
           <span class="text-right">{{ fila.podios }}</span>
           <span class="text-right">{{ textoPorcentaje(fila.porcentaje) }}</span>
         </div>
         <p class="text-caption text-medium-emphasis mt-2 mb-0">
-          Torneos, ligas y copas individuales con clasificación final. Podio es quedar 1º, 2º o 3º, y el ejército es
-          el que más llevó cada jugador en sus partidas de ese evento.
+          Torneos, ligas y copas individuales con clasificación final. Podio es
+          quedar 1º, 2º o 3º, y el ejército es el que más llevó cada jugador en
+          sus partidas de ese evento.
         </p>
       </template>
     </template>
@@ -103,13 +147,21 @@
         @keydown.enter="emit('ver', fila.ejercito)"
       >
         <span class="nombre">
-          <v-icon :color="colorBando(fila.bando)" size="10" class="mr-1">mdi-circle</v-icon>{{ fila.ejercito }}
+          <v-icon :color="colorBando(fila.bando)" size="10" class="mr-1"
+            >mdi-circle</v-icon
+          >{{ fila.ejercito }}
         </span>
-        <span class="text-right" :class="{ 'text-medium-emphasis': fila.partidas < POCAS_PARTIDAS }">
-          {{ fila.partidas }}<template v-if="fila.partidas < POCAS_PARTIDAS">*</template>
+        <span
+          class="text-right"
+          :class="{ 'text-medium-emphasis': fila.partidas < POCAS_PARTIDAS }"
+        >
+          {{ fila.partidas
+          }}<template v-if="fila.partidas < POCAS_PARTIDAS">*</template>
         </span>
         <span class="text-right">{{ textoPorcentaje(fila.porcentaje) }}</span>
-        <span class="text-right" :class="colorRinde(fila.rinde)">{{ textoRinde(fila.rinde) }}</span>
+        <span class="text-right" :class="colorRinde(fila.rinde)">{{
+          textoRinde(fila.rinde)
+        }}</span>
       </div>
 
       <p class="text-caption text-medium-emphasis mt-2 mb-0">
@@ -118,8 +170,18 @@
     </template>
 
     <div class="text-center mt-1">
-      <v-btn variant="text" size="small" color="primary" class="text-none" @click="todos = !todos">
-        {{ todos ? `Solo los de ${MINIMO} partidas o más` : `Ver también los de menos de ${MINIMO} partidas` }}
+      <v-btn
+        variant="text"
+        size="small"
+        color="primary"
+        class="text-none"
+        @click="todos = !todos"
+      >
+        {{
+          todos
+            ? `Solo los de ${MINIMO} partidas o más`
+            : `Ver también los de menos de ${MINIMO} partidas`
+        }}
       </v-btn>
     </div>
   </div>
@@ -127,7 +189,10 @@
 
 <script setup lang="ts">
 import { computed, defineEmits, defineProps, ref, watch } from "vue";
-import type { EjercitoBalanceDTO, FiltroEstadisticas } from "@/interfaces/Estadisticas";
+import type {
+  EjercitoBalanceDTO,
+  FiltroEstadisticas,
+} from "@/interfaces/Estadisticas";
 import { getRankingEjercitos } from "@/services/EstadisticasService";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
 import {
@@ -164,9 +229,15 @@ const cargar = async () => {
   cargando.value = true;
   error.value = null;
   try {
-    filas.value = await getRankingEjercitos(props.filtro, todos.value ? 1 : MINIMO);
+    filas.value = await getRankingEjercitos(
+      props.filtro,
+      todos.value ? 1 : MINIMO
+    );
   } catch (e) {
-    error.value = mensajeDelBack(e, "No se han podido cargar las estadísticas. Inténtalo de nuevo.");
+    error.value = mensajeDelBack(
+      e,
+      "No se han podido cargar las estadísticas. Inténtalo de nuevo."
+    );
   } finally {
     cargando.value = false;
   }
@@ -181,7 +252,11 @@ const normalizar = (texto: string) =>
 const porTorneos = computed(() => {
   const buscado = normalizar(busqueda.value ?? "");
   return filas.value
-    .filter(fila => fila.torneos > 0 && (!buscado || normalizar(fila.ejercito).includes(buscado)))
+    .filter(
+      fila =>
+        fila.torneos > 0 &&
+        (!buscado || normalizar(fila.ejercito).includes(buscado))
+    )
     .sort(
       (a, b) =>
         b.torneosGanados - a.torneosGanados ||
@@ -193,7 +268,12 @@ const porTorneos = computed(() => {
 
 const sinRematar = computed(() =>
   porTorneos.value
-    .filter(f => f.torneos >= MINIMO_TORNEOS && f.porcentaje >= PORCENTAJE_ALTO && f.torneosGanados === 0)
+    .filter(
+      f =>
+        f.torneos >= MINIMO_TORNEOS &&
+        f.porcentaje >= PORCENTAJE_ALTO &&
+        f.torneosGanados === 0
+    )
     .sort((a, b) => b.porcentaje - a.porcentaje)
 );
 

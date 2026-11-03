@@ -12,12 +12,20 @@
       >
         {{ anio }}
       </v-chip>
-      <v-chip size="small" :color="temporadas.length === 0 ? 'primary' : undefined" @click="cambiar({ temporadas: [] })">
+      <v-chip
+        size="small"
+        :color="temporadas.length === 0 ? 'primary' : undefined"
+        @click="cambiar({ temporadas: [] })"
+      >
         Todas
       </v-chip>
     </div>
     <div class="d-flex flex-wrap justify-center ga-1">
-      <v-chip size="small" :color="tramos.length === 0 ? 'primary' : undefined" @click="cambiar({ tramos: [] })">
+      <v-chip
+        size="small"
+        :color="tramos.length === 0 ? 'primary' : undefined"
+        @click="cambiar({ tramos: [] })"
+      >
         Todos los puntos
       </v-chip>
       <v-chip
@@ -32,13 +40,25 @@
     </div>
     <div class="d-flex flex-wrap justify-center ga-1">
       <template v-if="conBando">
-        <v-chip size="small" :color="!modelValue.bando ? 'primary' : undefined" @click="cambiar({ bando: null })">
+        <v-chip
+          size="small"
+          :color="!modelValue.bando ? 'primary' : undefined"
+          @click="cambiar({ bando: null })"
+        >
           Los dos bandos
         </v-chip>
-        <v-chip size="small" :color="modelValue.bando === 'good' ? 'primary' : undefined" @click="cambiar({ bando: 'good' })">
+        <v-chip
+          size="small"
+          :color="modelValue.bando === 'good' ? 'primary' : undefined"
+          @click="cambiar({ bando: 'good' })"
+        >
           Bien
         </v-chip>
-        <v-chip size="small" :color="modelValue.bando === 'evil' ? 'primary' : undefined" @click="cambiar({ bando: 'evil' })">
+        <v-chip
+          size="small"
+          :color="modelValue.bando === 'evil' ? 'primary' : undefined"
+          @click="cambiar({ bando: 'evil' })"
+        >
           Mal
         </v-chip>
       </template>
@@ -59,8 +79,13 @@ import { computed, defineEmits, defineProps } from "vue";
 import type { FiltroEstadisticas } from "@/interfaces/Estadisticas";
 import { TRAMOS } from "@/utils/estadisticasEjercitos";
 
-const props = defineProps<{ modelValue: FiltroEstadisticas; conBando?: boolean }>();
-const emit = defineEmits<{ (event: "update:modelValue", filtro: FiltroEstadisticas): void }>();
+const props = defineProps<{
+  modelValue: FiltroEstadisticas;
+  conBando?: boolean;
+}>();
+const emit = defineEmits<{
+  (event: "update:modelValue", filtro: FiltroEstadisticas): void;
+}>();
 
 // Este año y el anterior, más «Todas»: antes de 2025 apenas hay partidas
 const ACTUAL = new Date().getFullYear();
@@ -73,5 +98,6 @@ const tramos = computed(() => props.modelValue.tramos ?? []);
 const alternar = <T,>(lista: T[], valor: T): T[] =>
   lista.includes(valor) ? lista.filter(v => v !== valor) : [...lista, valor];
 
-const cambiar = (cambio: Partial<FiltroEstadisticas>) => emit("update:modelValue", { ...props.modelValue, ...cambio });
+const cambiar = (cambio: Partial<FiltroEstadisticas>) =>
+  emit("update:modelValue", { ...props.modelValue, ...cambio });
 </script>

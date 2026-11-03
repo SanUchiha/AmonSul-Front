@@ -8,23 +8,33 @@
     @keydown.enter="elegir"
   >
     <span class="nombre">
-      {{ cruce.ejercito }} <span class="text-medium-emphasis">contra</span> {{ cruce.rival }}
+      {{ cruce.ejercito }} <span class="text-medium-emphasis">contra</span>
+      {{ cruce.rival }}
     </span>
     <span class="text-right">{{ cruce.partidas }}</span>
     <span class="text-right">{{ textoPorcentaje(cruce.porcentaje) }}</span>
-    <span class="text-right" :class="colorRinde(cruce.rinde)">{{ textoRinde(cruce.rinde) }}</span>
+    <span class="text-right" :class="colorRinde(cruce.rinde)">{{
+      textoRinde(cruce.rinde)
+    }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { defineEmits, defineProps } from "vue";
 import type { CruceResumenDTO } from "@/interfaces/Estadisticas";
-import { colorRinde, textoPorcentaje, textoRinde } from "@/utils/estadisticasEjercitos";
+import {
+  colorRinde,
+  textoPorcentaje,
+  textoRinde,
+} from "@/utils/estadisticasEjercitos";
 
 const props = defineProps<{ cruce: CruceResumenDTO }>();
-const emit = defineEmits<{ (event: "elegir", cruce: { ejercito: string; rival: string }): void }>();
+const emit = defineEmits<{
+  (event: "elegir", cruce: { ejercito: string; rival: string }): void;
+}>();
 
-const elegir = () => emit("elegir", { ejercito: props.cruce.ejercito, rival: props.cruce.rival });
+const elegir = () =>
+  emit("elegir", { ejercito: props.cruce.ejercito, rival: props.cruce.rival });
 </script>
 
 <style scoped>

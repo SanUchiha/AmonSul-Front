@@ -5,13 +5,16 @@
       <v-card-title class="text-wrap">¿Borrar tu cuenta?</v-card-title>
       <v-card-text>
         <p class="text-body-2 mb-2">
-          Se borrarán tus datos personales: nombre, apellidos, correo, teléfono, fecha de nacimiento, ciudad, foto
-          y contraseña.
+          Se borrarán tus datos personales: nombre, apellidos, correo, teléfono,
+          fecha de nacimiento, ciudad, foto y contraseña.
         </p>
         <p class="text-body-2 mb-2">
-          Tus resultados y partidas seguirán en los eventos y en las clasificaciones, como «Desconocido».
+          Tus resultados y partidas seguirán en los eventos y en las
+          clasificaciones, como «Desconocido».
         </p>
-        <p class="text-body-2 mb-4">No se puede deshacer y no podrás volver a entrar con esta cuenta.</p>
+        <p class="text-body-2 mb-4">
+          No se puede deshacer y no podrás volver a entrar con esta cuenta.
+        </p>
 
         <v-text-field
           v-model="contrasena"
@@ -22,14 +25,28 @@
           hide-details="auto"
           @keydown.enter="borrar"
         />
-        <v-alert v-if="error" type="error" variant="tonal" density="compact" class="mt-3">
+        <v-alert
+          v-if="error"
+          type="error"
+          variant="tonal"
+          density="compact"
+          class="mt-3"
+        >
           {{ error }}
         </v-alert>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" :disabled="borrando" @click="visible = false">Cancelar</v-btn>
-        <v-btn color="error" variant="tonal" :loading="borrando" :disabled="!contrasena" @click="borrar">
+        <v-btn variant="text" :disabled="borrando" @click="visible = false"
+          >Cancelar</v-btn
+        >
+        <v-btn
+          color="error"
+          variant="tonal"
+          :loading="borrando"
+          :disabled="!contrasena"
+          @click="borrar"
+        >
           Borrar mi cuenta
         </v-btn>
       </v-card-actions>

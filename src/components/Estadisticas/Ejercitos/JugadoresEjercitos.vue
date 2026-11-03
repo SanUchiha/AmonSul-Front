@@ -21,10 +21,14 @@
     <div v-else-if="cargando" class="text-center py-6">
       <v-progress-circular indeterminate color="primary" />
     </div>
-    <p v-else-if="error" class="text-body-2 text-error text-center">{{ error }}</p>
+    <p v-else-if="error" class="text-body-2 text-error text-center">
+      {{ error }}
+    </p>
     <template v-else-if="datos">
       <div class="d-flex align-center ga-2 mb-1">
-        <h3 class="text-subtitle-1 font-weight-bold flex-grow-1">{{ datos.nick }}</h3>
+        <h3 class="text-subtitle-1 font-weight-bold flex-grow-1">
+          {{ datos.nick }}
+        </h3>
         <v-btn
           :to="`/detalle-jugador/${datos.idUsuario}`"
           variant="text"
@@ -37,19 +41,28 @@
         </v-btn>
       </div>
 
-      <p v-if="datos.resumen.partidas === 0" class="text-body-2 text-medium-emphasis">
+      <p
+        v-if="datos.resumen.partidas === 0"
+        class="text-body-2 text-medium-emphasis"
+      >
         No tiene partidas con estos filtros.
       </p>
       <template v-else>
         <p class="text-body-2 mb-1">
-          {{ datos.resumen.partidas }} partidas · {{ datos.resumen.victorias }}-{{ datos.resumen.empates }}-{{
+          {{ datos.resumen.partidas }} partidas ·
+          {{ datos.resumen.victorias }}-{{ datos.resumen.empates }}-{{
             datos.resumen.derrotas
           }}
           · {{ textoPorcentaje(datos.resumen.porcentaje) }} de victorias ·
-          <span :class="colorRinde(datos.resumen.rinde)">{{ textoRinde(datos.resumen.rinde) }}</span> de «Rinde»
+          <span :class="colorRinde(datos.resumen.rinde)">{{
+            textoRinde(datos.resumen.rinde)
+          }}</span>
+          de «Rinde»
         </p>
         <!-- Lo que más interesa: con qué ejército le va mejor o peor que de costumbre, no solo cuál gana más -->
-        <p v-if="comparacion" class="text-body-2 text-medium-emphasis mb-3">{{ comparacion }}</p>
+        <p v-if="comparacion" class="text-body-2 text-medium-emphasis mb-3">
+          {{ comparacion }}
+        </p>
 
         <h4 class="text-subtitle-2 font-weight-bold mb-1">Sus ejércitos</h4>
         <div class="fila cabecera text-caption text-medium-emphasis">
@@ -69,19 +82,35 @@
           @keydown.enter="emit('ver', fila.ejercito)"
         >
           <span class="nombre">
-            <v-icon :color="colorBando(fila.bando)" size="10" class="mr-1">mdi-circle</v-icon>{{ fila.ejercito }}
+            <v-icon :color="colorBando(fila.bando)" size="10" class="mr-1"
+              >mdi-circle</v-icon
+            >{{ fila.ejercito }}
           </span>
-          <span class="text-right" :class="{ 'text-medium-emphasis': fila.partidas < MINIMO }">
-            {{ fila.partidas }}<template v-if="fila.partidas < MINIMO">*</template>
+          <span
+            class="text-right"
+            :class="{ 'text-medium-emphasis': fila.partidas < MINIMO }"
+          >
+            {{ fila.partidas
+            }}<template v-if="fila.partidas < MINIMO">*</template>
           </span>
           <span class="text-right">{{ textoPorcentaje(fila.porcentaje) }}</span>
-          <span class="text-right" :class="colorRinde(fila.rinde)">{{ textoRinde(fila.rinde) }}</span>
+          <span class="text-right" :class="colorRinde(fila.rinde)">{{
+            textoRinde(fila.rinde)
+          }}</span>
         </div>
-        <p class="text-caption text-medium-emphasis mt-1 mb-0">* Menos de {{ MINIMO }} partidas con ese ejército.</p>
+        <p class="text-caption text-medium-emphasis mt-1 mb-0">
+          * Menos de {{ MINIMO }} partidas con ese ejército.
+        </p>
 
-        <h4 class="text-subtitle-2 font-weight-bold mt-4 mb-1">Le cuesta contra</h4>
-        <p v-if="datos.rivalesDificiles.length === 0" class="text-caption text-medium-emphasis mb-0">
-          No hay ningún ejército contra el que pierda más de lo que gana, con 3 partidas o más.
+        <h4 class="text-subtitle-2 font-weight-bold mt-4 mb-1">
+          Le cuesta contra
+        </h4>
+        <p
+          v-if="datos.rivalesDificiles.length === 0"
+          class="text-caption text-medium-emphasis mb-0"
+        >
+          No hay ningún ejército contra el que pierda más de lo que gana, con 3
+          partidas o más.
         </p>
         <template v-else>
           <div class="fila cabecera text-caption text-medium-emphasis">
@@ -90,15 +119,27 @@
             <span class="text-right">% vict.</span>
             <span class="text-right">Rinde</span>
           </div>
-          <div v-for="rival in datos.rivalesDificiles" :key="rival.ejercito" class="fila text-body-2">
+          <div
+            v-for="rival in datos.rivalesDificiles"
+            :key="rival.ejercito"
+            class="fila text-body-2"
+          >
             <span class="nombre">
-              <v-icon :color="colorBando(rival.bando)" size="10" class="mr-1">mdi-circle</v-icon>{{ rival.ejercito }}
+              <v-icon :color="colorBando(rival.bando)" size="10" class="mr-1"
+                >mdi-circle</v-icon
+              >{{ rival.ejercito }}
             </span>
             <span class="text-right">{{ rival.partidas }}</span>
-            <span class="text-right">{{ textoPorcentaje(rival.porcentaje) }}</span>
-            <span class="text-right" :class="colorRinde(rival.rinde)">{{ textoRinde(rival.rinde) }}</span>
+            <span class="text-right">{{
+              textoPorcentaje(rival.porcentaje)
+            }}</span>
+            <span class="text-right" :class="colorRinde(rival.rinde)">{{
+              textoRinde(rival.rinde)
+            }}</span>
           </div>
-          <p class="text-caption text-medium-emphasis mt-1 mb-0">Con 3 partidas o más, del peor al menos malo.</p>
+          <p class="text-caption text-medium-emphasis mt-1 mb-0">
+            Con 3 partidas o más, del peor al menos malo.
+          </p>
         </template>
       </template>
     </template>
@@ -107,23 +148,36 @@
 
 <script setup lang="ts">
 import { computed, defineEmits, defineProps, onMounted, ref, watch } from "vue";
-import type { EjercitosJugadorDTO, FiltroEstadisticas } from "@/interfaces/Estadisticas";
+import type {
+  EjercitosJugadorDTO,
+  FiltroEstadisticas,
+} from "@/interfaces/Estadisticas";
 import type { UsuarioIdNickDTO } from "@/interfaces/Usuario";
 import { getEjercitosJugador } from "@/services/EstadisticasService";
 import { getUsuariosIdNick } from "@/services/UsuariosService";
 import { useAuth } from "@/composables/useAuth";
 import { mensajeDelBack } from "@/utils/mensajeDelBack";
-import { colorBando, colorRinde, textoPorcentaje, textoRinde } from "@/utils/estadisticasEjercitos";
+import {
+  colorBando,
+  colorRinde,
+  textoPorcentaje,
+  textoRinde,
+} from "@/utils/estadisticasEjercitos";
 
 // Con menos, un ejército no dice mucho de cómo le va
 const MINIMO = 5;
 
-const props = defineProps<{ filtro: FiltroEstadisticas; jugadorInicial?: number | null }>();
+const props = defineProps<{
+  filtro: FiltroEstadisticas;
+  jugadorInicial?: number | null;
+}>();
 const emit = defineEmits<{ (event: "ver", ejercito: string): void }>();
 
 // Se empieza por el jugador pedido o, si no, por quien mira
 const { getidUsuario } = useAuth();
-const idUsuario = ref<number | null>(props.jugadorInicial ?? (Number(getidUsuario.value) || null));
+const idUsuario = ref<number | null>(
+  props.jugadorInicial ?? (Number(getidUsuario.value) || null)
+);
 const jugadores = ref<UsuarioIdNickDTO[]>([]);
 const datos = ref<EjercitosJugadorDTO | null>(null);
 const cargando = ref(false);
@@ -132,7 +186,9 @@ const error = ref<string | null>(null);
 onMounted(async () => {
   try {
     const respuesta = await getUsuariosIdNick();
-    jugadores.value = (respuesta.data as UsuarioIdNickDTO[]).sort((a, b) => a.nick.localeCompare(b.nick, "es"));
+    jugadores.value = (respuesta.data as UsuarioIdNickDTO[]).sort((a, b) =>
+      a.nick.localeCompare(b.nick, "es")
+    );
   } catch (e) {
     console.error("Error al cargar los jugadores:", e);
   }
@@ -156,7 +212,10 @@ const cargar = async () => {
   try {
     datos.value = await getEjercitosJugador(idUsuario.value, props.filtro);
   } catch (e) {
-    error.value = mensajeDelBack(e, "No se han podido cargar sus ejércitos. Inténtalo de nuevo.");
+    error.value = mensajeDelBack(
+      e,
+      "No se han podido cargar sus ejércitos. Inténtalo de nuevo."
+    );
   } finally {
     cargando.value = false;
   }
@@ -173,9 +232,11 @@ const comparacion = computed(() => {
   const mejor = ordenados[0];
   const peor = ordenados[ordenados.length - 1];
   const partes: string[] = [];
-  if (mejor.rinde - media >= 1) partes.push(`le va mejor que de costumbre con ${mejor.ejercito}`);
+  if (mejor.rinde - media >= 1)
+    partes.push(`le va mejor que de costumbre con ${mejor.ejercito}`);
   if (media - peor.rinde >= 1) partes.push(`peor con ${peor.ejercito}`);
-  if (partes.length === 0) return "Le va más o menos igual con todos sus ejércitos.";
+  if (partes.length === 0)
+    return "Le va más o menos igual con todos sus ejércitos.";
   const texto = partes.join(" y ");
   return `${texto.charAt(0).toUpperCase()}${texto.slice(1)}.`;
 });

@@ -110,8 +110,7 @@ const reglaIguales = (valor: string) =>
   valor === nueva.value || "Las contraseñas no coinciden";
 
 const esValido = computed(
-  () =>
-    reglaLongitud(nueva.value) === true && nueva.value === repetida.value
+  () => reglaLongitud(nueva.value) === true && nueva.value === repetida.value
 );
 
 onMounted(() => {

@@ -1,9 +1,19 @@
 <template>
   <!-- La clasificación final de un evento sin salir del circuito: la guardada, la misma que reparte los puntos -->
-  <v-dialog :model-value="modelValue" max-width="480" scrollable @update:model-value="cerrar">
+  <v-dialog
+    :model-value="modelValue"
+    max-width="480"
+    scrollable
+    @update:model-value="cerrar"
+  >
     <v-card v-if="evento">
-      <v-card-title class="text-wrap pb-0">{{ evento.nombreTorneo }}</v-card-title>
-      <v-card-subtitle class="pb-2">Clasificación final · {{ posiciones.length }} jugadores</v-card-subtitle>
+      <v-card-title class="text-wrap pb-0">{{
+        evento.nombreTorneo
+      }}</v-card-title>
+      <v-card-subtitle class="pb-2"
+        >Clasificación final ·
+        {{ posiciones.length }} jugadores</v-card-subtitle
+      >
       <v-card-text class="pt-0">
         <div class="fila cabecera text-caption text-medium-emphasis">
           <span>#</span>
@@ -17,12 +27,23 @@
           :class="{ resaltada: posicion.idUsuario === idUsuario }"
         >
           <span class="text-medium-emphasis">{{ posicion.resultado }}</span>
-          <span class="nick" :class="{ 'font-weight-bold': posicion.idUsuario === idUsuario }">{{ posicion.nick }}</span>
-          <span class="text-right">{{ puntosCircuito(posiciones.length, posicion.resultado) }}</span>
+          <span
+            class="nick"
+            :class="{ 'font-weight-bold': posicion.idUsuario === idUsuario }"
+            >{{ posicion.nick }}</span
+          >
+          <span class="text-right">{{
+            puntosCircuito(posiciones.length, posicion.resultado)
+          }}</span>
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-btn variant="text" size="small" class="text-none" :to="`/detalle-evento/${evento.idTorneo}?tab=resultados`">
+        <v-btn
+          variant="text"
+          size="small"
+          class="text-none"
+          :to="`/detalle-evento/${evento.idTorneo}?tab=resultados`"
+        >
           Ver el evento
         </v-btn>
         <v-spacer />
@@ -44,7 +65,9 @@ defineProps<{
   // El jugador desde el que se ha abierto, resaltado
   idUsuario: number | null;
 }>();
-const emit = defineEmits<{ (event: "update:modelValue", valor: boolean): void }>();
+const emit = defineEmits<{
+  (event: "update:modelValue", valor: boolean): void;
+}>();
 
 const cerrar = () => emit("update:modelValue", false);
 </script>

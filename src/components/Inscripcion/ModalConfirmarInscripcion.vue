@@ -6,8 +6,8 @@
       <v-card-text>
         <template v-if="pedirEjercito">
           <p class="text-body-2 mb-3">
-            Llevas este ejército en todas tus partidas. Puedes cambiar de lista antes de cada una, pero
-            siempre de este ejército.
+            Llevas este ejército en todas tus partidas. Puedes cambiar de lista
+            antes de cada una, pero siempre de este ejército.
           </p>
           <SelectorEjercito v-model="ejercito" />
         </template>
@@ -25,7 +25,9 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="grey" variant="text" @click="visible = false">Cancelar</v-btn>
+        <v-btn color="grey" variant="text" @click="visible = false"
+          >Cancelar</v-btn
+        >
         <v-btn
           color="primary"
           variant="tonal"
@@ -53,7 +55,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:isVisible", valor: boolean): void;
-  (e: "confirm", datos: { ejercito: string | null; compartirEmail: boolean }): void;
+  (
+    e: "confirm",
+    datos: { ejercito: string | null; compartirEmail: boolean }
+  ): void;
 }>();
 
 const visible = computed({
@@ -77,8 +82,12 @@ watch(
 );
 
 const confirmar = () => {
-  if ((props.pedirEjercito && !ejercito.value) || !aceptaPrivacidad.value) return;
-  emit("confirm", { ejercito: ejercito.value, compartirEmail: compartirEmail.value });
+  if ((props.pedirEjercito && !ejercito.value) || !aceptaPrivacidad.value)
+    return;
+  emit("confirm", {
+    ejercito: ejercito.value,
+    compartirEmail: compartirEmail.value,
+  });
   visible.value = false;
 };
 </script>

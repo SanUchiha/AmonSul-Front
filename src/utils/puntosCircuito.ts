@@ -9,5 +9,7 @@ export function puntosCircuito(jugadores: number, puesto: number): number {
   if (jugadores < 1 || puesto < 1) return 0;
   const base = 10 * Math.log2(Math.min(jugadores, TOPE_JUGADORES_CIRCUITO));
   const proporcion = Math.max(0, (jugadores - puesto + 1) / jugadores);
-  return Math.max(1, Math.round(base * proporcion ** 2)) + (BONUS_PODIO[puesto] ?? 0);
+  return (
+    Math.max(1, Math.round(base * proporcion ** 2)) + (BONUS_PODIO[puesto] ?? 0)
+  );
 }

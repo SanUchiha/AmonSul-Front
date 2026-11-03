@@ -10,7 +10,13 @@
     <template #label>
       <span>
         He leído y acepto la
-        <a href="/politica-privacidad" target="_blank" rel="noopener" class="enlace" @click.stop>
+        <a
+          href="/politica-privacidad"
+          target="_blank"
+          rel="noopener"
+          class="enlace"
+          @click.stop
+        >
           política de privacidad
         </a>
       </span>

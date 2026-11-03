@@ -22,7 +22,11 @@ import { defineEmits, defineProps } from "vue";
 import { appsettings } from "@/settings/appsettings";
 
 defineProps<{ modelValue: string | null }>();
-const emit = defineEmits<{ (e: "update:modelValue", valor: string | null): void }>();
+const emit = defineEmits<{
+  (e: "update:modelValue", valor: string | null): void;
+}>();
 
-const ejercitos = [...appsettings.armies].sort((a, b) => a.name.localeCompare(b.name));
+const ejercitos = [...appsettings.armies].sort((a, b) =>
+  a.name.localeCompare(b.name)
+);
 </script>
