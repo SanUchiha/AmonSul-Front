@@ -22,6 +22,10 @@
         segundo y 1 al tercero.
       </li>
       <li>
+        <strong>En Parejas</strong>, los dos miembros se llevan los puntos del
+        puesto de su pareja.
+      </li>
+      <li>
         <strong>Solo cuentan tus 4 mejores resultados.</strong> Juega todo lo
         que quieras: lo que sale mal no resta.
       </li>

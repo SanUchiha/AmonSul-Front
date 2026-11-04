@@ -33,7 +33,7 @@
             >{{ posicion.nick }}</span
           >
           <span class="text-right">{{
-            puntosCircuito(posiciones.length, posicion.resultado)
+            puntosDelPuesto(posicion.resultado)
           }}</span>
         </div>
       </v-card-text>
@@ -54,11 +54,11 @@
 </template>
 
 <script lang="ts" setup>
-import { defineEmits, defineProps } from "vue";
+import { computed, defineEmits, defineProps } from "vue";
 import { GanadorDTO } from "@/interfaces/Ganadores";
-import { puntosCircuito } from "@/utils/puntosCircuito";
+import { puntosDelEvento } from "@/utils/puntosCircuito";
 
-defineProps<{
+const props = defineProps<{
   modelValue: boolean;
   evento: { idTorneo: number; nombreTorneo: string } | null;
   posiciones: GanadorDTO[];
@@ -68,6 +68,8 @@ defineProps<{
 const emit = defineEmits<{
   (event: "update:modelValue", valor: boolean): void;
 }>();
+
+const puntosDelPuesto = computed(() => puntosDelEvento(props.posiciones));
 
 const cerrar = () => emit("update:modelValue", false);
 </script>

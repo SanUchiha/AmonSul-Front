@@ -3,7 +3,7 @@ import { CircuitoDTO, CircuitoTorneosDTO } from "@/interfaces/Circuito";
 import { getTorneosOfCircuito } from "@/services/CircuitosService";
 import { getGanadores } from "@/services/GanadoresService";
 import { GanadorDTO } from "@/interfaces/Ganadores";
-import { puntosCircuito } from "@/utils/puntosCircuito";
+import { puntosDelEvento } from "@/utils/puntosCircuito";
 
 // Un resultado que suma en el circuito: el puesto en un evento y los puntos que da
 export interface ResultadoCircuito {
@@ -48,6 +48,7 @@ export function useCircuitoData() {
       { nick: string; resultados: ResultadoCircuito[] }
     >();
     posicionesPorTorneo.value.forEach(posiciones => {
+      const puntosDelPuesto = puntosDelEvento(posiciones);
       posiciones.forEach(ganador => {
         const jugador = jugadores.get(ganador.idUsuario) ?? {
           nick: ganador.nick,
@@ -57,7 +58,7 @@ export function useCircuitoData() {
           idTorneo: ganador.idTorneo,
           nombreTorneo: ganador.nombreTorneo,
           resultado: ganador.resultado,
-          puntos: puntosCircuito(posiciones.length, ganador.resultado),
+          puntos: puntosDelPuesto(ganador.resultado),
         });
         jugadores.set(ganador.idUsuario, jugador);
       });
