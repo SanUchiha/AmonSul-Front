@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "SUS258R279.com.amonsul.app",
+        "paths": ["/restablecer-contrasena*"]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["SUS258R279.com.amonsul.app"]
+  }
+}

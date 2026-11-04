@@ -10,13 +10,14 @@
     "format:check": "prettier --check \"src/**/*.{js,ts,vue,json,css,scss}\"",
     "cap:sync": "npm run build && npx cap sync",
     "cap:android": "npm run build && npx cap sync && npx cap open android",
-    "cap:assets": "npx capacitor-assets generate --android --iconBackgroundColor \"#121212\" --splashBackgroundColor \"#121212\" --splashBackgroundColorDark \"#121212\" --logoSplashScale 0.4"
+    "cap:assets": "npx capacitor-assets generate --android --ios --iconBackgroundColor \"#121212\" --splashBackgroundColor \"#121212\" --splashBackgroundColorDark \"#121212\" --logoSplashScale 0.4"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.0",
     "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/ios": "^8.6.0",
     "@capacitor/keyboard": "^8.0.6",
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "^8.0.3",
