@@ -88,7 +88,7 @@
               <p class="text-body-2 descripcion">{{ torneo.descripcionTorneo }}</p>
             </template>
 
-            <v-btn v-if="torneo.tieneBases" variant="outlined" block class="mt-6 text-none" @click="descargarBases">
+            <v-btn v-if="torneo.tieneBases" variant="outlined" block class="mt-6 text-none" :loading="descargandoBases" @click="descargarBases">
               Descargar bases
             </v-btn>
           </div>
@@ -254,6 +254,7 @@ import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vu
 import DetalleTorneoLiveView from "@/views/DetalleTorneoLiveView.vue";
 import DetalleTorneoLiveMasView from "@/views/DetalleTorneoLiveMasView.vue";
 import DetalleTorneoLiveEquiposView from "@/views/DetalleTorneoLiveEquiposView.vue";
+import { entregarArchivos } from "@/utils/entregarArchivos";
 
 const { getidUsuario } = useAuth();
 const route = useRoute();
@@ -694,21 +695,26 @@ const confirmarBorrar = async () => {
   else await eliminarInscripcion(idInscripcion.value);
 };
 
+// En un móvil el PDF puede tardar: sin esto no se ve nada y se vuelve a pulsar
+const descargandoBases = ref<boolean>(false);
+
 const descargarBases = async () => {
+  descargandoBases.value = true;
   try {
     if (idTorneo.value) {
       const response = await descargarBasesTorneo(idTorneo.value);
-      const url = window.URL.createObjectURL(response.data);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Bases_Torneo_${torneo.value?.nombreTorneo}.pdf`;
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
+      await entregarArchivos([
+        {
+          blob: response.data,
+          nombre: `Bases_Torneo_${torneo.value?.nombreTorneo}.pdf`,
+        },
+      ]);
     }
   } catch (error) {
     console.error("Error descargando el archivo:", error);
     alert("Error al descargar el archivo. Por favor, inténtelo de nuevo.");
+  } finally {
+    descargandoBases.value = false;
   }
 };
 

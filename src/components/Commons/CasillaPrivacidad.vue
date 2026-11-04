@@ -11,7 +11,7 @@
       <span>
         He leído y acepto la
         <a
-          href="/politica-privacidad"
+          :href="URL_POLITICA_PRIVACIDAD"
           target="_blank"
           rel="noopener"
           class="enlace"
@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import { URL_POLITICA_PRIVACIDAD } from "@/utils/urlPoliticaPrivacidad";
 import { defineEmits, defineProps } from "vue";
 
 defineProps<{ modelValue: boolean }>();

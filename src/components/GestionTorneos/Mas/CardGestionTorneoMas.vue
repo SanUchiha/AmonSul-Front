@@ -129,6 +129,7 @@ import ModalHandlerMostrarClasificacion from "../ModalHandlerMostrarClasificacio
 import LoadingLOTR from "@/components/Commons/LoadingLOTR.vue";
 import { ListaCompletaDTO } from "@/interfaces/Lista";
 import jsPDF from "jspdf";
+import { ArchivoParaEntregar, entregarArchivos } from "@/utils/entregarArchivos";
 import CardAddTorneoCircuito from "../CardAddTorneoCircuito.vue";
 
 const progressPDF = ref<number>(0);
@@ -327,6 +328,7 @@ const descargarListasTorneo = async () => {
     const chunkedListas = chunkArray(listas, 40);
     const total = chunkedListas.reduce((acc, arr) => acc + arr.length, 0);
     let processed = 0;
+    const archivos: ArchivoParaEntregar[] = [];
     for (let i = 0; i < chunkedListas.length; i++) {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -390,8 +392,9 @@ const descargarListasTorneo = async () => {
         chunkedListas.length > 1
           ? `${baseName}_${i + 1}.pdf`
           : `${baseName}.pdf`;
-      doc.save(fileName);
+      archivos.push({ blob: doc.output("blob"), nombre: fileName });
     }
+    await entregarArchivos(archivos);
   } catch (error) {
     console.error(error);
     showErrorModal.value = true;

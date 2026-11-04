@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import { ListaCompletaDTO } from "@/interfaces/Lista";
+import { ArchivoParaEntregar, entregarArchivos } from "@/utils/entregarArchivos";
 
 function comprimirImagen(base64: string, maxWidth = 1200, quality = 0.75): Promise<string> {
   return new Promise(resolve => {
@@ -29,17 +30,6 @@ async function urlToBase64(url: string): Promise<string> {
     reader.onerror = () => reject(new Error("Error leyendo imagen"));
     reader.readAsDataURL(blob);
   });
-}
-
-function descargarBlob(blob: Blob, fileName: string) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
 }
 
 async function generarPDFDeGrupo(
@@ -104,19 +94,21 @@ export async function descargarListasPDF(
     const blob = await generarPDFDeGrupo(listas, () => {
       onProgress?.(++procesados, listas.length);
     });
-    descargarBlob(blob, `${baseName}.pdf`);
+    await entregarArchivos([{ blob, nombre: `${baseName}.pdf` }]);
   } else {
     // Un PDF por chunk (ej: por equipo)
     const chunks: ListaCompletaDTO[][] = [];
     for (let i = 0; i < listas.length; i += chunkSize) chunks.push(listas.slice(i, i + chunkSize));
 
     let procesados = 0;
+    const archivos: ArchivoParaEntregar[] = [];
     for (let i = 0; i < chunks.length; i++) {
       const blob = await generarPDFDeGrupo(chunks[i], () => {
         onProgress?.(++procesados, listas.length);
       });
       const fileName = chunks.length > 1 ? `${baseName}_${i + 1}.pdf` : `${baseName}.pdf`;
-      descargarBlob(blob, fileName);
+      archivos.push({ blob, nombre: fileName });
     }
+    await entregarArchivos(archivos);
   }
 }
