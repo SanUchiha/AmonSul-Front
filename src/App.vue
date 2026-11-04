@@ -45,6 +45,12 @@
         v-if="isAuthenticated"
         @click.stop="drawer = !drawer"
       ></v-app-bar-nav-icon>
+      <v-btn
+        v-if="mostrarVolver"
+        icon="mdi-arrow-left"
+        aria-label="Volver"
+        @click="router.back()"
+      ></v-btn>
       <v-app-bar-title
         ><v-img :src="LogoAmonSulSVG" alt="Icono personalizado" height="30"
       /></v-app-bar-title>
@@ -104,6 +110,7 @@ const mostrarModalPartidas = ref<boolean>(false);
 import { ref, computed, onMounted, watch } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
+import { Capacitor } from "@capacitor/core";
 import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
 import LogoAmonSulPNG from "@/assets/icons/Logo2.png";
 import LogoAmonSulSVG from "@/assets/icons/logo_horizontal3.png";
@@ -129,6 +136,17 @@ const { isAuthenticated } = useAuth();
 const estaJugando = ref<EstaJugandoDTO>();
 
 const isLoggedIn = computed(() => !!getUser.value);
+
+// El iPhone no tiene botón Atrás y el gesto desde el borde abre el menú: la barra lleva una flecha si hay página
+// anterior. En inicio y en el login no: al entrar, la página anterior a inicio sería el login
+const mostrarVolver = ref(false);
+router.afterEach(to => {
+  mostrarVolver.value =
+    Capacitor.getPlatform() === "ios" &&
+    to.name !== "home" &&
+    to.name !== "inicio-sesion" &&
+    !!window.history.state?.back;
+});
 
 const handleLogout = async () => {
   usuariosStore.usuario = {} as UsuarioViewDTO; // Limpia los datos del usuario anterior
