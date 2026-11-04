@@ -96,7 +96,7 @@
     />
   </v-app>
 
-  <v-snackbar v-model="showToast" :color="toastColor" timeout="3000" top right>
+  <v-snackbar v-model="showToast" :color="toastColor" timeout="3000" location="top">
     {{ toastMessage }}
   </v-snackbar>
 </template>
