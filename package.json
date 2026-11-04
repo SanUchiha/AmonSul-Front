@@ -9,7 +9,8 @@
     "format": "prettier --write \"src/**/*.{js,ts,vue,json,css,scss}\"",
     "format:check": "prettier --check \"src/**/*.{js,ts,vue,json,css,scss}\"",
     "cap:sync": "npm run build && npx cap sync",
-    "cap:android": "npm run build && npx cap sync && npx cap open android"
+    "cap:android": "npm run build && npx cap sync && npx cap open android",
+    "cap:assets": "npx capacitor-assets generate --android --iconBackgroundColor \"#121212\" --splashBackgroundColor \"#121212\" --splashBackgroundColorDark \"#121212\" --logoSplashScale 0.4"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",
@@ -40,6 +41,7 @@
     "vuetify": "^3.6.11"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.6.0",
     "@types/canvas-confetti": "^1.6.4",
     "@types/lodash": "^4.17.16",
