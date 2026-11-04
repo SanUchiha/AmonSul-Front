@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.amonsul.app",
+      "sha256_cert_fingerprints": [
+        "AB:2F:BF:FA:19:1F:63:9D:6B:DE:BC:06:3C:6D:01:14:B1:38:F7:2F:26:02:4C:71:D0:7C:27:C3:1E:37:95:ED"
+      ]
+    }
+  }
+]

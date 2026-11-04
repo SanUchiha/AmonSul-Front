@@ -85,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import { restablecerContrasena } from "@/services/UsuariosService";
@@ -117,6 +117,18 @@ onMounted(() => {
   // Fuera de la barra de direcciones y del historial: el enlace es como una contraseña de un solo uso
   if (enLaUrl) router.replace({ query: {} });
 });
+
+// Con la app abierta en esta página puede llegar otro enlace del correo: vale el último
+watch(
+  () => route.query.token,
+  (otro) => {
+    if (typeof otro !== "string" || !otro) return;
+    token.value = otro;
+    cambiada.value = false;
+    error.value = "";
+    router.replace({ query: {} });
+  }
+);
 
 const guardar = async () => {
   if (!esValido.value) return;

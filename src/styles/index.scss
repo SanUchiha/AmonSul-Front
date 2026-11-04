@@ -105,8 +105,8 @@ v-tabs-item{
 }
 
 // App móvil (Capacitor): la app ocupa toda la pantalla, también detrás de la barra de estado y de la de gestos.
-// Capacitor deja sus medidas en --safe-area-inset-*; en el navegador vale env(), que es 0 salvo en móviles
-// con muesca, así que en la web no se mueve nada
+// Capacitor deja sus medidas en --safe-area-inset-*; en el navegador vale env(), que es 0 porque viewport-fit=cover
+// solo lo pone la app (public/index.html), así que en la web no se mueve nada
 :root {
   --zona-segura-arriba: var(
     --safe-area-inset-top,

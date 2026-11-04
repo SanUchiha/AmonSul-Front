@@ -112,6 +112,8 @@ import { useUsuariosStore } from "@/store/usuarios";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import defaultAvatar from "@/assets/icons/perfil.png";
 import { useToast } from "@/composables/useToast";
+import { useDeepLinks } from "@/composables/useDeepLinks";
+import { useBotonAtras } from "@/composables/useBotonAtras";
 import { EstaJugandoDTO } from "./interfaces/Partidas";
 
 const usuariosStore = useUsuariosStore();
@@ -172,6 +174,9 @@ const comprobarPartidasActivas = async (idUsuario: string) => {
 };
 
 onMounted(() => {
+  useDeepLinks().init();
+  useBotonAtras().init();
+
   // Sin sesión no se pregunta: el servidor diría 401 y mandaría a iniciar sesión desde las páginas
   // que no la necesitan, como la de elegir una contraseña nueva o la de registro
   if (isLoggedIn.value) {
