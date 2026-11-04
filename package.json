@@ -23,6 +23,7 @@
     "@capacitor/share": "^8.0.3",
     "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.4",
+    "@capgo/capacitor-native-biometric": "^8.9.1",
     "@mdi/font": "^7.4.47",
     "ag-charts-community": "^11.1.1",
     "ag-charts-vue3": "^11.1.1",

@@ -17,6 +17,8 @@ PODS:
     - Capacitor
   - CapacitorStatusBar (8.0.4):
     - Capacitor
+  - CapgoCapacitorNativeBiometric (7.1.13):
+    - Capacitor
   - IONFilesystemLib (2.0.1)
 
 DEPENDENCIES:
@@ -29,6 +31,7 @@ DEPENDENCIES:
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - "CapgoCapacitorNativeBiometric (from `../../node_modules/@capgo/capacitor-native-biometric`)"
 
 SPEC REPOS:
   trunk:
@@ -53,6 +56,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/splash-screen"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  CapgoCapacitorNativeBiometric:
+    :path: "../../node_modules/@capgo/capacitor-native-biometric"
 
 SPEC CHECKSUMS:
   Capacitor: 62cab4ab4ba04ea925576ddd1be188869e90d9ea
@@ -64,8 +69,9 @@ SPEC CHECKSUMS:
   CapacitorShare: 5b5e53347556bee89ae6163ed20b5b3c25fe75f1
   CapacitorSplashScreen: 7bf61c2001557ff9e195e601c6b87344480d3c65
   CapacitorStatusBar: ff844df1f126da6c4fbc4028272425fa3a91e7e3
+  CapgoCapacitorNativeBiometric: c9a116d9516b3f52dd335aea6a0c5073be36fe5a
   IONFilesystemLib: 306469e4c563f61de82d7bca2bbfed9e64d1b2d2
 
-PODFILE CHECKSUM: 56918fa9f29bf69d783c8d4f2032d3c5bc79629c
+PODFILE CHECKSUM: 8c2577de8583e93c83b731685e3760aa9b46d3f5
 
 COCOAPODS: 1.17.0

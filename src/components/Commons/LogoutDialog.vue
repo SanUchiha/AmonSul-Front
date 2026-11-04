@@ -1,7 +1,7 @@
 <template>
-  <v-dialog v-model="internalVisible" max-width="400">
+  <v-dialog v-model="internalVisible" max-width="400" :persistent="persistent">
     <v-card>
-      <v-card-title class="headline">{{ titulo }}</v-card-title>
+      <v-card-title class="headline text-wrap">{{ titulo }}</v-card-title>
       <v-card-text>{{ mensaje }}</v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -20,6 +20,11 @@
 import { ref, watch, defineProps, defineEmits } from "vue";
 
 const props = defineProps({
+  // Hay que responder: tocar fuera no lo cierra
+  persistent: {
+    type: Boolean,
+    default: false,
+  },
   isVisible: {
     type: Boolean,
     required: true,

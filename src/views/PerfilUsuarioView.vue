@@ -91,6 +91,21 @@
             Cambiar contraseña
           </v-btn>
         </div>
+        <div v-if="accesoActivado" class="px-4 pb-3">
+          <v-switch
+            :model-value="true"
+            color="primary"
+            inset
+            hide-details
+            density="compact"
+            :label="`Entrar con ${nombreAcceso}`"
+            @update:model-value="desactivarAcceso"
+          />
+          <p class="text-caption text-medium-emphasis mb-0 mt-1">
+            Tu contraseña está cifrada en este dispositivo y solo se usa con {{ nombreAcceso }}. Al
+            desactivarlo se borra. Se puede volver a activar al entrar con la contraseña.
+          </p>
+        </div>
       </v-card>
 
       <h2 class="text-subtitle-1 font-weight-bold mb-1">Notificaciones</h2>
@@ -132,6 +147,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
 import { useToast } from "@/composables/useToast";
+import { useBiometria } from "@/composables/useBiometria";
 import { useUsuariosStore } from "@/store/usuarios";
 import { UsuarioViewDTO } from "@/interfaces/Usuario";
 import { FaccionDTO } from "@/interfaces/Faccion";
@@ -156,6 +172,14 @@ const usuariosStore = useUsuariosStore();
 const { getUser, logout } = useAuth();
 const router = useRouter();
 const { triggerToast } = useToast();
+const biometria = useBiometria();
+const nombreAcceso = ref("");
+const accesoActivado = ref(false);
+
+const desactivarAcceso = async () => {
+  await biometria.desactivar();
+  accesoActivado.value = false;
+};
 
 const isLoading = ref(true);
 const editando = ref(false);
@@ -166,6 +190,7 @@ const borrarCuenta = ref(false);
 const alBorrarCuenta = () => {
   borrarCuenta.value = false;
   usuariosStore.usuario = {} as UsuarioViewDTO;
+  void biometria.desactivar();
   logout();
   triggerToast("success", "Tu cuenta se ha borrado");
   router.push({ name: "inicio-sesion" });
@@ -259,6 +284,9 @@ const alGuardar = (cambios: Partial<UsuarioViewDTO>) => {
 };
 
 onMounted(async () => {
+  nombreAcceso.value = await biometria.nombreDelAcceso();
+  accesoActivado.value =
+    !!nombreAcceso.value && (await biometria.cuentaActivada()) === getUser.value;
   try {
     const [, respuestaFacciones] = await Promise.all([
       usuariosStore.requestUsuario(getUser.value),

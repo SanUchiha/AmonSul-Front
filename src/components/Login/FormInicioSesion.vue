@@ -48,6 +48,24 @@
                 </v-btn>
               </v-row>
 
+              <v-row v-if="nombreAcceso" justify="center" class="my-4">
+                <v-btn
+                  color="blue darken-1"
+                  variant="tonal"
+                  size="large"
+                  :prepend-icon="
+                    nombreAcceso === 'Face ID'
+                      ? 'mdi-face-recognition'
+                      : 'mdi-fingerprint'
+                  "
+                  :disabled="isLoading"
+                  class="login-form__button"
+                  @click="entrarConBiometria"
+                >
+                  Entrar con {{ nombreAcceso }}
+                </v-btn>
+              </v-row>
+
               <v-row justify="center" v-if="isLoading" class="mt-3">
                 <v-progress-linear
                   :size="24"
@@ -87,13 +105,24 @@
       @update:isVisible="handleOkClick = $event"
     />
 
+    <LogoutDialog
+      :isVisible="!!nombreAPreguntar"
+      persistent
+      :titulo="`¿Entrar con ${nombreAPreguntar} la próxima vez?`"
+      :mensaje="`No tendrás que escribir la contraseña. Se guarda cifrada en este dispositivo y solo se usa con ${nombreAPreguntar}.`"
+      textoConfirmar="Sí"
+      textoCancelar="Ahora no"
+      @confirmar="responderBiometria(true)"
+      @cancelar="responderBiometria(false)"
+    />
+
     <!-- Aquí se incluye el modal -->
     <ModalRecordarPass v-if="showModalRecordarPass" @close="closeModal" />
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { RequestLoginDTO } from "@/interfaces/Login";
 import { useAuth } from "@/composables/useAuth";
@@ -101,10 +130,13 @@ import ErrorLogin from "./ErrorLogin.vue";
 import { AxiosResponse } from "axios";
 import ResponseLogin from "./ResponseLogin.vue";
 import ModalRecordarPass from "./ModalRecordarPass.vue";
+import LogoutDialog from "@/components/Commons/LogoutDialog.vue";
+import { useBiometria } from "@/composables/useBiometria";
 
 const email = ref("");
 const password = ref("");
-const { login } = useAuth();
+const { login, getUser } = useAuth();
+const biometria = useBiometria();
 const router = useRouter();
 const dialog = ref(false);
 const mensajeError = ref("");
@@ -112,33 +144,73 @@ const dialogOk = ref(false);
 
 const isLoading = ref(false);
 const showModalRecordarPass = ref(false);
+const nombreAcceso = ref("");
+const nombreAPreguntar = ref("");
 
-const handleLogin = async () => {
+const entrar = async (
+  credentials: RequestLoginDTO
+): Promise<"dentro" | "rechazado" | "error"> => {
   dialog.value = false;
   dialogOk.value = false;
   isLoading.value = true;
-
-  var credentials: RequestLoginDTO = {
-    email: email.value,
-    password: password.value,
-  };
 
   try {
     const response: string | AxiosResponse = await login(credentials);
     if (typeof response === "string") {
       router.push({ name: "error" });
-    } else {
-      if (!response.data.isAccess) {
-        mensajeError.value = response.data.mensaje ?? "";
-        dialog.value = true;
-      } else {
-        dialogOk.value = true;
-      }
+      return "error";
     }
+    if (!response.data.isAccess) {
+      mensajeError.value = response.data.mensaje ?? "";
+      dialog.value = true;
+      return "rechazado";
+    }
+    return "dentro";
   } catch (error) {
     console.error(error);
+    return "error";
   } finally {
     isLoading.value = false;
+  }
+};
+
+const handleLogin = async () => {
+  const resultado = await entrar({
+    email: email.value,
+    password: password.value,
+  });
+  if (resultado !== "dentro") return;
+  if (await biometria.hayQuePreguntar(getUser.value))
+    nombreAPreguntar.value = await biometria.nombreDelAcceso();
+  else dialogOk.value = true;
+};
+
+const responderBiometria = async (acepta: boolean) => {
+  if (acepta) await biometria.activar(getUser.value, password.value);
+  nombreAPreguntar.value = "";
+  dialogOk.value = true;
+};
+
+const mirarAccesoGuardado = async () => {
+  nombreAcceso.value = (await biometria.hayAccesoGuardado())
+    ? await biometria.nombreDelAcceso()
+    : "";
+};
+
+onMounted(mirarAccesoGuardado);
+
+const entrarConBiometria = async () => {
+  const acceso = await biometria.leerAcceso();
+  if (!acceso) return;
+  const resultado = await entrar({
+    email: acceso.username,
+    password: acceso.password,
+  });
+  if (resultado === "dentro") dialogOk.value = true;
+  else if (resultado === "rechazado") {
+    // Ha cambiado la contraseña: al entrar escribiendo la nueva se vuelve a preguntar
+    await biometria.desactivar();
+    nombreAcceso.value = "";
   }
 };
 
