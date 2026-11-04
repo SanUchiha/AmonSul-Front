@@ -36,6 +36,10 @@ const config: CapacitorConfig = {
     Keyboard: {
       resize: "body",
     },
+    // FirebaseMessaging: en iOS, los avisos se ven también con la app abierta
+    FirebaseMessaging: {
+      presentationOptions: ["alert", "badge", "sound"],
+    },
   },
 };
 

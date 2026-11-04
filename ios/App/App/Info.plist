@@ -66,6 +66,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Amon Sûl usa la cámara para hacer la foto de tu perfil o de tu lista de ejército.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Amon Sûl usa Face ID para que entres sin escribir la contraseña.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

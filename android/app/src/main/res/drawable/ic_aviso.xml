@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- La torre de los avisos: Android la pinta de un solo color en la barra de estado -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M5,20H19V22H5V20ZM17,2V5H15V2H13V5H11V2H9V5H7V2H5V8L8,11V16L6,18V19H18V18L16,16V11L19,8V2H17Z" />
+</vector>

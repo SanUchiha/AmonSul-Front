@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "121562131097",
+    "project_id": "amonsul-31531",
+    "storage_bucket": "amonsul-31531.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121562131097:android:db1402c91ffa53922fe608",
+        "android_client_info": {
+          "package_name": "com.amonsul.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzCIZdC6ZUMMIOgT7E116iYihKm6zaFM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

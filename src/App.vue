@@ -121,6 +121,7 @@ import defaultAvatar from "@/assets/icons/perfil.png";
 import { useToast } from "@/composables/useToast";
 import { useDeepLinks } from "@/composables/useDeepLinks";
 import { useBotonAtras } from "@/composables/useBotonAtras";
+import { useNotificacionesPush } from "@/composables/useNotificacionesPush";
 import { EstaJugandoDTO } from "./interfaces/Partidas";
 
 const usuariosStore = useUsuariosStore();
@@ -148,7 +149,10 @@ router.afterEach(to => {
     !!window.history.state?.back;
 });
 
+const notificacionesPush = useNotificacionesPush();
+
 const handleLogout = async () => {
+  await notificacionesPush.quitar();
   usuariosStore.usuario = {} as UsuarioViewDTO; // Limpia los datos del usuario anterior
   logout();
   router.push({ name: "inicio-sesion" });
@@ -168,6 +172,7 @@ watch(
   nuevoUsuario => {
     if (nuevoUsuario) {
       cargarUsuario();
+      notificacionesPush.registrar();
     } else {
       usuariosStore.usuario = {} as UsuarioViewDTO;
     }
@@ -194,6 +199,7 @@ const comprobarPartidasActivas = async (idUsuario: string) => {
 onMounted(() => {
   useDeepLinks().init();
   useBotonAtras().init();
+  notificacionesPush.escuchar();
 
   // Sin sesión no se pregunta: el servidor diría 401 y mandaría a iniciar sesión desde las páginas
   // que no la necesitan, como la de elegir una contraseña nueva o la de registro

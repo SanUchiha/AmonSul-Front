@@ -13,6 +13,7 @@
     "cap:assets": "npx capacitor-assets generate --android --ios --iconBackgroundColor \"#121212\" --splashBackgroundColor \"#121212\" --splashBackgroundColorDark \"#121212\" --logoSplashScale 0.4"
   },
   "dependencies": {
+    "@capacitor-firebase/messaging": "^8.6.0",
     "@capacitor/android": "^8.6.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.0",
@@ -31,6 +32,7 @@
     "canvas-confetti": "^1.9.3",
     "core-js": "^3.8.3",
     "d3": "^7.9.0",
+    "firebase": "^12.19.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.0",
     "leaflet-control-geocoder": "^3.1.0",

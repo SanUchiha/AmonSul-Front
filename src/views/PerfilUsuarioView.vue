@@ -116,14 +116,15 @@
           inset
           hide-details
           density="compact"
-          label="Avisos por correo"
+          label="Avisos"
           :loading="guardandoAvisos"
           :disabled="guardandoAvisos"
           @update:model-value="cambiarNotificaciones"
         />
         <p class="text-caption text-medium-emphasis mb-0 mt-1">
-          Nuevos eventos, rondas, inscripciones, pagos, listas y partidas amistosas. Si los
-          desactivas, solo te llegarán los correos de tu cuenta, como el de recuperar la contraseña.
+          Nuevos eventos, rondas, inscripciones, pagos, listas y partidas amistosas, por correo y
+          en la app. Si los desactivas, solo te llegarán los correos de tu cuenta, como el de
+          recuperar la contraseña.
         </p>
       </v-card>
 
