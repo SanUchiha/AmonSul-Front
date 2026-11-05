@@ -94,6 +94,14 @@ const pedirTokenNuevo = async (tokenCaducado: string): Promise<boolean> => {
 };
 
 const logout = () => {
+  // Que deje de valer también en el servidor. Si falla, por ejemplo sin conexión, la sesión se cierra igual en el
+  // dispositivo y el token caduca solo
+  const refreshToken = leerDatoSesion("refreshToken");
+  if (refreshToken)
+    axios
+      .post(BASE_URL + "Acceso/Logout", { refreshToken })
+      .catch(() => undefined);
+
   void borrarSesionGuardada();
 
   stateAuth.user = "";
