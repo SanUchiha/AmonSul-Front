@@ -26,9 +26,9 @@
         nosotros.
       </li>
       <li>
-        <strong>Al usar la web:</strong> tus inscripciones a eventos (fecha, si
-        has pagado, el ejército elegido y si compartes tu correo con el
-        organizador), las listas de ejército que subes, tus partidas y
+        <strong>Al usar la web o la app:</strong> tus inscripciones a eventos
+        (fecha, si has pagado, el ejército elegido y si compartes tu correo con
+        el organizador), las listas de ejército que subes, tus partidas y
         resultados, tu ELO y tu posición en las clasificaciones.
       </li>
       <li>
@@ -38,6 +38,18 @@
       <li>
         <strong>Si nos escribes desde Contacto:</strong> lo que pongas en el
         formulario, para responderte.
+      </li>
+      <li>
+        <strong>Si usas la app y tienes activadas las notificaciones:</strong>
+        un identificador de tu móvil para poder enviártelas (el token de
+        Firebase Cloud Messaging) y si es Android o iPhone.
+      </li>
+      <li>
+        <strong>Si activas la entrada con Face ID, Touch ID o huella:</strong>
+        tu correo y tu contraseña se guardan cifrados solo en tu móvil,
+        protegidos por el sistema, y se usan únicamente para iniciar sesión por
+        ti. No vemos ni guardamos tu cara ni tu huella: las comprueba tu móvil,
+        que solo le dice a la app si eres tú.
       </li>
       <li>
         <strong>Datos técnicos:</strong> como cualquier web, el servidor
@@ -79,11 +91,19 @@
         quieras en Mi inscripción (art. 6.1.a).
       </li>
       <li>
-        <strong>Avisos por correo de tus eventos</strong> (inscripción, listas,
-        rondas) <strong>y novedades de la web.</strong> Base: el servicio (art.
-        6.1.b) y el interés legítimo en informarte del servicio que usas (art.
-        6.1.f). Puedes desactivarlos en tu perfil; los correos de tu cuenta,
-        como el de recuperar la contraseña, te llegan siempre.
+        <strong>Avisos de eventos</strong> (tu inscripción, listas y rondas, y
+        cuando se publica, empieza o termina un evento)
+        <strong>y novedades de la web,</strong> por correo o por notificación en
+        el móvil. Base: el servicio (art. 6.1.b) y el interés legítimo en
+        informarte del servicio que usas (art. 6.1.f). Puedes desactivarlos en
+        tu perfil, y las notificaciones también en los ajustes de tu móvil; los
+        correos de tu cuenta, como el de recuperar la contraseña, te llegan
+        siempre.
+      </li>
+      <li>
+        <strong>Entrar con Face ID, Touch ID o huella.</strong> Base: tu
+        consentimiento, que das al activarlo y puedes retirar en tu perfil (art.
+        6.1.a).
       </li>
       <li>
         <strong>Contar cuánto se usa la web</strong> (cuántas veces inicias
@@ -130,14 +150,19 @@
           <li>Alojamiento de la web: Netlify, Inc. (EE. UU.).</li>
           <li>Imágenes de listas y carteles: Cloudinary (EE. UU.).</li>
           <li>Envío de correos: Google (Gmail).</li>
+          <li>
+            Envío de notificaciones: Google (Firebase Cloud Messaging) y, en
+            iPhone, Apple. Reciben el identificador de tu móvil y el texto del
+            aviso.
+          </li>
         </ul>
       </li>
       <li>
-        <strong>Servicios a los que se conecta tu navegador:</strong> los mapas
-        usan OpenStreetMap (direcciones y mapas de los eventos) y datos públicos
-        alojados en GitHub (el mapa por provincias). Tu navegador se conecta
-        directamente a ellos y les envía tu dirección IP. Si pulsas la dirección
-        de un evento, se abre Google Maps.
+        <strong>Servicios a los que se conecta tu dispositivo:</strong> los
+        mapas usan OpenStreetMap (direcciones y mapas de los eventos) y datos
+        públicos alojados en GitHub (el mapa por provincias). Tu dispositivo se
+        conecta directamente a ellos y les envía tu dirección IP. Si pulsas la
+        dirección de un evento, se abre Google Maps.
       </li>
     </ul>
     <p>No vendemos ni cedemos tus datos a nadie.</p>
@@ -147,8 +172,9 @@
       Netlify y Cloudinary están en EE. UU. Las dos están adheridas al Marco de
       Privacidad de Datos UE-EE. UU. y sus contratos incluyen además las
       cláusulas contractuales tipo de la Comisión Europea. Google puede tratar
-      datos fuera del EEE con esas mismas garantías. OpenStreetMap está en Reino
-      Unido, que cuenta con una decisión de adecuación de la Comisión Europea.
+      datos fuera del EEE con esas mismas garantías, y Apple con cláusulas
+      contractuales tipo. OpenStreetMap está en Reino Unido, que cuenta con una
+      decisión de adecuación de la Comisión Europea.
     </p>
 
     <h2>6. Cuánto tiempo guardamos tus datos</h2>
@@ -166,6 +192,22 @@
         inscripción, o hasta que lo retires.
       </li>
       <li>Los enlaces para recuperar la contraseña caducan en una hora.</li>
+      <li>
+        La sesión de un dispositivo dura hasta 30 días desde la última vez que
+        la usas. Termina antes si cierras sesión en él o si cambias la
+        contraseña (en tus otros dispositivos, en un máximo de 12 horas).
+      </li>
+      <li>
+        El identificador de tu móvil para las notificaciones se borra al cerrar
+        sesión en él o al borrar tu cuenta, y también si deja de ser válido.
+      </li>
+      <li>
+        El correo y la contraseña guardados para Face ID, Touch ID o huella se
+        borran de tu móvil al desactivarlo en tu perfil, al borrar tu cuenta o
+        cuando la contraseña guardada deja de valer. Si desinstalas la app sin
+        desactivarlo, el iPhone puede conservarlos cifrados: para quitarlos,
+        desactívalo antes de desinstalarla.
+      </li>
     </ul>
 
     <h2>7. Menores</h2>
@@ -193,11 +235,13 @@
       >).
     </p>
 
-    <h2>9. Lo que se guarda en tu navegador</h2>
+    <h2>9. Lo que se guarda en tu navegador o en tu móvil</h2>
     <p>
-      Solo lo necesario para mantener tu sesión: el token de acceso, tu correo y
-      tu identificador de usuario. Se borran al cerrar sesión. No usamos cookies
-      de análisis ni de publicidad.
+      Solo lo necesario para mantener tu sesión: el token de acceso, el que
+      permite renovarla, tu correo y tu identificador de usuario. Se borran al
+      cerrar sesión. En la app se guarda además, de forma temporal, lo que
+      descargas para poder abrirlo o compartirlo. No usamos cookies de análisis
+      ni de publicidad, y la app no incluye analítica ni publicidad.
     </p>
 
     <h2>10. Cambios en esta política</h2>
@@ -209,7 +253,7 @@
 </template>
 
 <script setup lang="ts">
-const ULTIMA_ACTUALIZACION = "2 de noviembre de 2026";
+const ULTIMA_ACTUALIZACION = "5 de noviembre de 2026";
 const RESPONSABLE = "José Antonio Sánchez Molina";
 const CONTACTO = "jose.a.sanchez.molina@gmail.com";
 </script>
