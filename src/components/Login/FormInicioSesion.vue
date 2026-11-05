@@ -207,8 +207,10 @@ const entrarConBiometria = async () => {
     password: acceso.password,
   });
   if (resultado === "dentro") dialogOk.value = true;
-  else if (resultado === "rechazado") {
+  // Con un mensaje del servidor, como el de demasiados intentos, lo guardado sigue valiendo
+  else if (resultado === "rechazado" && !mensajeError.value) {
     // Ha cambiado la contraseña: al entrar escribiendo la nueva se vuelve a preguntar
+    mensajeError.value = `Tu contraseña ha cambiado. Entra escribiendo la nueva y podrás volver a activar ${nombreAcceso.value}.`;
     await biometria.desactivar();
     nombreAcceso.value = "";
   }
