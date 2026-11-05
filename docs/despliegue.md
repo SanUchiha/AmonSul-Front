@@ -45,7 +45,8 @@ Luego, en Play Console, se sube a la pista que toque. La ficha y las respuestas 
 Los enlaces de recuperar contraseña solo abren la app si `public/.well-known/assetlinks.json` tiene la huella SHA-256 del
 certificado que firma la app instalada:
 
-- **Instalada desde Play:** la de la firma de apps, en Play Console → Prueba y publicación → Configuración → Firma de apps.
+- **Instalada desde Play:** la de la firma de apps, `8F:DB:62:8D:…:62:28`. Está en Play Console → Protegida con Play →
+  Protección de Play Store → Firma de apps, en «Certificado de clave de firma de apps». No sirve la de la clave de subida.
 - **Compilada aquí en Debug:** la de `~/.android/debug.keystore`.
 
 ## iOS (App Store)
