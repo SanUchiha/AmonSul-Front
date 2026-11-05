@@ -102,7 +102,7 @@
     <ResponseLogin
       v-if="dialogOk"
       :isVisible="dialogOk"
-      @update:isVisible="handleOkClick = $event"
+      @update:isVisible="dialogOk = $event"
     />
 
     <LogoutDialog
