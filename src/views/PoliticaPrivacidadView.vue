@@ -181,11 +181,16 @@
     <ul>
       <li>Mientras tengas la cuenta.</li>
       <li>
-        Si la borras, desde tu perfil o escribiéndonos, eliminamos tus datos
-        personales. Tus resultados y partidas siguen en las clasificaciones y en
-        los eventos, sin nada que te identifique: aparecerás como «Desconocido»
-        seguido de un número. Si estás inscrito en un evento que no ha
-        terminado, o lo organizas, podrás borrarla cuando termine.
+        Si la borras, desde tu perfil o escribiéndonos (<a
+          :href="URL_ELIMINAR_CUENTA"
+          target="_blank"
+          rel="noopener"
+          >cómo hacerlo</a
+        >), eliminamos tus datos personales. Tus resultados, partidas e
+        inscripciones, con las listas que entregaste, siguen en las
+        clasificaciones y en los eventos a nombre de «Desconocido» seguido de un
+        número. Si estás inscrito en un evento que no ha terminado, o lo
+        organizas, podrás borrarla cuando termine.
       </li>
       <li>
         El permiso para que el organizador vea tu correo dura lo que tu
@@ -256,6 +261,8 @@
 const ULTIMA_ACTUALIZACION = "5 de noviembre de 2026";
 const RESPONSABLE = "José Antonio Sánchez Molina";
 const CONTACTO = "jose.a.sanchez.molina@gmail.com";
+// Completa, como la de esta política: en la app, una relativa se abriría dentro y perdería la página
+const URL_ELIMINAR_CUENTA = "https://amonsul.netlify.app/eliminar-cuenta.html";
 </script>
 
 <style scoped>
