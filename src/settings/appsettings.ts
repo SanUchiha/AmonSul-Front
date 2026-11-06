@@ -92,7 +92,7 @@ export const appsettings = {
     { name: "The Grey Company", band: "good", shortName: "TGC" },
 
     {
-      name: "Battle of Grrenfields (legacy)",
+      name: "Battle of Greenfields (legacy)",
       band: "good",
       shortName: "BoG(L)",
     },
