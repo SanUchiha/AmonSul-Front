@@ -42,15 +42,23 @@ const funcErrors = (
   else if (errorCode === 404) { router.push({ name: "inicio-sesion" }); }
 }
 
-// El servidor corta las peticiones si llegan muchas seguidas, como cuando todo un torneo toca el aviso de una ronda.
-// Las lecturas se repiten solas; las escrituras no, porque la primera puede haber llegado
-const ESPERAS_TRAS_CORTE_MS = [700, 1800, 4000]
+// El hosting corta por IP si llegan muchas peticiones seguidas, como cuando todo un torneo toca el aviso de una ronda
+// desde la misma wifi. El corte dura mientras siga entrando tráfico, unos 10 s en las pruebas: esperas largas para
+// cubrirlo sin alargarlo. Las lecturas se repiten solas; de las escrituras, solo guardar el resultado de una partida,
+// que lleva los mismos valores: si la primera llegó, la segunda no cambia nada
+const ESPERAS_TRAS_CORTE_MS = [1500, 3000, 5000, 8000]
 const CODIGOS_SERVIDOR_NO_DISPONIBLE = [502, 503, 504]
+const RUTA_GUARDAR_PARTIDA = 'Torneo/Editar-Partida'
+
+const sePuedeRepetir = (config: AxiosError['config']) => {
+  const metodo = config?.method?.toLowerCase()
+  return metodo === 'get' || (metodo === 'put' && config?.url === RUTA_GUARDAR_PARTIDA)
+}
 
 const esCorte = (err: AxiosError) => {
   const { config, response } = err
   return (
-    config?.method?.toLowerCase() === 'get' &&
+    sePuedeRepetir(config) &&
     !axios.isCancel(err) &&
     (!response || CODIGOS_SERVIDOR_NO_DISPONIBLE.includes(response.status))
   )
