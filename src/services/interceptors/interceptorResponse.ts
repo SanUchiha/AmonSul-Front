@@ -42,6 +42,34 @@ const funcErrors = (
   else if (errorCode === 404) { router.push({ name: "inicio-sesion" }); }
 }
 
+// El servidor corta las peticiones si llegan muchas seguidas, como cuando todo un torneo toca el aviso de una ronda.
+// Las lecturas se repiten solas; las escrituras no, porque la primera puede haber llegado
+const ESPERAS_TRAS_CORTE_MS = [700, 1800, 4000]
+const CODIGOS_SERVIDOR_NO_DISPONIBLE = [502, 503, 504]
+
+const esCorte = (err: AxiosError) => {
+  const { config, response } = err
+  return (
+    config?.method?.toLowerCase() === 'get' &&
+    !axios.isCancel(err) &&
+    (!response || CODIGOS_SERVIDOR_NO_DISPONIBLE.includes(response.status))
+  )
+}
+
+const repetirTrasCorte = async (config: InternalAxiosRequestConfig) => {
+  for (const espera of ESPERAS_TRAS_CORTE_MS) {
+    // Con algo de azar: si se ha cortado a muchos a la vez, que no vuelvan todos en el mismo momento
+    await new Promise(resolve => setTimeout(resolve, espera * (0.5 + Math.random())))
+    try {
+      return await axios.request(config)
+    }
+    catch (errReintento) {
+      if (!axios.isAxiosError(errReintento) || !esCorte(errReintento)) throw errReintento
+    }
+  }
+  return null
+}
+
 // Token caducado: se pide otro con el refresh token y se repite la petición una vez. Se repite con axios sin
 // interceptores, que no vuelva a entrar aquí; si falla otra vez, se trata como cualquier otro error
 const repetirConTokenNuevo = async (config: InternalAxiosRequestConfig) => {
@@ -60,7 +88,7 @@ const repetirConTokenNuevo = async (config: InternalAxiosRequestConfig) => {
 
 export const interceptorResponseError = async (
   err: interceptorError,
-) => {
+): Promise<AxiosResponse> => {
   const errorCode: errorCode
     = err.response && err.response.status
       ? err.response.status
@@ -72,6 +100,16 @@ export const interceptorResponseError = async (
     err.errorType = 'cancelled'
   }
   else {
+    if (config && esCorte(err)) {
+      try {
+        const respuesta = await repetirTrasCorte(config)
+        if (respuesta) return respuesta
+      }
+      catch (errReintento) {
+        // Ya no es un corte (la sesión ha caducado, por ejemplo): se trata como cualquier otro error
+        return interceptorResponseError(errReintento as interceptorError)
+      }
+    }
     if (errorCode === 401 && config && leerDatoSesion("refreshToken")) {
       const respuesta = await repetirConTokenNuevo(config)
       if (respuesta) return respuesta

@@ -7,6 +7,7 @@
     <LigaEnVivo v-else-if="esLiga && torneo" :torneo="torneo" :idUsuario="idUsuario" />
     <CopaEnVivo v-else-if="esCopa && torneo" :torneo="torneo" :idUsuario="idUsuario" />
     <div v-else>
+      <AvisoErrorCarga v-if="errorCarga" @reintentar="cargar" />
       <!-- TABS -->
       <v-tabs v-model="pestana" show-arrows grow>
         <v-tab
@@ -54,7 +55,7 @@
         :jugadores="jugadores"
       />
       <v-window v-model="activeTab">
-        <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion && activeTab !== tabClasificacionIndividual">
+        <div v-if="!errorCarga && !isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion && activeTab !== tabClasificacionIndividual">
           <p>Aún no se ha generado ninguna ronda</p>
         </div>
 
@@ -163,6 +164,7 @@ import { compartirSistemaAleman } from "@/composables/useSistemaAleman";
 import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
 import { useRondasEnPestana } from "@/composables/useRondasEnPestana";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import AvisoErrorCarga from "@/components/Commons/AvisoErrorCarga.vue";
 import CardEmparejamientos from "@/components/GestionTorneos/Equipos/CardEmparejamientos.vue";
 import TabClasificacionEquipos from "@/components/GestionTorneos/Equipos/TabClasificacionEquipos.vue";
 import TabClasificacionEquiposIndividual from "@/components/GestionTorneos/Equipos/TabClasificacionEquiposIndividual.vue";
@@ -199,8 +201,11 @@ import {
 import { appsettings } from "@/settings/appsettings";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
 import { esUsuarioBye } from "@/utils/bye";
-import { onMounted, ref, computed } from "vue";
+import { computed, defineProps, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
+
+// La ficha del evento ya lo ha cargado: con el cartel, pesa
+const props = defineProps<{ torneoCargado?: Torneo }>();
 
 const route = useRoute();
 const idTorneo = ref<number>(Number(route.params.idTorneo));
@@ -241,13 +246,18 @@ function manejarClasificacion(clasificacion: ClasificacionEquipo[]) {
   clasificacionEquipos.value = clasificacion;
 }
 
-onMounted(async () => {
+// Se repite si la carga falla: con el servidor saturado, mejor decirlo que dar a entender que no hay rondas
+const errorCarga = ref(false);
+
+const cargar = async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
   isLoading.value = true;
+  errorCarga.value = false;
+  isLoadingPartidas.value = true;
 
   // Llamadas críticas en paralelo: en cuanto respondan se muestra la vista
   const [resTorneo, resResumen] = await Promise.allSettled([
-    getTorneo(idTorneo.value),
+    props.torneoCargado ? { data: props.torneoCargado } : getTorneo(idTorneo.value),
     getResumenTorneoAsync(idTorneo.value),
   ]);
 
@@ -268,15 +278,22 @@ onMounted(async () => {
 
   activeTab.value = TAB_RESUMEN;
   isLoading.value = false;
+  if (resTorneo.status === "rejected" || resResumen.status === "rejected") errorCarga.value = true;
+  if (resTorneo.status === "rejected") {
+    isLoadingPartidas.value = false;
+    return;
+  }
   // La liga y la copa cargan lo suyo
   if (esLiga.value || esCopa.value) return;
 
   // Llamadas secundarias en background — actualizan reactivamente
   Promise.allSettled([
     getPartidasTorneo(idTorneo.value),
-    getInfoTorneoEquipoCreado(idTorneo.value),
+    // Los equipos: en individual no hay
+    torneo.value?.tipoTorneo === "Individual" ? null : getInfoTorneoEquipoCreado(idTorneo.value),
     getInscripcionesTorneo(idTorneo.value),
   ]).then(([resPartidas, resTorneoGestion, resInscripciones]) => {
+    if ([resPartidas, resTorneoGestion, resInscripciones].some(r => r.status === "rejected")) errorCarga.value = true;
     if (resPartidas.status === "fulfilled") {
       partidas.value = resPartidas.value.data;
       partidasPorRonda.value = partidas.value.reduce(
@@ -289,7 +306,7 @@ onMounted(async () => {
         {} as Record<number, PartidaTorneoDTO[]>
       );
     }
-    if (resTorneoGestion.status === "fulfilled") {
+    if (resTorneoGestion.status === "fulfilled" && resTorneoGestion.value) {
       torneoGestion.value = resTorneoGestion.value.data;
     }
     if (resInscripciones.status === "fulfilled") {
@@ -299,7 +316,9 @@ onMounted(async () => {
     if (resPartidas.status === "fulfilled") calcularClasificacion();
     isLoadingPartidas.value = false;
   });
-});
+};
+
+onMounted(cargar);
 
 const calcularClasificacion = async () => {
   const ranking: Record<

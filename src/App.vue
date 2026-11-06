@@ -103,7 +103,7 @@
 
 <script setup lang="ts">
 import ModalPartidasActivas from "@/components/Commons/ModalPartidasActivas.vue";
-import { getPartidasTorneoPorFechaAsync } from "@/services/PartidaTorneoService";
+import { pedirPartidasDeHoy } from "@/services/PartidaTorneoService";
 // Estado para el modal y las partidas activas
 const mostrarModalPartidas = ref<boolean>(false);
 
@@ -142,6 +142,8 @@ const isLoggedIn = computed(() => !!getUser.value);
 // anterior. En inicio y en el login no: al entrar, la página anterior a inicio sería el login
 const mostrarVolver = ref(false);
 router.afterEach(to => {
+  // La ficha del evento ya enseña «Tu partida»: la ventana de partidas de hoy la taparía
+  if (to.name === "detalle-evento") mostrarModalPartidas.value = false;
   mostrarVolver.value =
     Capacitor.getPlatform() === "ios" &&
     to.name !== "home" &&
@@ -183,13 +185,9 @@ watch(
 // Llamada real al backend para comprobar partidas activas
 const comprobarPartidasActivas = async (idUsuario: string) => {
   try {
-    const response = await getPartidasTorneoPorFechaAsync(Number(idUsuario));
-
-    if (response.status === 200) {
-      estaJugando.value = response.data;
-      if (estaJugando.value?.tienePartidas) {
-        mostrarModalPartidas.value = true;
-      }
+    estaJugando.value = await pedirPartidasDeHoy(Number(idUsuario));
+    if (estaJugando.value?.tienePartidas && router.currentRoute.value.name !== "detalle-evento") {
+      mostrarModalPartidas.value = true;
     }
   } catch (error) {
     console.error("Error al comprobar partidas activas:", error);
@@ -204,7 +202,6 @@ onMounted(() => {
   // Sin sesión no se pregunta: el servidor diría 401 y mandaría a iniciar sesión desde las páginas
   // que no la necesitan, como la de elegir una contraseña nueva o la de registro
   if (isLoggedIn.value) {
-    cargarUsuario();
     comprobarPartidasActivas(getidUsuario.value);
   }
 });

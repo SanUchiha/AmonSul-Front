@@ -1,15 +1,54 @@
 <template>
   <v-container class="pa-0 pa-sm-4">
     <LoadingGandalf v-if="isLoading" />
+    <!-- Lo primero, si hoy juega este evento: su partida. Nada más se pide hasta que abra el resto -->
+    <v-card v-else-if="verTuPartida && partidasHoy" flat class="detalle mx-auto">
+      <div class="pa-3 pa-sm-4">
+        <h1 class="text-h6 font-weight-bold titulo">Tu partida</h1>
+        <p v-if="partidasHoy.nombreTorneo" class="text-body-2 text-medium-emphasis mb-3">
+          {{ partidasHoy.nombreTorneo }}
+        </p>
+        <ListaPartidasDeHoy
+          :estaJugando="partidasHoy"
+          :idUsuario="Number(idUsuario)"
+          :idTorneo="idTorneo"
+          soloRondaActual
+        />
+        <v-btn block variant="tonal" class="text-none mt-2" @click="abrirEvento('resultados')">
+          Rondas y clasificación
+        </v-btn>
+        <v-btn block variant="text" class="text-none mt-2" @click="abrirEvento('detalle')">
+          Ficha del evento
+        </v-btn>
+      </div>
+    </v-card>
+    <AvisoErrorCarga v-else-if="errorCarga" class="ma-3" @reintentar="cargarEvento(tab)" />
     <!-- Sencilla a propósito: lo que más se busca arriba (tu inscripción) y los datos como etiqueta y valor -->
     <!-- En Resultados, más ancha: las clasificaciones tienen varias columnas -->
     <v-card v-else-if="torneo" flat class="detalle mx-auto" :class="{ 'detalle--ancha': tab === 'resultados' }">
+      <v-btn
+        v-if="partidasHoy"
+        size="small"
+        variant="text"
+        prepend-icon="mdi-arrow-left"
+        class="text-none mt-1"
+        @click="verTuPartida = true"
+      >
+        Tu partida
+      </v-btn>
       <!-- Sin el número de inscritos en la pestaña: con él, las tres no caben en el móvil -->
       <v-tabs v-model="tab" grow class="pestanas-evento">
         <v-tab value="detalle">Detalle</v-tab>
         <v-tab value="inscritos">Inscritos</v-tab>
         <v-tab value="resultados">Resultados</v-tab>
       </v-tabs>
+
+      <AvisoErrorCarga
+        v-if="errorFicha && tab !== 'resultados'"
+        class="ma-3"
+        mensaje="No se han podido cargar tu inscripción ni los inscritos."
+        @reintentar="cargarDatosFicha"
+      />
 
       <v-window v-model="tab">
         <v-window-item value="detalle">
@@ -25,20 +64,24 @@
 
             <!-- Tu inscripción -->
             <div class="mt-4">
-              <p v-if="estado.texto" class="text-body-2 mb-2">{{ estado.texto }}</p>
-              <div v-if="estado.acciones.length" class="d-flex flex-wrap ga-2">
-                <v-btn
-                  v-for="accion in estado.acciones"
-                  :key="accion.texto"
-                  :color="accion.color ?? 'primary'"
-                  :variant="accion.variant ?? 'tonal'"
-                  :block="accion.block"
-                  class="text-none"
-                  @click="accion.hacer"
-                >
-                  {{ accion.texto }}
-                </v-btn>
-              </div>
+              <!-- Mientras no se sepa, sin botones: «Apúntate» saldría también a quien ya está inscrito -->
+              <v-progress-linear v-if="cargandoFicha" indeterminate color="primary" class="mb-2" />
+              <template v-else-if="!errorFicha">
+                <p v-if="estado.texto" class="text-body-2 mb-2">{{ estado.texto }}</p>
+                <div v-if="estado.acciones.length" class="d-flex flex-wrap ga-2">
+                  <v-btn
+                    v-for="accion in estado.acciones"
+                    :key="accion.texto"
+                    :color="accion.color ?? 'primary'"
+                    :variant="accion.variant ?? 'tonal'"
+                    :block="accion.block"
+                    class="text-none"
+                    @click="accion.hacer"
+                  >
+                    {{ accion.texto }}
+                  </v-btn>
+                </div>
+              </template>
             </div>
 
             <dl class="datos mt-6">
@@ -60,7 +103,7 @@
               <div class="dato">
                 <dt>Plazas</dt>
                 <dd>
-                  {{ plazasOcupadas }} / {{ torneo.limiteParticipantes || "sin límite" }}
+                  {{ cargandoFicha ? "…" : plazasOcupadas }} / {{ torneo.limiteParticipantes || "sin límite" }}
                   <template v-if="porEquipos && torneo.limiteParticipantes">{{ esParejas ? "parejas" : "equipos" }}</template>
                 </dd>
               </div>
@@ -146,7 +189,7 @@
 
         <!-- Resultados: la vista en vivo de siempre, con sus pestañas. Se carga al abrirla -->
         <v-window-item value="resultados">
-          <component :is="vistaResultados" />
+          <component :is="vistaResultados" :torneoCargado="torneo" />
         </v-window-item>
       </v-window>
     </v-card>
@@ -177,7 +220,9 @@
     />
 
     <!-- Registro equipo -->
+    <!-- Solo al abrirla: al montarse pide la lista de jugadores -->
     <ModalRegistroEquipo
+      v-if="showModalInscripcionPorEquipos"
       :isVisible="showModalInscripcionPorEquipos"
       :tipoTorneo="torneo?.tipoTorneo"
       :idTorneo="idTorneo"
@@ -248,6 +293,10 @@ import { esPorJornadas, nombreEvento, textosEvento } from "@/Constant/FormatoTor
 import { esUsuarioBye } from "@/utils/bye";
 import { tipoTorneoOptions } from "@/Constant/TiposTorneo";
 import ModalInscripcion from "@/components/Inscripcion/ModalInscripcion.vue";
+import AvisoErrorCarga from "@/components/Commons/AvisoErrorCarga.vue";
+import ListaPartidasDeHoy from "@/components/Commons/ListaPartidasDeHoy.vue";
+import { olvidarPartidasDeHoy, pedirPartidasDeHoy } from "@/services/PartidaTorneoService";
+import { EstaJugandoDTO } from "@/interfaces/Partidas";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
 import { diaDeHoy, formatHora, ultimoDiaEvento } from "@/utils/Fecha";
 import ModalRegistroEquipo from "@/components/Inscripcion/ModalRegistroEquipo.vue";
@@ -438,75 +487,138 @@ const eliminarInscripcionEquipo = async (
   }
 };
 
-// Montaje y obtención de datos
-onMounted(async () => {
-  isLoading.value = true;
+// Hoy juega este evento: lo primero es su partida, con una sola petición. Tras el aviso de una ronda entran todos a la
+// vez y el servidor corta si llegan demasiadas, así que el resto no se pide hasta que abra el evento
+const partidasHoy = ref<EstaJugandoDTO | null>(null);
+const verTuPartida = ref<boolean>(false);
+const errorCarga = ref<boolean>(false);
+
+const buscarTuPartida = async () => {
+  if (idUsuario.value == null) return false;
   try {
-    if (idUsuario.value != null) {
-      idTorneo.value = Number(route.params.idTorneo);
+    const datos = await pedirPartidasDeHoy(Number(idUsuario.value));
+    // Liga y copa van por jornadas con calendario abierto: su ficha ya enseña las suyas
+    if (esPorJornadas(datos.formatoTorneo) || !datos.partidas?.some(p => p.idTorneo === idTorneo.value))
+      return false;
+    partidasHoy.value = datos;
+    return true;
+  } catch {
+    // Sin ella se sigue con el evento, que es lo que había
+    return false;
+  }
+};
 
-      //TODO Cambiar getInscripcionesUser por servicio que devuelva el estado de la inscripción al torneo.
-      // No es necesario tener una lista de inscripciones, es mas optimo solo la inscripción al torneo.
-      // Paralelizar las solicitudes
-      const [responseTorneo, responseInscripcion, responseInscriptionesUser] =
-        await Promise.all([
-          getTorneo(idTorneo.value),
-          getInscripcionesTorneo(idTorneo.value),
-          getInscripcionesIndividualByUser(idUsuario.value),
-        ]);
+// Lo de la ficha y los inscritos: en Resultados no hace falta, solo al abrir esas pestañas
+const cargandoFicha = ref<boolean>(false);
+const errorFicha = ref<boolean>(false);
+let fichaPedida = false;
 
-      torneo.value = responseTorneo.data;
-      participantes.value = responseInscripcion.data;
-      torneosApuntado.value = responseInscriptionesUser.data;
+const cargarDatosFicha = async () => {
+  if (fichaPedida || !torneo.value) return;
+  fichaPedida = true;
+  cargandoFicha.value = true;
+  errorFicha.value = false;
 
-      // Verificar si el usuario ya está apuntado
-      if (torneosApuntado.value != null) {
-        torneosApuntado.value.forEach(element => {
-          if (element.idTorneo === idTorneo.value) {
-            idInscripcion.value = element.idInscripcion;
-            estaApuntado.value = true;
-            if (element.idEquipo != null) idEquipo.value = element.idEquipo;
-          }
-        });
+  if (isValidCoordinates(torneo.value.lugarTorneo)) {
+    getAddress(
+      parseFloat(torneo.value.lugarTorneo.split(", ")[0]),
+      parseFloat(torneo.value.lugarTorneo.split(", ")[1])
+    );
+  }
 
+  //TODO Cambiar getInscripcionesUser por servicio que devuelva el estado de la inscripción al torneo.
+  // No es necesario tener una lista de inscripciones, es mas optimo solo la inscripción al torneo.
+  const [resInscritos, resEquipos, resMisInscripciones, resApuntado] = await Promise.allSettled([
+    porEquipos.value ? null : getInscripcionesTorneo(idTorneo.value),
+    porEquipos.value ? getEquiposByTorneoAsync(idTorneo.value) : null,
+    idUsuario.value != null ? getInscripcionesIndividualByUser(idUsuario.value) : null,
+    idUsuario.value != null ? estaApuntadoTorneoAsync(idTorneo.value, parseInt(idUsuario.value)) : null,
+  ]);
+
+  if (resInscritos.status === "fulfilled" && resInscritos.value) participantes.value = resInscritos.value.data;
+  if (resEquipos.status === "fulfilled" && resEquipos.value) infoEquipos.value = resEquipos.value.data;
+  if (resMisInscripciones.status === "fulfilled" && resMisInscripciones.value) {
+    torneosApuntado.value = resMisInscripciones.value.data;
+    // Verificar si el usuario ya está apuntado
+    torneosApuntado.value?.forEach(element => {
+      if (element.idTorneo === idTorneo.value) {
+        idInscripcion.value = element.idInscripcion;
+        estaApuntado.value = true;
+        if (element.idEquipo != null) idEquipo.value = element.idEquipo;
       }
-    }
+    });
+  }
+  if (resApuntado.status === "fulfilled" && resApuntado.value?.data) estaApuntado.value = true;
 
+  errorFicha.value = [resInscritos, resEquipos, resMisInscripciones, resApuntado].some(r => r.status === "rejected");
+  fichaPedida = !errorFicha.value;
+  cargandoFicha.value = false;
+};
+
+const cargarEvento = async (pestana = "") => {
+  isLoading.value = true;
+  errorCarga.value = false;
+  verTuPartida.value = false;
+  try {
+    torneo.value = (await getTorneo(idTorneo.value)).data;
     if (torneo.value) tipoTorneo.value = torneo.value.tipoTorneo;
-    const pedida = String(route.query.tab ?? "");
-    if (PESTANAS.includes(pedida)) tab.value = pedida;
-    else if (haEmpezado.value) tab.value = "resultados";
-
-    if (idTorneo.value) {
-      const responseEquipos = await getEquiposByTorneoAsync(idTorneo.value);
-
-      infoEquipos.value = responseEquipos.data;
-    }
-    try {
-      if (torneo.value)
-        if (isValidCoordinates(torneo.value.lugarTorneo)) {
-          getAddress(
-            parseFloat(torneo.value.lugarTorneo.split(", ")[0]),
-            parseFloat(torneo.value.lugarTorneo.split(", ")[1])
-          );
-        }
-    } catch (err) {
-      console.error("Error al obtener coordenadas del torneo:", err);
-    }
-    if (idTorneo.value && idUsuario.value) {
-      const responseEstaApuntado = await estaApuntadoTorneoAsync(
-        idTorneo.value,
-        parseInt(idUsuario.value)
-      );
-
-      if (responseEstaApuntado.data) estaApuntado.value = true;
-    }
+    if (PESTANAS.includes(pestana)) tab.value = pestana;
+    else tab.value = haEmpezado.value ? "resultados" : "detalle";
+    if (tab.value !== "resultados") cargarDatosFicha();
   } catch (err) {
     console.error("Error al cargar el torneo:", err);
+    errorCarga.value = true;
   } finally {
     isLoading.value = false;
   }
-});
+};
+
+// Desde «Tu partida»: el evento solo se pide la primera vez
+const abrirEvento = (pestana: string) => {
+  if (!torneo.value) {
+    cargarEvento(pestana);
+    return;
+  }
+  tab.value = pestana;
+  verTuPartida.value = false;
+};
+
+const iniciar = async () => {
+  isLoading.value = true;
+  idTorneo.value = Number(route.params.idTorneo);
+  torneo.value = undefined;
+  partidasHoy.value = null;
+  participantes.value = [];
+  infoEquipos.value = [];
+  torneosApuntado.value = undefined;
+  estaApuntado.value = false;
+  idInscripcion.value = 0;
+  idEquipo.value = undefined;
+  formattedAddress.value = "";
+  fichaPedida = false;
+  errorFicha.value = false;
+
+  // Quien pide una pestaña concreta, como los enlaces a los resultados, va a ella
+  const pedida = String(route.query.tab ?? "");
+  if (!PESTANAS.includes(pedida) && (await buscarTuPartida())) {
+    verTuPartida.value = true;
+    isLoading.value = false;
+    return;
+  }
+  await cargarEvento(pedida);
+};
+
+onMounted(iniciar);
+
+// Ha tocado un aviso con esta misma página abierta, quizá de otro evento
+watch(
+  () => route.query.aviso,
+  aviso => {
+    if (!aviso || route.name !== "detalle-evento") return;
+    olvidarPartidasDeHoy();
+    iniciar();
+  }
+);
 
 watch(
   () => showSuccessModal.value,
@@ -605,6 +717,7 @@ watch(texto, () => {
 
 // «45 jugadores» o «20 equipos»
 const resumenInscritos = computed(() => {
+  if (cargandoFicha.value) return "";
   if (!porEquipos.value) {
     const n = participantesReales.value.length;
     return `${n} ${n === 1 ? "jugador" : "jugadores"}`;
@@ -614,7 +727,11 @@ const resumenInscritos = computed(() => {
   return `${n} ${n === 1 ? "equipo" : "equipos"}`;
 });
 
-const textoVacio = computed(() => (texto.value ? "Nada coincide con la búsqueda." : "Todavía no hay inscritos."));
+const textoVacio = computed(() => {
+  if (cargandoFicha.value) return "Cargando…";
+  if (errorFicha.value) return "No se han podido cargar.";
+  return texto.value ? "Nada coincide con la búsqueda." : "Todavía no hay inscritos.";
+});
 
 // La vista en vivo que toca: la individual también lleva la liga y la copa
 const vistaResultados = computed(() => {
@@ -628,6 +745,7 @@ const vistaResultados = computed(() => {
 const PESTANAS = ["detalle", "inscritos", "resultados"];
 watch(tab, valor => {
   if (route.query.tab !== valor) router.replace({ query: { ...route.query, tab: valor } });
+  if (valor !== "resultados") cargarDatosFicha();
 });
 
 // Tu situación y lo que puedes hacer, justo bajo el nombre

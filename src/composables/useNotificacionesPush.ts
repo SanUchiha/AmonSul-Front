@@ -61,7 +61,10 @@ const escuchar = () => {
     "notificationActionPerformed",
     ({ notification }) => {
       const { ruta } = (notification.data ?? {}) as { ruta?: string };
-      if (ruta) router.push(ruta);
+      if (!ruta) return;
+      // Con la marca, tocar el aviso del evento que ya se está viendo también lo actualiza
+      const destino = router.resolve(ruta);
+      router.push({ path: destino.path, query: { ...destino.query, aviso: String(Date.now()) } });
     }
   );
 

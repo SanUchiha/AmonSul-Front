@@ -4,6 +4,7 @@
       <LoadingGandalf />
     </div>
     <div v-else>
+      <AvisoErrorCarga v-if="errorCarga" @reintentar="cargar" />
       <!-- TABS -->
       <v-tabs v-model="pestana" show-arrows grow>
         <v-tab
@@ -42,7 +43,7 @@
         :jugadores="jugadores"
       />
       <v-window v-model="activeTab">
-        <div v-if="!isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion">
+        <div v-if="!errorCarga && !isLoadingPartidas && partidas.length === 0 && activeTab !== -1 && activeTab !== tabListas && activeTab !== tabClasificacion">
           <p>Aún no se ha generado ninguna ronda</p>
         </div>
 
@@ -256,6 +257,7 @@ import { compartirSistemaAleman } from "@/composables/useSistemaAleman";
 import SelectorRondas from "@/components/Commons/SelectorRondas.vue";
 import { useRondasEnPestana } from "@/composables/useRondasEnPestana";
 import LoadingGandalf from "@/components/Commons/LoadingGandalf.vue";
+import AvisoErrorCarga from "@/components/Commons/AvisoErrorCarga.vue";
 import CardPartidaGestion from "@/components/GestionTorneos/CardPartidaGestion.vue";
 import TabResumenTorneo from "@/components/GestionTorneos/TabResumenTorneo.vue";
 import TabMostrarListas from "@/components/GestionTorneos/TabMostrarListas.vue";
@@ -274,8 +276,11 @@ import { getPartidasTorneoMas, getResumenTorneoAsync, getTorneo } from "@/servic
 import { appsettings } from "@/settings/appsettings";
 import { calcularPuntosAleman } from "@/utils/sistemaAleman";
 import { esUsuarioBye } from "@/utils/bye";
-import { onMounted, ref } from "vue";
+import { defineProps, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
+
+// La ficha del evento ya lo ha cargado: con el cartel, pesa
+const props = defineProps<{ torneoCargado?: Torneo }>();
 
 const route = useRoute();
 const idTorneo = ref<number>(Number(route.params.idTorneo));
@@ -304,13 +309,18 @@ const inscripciones = ref<InscripcionTorneoCreadoDTO[]>([]);
 const resumen = ref<ResumenTorneoDTO | null>(null);
 const isLoadingPartidas = ref(true);
 
-onMounted(async () => {
+// Se repite si la carga falla: con el servidor saturado, mejor decirlo que dar a entender que no hay rondas
+const errorCarga = ref(false);
+
+const cargar = async () => {
   if (idUsuarioLogger.value) idUsuario.value = parseInt(idUsuarioLogger.value);
   isLoading.value = true;
+  errorCarga.value = false;
+  isLoadingPartidas.value = true;
 
   // Llamadas críticas en paralelo: en cuanto respondan se muestra la vista
   const [resTorneo, resResumen] = await Promise.allSettled([
-    getTorneo(idTorneo.value),
+    props.torneoCargado ? { data: props.torneoCargado } : getTorneo(idTorneo.value),
     getResumenTorneoAsync(idTorneo.value),
   ]);
 
@@ -329,12 +339,18 @@ onMounted(async () => {
 
   activeTab.value = TAB_RESUMEN;
   isLoading.value = false;
+  if (resTorneo.status === "rejected" || resResumen.status === "rejected") errorCarga.value = true;
+  if (resTorneo.status === "rejected") {
+    isLoadingPartidas.value = false;
+    return;
+  }
 
   // Llamadas secundarias en background — actualizan reactivamente
   Promise.allSettled([
     getPartidasTorneoMas(idTorneo.value),
     getInscripcionesTorneo(idTorneo.value),
   ]).then(([resPartidas, resInscripciones]) => {
+    if ([resPartidas, resInscripciones].some(r => r.status === "rejected")) errorCarga.value = true;
     if (resPartidas.status === "fulfilled") {
       partidas.value = resPartidas.value.data;
       partidasPorRonda.value = partidas.value.reduce(
@@ -354,7 +370,9 @@ onMounted(async () => {
     if (resPartidas.status === "fulfilled") calcularClasificacion();
     isLoadingPartidas.value = false;
   });
-});
+};
+
+onMounted(cargar);
 
 const calcularClasificacion = async () => {
   const ranking: Record<
