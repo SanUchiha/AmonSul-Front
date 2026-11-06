@@ -49,6 +49,26 @@ const quitar = async () => {
   tokenRegistrado = "";
 };
 
+// Quien ya tiene el evento del aviso delante lo ve actualizado sin tocar nada. El aviso de una ronda llega a todos a la
+// vez y el servidor corta si le entran demasiadas peticiones juntas: cada móvil espera un rato al azar
+const ESPERA_MAX_REFRESCO_MS = 10000;
+let refrescoPendiente = false;
+
+const refrescarSiEstaEnPantalla = (ruta: string) => {
+  const destino = router.resolve(ruta);
+  const enPantalla = () => router.currentRoute.value.path === destino.path;
+  if (destino.name !== "detalle-evento" || !enPantalla() || refrescoPendiente) return;
+
+  refrescoPendiente = true;
+  setTimeout(() => {
+    refrescoPendiente = false;
+    // Se ha ido del evento, o está con una ventana abierta, como la de meter el resultado: no se le quita de delante
+    if (!enPantalla() || document.querySelector(".v-dialog.v-overlay--active")) return;
+    const { path, query } = router.currentRoute.value;
+    router.replace({ path, query: { ...query, aviso: String(Date.now()) } });
+  }, Math.random() * ESPERA_MAX_REFRESCO_MS);
+};
+
 const escuchar = () => {
   if (!Capacitor.isNativePlatform()) return;
 
@@ -70,6 +90,8 @@ const escuchar = () => {
 
   // Con la app abierta, Android no enseña nada; iOS sí, por presentationOptions
   FirebaseMessaging.addListener("notificationReceived", ({ notification }) => {
+    const { ruta } = (notification.data ?? {}) as { ruta?: string };
+    if (ruta) refrescarSiEstaEnPantalla(ruta);
     if (Capacitor.getPlatform() !== "android") return;
     useToast().triggerToast(
       "info",
