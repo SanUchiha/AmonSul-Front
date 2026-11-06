@@ -24,7 +24,7 @@
     </div>
 
     <v-spacer />
-    <!-- Los tres en una fila, a partes iguales: sin mayúsculas caben en el móvil -->
+    <!-- Los dos en una fila, a partes iguales. Los resultados se ven desde el evento -->
     <div class="d-flex ga-1 mt-3">
       <v-btn
         size="small"
@@ -37,16 +37,13 @@
       <v-btn size="small" variant="tonal" class="accion text-none" @click="emit('verInscripcion', inscripcion)">
         Inscripción
       </v-btn>
-      <v-btn size="small" variant="tonal" class="accion text-none" :to="rutaResultados">
-        {{ textoResultados }}
-      </v-btn>
     </div>
   </v-card>
 </template>
 
 <script setup lang="ts">
 import { computed, defineEmits, defineProps } from "vue";
-import { esPorJornadas, nombreEvento, textosEvento } from "@/Constant/FormatoTorneo";
+import { nombreEvento } from "@/Constant/FormatoTorneo";
 import { tipoTorneoOptions } from "@/Constant/TiposTorneo";
 import { formatFechaSpaWhitoutAsync } from "@/utils/Fecha";
 import { estadoLista } from "@/utils/estadoLista";
@@ -86,14 +83,6 @@ const lista = computed(() => estadoLista(props.inscripcion.estadoLista));
 const pagado = computed(
   () => props.inscripcion.esPago === true || String(props.inscripcion.esPago).toUpperCase() === "SI"
 );
-
-const textoResultados = computed(() =>
-  esPorJornadas(props.inscripcion.torneo.formatoTorneo)
-    ? `Ver ${textosEvento(props.inscripcion.torneo.formatoTorneo).el}`
-    : "Resultados"
-);
-// Los resultados están en el evento, en su pestaña
-const rutaResultados = computed(() => `/detalle-evento/${props.inscripcion.idTorneo}?tab=resultados`);
 </script>
 
 <style scoped>

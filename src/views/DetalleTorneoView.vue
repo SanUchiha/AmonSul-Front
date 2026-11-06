@@ -741,7 +741,7 @@ const vistaResultados = computed(() => {
   return t.listasPorJugador > 1 ? DetalleTorneoLiveMasView : DetalleTorneoLiveView;
 });
 
-// La pestaña va en la URL (?tab=resultados): Mis eventos enlaza directo a los resultados y al recargar se queda
+// La pestaña va en la URL (?tab=resultados): hay enlaces directos a los resultados y al recargar se queda
 const PESTANAS = ["detalle", "inscritos", "resultados"];
 watch(tab, valor => {
   if (route.query.tab !== valor) router.replace({ query: { ...route.query, tab: valor } });
