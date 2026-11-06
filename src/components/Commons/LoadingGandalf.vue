@@ -60,7 +60,7 @@ onMounted(updateText);
 }
 
 .card-background {
-  background-image: url("@/assets/images/Gandalf_Smoke.gif");
+  background-image: url("@/assets/images/Gandalf_Smoke.webp");
   background-size: cover; /* Ensures background covers entire card */
   background-position: center; /* Centers the background image */
   background-repeat: no-repeat; /* Prevents the background from repeating */
